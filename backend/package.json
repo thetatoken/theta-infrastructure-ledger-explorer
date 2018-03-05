@@ -1,0 +1,16 @@
+{
+  "name": "theta-explorer",
+  "version": "1.0.0",
+  "description": "blockchain explorer for theta token",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aerospike": "^3.2.0",
+    "bluebird": "^3.5.1",
+    "node-schedule": "^1.3.0"
+  }
+}
