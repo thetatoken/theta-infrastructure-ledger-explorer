@@ -1,0 +1,10 @@
+**/*.swo
+**/*.swp
+
+**/*.pyc
+**/*.py~
+
+desktop.ini
+
+**/*.log
+**/.DS_Store
