@@ -1,4 +1,4 @@
-var http = require("http")
+var http = require("http");
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -19,8 +19,7 @@ exports.GetBlock = function(params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-
-  ProcessHttpRequest(config.private_api_host, config.private_api_port, 'POST', '/rpc', body, callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +44,7 @@ var ProcessHttpRequest = function(host, port, method, path, requestBody, callbac
     path: path,
     headers: {'Content-Type': 'application/json'}
   };
-  if (config.log.log_level == 'debug'){
+  if (config.log.level == 'debug'){
     console.log('[Debug] ____');
     console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
   }

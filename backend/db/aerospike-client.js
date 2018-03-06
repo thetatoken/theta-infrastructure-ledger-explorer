@@ -7,7 +7,7 @@ let client = null;
 //------------------------------------------------------------------------------
 
 exports.init = function (hostIp, hostPort, namespace) {
-  client = Aerospike.client( {hosts: hostIp + ':' + hostPort});
+  client = Aerospike.client( {hosts: hostIp + ':' + hostPort.toString()});
   ns = namespace;
 }
 

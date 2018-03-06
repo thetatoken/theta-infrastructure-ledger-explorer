@@ -1,8 +1,9 @@
-var schedule = require('node-schedule')
+var schedule = require('node-schedule');
 var bluebird = require("bluebird");
-var rpc = require('./api/rpc.js')
-var aerospikeClient = require('./db/aerospike-client.js')
-var blockDao = require('./db/block-dao.js')
+var fs = require('fs');
+var rpc = require('./api/rpc.js');
+var aerospikeClient = require('./db/aerospike-client.js');
+var getBlockCronJob = require('./jobs/get-block.js')
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -19,7 +20,6 @@ main();
 //  All the implementation goes below
 //------------------------------------------------------------------------------
 
-
 function main() {
 
   // load config
@@ -33,6 +33,9 @@ function main() {
   }
   console.log(config);
 
+  rpc.SetConfig(config);
+  bluebird.promisifyAll(rpc);
+
   // connect to db
   aerospikeClient.init(config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
   aerospikeClient.connect(function (error) {
@@ -41,25 +44,14 @@ function main() {
       process.exit();
     } else {
       console.log('DB connection succeeded');
+      setupGetBlockCronJob(aerospikeClient);
     }
   });
+}
 
-  
-
-  blockDaoInstance = new blockDao(aerospikeClient);
-  blockInfo = {
-    height:      'a',
-    timeStamp:   '10230123',
-    hash:        '0x1234',
-    parentHash:  '0x4321'
-  }
-
-  blockDaoInstance.upsertBlock(blockInfo, null);
-
-  blockDaoInstance.getBlock('a', (record) => {
-    console.log('callback:'); console.log(record);
-  });
-
+function setupGetBlockCronJob(aerospikeClient) {
+  getBlockCronJob.Initialize(aerospikeClient);
+  schedule.scheduleJob('*/5 * * * * *', getBlockCronJob.Execute);
 }
 
 
