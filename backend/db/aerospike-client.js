@@ -1,6 +1,6 @@
 const Aerospike = require('aerospike')
-let ns = null;
-let client = null;
+var ns = null;
+var client = null;
 
 //------------------------------------------------------------------------------
 //  Initialization
@@ -27,11 +27,11 @@ exports.aerospikeDBParams = function() {
 }
 
 exports.put = function(set, pk, bins, meta, policy, callback) {
-  let key = new Aerospike.Key(ns, set, pk);
+  var key = new Aerospike.Key(ns, set, pk);
   client.put(key, bins, meta, policy, callback);
 }
 
 exports.get = function(set, pk, policy, callback) {
-  let key = new Aerospike.Key(ns, set, pk);
+  var key = new Aerospike.Key(ns, set, pk);
   client.get(key, policy, callback);
 }
