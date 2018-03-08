@@ -3,13 +3,19 @@ var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
 var aerospikeClient = require('./db/aerospike-client.js');
-var getBlockCronJob = require('./jobs/get-block.js')
+var statusDaoLib = require('./db/status-dao.js');
+var blockDaoLib = require('./db/block-dao.js');
+var progressDaoLib = require('./db/progress-dao.js')
+var readStatusCronJob = require('./jobs/read-status.js');
+var readBlockCronJob = require('./jobs/read-block.js');
 
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
 var config = null;
 var configFileName = 'config.cfg'
+var statusDao = null;
+var blockDao = null;
 
 //------------------------------------------------------------------------------
 //  Start from here
@@ -33,7 +39,7 @@ function main() {
   }
   console.log(config);
 
-  rpc.SetConfig(config);
+  rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
   // connect to db
@@ -50,8 +56,23 @@ function main() {
 }
 
 function setupGetBlockCronJob(aerospikeClient) {
-  getBlockCronJob.Initialize(aerospikeClient);
-  schedule.scheduleJob('*/5 * * * * *', getBlockCronJob.Execute);
+
+  // initialize DAOs
+  blockDao = new blockDaoLib(aerospikeClient);
+  bluebird.promisifyAll(blockDao);
+
+  progressDao = new progressDaoLib(aerospikeClient);
+  bluebird.promisifyAll(progressDao);
+
+  // statusDao = new statusDaoLib(aerospikeClient);
+  // bluebird.promisifyAll(statusDao);
+
+  // start cron jobs
+  // readStatusCronJob.Initialize(statusDao);
+  // schedule.scheduleJob('*/3 * * * * *', readStatusCronJob.Execute);
+  
+  readBlockCronJob.Initialize(progressDao, blockDao);
+  schedule.scheduleJob('*/3 * * * * *', readBlockCronJob.Execute);
 }
 
 

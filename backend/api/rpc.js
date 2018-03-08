@@ -8,14 +8,24 @@ var config = null;
 //------------------------------------------------------------------------------
 //  APIs
 //------------------------------------------------------------------------------
-exports.SetConfig = function(cfg) {
+exports.setConfig = function(cfg) {
   config = cfg;
 }
 
-exports.GetBlock = function(params, callback) {
+exports.getBlock = function(params, callback) {
   body = {
     jsonrpc: '2.0',
     method: 'theta.GetBlock',
+    params: params,
+    id: RandomIdGenerator()
+  }
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+}
+
+exports.getStatus = function(params, callback) {
+  body = {
+    jsonrpc: '2.0',
+    method: 'theta.GetStatus',
     params: params,
     id: RandomIdGenerator()
   }
