@@ -43,7 +43,7 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   // connect to db
-  aerospikeClient.init(config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
+  aerospikeClient.init(__dirname, config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
   aerospikeClient.connect(function (error) {
     if (error) {
       console.log('DB connection failed');
