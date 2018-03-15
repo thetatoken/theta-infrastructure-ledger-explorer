@@ -1,5 +1,3 @@
-var Aerospike = require('aerospike')
-
 //------------------------------------------------------------------------------
 //  DAO for chain status
 //------------------------------------------------------------------------------
@@ -7,11 +5,12 @@ var Aerospike = require('aerospike')
 module.exports = class StatusDAO {
 
   constructor(execDir, client) {
-    const Aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
+    this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
+
     this.client = client;
     this.statusInfoSet = 'status';
-    this.upsertPolicy = new Aerospike.WritePolicy({
-      exists: Aerospike.policy.exists.CREATE_OR_REPLACE
+    this.upsertPolicy = new this.aerospike.WritePolicy({
+      exists: this.aerospike.policy.exists.CREATE_OR_REPLACE
     });
   }
 

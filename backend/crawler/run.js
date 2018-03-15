@@ -6,7 +6,7 @@ var aerospikeClient = require('../db/aerospike-client.js');
 var statusDaoLib = require('../db/status-dao.js');
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js')
-var readStatusCronJob = require('./jobs/read-status.js');
+//var readStatusCronJob = require('./jobs/read-status.js');
 var readBlockCronJob = require('./jobs/read-block.js');
 
 //------------------------------------------------------------------------------
@@ -57,10 +57,10 @@ function main() {
 
 function setupGetBlockCronJob(aerospikeClient) {
   // initialize DAOs
-  blockDao = new blockDaoLib(aerospikeClient);
+  blockDao = new blockDaoLib(__dirname, aerospikeClient);
   bluebird.promisifyAll(blockDao);
 
-  progressDao = new progressDaoLib(aerospikeClient);
+  progressDao = new progressDaoLib(__dirname, aerospikeClient);
   bluebird.promisifyAll(progressDao);
 
   // statusDao = new statusDaoLib(aerospikeClient);
