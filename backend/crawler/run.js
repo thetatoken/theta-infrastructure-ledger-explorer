@@ -2,10 +2,10 @@ var schedule = require('node-schedule');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
-var aerospikeClient = require('./db/aerospike-client.js');
-var statusDaoLib = require('./db/status-dao.js');
-var blockDaoLib = require('./db/block-dao.js');
-var progressDaoLib = require('./db/progress-dao.js')
+var aerospikeClient = require('../db/aerospike-client.js');
+var statusDaoLib = require('../db/status-dao.js');
+var blockDaoLib = require('../db/block-dao.js');
+var progressDaoLib = require('../db/progress-dao.js')
 var readStatusCronJob = require('./jobs/read-status.js');
 var readBlockCronJob = require('./jobs/read-block.js');
 
@@ -56,7 +56,6 @@ function main() {
 }
 
 function setupGetBlockCronJob(aerospikeClient) {
-
   // initialize DAOs
   blockDao = new blockDaoLib(aerospikeClient);
   bluebird.promisifyAll(blockDao);

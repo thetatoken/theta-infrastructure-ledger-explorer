@@ -6,7 +6,8 @@ var Aerospike = require('aerospike')
 
 module.exports = class StatusDAO {
 
-  constructor(client) {
+  constructor(execDir, client) {
+    const Aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
     this.client = client;
     this.statusInfoSet = 'status';
     this.upsertPolicy = new Aerospike.WritePolicy({

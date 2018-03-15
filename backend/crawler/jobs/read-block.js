@@ -29,8 +29,8 @@ exports.Execute = function(callback) {
     console.log('Latest block height: ' + latest_block_height.toString());
     return progressDao.getProgressAsync(network_id);
   })
-  .then(function (record) {
-    var crawled_block_height_progress = record.bins.lst_blk_height; 
+  .then(function (progressInfo) {
+    var crawled_block_height_progress = progressInfo.height; 
     console.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
     if (latest_block_height > crawled_block_height_progress) {

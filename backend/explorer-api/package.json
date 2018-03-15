@@ -1,0 +1,18 @@
+{
+  "name": "explorer-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "run.js",
+  "dependencies": {
+    "aerospike": "^3.2.0",
+    "bluebird": "^3.5.1",
+    "express": "^4.16.3",
+    "socketio": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
