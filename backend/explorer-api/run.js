@@ -84,7 +84,7 @@ function pushTopBlocks() {
         io.sockets.emit('event', {type: 'block_list', body: blockInfoList});
     });
 
-    setTimeout(pushTopBlocks, 2000);
+    setTimeout(pushTopBlocks, 1000);
 }
 
 function onReceiveBlockQuery(req, res) {
