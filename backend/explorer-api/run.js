@@ -67,7 +67,7 @@ function onClientConnect(client) {
 }
 
 function pushTopBlocks() {
-    numberOfBlocks = 50;
+    numberOfBlocks = 20;
 
     progressDao.getProgressAsync(config.blockchain.network_id)
     .then(function(progressInfo) {
