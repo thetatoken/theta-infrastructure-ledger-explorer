@@ -71,7 +71,7 @@ function setupGetBlockCronJob(aerospikeClient) {
   // schedule.scheduleJob('*/3 * * * * *', readStatusCronJob.Execute);
   
   readBlockCronJob.Initialize(progressDao, blockDao);
-  schedule.scheduleJob('*/3 * * * * *', readBlockCronJob.Execute);
+  schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
 }
 
 
