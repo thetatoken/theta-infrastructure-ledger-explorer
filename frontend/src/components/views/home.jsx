@@ -4,7 +4,7 @@ import socketClient from 'socket.io-client';
 
 
 class BlockInfoRows extends Component {
-  render () {
+  render() {
     const { blockInfoList } = this.props;
     // var blocks = [].concat(blockInfoList)
     //   .sort((a,b) => a.height > b.height)
@@ -19,28 +19,32 @@ class BlockInfoRows extends Component {
 
     return (
       <div>
-        <table class="tableContainer" cellspacing="10px" >
-          <td width='300'>Creation Timestamp</td>
-          <td width='200'>Block Height</td>
-          <td width='300'>Block Hash</td>
-          <td width='300'>Number of Transactions</td>
-          <td width='300'>Parent Hash</td>
-          <td width='300'>Data Hash</td>
-          {blockInfoList
-            .sort((a,b) => b.height - a.height)
-            .map(function (blockInfo, i) {
-              return (
-                <tr key={blockInfo.height}>
-                  <td width='300'>{blockInfo.timestamp}</td>
-                  <td width='200'>{blockInfo.height}</td>
-                  <td width='300'>{blockInfo.hash}</td>
-                  <td width='300'>{blockInfo.num_txs}</td>
-                  <td width='300'>{blockInfo.parent_hash}</td>
-                  <td width='300'>{blockInfo.data_hash}</td>
-                </tr>
-              );
-            }
-          )}
+        <table className="tableContainer" cellSpacing="10px" >
+          <tbody>
+            <tr>
+              <th width='300'>Creation Timestamp</th>
+              <th width='200'>Block Height</th>
+              <th width='300'>Block Hash</th>
+              <th width='300'>Number of Transactions</th>
+              <th width='300'>Parent Hash</th>
+              <th width='300'>Data Hash</th>
+            </tr>
+            {blockInfoList
+              .sort((a, b) => b.height - a.height)
+              .map(blockInfo => {
+                return (
+                  <tr key={blockInfo.height}>
+                    <td width='300'>{blockInfo.timestamp}</td>
+                    <td width='200'>{blockInfo.height}</td>
+                    <td width='300'>{blockInfo.hash}</td>
+                    <td width='300'>{blockInfo.num_txs}</td>
+                    <td width='300'>{blockInfo.parent_hash}</td>
+                    <td width='300'>{blockInfo.data_hash}</td>
+                  </tr>
+                );
+              }
+              )}
+          </tbody>
         </table>
       </div>
     );
@@ -70,7 +74,7 @@ export default class Home extends Component {
   onSocketEvent(data) {
     console.log(data);
     if (data.type == 'block_list') {
-      this.setState( {blockInfoList: data.body} )
+      this.setState({ blockInfoList: data.body })
     }
   }
 
