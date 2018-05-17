@@ -1,10 +1,11 @@
 import React, { Component } from "react";
+// import './styles.scss';
 
-export default class NewHome extends Component {
+export default class Dashboard extends Component {
   render() {
     return (
       <div>
-        this is new home
+        this is dashboard
       </div>
     );
   }

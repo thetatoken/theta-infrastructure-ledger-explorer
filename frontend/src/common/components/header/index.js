@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router"
+// import './styles.scss';
+
 export default class Header extends Component {
   render() {
     return (
       <div>
         this is header
-        <Link to="/home">
+        <Link to="/dashboard">
           <button>Overview</button>
         </Link>
         <Link to="/blocks">
