@@ -15,9 +15,10 @@ const app = document.querySelector('#app');
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
-      <IndexRoute component={Home} backendAddress="52.53.243.120:9000"/>
+      <IndexRoute component={NewHome} backendAddress="52.53.243.120:9000"/>
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/home' component={NewHome} />
+      <Route path='/txs' component={Home} backendAddress="52.53.243.120:9000"/>
     </Route>
   </Router>,
   app

@@ -55,7 +55,8 @@ export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      // backendAddress: this.props.route.backendAddress,
+      backendAddress: "52.53.243.120:9000",
       blockHeight: 0,
       blockInfoList: []
     };
@@ -63,14 +64,16 @@ export default class Home extends Component {
   }
 
   componentDidMount() {
-    browserHistory.push('/');
+    browserHistory.push('/txs');
 
     const { backendAddress } = this.state;
-    console.log(backendAddress);
+    // console.log(backendAddress);
     this.socket = socketClient(backendAddress);
     this.socket.on('event', this.onSocketEvent)
   }
-
+  componentWillUnmount(){
+    this.socket.disconnect();
+  }
   onSocketEvent(data) {
     console.log(data);
     if (data.type == 'block_list') {
@@ -83,7 +86,8 @@ export default class Home extends Component {
     return (
       <div id="home">
         Blockchain Exploror v0.1
-        <BlockInfoRows blockInfoList={blockInfoList} />
+        { blockInfoList !== undefined ?
+        <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
       </div>
     );
   }
