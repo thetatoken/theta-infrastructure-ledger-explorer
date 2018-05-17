@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 
-export default class NewHome extends Component {
+export default class Blocks extends Component {
   render() {
     return (
       <div>
-        this is new home
+        this is blocks page
       </div>
     );
   }

@@ -8,6 +8,9 @@ export default class Header extends Component {
         <Link to="/home">
           <button>Overview</button>
         </Link>
+        <Link to="/blocks">
+          <button>Blocks</button>
+        </Link>
         <Link to="/txs">
           <button>Transaction</button>
         </Link>
