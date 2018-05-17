@@ -42,8 +42,7 @@ class BlockInfoRows extends Component {
                     <td width='300'>{blockInfo.data_hash}</td>
                   </tr>
                 );
-              }
-              )}
+              })}
           </tbody>
         </table>
       </div>

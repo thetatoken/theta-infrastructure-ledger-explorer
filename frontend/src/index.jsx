@@ -2,11 +2,9 @@ import React from 'react';
 import ReactDom from 'react-dom';
 
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
-import routes from './routes';
 import Home from './components/views/home';
 import App from './components/app';
 import NewHome from './components/views/new-home'
-import Routes from './routes'
 
 require('./stylesheets/home.scss');
 
