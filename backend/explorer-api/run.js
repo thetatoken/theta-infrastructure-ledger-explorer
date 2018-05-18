@@ -61,7 +61,7 @@ function main() {
             server.listen('3000');
 
             //REST service
-            routes(app, blockDao);
+            routes(app, blockDao, progressDao, config);
 
             // keep push block data
             // pushTopBlocks();
