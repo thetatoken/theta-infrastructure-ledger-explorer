@@ -7,7 +7,8 @@ var bluebird = require("bluebird");
 var asClient = require('../db/aerospike-client.js')
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
-
+var bodyParser = require("body-parser");
+var routes = require("./routes/routes.js");
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -21,14 +22,12 @@ var isPushing = false;
 //------------------------------------------------------------------------------
 
 main();
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// routes(app);
-
-// var server = app.listen(config.server.port, () => {
-//     console.log("app running on port.", server.address().port);
-// });
+var restServer = app.listen(config.server.port, () => {
+    console.log("rest api running on port.", 9000);
+});
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -58,8 +57,11 @@ function main() {
             
             // start server program
             io.on('connection', onClientConnect);
-            server.listen(config.server.port);
+            // server.listen(config.server.port);
+            server.listen('3000');
 
+            //REST service
+            routes(app, blockDao);
 
             // keep push block data
             // pushTopBlocks();

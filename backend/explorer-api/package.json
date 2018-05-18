@@ -7,7 +7,8 @@
     "aerospike": "^3.2.0",
     "bluebird": "^3.5.1",
     "express": "^4.16.3",
-    "socketio": "^1.0.0"
+    "socketio": "^1.0.0",
+    "body-parser": "^1.18.3"
   },
   "devDependencies": {},
   "scripts": {
