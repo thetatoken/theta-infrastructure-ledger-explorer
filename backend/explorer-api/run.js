@@ -15,13 +15,20 @@ var progressDaoLib = require('../db/progress-dao.js');
 var config = null;
 var configFileName = 'config.cfg';
 var blockDao = null;
-
+var isPushing = false;
 //------------------------------------------------------------------------------
 //  Start from here
 //------------------------------------------------------------------------------
 
 main();
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
+// routes(app);
+
+// var server = app.listen(config.server.port, () => {
+//     console.log("app running on port.", server.address().port);
+// });
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -55,13 +62,15 @@ function main() {
 
 
             // keep push block data
-            pushTopBlocks();
+            // pushTopBlocks();
         }
     });
 }
 
 function onClientConnect(client) {
     console.log('client connected.');
+    isPushing = true;
+    pushTopBlocks();
     // setup client event listeners
     client.on('disconnect', onClientDisconnect);
 }
@@ -84,7 +93,7 @@ function pushTopBlocks() {
         io.sockets.emit('event', {type: 'block_list', body: blockInfoList});
     });
 
-    setTimeout(pushTopBlocks, 1000);
+    if(isPushing) setTimeout(pushTopBlocks, 1000);
 }
 
 function onReceiveBlockQuery(req, res) {
@@ -100,5 +109,6 @@ function onReceiveBlockQuery(req, res) {
 }
 
 function onClientDisconnect() {
+    isPushing = false;
     console.log('client disconnect');
 }
