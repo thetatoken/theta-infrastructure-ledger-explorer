@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
-import BlockInfoRows from './components/blockInfoRows'
+import BlockInfoRows from './components/blockInfoRows';
+import { blocksService } from '/common/services/block';
 // import './styles.scss';
 
 // class BlockInfoRows extends Component {
@@ -57,7 +58,8 @@ export default class Blocks extends Component {
     this.state = {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
-      backendAddress: "localhost:3000",
+      backendAddress: "localhost:9000",
+      // backendAddress: "localhost:3000",
       blockHeight: 0,
       blockInfoList: []
     };
@@ -68,12 +70,19 @@ export default class Blocks extends Component {
     browserHistory.push('/blocks');
 
     const { backendAddress } = this.state;
+    blocksService.getTopBlocks()
+      .then(res => {
+        this.onSocketEvent(res);
+      }).catch(err => {
+
+      })
     // console.log(backendAddress);
-    this.socket = socketClient(backendAddress);
-    this.socket.on('event', this.onSocketEvent)
+    // this.socket = socketClient(backendAddress);
+    // this.socket.on('event', this.onSocketEvent)
+
   }
-  componentWillUnmount(){
-    this.socket.disconnect();
+  componentWillUnmount() {
+    // this.socket.disconnect();
   }
   onSocketEvent(data) {
     console.log(data);
@@ -87,8 +96,8 @@ export default class Blocks extends Component {
     return (
       <div id="home">
         Blockchain Exploror v0.1
-        { blockInfoList !== undefined ?
-        <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
+        {blockInfoList !== undefined ?
+          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
       </div>
     );
   }
