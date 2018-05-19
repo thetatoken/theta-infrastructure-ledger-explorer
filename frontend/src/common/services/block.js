@@ -8,6 +8,6 @@ export const blocksService = {
     return apiService.get(`block/${blockHeight}`, {});
   },
   getTopBlocks() {
-    return apiService.get(`blocks/top_block`);
+    return apiService.get(`blocks/top_blocks`);
   },
 };

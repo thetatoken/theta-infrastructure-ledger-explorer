@@ -9,6 +9,7 @@ var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
 var bodyParser = require("body-parser");
 var routes = require("./routes/routes.js");
+var cors = require('cors')
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -22,6 +23,7 @@ var isPushing = false;
 //------------------------------------------------------------------------------
 
 main();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -61,7 +63,7 @@ function main() {
             server.listen('3000');
 
             //REST service
-            routes(app, blockDao, progressDao, config);
+            routes(app, blockDao, progressDao, config);            
 
             // keep push block data
             // pushTopBlocks();

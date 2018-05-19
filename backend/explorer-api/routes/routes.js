@@ -1,9 +1,9 @@
-var appRouter = (app, blockDao, progressDao, config) => {
+var router = (app, blockDao, progressDao, config) => {
   // app.get("/", (req, res) => {
   //   res.status(200).send("Welcome to our restful API");
   // });
 
-  app.get("/block/:id", (req, res) => {
+  app.get("/api/block/:id", (req, res) => {
     let blockId = req.params.id;
     console.log('Querying block by using Id' + blockId);
     blockDao.getBlockAsync(Number(blockId))
@@ -15,7 +15,7 @@ var appRouter = (app, blockDao, progressDao, config) => {
         res.status(200).send(data);
       });
   });
-  app.get("/blocks/top_blocks", (req, res) => {
+  app.get("/api/blocks/top_blocks", (req, res) => {
     numberOfBlocks = 20;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
@@ -36,5 +36,8 @@ var appRouter = (app, blockDao, progressDao, config) => {
         res.status(200).send(data);
       });
   })
+  app.use('/api', router); 
+
 }
-module.exports = appRouter;
+
+module.exports = router;

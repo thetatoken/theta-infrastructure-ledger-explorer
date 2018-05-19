@@ -1,6 +1,6 @@
 import { httpClient } from './http';
 import Raven from 'raven-js';
-const API_URI = 'localhost:9000/api'
+const API_URI = 'http://localhost:9000/api'
 
 
 export const apiService = {
