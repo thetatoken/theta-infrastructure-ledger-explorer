@@ -1,25 +1,26 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
-import BlockInfoRows from './components/block-info-rows';
+import BlockInfoRows from './block-info-rows';
 import { blocksService } from '/common/services/block';
 // import './styles.scss';
 
-export default class Blocks extends Component {
+export default class BlocksExplorer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
-      // backendAddress: "localhost:3000",
-      blockHeight: 0,
-      blockInfoList: []
+      blockHeight: null,
+      blockInfo: {}
     };
     this.receivedBlocksEvent = this.receivedBlocksEvent.bind(this);
   }
 
   componentDidMount() {
+    const { blockHeight } = this.props.match.params;
+    console.log(blockHeight);
     browserHistory.push('/blocks');
 
     const { backendAddress } = this.state;
