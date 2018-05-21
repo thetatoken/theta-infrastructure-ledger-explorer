@@ -17,13 +17,13 @@ var blockRouter = (app, blockDao, progressDao, config) => {
       });
   });
   router.get("/blocks/top_blocks", (req, res) => {
-    numberOfBlocks = 20;
+    numberOfBlocks = 10;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_block_height = progressInfo.height;
         console.log('Latest block height: ' + latest_block_height.toString());
         var query_block_height_max = latest_block_height;
-        var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks); // pushing 100 blocks initially
+        var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 100 blocks initially
         console.log('REST api querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
         //return blockDao.getBlockAsync(123) 
         return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)

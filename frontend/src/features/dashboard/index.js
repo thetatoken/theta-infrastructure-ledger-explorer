@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import BlocksOverView from "./components/blocks-overview";
 // import './styles.scss';
 
 export default class Dashboard extends Component {
@@ -6,6 +7,7 @@ export default class Dashboard extends Component {
     return (
       <div>
         this is a dashboard
+        <BlocksOverView />
       </div>
     );
   }
