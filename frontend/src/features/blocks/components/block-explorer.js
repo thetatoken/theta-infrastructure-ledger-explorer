@@ -3,6 +3,8 @@ import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
 import BlockInfoRows from './block-info-rows';
 import { blocksService } from '/common/services/block';
+import { Link } from "react-router"
+
 // import './styles.scss';
 
 export default class BlocksExplorer extends Component {
@@ -12,46 +14,42 @@ export default class BlocksExplorer extends Component {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
-      blockHeight: null,
-      blockInfo: {}
+      blockInfo: null
     };
-    this.receivedBlocksEvent = this.receivedBlocksEvent.bind(this);
   }
-
+  componentWillUpdate(nextProps, nextState){
+    if(nextProps.params.blockHeight !== this.props.params.blockHeight){
+      this.gerOneBlockByHeight(nextProps.params.blockHeight);
+    }
+  }
   componentDidMount() {
-    const { blockHeight } = this.props.match.params;
-    console.log(blockHeight);
-    browserHistory.push('/blocks');
+    const { blockHeight } = this.props.params;
+    browserHistory.push(`/blocks/${blockHeight}`);
 
     const { backendAddress } = this.state;
-    blocksService.getTopBlocks()
+    this.gerOneBlockByHeight(blockHeight);
+  }
+  gerOneBlockByHeight(height){
+    blocksService.getBlockByHeight(height)
       .then(res => {
-        this.receivedBlocksEvent(res);
+        if (res.data.type == 'block') {
+          this.setState({ blockInfo: res.data.body })
+        }
       }).catch(err => {
         console.log(err);
       })
-    // Initial the socket
-    // this.socket = socketClient(backendAddress);
-    // this.socket.on('event', this.onSocketEvent)
-
-  }
-  componentWillUnmount() {
-    // this.socket.disconnect();
-  }
-  receivedBlocksEvent(data) {
-    console.log(data);
-    if (data.data.type == 'block_list') {
-      this.setState({ blockInfoList: data.data.body })
-    }
   }
 
   render() {
-    const { blockInfoList } = this.state;
+    const { blockInfo } = this.state;
+    const height = Number(this.props.params.blockHeight);
     return (
       <div>
-        Blockchain Exploror v0.1
-        {blockInfoList !== undefined ?
-          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
+        <Link to={"/blocks"}><button>Back to Blocks</button></Link>
+        <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
+        <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link>
+        {blockInfo !== null ?
+          <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>}
       </div>
     );
   }

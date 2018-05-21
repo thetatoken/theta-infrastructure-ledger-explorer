@@ -1,7 +1,7 @@
 import { apiService } from './api';
 
 export const blocksService = {
-  getBlockByHeight({ blockHeight }) {
+  getBlockByHeight(blockHeight) {
     if (!blockHeight) {
       throw Error('Missing argument');
     }

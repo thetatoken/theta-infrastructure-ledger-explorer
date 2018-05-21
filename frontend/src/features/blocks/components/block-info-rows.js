@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router"
 // import '../styles.scss';
 
 export default class BlockInfoRows extends Component {
@@ -13,7 +14,6 @@ export default class BlockInfoRows extends Component {
       //     </React.Fragment>
       //   );
       // });  <p>Height        Hash        Timestamp</p>
-  
   
       return (
         <div>
@@ -34,7 +34,7 @@ export default class BlockInfoRows extends Component {
                     <tr key={blockInfo.height}>
                       <td width='300'>{blockInfo.timestamp}</td>
                       <td width='200'>{blockInfo.height}</td>
-                      <td width='300'>{blockInfo.hash}</td>
+                      <td width='300'><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
                       <td width='300'>{blockInfo.num_txs}</td>
                       <td width='300'>{blockInfo.parent_hash}</td>
                       <td width='300'>{blockInfo.data_hash}</td>

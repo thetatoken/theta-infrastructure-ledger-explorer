@@ -6,7 +6,7 @@ import Dashboard from './features/dashboard';
 import App from './app';
 import Transactions from './features/blocks' //TODO: need to change to features/transactions later
 import Blocks from './features/blocks'
-// import BlockExplorer from './features/blocks/components/block-explorer'
+import BlockExplorer from './features/blocks/components/block-explorer'
 import './styles.scss';
 
 const app = document.querySelector('#app');
@@ -17,8 +17,8 @@ ReactDom.render(
       {/* <IndexRoute component={NewHome} backendAddress="52.53.243.120:9000"/> */}
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} />
-      <Route path='/blocks' component={Blocks} backendAddress={backendAddress}/>
-      {/* <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/> */}
+      <Route exact path='/blocks' component={Blocks} backendAddress={backendAddress}/>
+      <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/>
       <Route path='/txs' component={Transactions} backendAddress={backendAddress}/>
     </Route>
   </Router>,
