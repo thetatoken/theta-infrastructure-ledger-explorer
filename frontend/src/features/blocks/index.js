@@ -72,11 +72,11 @@ export default class Blocks extends Component {
     const { backendAddress } = this.state;
     blocksService.getTopBlocks()
       .then(res => {
-        this.onSocketEvent(res);
+        this.receivedBlocksEvent(res);
       }).catch(err => {
-
+        console.log(err);
       })
-    // console.log(backendAddress);
+    // Initial the socket
     // this.socket = socketClient(backendAddress);
     // this.socket.on('event', this.onSocketEvent)
 
@@ -84,10 +84,10 @@ export default class Blocks extends Component {
   componentWillUnmount() {
     // this.socket.disconnect();
   }
-  onSocketEvent(data) {
+  receivedBlocksEvent(data) {
     console.log(data);
-    if (data.type == 'block_list') {
-      this.setState({ blockInfoList: data.body })
+    if (data.data.type == 'block_list') {
+      this.setState({ blockInfoList: data.data.body })
     }
   }
 
