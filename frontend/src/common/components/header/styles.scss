@@ -1,0 +1,32 @@
+.theta-header{
+    a{
+        text-decoration: none;
+    }
+    // a:active{
+    //     color: black;
+    // }
+    height: 80px;
+    display: flex;
+    &__logo{
+        height: 40px;
+        width: 120px;
+        margin: 0;
+        text-align: center;
+        line-height: 40px;
+        color: white;
+        font-size: 24px;
+        background-color: #1c1f29;
+    }
+    &__logo:actice{
+        color: white;
+    }
+    &__navigator{
+        height: 60px;
+        margin: 0;
+        display: flex;
+        &--button{
+            margin: 15px;
+            color: white;
+        }
+    }
+}

@@ -9,12 +9,12 @@ import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
 import './styles.scss';
 
-const app = document.querySelector('#app');
+const app = document.querySelector('#root');
 const backendAddress = "52.53.243.120:9000";
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
-      {/* <IndexRoute component={NewHome} backendAddress="52.53.243.120:9000"/> */}
+      <IndexRoute component={Dashboard}/>
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} />
       <Route exact path='/blocks' component={Blocks} backendAddress={backendAddress}/>
