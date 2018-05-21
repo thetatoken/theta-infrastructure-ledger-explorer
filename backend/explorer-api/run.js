@@ -8,7 +8,7 @@ var asClient = require('../db/aerospike-client.js')
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
 var bodyParser = require("body-parser");
-var routes = require("./routes/routes.js");
+var blocksRouter = require("./routes/blocksRouter");
 var cors = require('cors')
 
 //------------------------------------------------------------------------------
@@ -24,8 +24,8 @@ var isPushing = false;
 
 main();
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 var restServer = app.listen(config.server.port, () => {
     console.log("rest api running on port.", 9000);
@@ -62,9 +62,9 @@ function main() {
             // server.listen(config.server.port);
             server.listen('3000');
 
-            //REST service
-            routes(app, blockDao, progressDao, config);            
-
+            //REST services
+            //blocks router
+            blocksRouter(app, blockDao, progressDao, config);            
             // keep push block data
             // pushTopBlocks();
         }

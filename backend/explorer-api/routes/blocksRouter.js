@@ -1,11 +1,12 @@
-var router = (app, blockDao, progressDao, config) => {
-  // app.get("/", (req, res) => {
-  //   res.status(200).send("Welcome to our restful API");
-  // });
+var express = require('express');
+var router = express.Router();
+var bodyParser = require('body-parser');
 
-  app.get("/api/block/:id", (req, res) => {
+var blockRouter = (app, blockDao, progressDao, config) => {
+  router.use(bodyParser.urlencoded({ extended: true }));
+  router.get("/block/:id", (req, res) => {
     let blockId = req.params.id;
-    console.log('Querying block by using Id' + blockId);
+    console.log('Querying one block by using Id: ' + blockId);
     blockDao.getBlockAsync(Number(blockId))
       .then(blockInfo => {
         var data = ({
@@ -15,13 +16,12 @@ var router = (app, blockDao, progressDao, config) => {
         res.status(200).send(data);
       });
   });
-  app.get("/api/blocks/top_blocks", (req, res) => {
+  router.get("/blocks/top_blocks", (req, res) => {
     numberOfBlocks = 20;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_block_height = progressInfo.height;
         console.log('Latest block height: ' + latest_block_height.toString());
-
         var query_block_height_max = latest_block_height;
         var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks); // pushing 100 blocks initially
         console.log('REST api querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
@@ -36,8 +36,8 @@ var router = (app, blockDao, progressDao, config) => {
         res.status(200).send(data);
       });
   })
-  app.use('/api', router); 
-
+  //the / route of router will get mapped to /api
+  app.use('/api', router);
 }
 
-module.exports = router;
+module.exports = blockRouter;
