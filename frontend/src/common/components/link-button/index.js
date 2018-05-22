@@ -5,12 +5,12 @@ import './styles.scss';
 export default class LinkButton extends Component {
   renderLeftArrow(left){
     return(
-      left ? <div className="th-link-button__container--left">&#8678;</div> : null
+      left ? <div>&#8678;</div> : null
     )
   }
   renderRightArrow(right){
     return(
-      right ? <div className="th-link-button__container--right">&#8680;</div> : null
+      right ? <div>&#8680;</div> : null
     )
   }
   render() {
@@ -19,7 +19,7 @@ export default class LinkButton extends Component {
       <Link to={url} className={`${className} th-link-button`}>
         <div className="th-link-button__container">
           {this.renderLeftArrow(left)}
-          <div className="th-link-button__container--content">{children}</div>
+          <div>{children}</div>
           {this.renderRightArrow(right)}
         </div>
       </Link>

@@ -16,18 +16,8 @@ $line-height: 40px;
     border: 2px solid $th-blue;
     text-decoration: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     line-height: 36px;
     border-radius: 5px;
-    // padding: 0 10px;
-    &--left{
-      margin-left: 10px;
-    }
-    &--right{
-      margin-right: 10px;
-    }
-    &--content{
-      margin: 0 10px;
-    }
   }
 }
