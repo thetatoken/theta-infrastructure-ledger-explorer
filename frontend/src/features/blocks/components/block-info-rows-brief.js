@@ -11,16 +11,16 @@ export default class BlockInfoRowsBrief extends Component {
         <table className="tableContainer" cellSpacing="10px" >
           <tbody>
             <tr>
-              <th width='200'>Block Height</th>
-              <th width='300'>Block Hash</th>
+              <th>Block Height</th>
+              <th>Block Hash</th>
             </tr>
             {blockInfoList
               .sort((a, b) => b.height - a.height)
               .map(blockInfo => {
                 return (
                   <tr key={blockInfo.height}>
-                    <td width='200'>{blockInfo.height}</td>
-                    <td width='300'><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
+                    <td>{blockInfo.height}</td>
+                    <td><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
                   </tr>
                 );
               })}

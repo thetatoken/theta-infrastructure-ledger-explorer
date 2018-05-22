@@ -1,57 +1,72 @@
+@import 'styles/_variables.scss';
+
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
 }
-
+a {
+  color: $th-grey-lighter;
+  // hover function
+  // &:hover{
+  //   @include linearHorizontalGradient($th-blue, $th-green);
+  //   -webkit-background-clip: text;
+  //   -webkit-text-fill-color: transparent;
+  // }
+}
 body {
   overflow: hidden;
   color: white;
   background: #1b1f2a;
   font-family: "AlwynNew", sans-serif;
   -webkit-font-smoothing: antialiased;
+  &:before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("/public/images/center-glow.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: -1;
+  }
 }
-body:before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("/public/images/center-glow.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-  z-index: -1;
+
+#root{
+  &:before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("/public/images/red-glow-top-right.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: top right;
+    pointer-events: none;
+    z-index: -1;
+  }
 }
-#root:before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("/public/images/red-glow-top-right.png");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: top right;
-  pointer-events: none;
-  z-index: -1;
-}
-.theta-container:before{
-  content: '';
-  position: absolute;
-  top: calc(63px - 180px);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url("/public/images/grid_transparent_tile.png");
-  background-size: 180px;
-  background-repeat: repeat;
-  background-position: top right;
-  pointer-events: none;
-  z-index: -1;
+.theta-container{
+  &:before{
+    content: '';
+    position: absolute;
+    top: calc(63px - 180px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("/public/images/grid_transparent_tile.png");
+    background-size: 180px;
+    background-repeat: repeat;
+    background-position: top right;
+    pointer-events: none;
+    z-index: -1;
+  }
 }
 .theta-content{
   margin: 0 140px 0 140px;

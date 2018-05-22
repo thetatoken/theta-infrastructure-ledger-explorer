@@ -1,70 +1,60 @@
 @import 'styles/_variables.scss';
 
 .theta-header{
+  height: 60px;
+  display: flex;
+  padding-left: 140px;
+  padding-right: 140px;
+
+  a{
+    text-decoration: none;
+  }
+
+  &__logo{
+    height: 40px;
+    width: 120px;
+    margin: 0;
+    text-align: center;
+    line-height: 40px;
+    color: white;
+    font-size: 24px;
+    background-color: #1c1f29;
+
+    &:actice{
+      color: white;
+    }
+  }
+  &__navigator{
     height: 60px;
+    margin: 0 0 0 120px;
     display: flex;
-    padding-left: 140px;
-    padding-right: 140px;
-    a{
-        text-decoration: none;
-    }
 
-    &__logo{
-        height: 40px;
-        width: 120px;
-        margin: 0;
-        text-align: center;
-        line-height: 40px;
-        color: white;
-        font-size: 24px;
-        background-color: #1c1f29;
-    }
-    &__logo:actice{
-        color: white;
-    }
-    &__navigator{
-        height: 60px;
-        margin: 0 0 0 120px;
-        display: flex;
+    &--button{
+      margin: 21px;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      line-height: 15px;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
 
-        &--button{
-            margin: 21px;
-            color: white;
-            // font-family: 'Rift';
-            font-size: 15px;
-            font-weight: bold;
-            letter-spacing: 4.0px;
-            line-height: 15px;
-            background: white;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-            white-space: nowrap;
-            overflow: hidden;
-            &:hover{
-                @include linearHorizontalGradient($th-blue, $th-green);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-        }
-        &--button:after{
-            height: 2px;
-            width: calc(100% - 3px);
-            opacity: 0.0;
-            transition: opacity 0.3s ease-in-out;
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -5px;
-            background: url("/public/images/dot_strip.png");
-            z-index: -1;
-        }
+      &:hover{
+        @include linearHorizontalGradient($th-blue, $th-green);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
     }
+  }
 }
 .theta-logo{
-    height: 25px;
-    width: 90px;
-    background: url("/public/images/nav-logo.png");
-    background-size: 90px 25px;
-    margin-top: 17px;
+  height: 25px;
+  width: 90px;
+  background: url("/public/images/nav-logo.png");
+  background-size: 90px 25px;
+  margin-top: 17px;
 }
