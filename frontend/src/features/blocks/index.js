@@ -48,7 +48,6 @@ export default class Blocks extends Component {
     const { blockInfoList } = this.state;
     return (
       <div>
-        Blockchain Exploror v0.1
         {blockInfoList !== undefined ?
           <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
       </div>

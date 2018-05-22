@@ -21,7 +21,16 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('css-loader!sass-loader')
+        use: [{
+          loader: 'style-loader' // creates style nodes from JS strings
+        }, {
+          loader: 'css-loader' // translates CSS into CommonJS
+        }, {
+          loader: 'sass-loader', // compiles Sass to CSS
+          options: {
+            includePaths: ['src/']
+          }
+        }]
       }
     ]
   },

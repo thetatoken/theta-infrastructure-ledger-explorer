@@ -7,12 +7,11 @@ export default class Header extends Component {
     return (
       <div className="theta-header">
         <Link to="/" className="theta-header__logo">
-          Theta
-          {/* <div className="theta-logo"></div> */}
+          <div className="theta-logo"></div>
         </Link>
         <div className="theta-header__navigator">
           <Link to="/dashboard" className="theta-header__navigator--button">
-            <div>Overview</div>
+            Overview
           </Link>
           <Link to="/blocks" className="theta-header__navigator--button">
             <div>Blocks</div>
