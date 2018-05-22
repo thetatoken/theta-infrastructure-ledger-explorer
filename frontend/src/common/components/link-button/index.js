@@ -15,7 +15,6 @@ export default class LinkButton extends Component {
   }
   render() {
     const { left, right, handleOnClick, url, className, children } = this.props;
-    console.log(this.props)
     return (
       <Link to={url} className={`${className} th-link-button`}>
         <div className="th-link-button__container">

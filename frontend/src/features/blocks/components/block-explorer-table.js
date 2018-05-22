@@ -4,11 +4,11 @@ import '../styles.scss';
 
 export default class BlockExplorerTable extends Component {
   renderContent(key, content){
-    // if(key === 'hash'){
-    //   return(
-    //     <Link to="">{content}</Link>
-    //   )
-    // }else 
+    if(key === 'parent_hash'){
+      return(
+        <Link to={`/blocks/${Number(this.props.blockInfo.height)-1}`} >{content}</Link>
+      )
+    }else 
       return content;
   }
   render() {

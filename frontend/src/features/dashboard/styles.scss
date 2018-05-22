@@ -1,0 +1,11 @@
+.th-blocks-overview{
+  &__title{
+    width: 45%;
+    text-align: center;
+  }
+  &__button{
+    width: 90px;
+    margin-top: 10px;
+    display: flex;
+  }
+}

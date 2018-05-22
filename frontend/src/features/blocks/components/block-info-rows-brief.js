@@ -4,11 +4,11 @@ import { Link } from "react-router"
 
 export default class BlockInfoRowsBrief extends Component {
   render() {
-    const { blockInfoList } = this.props;
-
+    const { blockInfoList, size } = this.props;
+    const className = size === 'full' ? "th-block-info-brief full" : "th-block-info-brief"
     return (
-      <div>
-        <table className="tableContainer" cellSpacing="10px" >
+      <div className={className}>
+        <table>
           <tbody>
             <tr>
               <th>Block Height</th>

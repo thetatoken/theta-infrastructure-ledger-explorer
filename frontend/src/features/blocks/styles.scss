@@ -5,7 +5,7 @@ $line-height: 50px;
 .th-be-table{
   width: 60%;
   margin: 20px 20%;
-  border: $border-width solid $th-blue;
+  border: $border-width solid $th-green;
 
   &__row{
     display: flex;
@@ -14,7 +14,7 @@ $line-height: 50px;
       width: 30%;
       // margin: -$border-width 0 0 -$border-width;
       margin: 0;
-      border: $border-width solid $th-blue;
+      border: $border-width solid $th-green;
       text-align: center;
       line-height: $line-height
     }
@@ -34,7 +34,14 @@ $line-height: 50px;
 }
 .th-block-explorer{
   &__title{
-
+    margin: 30px 0 20px 20%;
+    width: 60%;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    span{
+      font-size: 20px;
+    }
   }
   &__buttons{
     width: 60%;
@@ -49,4 +56,37 @@ $line-height: 50px;
     //   float: right;
     // }
   }
+}
+.th-block-info-brief{
+  width: 45%;
+  & table, th, td{
+    border: 1px solid $th-blue;
+    border-collapse: collapse;
+    text-align: center;
+    padding: 5px;
+  }
+  &.full{
+    width: 80%;
+    margin-left: 10%;
+    & table, th, td{
+      border: 2px solid $th-blue;
+      border-collapse: collapse;
+      text-align: center;
+      padding: 10px;
+    }
+    & table{
+      width: 100%;
+    }
+    & tr{
+      height: 40px;
+    }
+  }
+}
+.th-blocks-title{
+  width: 80%;
+  height: 50px;
+  line-height: 50px;
+  margin-left: 10%;
+  font-size: 25px;
+  text-align: center;
 }

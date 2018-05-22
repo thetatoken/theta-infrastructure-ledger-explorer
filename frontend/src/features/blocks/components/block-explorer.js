@@ -55,6 +55,7 @@ export default class BlocksExplorer extends Component {
           <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>} */}
         <div className="th-block-explorer__title">
           {/* <LinkButton url={"/blocks"} className="th-be-button__back">Back to Blocks</LinkButton> */}
+          <span>Block Detail: {height}</span>
         </div>
         <div className="th-block-explorer__buttons">
           <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>

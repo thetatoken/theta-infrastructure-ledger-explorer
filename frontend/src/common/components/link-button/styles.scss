@@ -4,16 +4,21 @@ $line-height: 40px;
 .th-link-button{
   text-decoration: none;
   height: $line-height;
-  width: 79px;
-
+  width: 83px;
+  &:hover{
+    @include linearHorizontalGradient($th-blue, $th-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
   &__container{
-    width: inherit;
-    height: inherit;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
     border: 2px solid $th-blue;
     text-decoration: none;
     display: flex;
     justify-content: space-between;
-    line-height: $line-height;
+    line-height: 36px;
+    border-radius: 5px;
     // padding: 0 10px;
     &--left{
       margin-left: 10px;

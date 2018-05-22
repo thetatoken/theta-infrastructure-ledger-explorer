@@ -3,6 +3,8 @@ import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
 import BlockInfoRows from './components/block-info-rows';
 import { blocksService } from '/common/services/block';
+import BlockInfoRowsBrief from './components/block-info-rows-brief';
+
 // import './styles.scss';
 
 export default class Blocks extends Component {
@@ -48,8 +50,11 @@ export default class Blocks extends Component {
     const { blockInfoList } = this.state;
     return (
       <div>
+        {/* {blockInfoList !== undefined ?
+          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>} */}
+        <div className="th-blocks-title">Blocks listing</div>
         {blockInfoList !== undefined ?
-          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>}
+          <BlockInfoRowsBrief blockInfoList={blockInfoList} size='full' /> : <div></div>}
       </div>
     );
   }

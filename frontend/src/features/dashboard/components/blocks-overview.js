@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import socketClient from 'socket.io-client';
 import BlockInfoRowsBrief from 'features/blocks/components/block-info-rows-brief';
 import { blocksService } from '/common/services/block';
-// import './styles.scss';
+import LinkButton from "common/components/link-button";
+import '../styles.scss';
 
 export default class BlocksOverView extends Component {
   constructor(props) {
@@ -39,9 +40,12 @@ export default class BlocksOverView extends Component {
     const { blockInfoList } = this.state;
     return (
       <div>
-        Blockchains overview
+        <div className="th-blocks-overview__title">Blockchains overview</div>
         {blockInfoList !== undefined ?
           <BlockInfoRowsBrief blockInfoList={blockInfoList} /> : <div></div>}
+        <div className="th-blocks-overview__button">
+          <LinkButton className="th-blocks-overview__button--a" url="/blocks">View All</LinkButton>
+        </div>
       </div>
     );
   }
