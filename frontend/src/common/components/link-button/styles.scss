@@ -1,0 +1,28 @@
+@import 'styles/_variables.scss';
+$line-height: 40px;
+
+.th-link-button{
+  text-decoration: none;
+  height: $line-height;
+  width: 79px;
+
+  &__container{
+    width: inherit;
+    height: inherit;
+    border: 2px solid $th-blue;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    line-height: $line-height;
+    // padding: 0 10px;
+    &--left{
+      margin-left: 10px;
+    }
+    &--right{
+      margin-right: 10px;
+    }
+    &--content{
+      margin: 0 10px;
+    }
+  }
+}

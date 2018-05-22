@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router"
 import '../styles.scss';
 
-export default class BlockExplorerForm extends Component {
+export default class BlockExplorerTable extends Component {
   renderContent(key, content){
     // if(key === 'hash'){
     //   return(
@@ -13,15 +13,14 @@ export default class BlockExplorerForm extends Component {
   }
   render() {
     const { blockInfo } = this.props;
-    console.log(blockInfo)
     return (
-      <div className="th-be-form">
+      <div className="th-be-table">
         {Object.keys(blockInfo).map(key => {
           const content = key === 'txs' ? blockInfo[key][0].outputs[0].address : blockInfo[key];
           return (
-            <div className="th-be-form__row" key={key}>
-              <div className="th-be-form__row--left">{key}</div>
-              <div className="th-be-form__row--right">
+            <div className="th-be-table__row" key={key}>
+              <div className="th-be-table__row--left">{key}</div>
+              <div className="th-be-table__row--right">
                 {this.renderContent(key, content)}
               </div>
             </div>

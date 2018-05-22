@@ -2,7 +2,7 @@
 $border-width: 1px;
 $line-height: 50px;
 
-.th-be-form{
+.th-be-table{
   width: 60%;
   margin: 20px 20%;
   border: $border-width solid $th-blue;
@@ -26,5 +26,27 @@ $line-height: 50px;
       text-align: center;
       line-height: $line-height;
     }
+  }
+}
+
+.th-be-button__back{
+  width: 110px !important;
+}
+.th-block-explorer{
+  &__title{
+
+  }
+  &__buttons{
+    width: 60%;
+    margin-left: 20%;
+    display: flex;
+    justify-content: space-between;
+    // &--prev{
+    //   float: left;
+    // }
+
+    // &--next{
+    //   float: right;
+    // }
   }
 }

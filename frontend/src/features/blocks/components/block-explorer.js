@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
 import BlockInfoRows from './block-info-rows';
-import BlockExplorerForm from './block-explorer-form';
+import BlockExplorerTable from './block-explorer-table';
 import { blocksService } from '/common/services/block';
 import { Link } from "react-router"
+import LinkButton from "common/components/link-button";
+
 
 // import './styles.scss';
 
@@ -46,13 +48,20 @@ export default class BlocksExplorer extends Component {
     const height = Number(this.props.params.blockHeight);
     return (
       <div>
-        <Link to={"/blocks"}><button>Back to Blocks</button></Link>
-        <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
-        <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link>
+        {/* <Link to={"/blocks"}><button>Back to Blocks</button></Link> */}
+        {/* <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
+        <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link> */}
         {/* {blockInfo !== null ?
           <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>} */}
+        <div className="th-block-explorer__title">
+          {/* <LinkButton url={"/blocks"} className="th-be-button__back">Back to Blocks</LinkButton> */}
+        </div>
+        <div className="th-block-explorer__buttons">
+          <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+          <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
+        </div>
         {blockInfo !== null ?
-          <BlockExplorerForm blockInfo={blockInfo} /> : <div></div>}
+          <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>}
       </div>
     );
   }
