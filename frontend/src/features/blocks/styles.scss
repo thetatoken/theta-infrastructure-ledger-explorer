@@ -1,5 +1,30 @@
 @import 'styles/_variables.scss';
+$border-width: 1px;
+$line-height: 50px;
 
-.something{
-    width: 30px;
+.th-be-form{
+  width: 60%;
+  margin: 20px 20%;
+  border: $border-width solid $th-blue;
+
+  &__row{
+    display: flex;
+    height: $line-height;
+    &--left{
+      width: 30%;
+      // margin: -$border-width 0 0 -$border-width;
+      margin: 0;
+      border: $border-width solid $th-blue;
+      text-align: center;
+      line-height: $line-height
+    }
+    &--right{
+      width: 70%;
+      // margin: 0 -$border-width 0 0;
+      margin: 0;
+      border: $border-width solid $th-blue;
+      text-align: center;
+      line-height: $line-height;
+    }
+  }
 }

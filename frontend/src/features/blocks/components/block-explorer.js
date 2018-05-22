@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import socketClient from 'socket.io-client';
 import BlockInfoRows from './block-info-rows';
+import BlockExplorerForm from './block-explorer-form';
 import { blocksService } from '/common/services/block';
 import { Link } from "react-router"
 
@@ -17,8 +18,8 @@ export default class BlocksExplorer extends Component {
       blockInfo: null
     };
   }
-  componentWillUpdate(nextProps, nextState){
-    if(nextProps.params.blockHeight !== this.props.params.blockHeight){
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
       this.gerOneBlockByHeight(nextProps.params.blockHeight);
     }
   }
@@ -29,7 +30,7 @@ export default class BlocksExplorer extends Component {
     const { backendAddress } = this.state;
     this.gerOneBlockByHeight(blockHeight);
   }
-  gerOneBlockByHeight(height){
+  gerOneBlockByHeight(height) {
     blocksService.getBlockByHeight(height)
       .then(res => {
         if (res.data.type == 'block') {
@@ -48,8 +49,10 @@ export default class BlocksExplorer extends Component {
         <Link to={"/blocks"}><button>Back to Blocks</button></Link>
         <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
         <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link>
+        {/* {blockInfo !== null ?
+          <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>} */}
         {blockInfo !== null ?
-          <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>}
+          <BlockExplorerForm blockInfo={blockInfo} /> : <div></div>}
       </div>
     );
   }
