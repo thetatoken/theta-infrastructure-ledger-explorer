@@ -24,6 +24,12 @@ var blockRouter = (app, blockDao, progressDao, config) => {
         console.log('Latest block height: ' + latest_block_height.toString());
         var query_block_height_max = latest_block_height;
         var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 100 blocks initially
+        if (req.query.pageNumber !== undefined && req.query.limit !== undefined) {
+          const { pageNumber, limit } = req.query;
+          // const totalPageNumber = Math.floor(latest_block_height / req.query.limit + 1);
+          query_block_height_max = latest_block_height - (pageNumber - 1) * limit;
+          query_block_height_min = Math.max(0, query_block_height_max - limit + 1);
+        }
         console.log('REST api querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
         //return blockDao.getBlockAsync(123) 
         return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
@@ -31,7 +37,7 @@ var blockRouter = (app, blockDao, progressDao, config) => {
       .then(blockInfoList => {
         var data = ({
           type: 'block_list',
-          body: blockInfoList
+          body: blockInfoList,
         });
         res.status(200).send(data);
       });
