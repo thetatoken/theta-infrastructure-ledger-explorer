@@ -3,12 +3,12 @@ import { Link } from "react-router"
 import '../styles.scss';
 
 export default class BlockExplorerTable extends Component {
-  renderContent(key, content){
-    if(key === 'parent_hash'){
-      return(
-        <Link to={`/blocks/${Number(this.props.blockInfo.height)-1}`} >{content}</Link>
+  renderContent(key, content) {
+    if (key === 'parent_hash') {
+      return (
+        <Link to={`/blocks/${Number(this.props.blockInfo.height) - 1}`} >{content}</Link>
       )
-    }else 
+    } else
       return content;
   }
   render() {
@@ -16,7 +16,8 @@ export default class BlockExplorerTable extends Component {
     return (
       <div className="th-be-table">
         {Object.keys(blockInfo).map(key => {
-          const content = key === 'txs' ? blockInfo[key][0].outputs[0].address : blockInfo[key];
+          const content = (key === 'txs' && blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].outputs) ?
+            blockInfo[key][blockInfo[key].length - 1].outputs[0].address : blockInfo[key];
           return (
             <div className="th-be-table__row" key={key}>
               <div className="th-be-table__row--left">{key}</div>
