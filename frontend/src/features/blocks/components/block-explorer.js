@@ -53,13 +53,6 @@ export default class BlocksExplorer extends Component {
       console.log('Wrong Height')
     }
   }
-  disableButton(type) {
-    if (type === 'Prev') {
-      this.setState({ disablePrevButton: true });
-    } else if (type === 'Next') {
-      this.setState({ disableNextButton: true });
-    }
-  }
   renderNoMoreMsg(){
     return(
       <div className="th-block-explorer__buttons--no-more">No More</div>
