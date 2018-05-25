@@ -30,8 +30,6 @@ class Pagination extends React.Component {
 
   renderPaginationItems() {
     const { totalPages, currentPage } = this.props;
-    console.log(totalPages);
-    console.log(currentPage)
     const pageButtons = [];
     const maxButtons = 6;
     const items = totalPages;
@@ -52,7 +50,6 @@ class Pagination extends React.Component {
       startPage = 0;
       endPage = items - 1;
     }
-    console.log(startPage)
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
         <PaginationItem disabled={this.props.isDisabled} key={page} active={page === activePage}>

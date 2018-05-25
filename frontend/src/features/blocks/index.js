@@ -54,7 +54,6 @@ export default class Blocks extends Component {
     }
   }
   handleGetBlocksByPage(pageNumber, type) {
-    console.log(pageNumber)
     blocksService.getBlocksByPage(pageNumber)
       .then(res => {
         this.receivedBlocksEvent(res);
@@ -89,7 +88,6 @@ export default class Blocks extends Component {
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
-    console.log(currentPageNumber)
     return (
       <div className="th-blocks">
         {/* {blockInfoList !== undefined ?
