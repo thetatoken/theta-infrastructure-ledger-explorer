@@ -18,7 +18,7 @@ export default class Blocks extends Component {
       // backendAddress: "localhost:3000",
       blockHeight: 0,
       blockInfoList: [],
-      currentPageNumber: 1,
+      currentPageNumber: 0,
       totalPageNumber: 0
     };
     this.receivedBlocksEvent = this.receivedBlocksEvent.bind(this);
@@ -28,8 +28,8 @@ export default class Blocks extends Component {
   componentDidMount() {
     browserHistory.push('/blocks');
 
-    const { backendAddress } = this.state;
-    blocksService.getTopBlocks()
+    const { backendAddress, currentPageNumber } = this.state;
+    blocksService.getBlocksByPage(currentPageNumber)
       .then(res => {
         this.receivedBlocksEvent(res);
       }).catch(err => {
@@ -89,25 +89,26 @@ export default class Blocks extends Component {
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
+    console.log(currentPageNumber)
     return (
       <div className="th-blocks">
         {/* {blockInfoList !== undefined ?
           <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>} */}
-        <div className="th-blocks-title">Blocks listing. Page: #{currentPageNumber}</div>
+        <div className="th-blocks-title">Blocks listing. Page: #{currentPageNumber + 1}</div>
         {blockInfoList !== undefined ?
           <BlockInfoRowsBrief blockInfoList={blockInfoList} size='full' /> : <div></div>}
         <div className="th-blocks-pagination">
-          {Number(totalPageNumber) !== 0 ? <Pagination
+          <Pagination
             size={'lg'}
             totalPages={totalPageNumber}
             currentPage={currentPageNumber}
             callback={this.handleGetBlocksByPage}
-          /> : <div></div>}
+          />
         </div>
-        <div className="th-blocks-button">
+        {/* <div className="th-blocks-button">
           {this.renderPrevPageButton()}
           {this.renderNextPageButton()}
-        </div>
+        </div> */}
       </div>
     );
   }

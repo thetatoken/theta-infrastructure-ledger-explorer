@@ -4,27 +4,27 @@ import classnames from 'classnames';
 import './styles.scss';
 
 class Pagination extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.handlePrevious = this.handlePrevious.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handleOnPage = this.handleOnPage.bind(this);
   }
-  handlePrevious(){
+  handlePrevious() {
     const previous = this.props.currentPage - 1;
     if (previous >= 1) {
       this.handleOnPage(previous);
     }
   }
 
-  handleNext(){
+  handleNext() {
     const next = this.props.currentPage + 1;
     if (next <= (this.props.totalPages - 1)) {
       this.handleOnPage(next);
     }
   }
 
-  handleOnPage(pageNumber){
+  handleOnPage(pageNumber) {
     this.props.callback(pageNumber);
   }
 
@@ -33,7 +33,7 @@ class Pagination extends React.Component {
     console.log(totalPages);
     console.log(currentPage)
     const pageButtons = [];
-    const maxButtons = 10;
+    const maxButtons = 6;
     const items = totalPages;
     const activePage = currentPage;
     let startPage;
@@ -56,7 +56,7 @@ class Pagination extends React.Component {
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
         <PaginationItem disabled={this.props.isDisabled} key={page} active={page === activePage}>
-          <PaginationLink onClick={() => this.handleOnPage(page)}>
+          <PaginationLink onClick={() => this.handleOnPage(page)} className={classnames({ 'active': page === activePage })}>
             {page + 1}
           </PaginationLink>
         </PaginationItem>

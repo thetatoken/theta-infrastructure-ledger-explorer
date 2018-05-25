@@ -6,7 +6,7 @@
   padding: 0;
   list-style: none;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   .page-link {
     text-align: center;
     color: $th-blue;
@@ -16,6 +16,9 @@
       border-color: $th-grey;
       cursor: pointer;
     }  
+    &.active{
+      color: $th-green;
+    }
   }
   &--lg {
     .page-link {

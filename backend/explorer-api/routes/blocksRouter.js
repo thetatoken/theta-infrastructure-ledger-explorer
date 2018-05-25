@@ -29,7 +29,7 @@ var blockRouter = (app, blockDao, progressDao, config) => {
         if (req.query.pageNumber !== undefined && req.query.limit !== undefined) {
           const { limit } = req.query;
           pageNumber = req.query.pageNumber;
-          query_block_height_max = latest_block_height - (pageNumber - 1) * limit;
+          query_block_height_max = latest_block_height - pageNumber * limit;
           query_block_height_min = Math.max(0, query_block_height_max - limit + 1);
         }
         console.log('REST api querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
