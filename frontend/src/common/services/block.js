@@ -10,4 +10,7 @@ export const blocksService = {
   getTopBlocks() {
     return apiService.get(`blocks/top_blocks`);
   },
+  getBlocksByPage(pageNumber) {
+    return apiService.get('blocks/top_blocks', { params: { pageNumber: pageNumber, limit: 10 } });
+  }
 };

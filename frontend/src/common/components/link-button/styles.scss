@@ -5,6 +5,8 @@ $line-height: 40px;
   text-decoration: none;
   height: $line-height;
   width: 83px;
+  display: flex;
+
   &:hover{
     @include linearHorizontalGradient($th-blue, $th-green);
     -webkit-background-clip: text;

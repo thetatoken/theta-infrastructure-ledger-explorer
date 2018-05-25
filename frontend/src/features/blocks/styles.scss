@@ -90,3 +90,21 @@ $line-height: 50px;
   font-size: 25px;
   text-align: center;
 }
+.th-blocks-button{
+  width: 80%;
+  margin: 10px 0 0 10%;
+  display: flex;
+  justify-content: space-between;
+  &__left{
+    width: 120px !important;
+    cursor: pointer;
+  }
+  &__right{
+    width: 120px;
+    cursor: pointer;
+  }
+}
+.th-blocks-pagination{
+  display: flex;
+  width: 100%;
+}
