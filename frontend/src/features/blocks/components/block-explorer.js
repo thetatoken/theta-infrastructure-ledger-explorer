@@ -17,7 +17,8 @@ export default class BlocksExplorer extends Component {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
-      blockInfo: null
+      blockInfo: null,
+      totalBlocksNumber: undefined
     };
   }
   componentWillUpdate(nextProps, nextState) {
@@ -33,18 +34,39 @@ export default class BlocksExplorer extends Component {
     this.gerOneBlockByHeight(blockHeight);
   }
   gerOneBlockByHeight(height) {
-    blocksService.getBlockByHeight(height)
-      .then(res => {
-        if (res.data.type == 'block') {
-          this.setState({ blockInfo: res.data.body })
-        }
-      }).catch(err => {
-        console.log(err);
-      })
+    const { totalBlocksNumber } = this.state;
+    if (totalBlocksNumber === undefined
+      || totalBlocksNumber >= height
+      || height > 0) {
+      blocksService.getBlockByHeight(height)
+        .then(res => {
+          if (res.data.type == 'block') {
+            this.setState({
+              blockInfo: res.data.body,
+              totalBlocksNumber: res.data.totalBlocksNumber
+            })
+          }
+        }).catch(err => {
+          console.log(err);
+        })
+    } else {
+      console.log('Wrong Height')
+    }
   }
-
+  disableButton(type) {
+    if (type === 'Prev') {
+      this.setState({ disablePrevButton: true });
+    } else if (type === 'Next') {
+      this.setState({ disableNextButton: true });
+    }
+  }
+  renderNoMoreMsg(){
+    return(
+      <div className="th-block-explorer__buttons--no-more">No More</div>
+    )
+  }
   render() {
-    const { blockInfo } = this.state;
+    const { blockInfo, totalBlocksNumber } = this.state;
     const height = Number(this.props.params.blockHeight);
     return (
       <div>
@@ -58,8 +80,14 @@ export default class BlocksExplorer extends Component {
           <span>Block Detail: {height}</span>
         </div>
         <div className="th-block-explorer__buttons">
-          <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
-          <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
+          {height > 1 ?
+            <LinkButton className="th-block-explorer__buttons--prev" handleOnClick={() => this.disableButton('Prev')} url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+            : this.renderNoMoreMsg()
+          }
+          {totalBlocksNumber > height ?
+            <LinkButton className="th-block-explorer__buttons--next" handleOnClick={() => this.disableButton('Next')} url={`/blocks/${height + 1}`} right>Next</LinkButton>
+            : this.renderNoMoreMsg()
+          }
         </div>
         {blockInfo !== null ?
           <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>}

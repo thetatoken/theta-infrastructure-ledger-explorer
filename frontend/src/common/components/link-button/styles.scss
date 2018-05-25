@@ -1,9 +1,9 @@
 @import 'styles/_variables.scss';
-$line-height: 40px;
+$button-line-height: 40px;
 
 .th-link-button{
   text-decoration: none;
-  height: $line-height;
+  height: $button-line-height;
   width: 83px;
   display: flex;
 

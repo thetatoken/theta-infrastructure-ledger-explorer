@@ -6,12 +6,18 @@ var blockRouter = (app, blockDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   router.get("/block/:id", (req, res) => {
     let blockId = req.params.id;
+    let latest_block_height;
     console.log('Querying one block by using Id: ' + blockId);
-    blockDao.getBlockAsync(Number(blockId))
+    progressDao.getProgressAsync(config.blockchain.network_id)
+      .then((progressInfo) => {
+        latest_block_height = progressInfo.height;
+        return blockDao.getBlockAsync(Number(blockId))
+      })
       .then(blockInfo => {
         var data = ({
           type: 'block',
-          body: blockInfo
+          body: blockInfo,
+          totalBlocksNumber: latest_block_height
         });
         res.status(200).send(data);
       });

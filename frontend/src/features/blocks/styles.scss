@@ -1,4 +1,5 @@
 @import 'styles/_variables.scss';
+@import 'common/components/link-button/styles.scss';
 $border-width: 1px;
 $line-height: 50px;
 
@@ -48,6 +49,10 @@ $line-height: 50px;
     margin-left: 20%;
     display: flex;
     justify-content: space-between;
+    &--no-more{
+      color: $th-grey;
+      line-height: $button-line-height;
+    }
     // &--prev{
     //   float: left;
     // }
