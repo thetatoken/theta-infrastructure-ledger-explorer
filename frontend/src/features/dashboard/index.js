@@ -7,7 +7,7 @@ export default class Dashboard extends Component {
   render() {
     return (
       <div>
-        <div className="th-dashboard__title">Webcome to Theta Explorer</div>
+        <div className="th-dashboard__title">Welcome to Theta Explorer</div>
         <div className="th-dashboard__container">
           <BlocksOverView />
           <TransactionOverView />

@@ -45,6 +45,7 @@ export default class BlocksExplorer extends Component {
               blockInfo: res.data.body,
               totalBlocksNumber: res.data.totalBlocksNumber
             })
+            console.log(res.data.body.txs)
           }
         }).catch(err => {
           console.log(err);
@@ -74,11 +75,11 @@ export default class BlocksExplorer extends Component {
         </div>
         <div className="th-block-explorer__buttons">
           {height > 1 ?
-            <LinkButton className="th-block-explorer__buttons--prev" handleOnClick={() => this.disableButton('Prev')} url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+            <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
             : this.renderNoMoreMsg()
           }
           {totalBlocksNumber > height ?
-            <LinkButton className="th-block-explorer__buttons--next" handleOnClick={() => this.disableButton('Next')} url={`/blocks/${height + 1}`} right>Next</LinkButton>
+            <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
             : this.renderNoMoreMsg()
           }
         </div>
