@@ -2,25 +2,23 @@ import React, { Component } from "react";
 import { Link } from "react-router"
 // import '../styles.scss';
 
-export default class BlockInfoRowsBrief extends Component {
+export default class TransactionInfoRows extends Component {
   render() {
-    const { blockInfoList, size } = this.props;
+    const { transactionInfoList, size } = this.props;
     const className = size === 'full' ? "th-block-info-brief full" : "th-block-info-brief"
     return (
       <div className={className}>
         <table>
           <tbody>
             <tr>
-              <th>Height</th>
-              <th>Block Hash</th>
+              <th>Transaction Payment Sequence</th>
             </tr>
-            {blockInfoList
-              .sort((a, b) => b.height - a.height)
-              .map(blockInfo => {
+            {transactionInfoList
+              .sort((a, b) => b.uuid - a.uuid)
+              .map(transactionInfo => {
                 return (
-                  <tr key={blockInfo.height}>
-                    <td>{blockInfo.height}</td>
-                    <td><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
+                  <tr key={transactionInfo.uuid}>
+                    <td><Link to={`/txs/${transactionInfo.uuid}`}>{transactionInfo.pmt_sqnc}</Link></td>
                   </tr>
                 );
               })}

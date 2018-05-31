@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import socketClient from 'socket.io-client';
-import BlockInfoRowsBrief from 'features/blocks/components/block-info-rows-brief';
+import TransactionInfoRows from 'features/transactions/components/transaction-info-rows';
 import { blocksService } from '/common/services/block';
 import LinkButton from "common/components/link-button";
 import '../styles.scss';
@@ -12,8 +12,7 @@ export default class TransactionOverView extends Component {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:3000",
-      blockHeight: 0,
-      blockInfoList: []
+      transactionInfoList: []
     };
     this.onSocketEvent = this.onSocketEvent.bind(this);
   }
@@ -30,21 +29,21 @@ export default class TransactionOverView extends Component {
     this.socket.disconnect();
   }
   onSocketEvent(data) {
-    console.log(data);
-    if (data.type == 'block_list') {
-      this.setState({ blockInfoList: data.body })
+    // console.log(data);
+    if (data.type == 'transaction_list') {
+      this.setState({ transactionInfoList: data.body })
     }
   }
 
   render() {
-    const { blockInfoList } = this.state;
+    const { transactionInfoList } = this.state;
     return (
-      <div>
+      <div className="th-overview">
         <div className="th-blocks-overview__title">Transaction overview</div>
-        {blockInfoList !== undefined ?
-          <BlockInfoRowsBrief blockInfoList={blockInfoList} /> : <div></div>}
+        {transactionInfoList !== undefined ?
+          <TransactionInfoRows transactionInfoList={transactionInfoList} /> : <div></div>}
         <div className="th-blocks-overview__button">
-          <LinkButton className="th-blocks-overview__button--a" url="/blocks">View All</LinkButton>
+          <LinkButton className="th-blocks-overview__button--a" url="/txs">View All</LinkButton>
         </div>
       </div>
     );

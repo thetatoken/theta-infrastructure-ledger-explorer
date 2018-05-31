@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import { blocksService } from '/common/services/block';
-import BlockInfoRowsBrief from './components/block-info-rows-brief';
+import { transactionsService } from '/common/services/transaction';
+import TransactionInfoRows from './components/transaction-info-rows';
 import LinkButton from "common/components/link-button";
 import Pagination from "common/components/pagination"
 // import './styles.scss';
@@ -14,22 +14,22 @@ export default class Blocks extends Component {
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
       // backendAddress: "localhost:3000",
-      blockHeight: 0,
-      blockInfoList: [],
+      transactionNum: 0,
+      transactionInfoList: [],
       currentPageNumber: 0,
       totalPageNumber: 0
     };
-    this.receivedBlocksEvent = this.receivedBlocksEvent.bind(this);
-    this.handleGetBlocksByPage = this.handleGetBlocksByPage.bind(this);
+    this.receivedTransactionsEvent = this.receivedTransactionsEvent.bind(this);
+    this.handleGetTransactionsByPage = this.handleGetTransactionsByPage.bind(this);
   }
 
   componentDidMount() {
-    browserHistory.push('/blocks');
+    browserHistory.push('/txs');
 
     const { backendAddress, currentPageNumber } = this.state;
-    blocksService.getBlocksByPage(currentPageNumber)
+    transactionsService.getTransactionsByPage(currentPageNumber)
       .then(res => {
-        this.receivedBlocksEvent(res);
+        this.receivedTransactionsEvent(res);
       }).catch(err => {
         console.log(err);
       })
@@ -41,20 +41,20 @@ export default class Blocks extends Component {
   componentWillUnmount() {
     // this.socket.disconnect();
   }
-  receivedBlocksEvent(data) {
+  receivedTransactionsEvent(data) {
     console.log(data);
-    if (data.data.type == 'block_list') {
+    if (data.data.type == 'transaction_list') {
       this.setState({
-        blockInfoList: data.data.body,
+        transactionInfoList: data.data.body,
         currentPageNumber: data.data.currentPageNumber,
         totalPageNumber: data.data.totalPageNumber
       })
     }
   }
-  handleGetBlocksByPage(pageNumber, type) {
-    blocksService.getBlocksByPage(pageNumber)
+  handleGetTransactionsByPage(pageNumber, type) {
+    transactionsService.getTransactionsByPage(pageNumber)
       .then(res => {
-        this.receivedBlocksEvent(res);
+        this.receivedTransactionsEvent(res);
         // this.setState({
         //   pageNumber: type === 'Prev' ? pageNumber - 1 : pageNumber + 1,
         // })
@@ -67,7 +67,7 @@ export default class Blocks extends Component {
     currentPageNumber = Number(currentPageNumber);
     return (
       Number(currentPageNumber) !== 1 ?
-        <LinkButton className="th-blocks-button__left" left handleOnClick={() => this.handleGetBlocksByPage(currentPageNumber - 1)}>Prev</LinkButton>
+        <LinkButton className="th-blocks-button__left" left handleOnClick={() => this.handleGetTransactionsByPage(currentPageNumber - 1)}>Prev</LinkButton>
         : <div></div>
     );
   }
@@ -77,26 +77,29 @@ export default class Blocks extends Component {
     totalPageNumber = Number(totalPageNumber);
     return (
       currentPageNumber !== totalPageNumber ?
-        <LinkButton className="th-blocks-button__right" right handleOnClick={() => this.handleGetBlocksByPage(currentPageNumber + 1)} >Next</LinkButton>
+        <LinkButton className="th-blocks-button__right" right handleOnClick={() => this.handleGetTransactionsByPage(currentPageNumber + 1)} >Next</LinkButton>
         : <div></div>
     );
   }
   render() {
-    const { blockInfoList } = this.state;
+    const { transactionInfoList } = this.state;
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
+    console.log(transactionInfoList)
     return (
       <div className="th-blocks">
-        <div className="th-blocks-title">Blocks listing. Page: #{currentPageNumber + 1}</div>
-        {blockInfoList !== undefined ?
-          <BlockInfoRowsBrief blockInfoList={blockInfoList} size='full' /> : <div></div>}
+        {/* {blockInfoList !== undefined ?
+          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>} */}
+        <div className="th-blocks-title">Transactions listing. Page: #{currentPageNumber + 1}</div>
+        {transactionInfoList !== undefined ?
+          <TransactionInfoRows transactionInfoList={transactionInfoList} size='full' /> : <div></div>}
         <div className="th-blocks-pagination">
           <Pagination
             size={'lg'}
             totalPages={totalPageNumber}
             currentPage={currentPageNumber}
-            callback={this.handleGetBlocksByPage}
+            callback={this.handleGetTransactionsByPage}
           />
         </div>
         {/* <div className="th-blocks-button">

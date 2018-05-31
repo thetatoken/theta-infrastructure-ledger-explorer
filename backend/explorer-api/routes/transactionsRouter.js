@@ -31,7 +31,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
       })
       .then(transactionInfoList => {
         var data = ({
-          type: 'transaction',
+          type: 'transaction_list',
           body: transactionInfoList,
         });
         res.status(200).send(data);
@@ -60,7 +60,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
       })
       .then(transactionInfoList => {
         var data = ({
-          type: 'transaction',
+          type: 'transaction_list',
           body: transactionInfoList,
           totalPageNumber,
           currentPageNumber: pageNumber

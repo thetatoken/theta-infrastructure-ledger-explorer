@@ -4,7 +4,7 @@ import ReactDom from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import Dashboard from './features/dashboard';
 import App from './app';
-import Transactions from './features/blocks' //TODO: need to change to features/transactions later
+import Transactions from './features/transactions' //TODO: need to change to features/transactions later
 import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
 import './styles.scss';
