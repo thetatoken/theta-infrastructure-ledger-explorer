@@ -10,7 +10,7 @@ var transactionDao = null;
 var current_block_hight = 0;
 var network_id = 'test_chain_id_txs';
 var max_block_per_crawl = 10;
-
+var txs_count = 0;
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ exports.Execute = function (callback) {
     })
     .then(function (progressInfo) {
       var crawled_block_height_progress = progressInfo.height;
+      txs_count = progressInfo.count;
       console.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
       if (latest_block_height > crawled_block_height_progress) {
@@ -59,17 +60,19 @@ exports.Execute = function (callback) {
         // if(txs.length !== 1)console.log(txs.length);
         if (txs !== undefined && txs.length > 1) {
           console.log(txs)
+          console.log(txs_count);
           for (var j = 0; j < txs.length - 1; j++) {
             console.log(txs[j])
             var transaction = {
+              uuid: ++txs_count,
               fee: txs[j].fee,
               gas: txs[j].gas,
-              pmt_sqnc: txs[j].payment_sequence,
-              rsv_sqnc: txs[j].reserve_sequence,
+              payment_sequence: txs[j].payment_sequence,
+              reserve_sequence: txs[j].reserve_sequence,
               source: txs[j].source,
               target: txs[j].target,
             }
-            upsertTransactionAsyncList.push(transactionDao.upsertTransaction(txs[j]));
+            upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
           }
         }
       }
@@ -78,7 +81,7 @@ exports.Execute = function (callback) {
     })
     .then(function () {
       console.log(target_crawl_height)
-      transactionProgressDao.upsertProgressAsync(network_id, target_crawl_height);
+      transactionProgressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl transaction progress updated to ' + target_crawl_height.toString());
     })
     .catch(function (error) {
@@ -86,7 +89,7 @@ exports.Execute = function (callback) {
         switch (error.code) {
           case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
             console.log('Initializng progress record..');
-            transactionProgressDao.upsertProgressAsync(network_id, 0)
+            transactionProgressDao.upsertProgressAsync(network_id, 0, 0)
             break;
           default:
             console.log(error);

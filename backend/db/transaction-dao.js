@@ -17,6 +17,7 @@ module.exports = class TransactionDAO {
 
   upsertTransaction(transactionInfo, callback) {
     let bins = {
+      'uuid': transactionInfo.uuid,
       'fee': transactionInfo.fee,
       'gas': transactionInfo.gas,
       'pmt_sqnc': transactionInfo.payment_sequence,
@@ -24,7 +25,7 @@ module.exports = class TransactionDAO {
       'source': transactionInfo.source,
       'target': transactionInfo.target,
     }
-    this.client.put(this.transactionInfoSet, bins.pmt_sqnc, bins, {}, this.upsertPolicy, callback);
+    this.client.put(this.transactionInfoSet, bins.uuid, bins, {}, this.upsertPolicy, callback);
   }
   getAllTransactions(callback) {
     console.log("this is the query")
@@ -32,6 +33,7 @@ module.exports = class TransactionDAO {
       var transactionInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var transactionInfo = {};
+        transactionInfo.uuid = recordList[i].bins.uuid;
         transactionInfo.fee = recordList[i].bins.fee;
         transactionInfo.gas = recordList[i].bins.gas;
         transactionInfo.pmt_sqnc = recordList[i].bins.pmt_sqnc;
