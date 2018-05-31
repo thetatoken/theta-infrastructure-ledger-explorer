@@ -26,24 +26,24 @@ module.exports = class TransactionDAO {
     }
     this.client.put(this.transactionInfoSet, bins.pmt_sqnc, bins, {}, this.upsertPolicy, callback);
   }
-  // getAllTransactions(callback){
-  //   this.client.select(this.transactionInfoSet, ['*'], function (error, record) {
-  //     if (error) {
-  //       console.log(error);
-  //     } else {
-  //       console.log("this is record")
-  //       console.log(record);
-  //       // var transactionInfo = {};
-  //       // transactionInfo.fee = record.bins.fee;
-  //       // transactionInfo.gas = record.bins.gas;
-  //       // transactionInfo.pmt_sqnc = record.bins.pmt_sqnc;
-  //       // transactionInfo.rsv_sqnc = record.bins.rsv_sqnc;
-  //       // transactionInfo.source = record.bins.source;
-  //       // transactionInfo.target = record.bins.target;
-  //       // callback(error, transactionInfo);
-  //     }
-  //   });
-  // }
+  getAllTransactions(callback) {
+    console.log("this is the query")
+    this.client.query(this.transactionInfoSet, null, function (error, recordList) {
+      var transactionInfoList = []
+      for (var i = 0; i < recordList.length; i++) {
+        var transactionInfo = {};
+        transactionInfo.fee = recordList[i].bins.fee;
+        transactionInfo.gas = recordList[i].bins.gas;
+        transactionInfo.pmt_sqnc = recordList[i].bins.pmt_sqnc;
+        transactionInfo.rsv_sqnc = recordList[i].bins.rsv_sqnc;
+        transactionInfo.source = recordList[i].bins.source;
+        transactionInfo.target = recordList[i].bins.target;
+        transactionInfoList.push(transactionInfo)
+      }
+      callback(error, transactionInfoList)
+    });
+  }
+
   getTransactionByPmtsqnt(sequence, callback) {
     this.client.get(this.transactionInfoSet, sequence, function (error, record) {
       if (error) {
