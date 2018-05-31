@@ -27,9 +27,10 @@ module.exports = class TransactionDAO {
     }
     this.client.put(this.transactionInfoSet, bins.uuid, bins, {}, this.upsertPolicy, callback);
   }
-  getAllTransactions(callback) {
-    console.log("this is the query")
-    this.client.query(this.transactionInfoSet, null, function (error, recordList) {
+  getTransactions(min, max, callback) {
+    // var filter = (min !== null && max !== null) ? this.aerospike.filter.range('uuid', min, max) : null;
+    var filter = this.aerospike.filter.range('uuid', min, max);
+    this.client.query(this.transactionInfoSet, filter, function (error, recordList) {
       var transactionInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var transactionInfo = {};
@@ -46,8 +47,8 @@ module.exports = class TransactionDAO {
     });
   }
 
-  getTransactionByPmtsqnt(sequence, callback) {
-    this.client.get(this.transactionInfoSet, sequence, function (error, record) {
+  getTransactionByUuid(uuid, callback) {
+    this.client.get(this.transactionInfoSet, uuid, function (error, record) {
       if (error) {
         console.log(error);
       } else {
