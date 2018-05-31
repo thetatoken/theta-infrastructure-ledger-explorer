@@ -24,7 +24,42 @@ module.exports = class TransactionDAO {
       'source': transactionInfo.source,
       'target': transactionInfo.target,
     }
-    this.client.put(this.transactionInfoSet, this.RandomIdGenerator(), bins, {}, this.upsertPolicy, callback);
+    this.client.put(this.transactionInfoSet, bins.pmt_sqnc, bins, {}, this.upsertPolicy, callback);
+  }
+  // getAllTransactions(callback){
+  //   this.client.select(this.transactionInfoSet, ['*'], function (error, record) {
+  //     if (error) {
+  //       console.log(error);
+  //     } else {
+  //       console.log("this is record")
+  //       console.log(record);
+  //       // var transactionInfo = {};
+  //       // transactionInfo.fee = record.bins.fee;
+  //       // transactionInfo.gas = record.bins.gas;
+  //       // transactionInfo.pmt_sqnc = record.bins.pmt_sqnc;
+  //       // transactionInfo.rsv_sqnc = record.bins.rsv_sqnc;
+  //       // transactionInfo.source = record.bins.source;
+  //       // transactionInfo.target = record.bins.target;
+  //       // callback(error, transactionInfo);
+  //     }
+  //   });
+  // }
+  getTransactionByPmtsqnt(sequence, callback) {
+    this.client.get(this.transactionInfoSet, sequence, function (error, record) {
+      if (error) {
+        console.log(error);
+      } else {
+        var transactionInfo = {};
+        transactionInfo.uuid = record.bins.uuid;
+        transactionInfo.fee = record.bins.fee;
+        transactionInfo.gas = record.bins.gas;
+        transactionInfo.pmt_sqnc = record.bins.pmt_sqnc;
+        transactionInfo.rsv_sqnc = record.bins.rsv_sqnc;
+        transactionInfo.source = record.bins.source;
+        transactionInfo.target = record.bins.target;
+        callback(error, transactionInfo);
+      }
+    });
   }
 
   RandomIdGenerator() {
@@ -36,25 +71,6 @@ module.exports = class TransactionDAO {
     return id;
   }
 
-  // getBlock(height, callback) {
-  //   this.client.get(this.blockInfoSet, height, null, function (error, record) {
-  //     if (error) {
-  //       console.log(error);
-  //     } else {
-  //       var blockInfo = {};
-  //       blockInfo.height = record.bins.height;
-  //       blockInfo.timestamp = record.bins.timestamp;
-  //       blockInfo.hash = record.bins.hash;
-  //       blockInfo.parent_hash = record.bins.parent_hash;
-  //       blockInfo.num_txs = record.bins.num_txs;
-  //       blockInfo.lst_cmt_hash = record.bins.lst_cmt_hash;
-  //       blockInfo.data_hash = record.bins.data_hash;
-  //       blockInfo.vldatr_hash = record.bins.vldatr_hash;
-  //       blockInfo.txs = record.bins.txs;
-  //       callback(error, blockInfo);
-  //     }
-  //   });
-  // }
 
   // getBlocksByRange(min, max, callback) {
   //   var filter = this.aerospike.filter.range('height', min, max);

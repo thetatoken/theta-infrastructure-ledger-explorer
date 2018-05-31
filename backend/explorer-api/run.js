@@ -7,8 +7,11 @@ var bluebird = require("bluebird");
 var asClient = require('../db/aerospike-client.js')
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
+var transactionDaoLib = require('../db/transaction-dao.js');
+var transactionProgressDaoLib = require('../db/transaction-progress-dao.js');
 var bodyParser = require("body-parser");
 var blocksRouter = require("./routes/blocksRouter");
+var transactionsRouter = require("./routes/transactionsRouter");
 var cors = require('cors')
 
 //------------------------------------------------------------------------------
@@ -56,15 +59,21 @@ function main() {
             bluebird.promisifyAll(blockDao);
             progressDao = new progressDaoLib(__dirname, asClient);
             bluebird.promisifyAll(progressDao);
+            transactionDao = new transactionDaoLib(__dirname, asClient);
+            bluebird.promisifyAll(transactionDao);
+            transactionProgressDao = new transactionProgressDaoLib(__dirname, asClient);
+            bluebird.promisifyAll(transactionProgressDao);
             
             // start server program
             io.on('connection', onClientConnect);
             // server.listen(config.server.port);
             server.listen('3000');
 
-            //REST services
-            //blocks router
-            blocksRouter(app, blockDao, progressDao, config);            
+            // REST services
+            // blocks router
+            blocksRouter(app, blockDao, progressDao, config);    
+            // transactions router       
+            transactionsRouter(app, transactionDao, transactionProgressDao, config);
             // keep push block data
             // pushTopBlocks();
         }
