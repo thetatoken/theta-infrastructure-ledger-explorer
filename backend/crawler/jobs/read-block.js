@@ -10,7 +10,7 @@ var blockDao = null;
 var current_block_hight = 0;
 var network_id = 'test_chain_id';
 var max_block_per_crawl = 10;
-
+var target_crawl_height;
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
