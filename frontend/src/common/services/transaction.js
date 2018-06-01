@@ -1,7 +1,7 @@
 import { apiService } from './api';
 
 export const transactionsService = {
-  getTransactionByUuid(uuid) {
+  getOneTransactionByUuid(uuid) {
     if (!uuid) {
       throw Error('Missing argument');
     }

@@ -5,7 +5,7 @@ import { blocksService } from '/common/services/block';
 import LinkButton from "common/components/link-button";
 import '../styles.scss';
 
-export default class TransactionOverView extends Component {
+export default class TransactionsOverView extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -39,7 +39,7 @@ export default class TransactionOverView extends Component {
     const { transactionInfoList } = this.state;
     return (
       <div className="th-overview">
-        <div className="th-blocks-overview__title">Transaction overview</div>
+        <div className="th-blocks-overview__title">Transactions overview</div>
         {transactionInfoList !== undefined ?
           <TransactionInfoRows transactionInfoList={transactionInfoList} /> : <div></div>}
         <div className="th-blocks-overview__button">

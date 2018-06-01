@@ -86,7 +86,6 @@ export default class Blocks extends Component {
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
-    console.log(transactionInfoList)
     return (
       <div className="th-blocks">
         {/* {blockInfoList !== undefined ?

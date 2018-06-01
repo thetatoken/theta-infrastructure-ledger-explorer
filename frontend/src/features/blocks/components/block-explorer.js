@@ -45,7 +45,6 @@ export default class BlocksExplorer extends Component {
               blockInfo: res.data.body,
               totalBlocksNumber: res.data.totalBlocksNumber
             })
-            console.log(res.data.body.txs)
           }
         }).catch(err => {
           console.log(err);

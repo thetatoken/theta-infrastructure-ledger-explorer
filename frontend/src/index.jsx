@@ -4,7 +4,8 @@ import ReactDom from 'react-dom';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import Dashboard from './features/dashboard';
 import App from './app';
-import Transactions from './features/transactions' //TODO: need to change to features/transactions later
+import Transactions from './features/transactions'
+import TransactionExplorer from './features/transactions/components/transaction-explorer'
 import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
 import './styles.scss';
@@ -20,6 +21,7 @@ ReactDom.render(
       <Route exact path='/blocks' component={Blocks} backendAddress={backendAddress}/>
       <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/>
       <Route path='/txs' component={Transactions} backendAddress={backendAddress}/>
+      <Route path='/txs/:transactionNum' component={TransactionExplorer} backendAddress={backendAddress}/>
     </Route>
   </Router>,
   app
