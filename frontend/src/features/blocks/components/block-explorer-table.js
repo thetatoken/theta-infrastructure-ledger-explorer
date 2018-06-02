@@ -16,8 +16,8 @@ export default class BlockExplorerTable extends Component {
     return (
       <div className="th-be-table">
         {Object.keys(blockInfo).map(key => {
-          const content = (key === 'txs' && blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].outputs) ?
-            blockInfo[key][blockInfo[key].length - 1].outputs[0].address : blockInfo[key];
+          const content = (key === 'txs' && blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].data.outputs) ?
+            blockInfo[key][blockInfo[key].length - 1].data.outputs[0].address : blockInfo[key];
           return (
             <div className="th-be-table__row" key={key}>
               <div className="th-be-table__row--left">{key}</div>
