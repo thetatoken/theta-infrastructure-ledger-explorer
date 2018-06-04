@@ -14,12 +14,29 @@ var blockRouter = (app, blockDao, progressDao, config) => {
         return blockDao.getBlockAsync(Number(blockId))
       })
       .then(blockInfo => {
-        var data = ({
+        const data = ({
           type: 'block',
           body: blockInfo,
           totalBlocksNumber: latest_block_height
         });
         res.status(200).send(data);
+      })
+      .catch(error => {
+        switch (error.code) {
+          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
+          // No record is found with the specified namespace/set/key combination.
+          case 2:
+            const err = ({
+              type: 'error_not_found',
+              error
+            });
+            // var blockInfo = {};
+            // blockInfo.error = 'Not Found';
+            res.status(200).send(err);
+            break
+          default:
+            console.log('ERR - ', err)
+        }
       });
   });
   router.get("/blocks/top_blocks", (req, res) => {
@@ -38,7 +55,7 @@ var blockRouter = (app, blockDao, progressDao, config) => {
           query_block_height_max = latest_block_height - pageNumber * limit;
           query_block_height_min = Math.max(0, query_block_height_max - limit + 1);
         }
-        console.log('REST api querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
+        console.log('REST api querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
         //return blockDao.getBlockAsync(123) 
         return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
       })

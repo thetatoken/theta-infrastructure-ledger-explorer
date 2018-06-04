@@ -18,7 +18,8 @@ export default class BlocksExplorer extends Component {
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
       blockInfo: null,
-      totalBlocksNumber: undefined
+      totalBlocksNumber: undefined,
+      errorType: null
     };
   }
   componentWillUpdate(nextProps, nextState) {
@@ -40,11 +41,18 @@ export default class BlocksExplorer extends Component {
       || height > 0) {
       blocksService.getBlockByHeight(height)
         .then(res => {
-          if (res.data.type == 'block') {
-            this.setState({
-              blockInfo: res.data.body,
-              totalBlocksNumber: res.data.totalBlocksNumber
-            })
+          console.log(res)
+          switch (res.data.type) {
+            case 'block':
+              this.setState({
+                blockInfo: res.data.body,
+                totalBlocksNumber: res.data.totalBlocksNumber
+              });
+              break;
+            case 'error_not_found':
+              this.setState({
+                errorType: 'error_not_found'
+              });
           }
         }).catch(err => {
           console.log(err);
@@ -53,37 +61,42 @@ export default class BlocksExplorer extends Component {
       console.log('Wrong Height')
     }
   }
-  renderNoMoreMsg(){
-    return(
+  renderNoMoreMsg() {
+    return (
       <div className="th-block-explorer__buttons--no-more">No More</div>
     )
   }
+  renderContent() {
+    const { blockInfo, totalBlocksNumber, errorType } = this.state;
+    const height = Number(this.props.params.blockHeight);
+    return (
+      errorType === 'error_not_found' ? <div>Not Found</div> :
+        <div>
+          <div className="th-block-explorer__buttons">
+            {height > 1 ?
+              <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+              : this.renderNoMoreMsg()
+            }
+            {totalBlocksNumber > height ?
+              <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
+              : this.renderNoMoreMsg()
+            }
+          </div>
+          {
+            blockInfo !== null ?
+              <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>
+          }
+        </div>
+    )
+  }
   render() {
-    const { blockInfo, totalBlocksNumber } = this.state;
     const height = Number(this.props.params.blockHeight);
     return (
       <div>
-        {/* <Link to={"/blocks"}><button>Back to Blocks</button></Link> */}
-        {/* <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
-        <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link> */}
-        {/* {blockInfo !== null ?
-          <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>} */}
         <div className="th-block-explorer__title">
-          {/* <LinkButton url={"/blocks"} className="th-be-button__back">Back to Blocks</LinkButton> */}
           <span>Block Detail: {height}</span>
         </div>
-        <div className="th-block-explorer__buttons">
-          {height > 1 ?
-            <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
-            : this.renderNoMoreMsg()
-          }
-          {totalBlocksNumber > height ?
-            <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
-            : this.renderNoMoreMsg()
-          }
-        </div>
-        {blockInfo !== null ?
-          <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>}
+        {this.renderContent()}
       </div>
     );
   }

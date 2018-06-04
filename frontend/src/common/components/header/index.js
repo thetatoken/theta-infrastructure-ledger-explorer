@@ -14,19 +14,22 @@ export default class Header extends Component {
     const value = this.searchInput.value;
     switch (this.searchType.value){
       case 'block':
-        console.log('In block');
         browserHistory.push(`/blocks/${value}`);
+        this.searchInput.value = '';
         break;
       case 'transaction':
-        console.log("In transaction")
+        console.log("TODO: add transaction search function")
         break;
       case 'address':
         break;
       default:
         break;
     }
-    console.log(this.searchInput.value)
-    // console.log(this.searchType.value)
+  }
+  handleEnterKey(e){
+    if(e.key === 'Enter'){
+      this.handleSearch();
+    }
   }
   render() {
     return (
@@ -47,7 +50,7 @@ export default class Header extends Component {
         </div>
         <div className="theta-header__blank"></div>
         <div className="theta-header__search">
-          <input className="theta-header__search--input" placeholder="Search" ref={input => this.searchInput = input} />
+          <input className="theta-header__search--input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)}/>
           <div className="theta-header__search--select">
             <select ref={option => this.searchType = option}>
               <option value="address" disabled>Address</option>

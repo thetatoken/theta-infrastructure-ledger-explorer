@@ -33,7 +33,16 @@ module.exports = class BlockDAO {
   getBlock(height, callback) {
     this.client.get(this.blockInfoSet, height, null, function (error, record) {
       if (error) {
-        console.log(error);
+        switch (error.code) {
+          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
+          // No record is found with the specified namespace/set/key combination.
+          case 2:
+            console.log('NOT_FOUND -', height)
+            callback(error);
+            break
+          default:
+            console.log('ERR - ', error, height)
+        }
       } else {
         var blockInfo = {};
         blockInfo.height = record.bins.height;

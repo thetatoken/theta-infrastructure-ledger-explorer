@@ -22,7 +22,6 @@ export default class BlockExplorerTable extends Component {
   }
   render() {
     const { blockInfo } = this.props;
-    console.log(blockInfo)
     return (
       <div className="th-be-table">
         {Object.keys(blockInfo).map(key => {
