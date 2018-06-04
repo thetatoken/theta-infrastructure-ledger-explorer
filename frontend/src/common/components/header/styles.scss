@@ -3,6 +3,7 @@
 .theta-header{
   height: 60px;
   display: flex;
+  justify-content: space-between;
   padding-left: 140px;
   padding-right: 140px;
 
@@ -25,7 +26,7 @@
   }
   &__navigator{
     height: 60px;
-    margin: 0 0 0 120px;
+    // margin: 0 0 0 120px;
     display: flex;
 
     &--button{
@@ -49,6 +50,67 @@
       }
     }
   }
+  &__blank{
+    flex: 1;
+  }
+  &__search{
+    height: 60px;
+    display: flex;
+    align-items: center;
+    color: $th-body;
+
+    &--input{
+      height: 30px;
+      font-size: 1rem;
+      line-height: 1.5;
+      border: 1px solid $th-blue;
+      border-radius: .25rem 0 0 .25rem;
+      padding: 5px 10px;
+    }
+
+    &--select{
+      position: relative;
+      width: 150px;
+      margin: 0 10px;
+
+      &::after {
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid $th-blue;
+        position: absolute;
+        right: 8px;
+        top: 18px;
+        pointer-events: none;
+      }
+
+      & select{
+        height: 42px;
+        width: 100%;
+        font-size: 1rem;
+        padding: 5px 10px;
+        display: inline-block;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        border: 1px solid $th-blue;
+        border-radius: 0;
+        color: $th-body;
+      }
+    }
+
+    &--button{
+      @include linearHorizontalGradient($th-blue, $th-green);
+      height: 42px;
+      width: 42px;
+      border-radius: 0 .25rem .25rem 0;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+  }
 }
 .theta-logo{
   height: 25px;
@@ -56,4 +118,21 @@
   background: url("/public/images/nav-logo.png");
   background-size: 90px 25px;
   margin-top: 17px;
+}
+.svg-icon {
+  width: 80%;
+  height: 80%;
+  display: block;
+  margin: auto;
+}
+
+.svg-icon path,
+.svg-icon polygon,
+.svg-icon rect {
+  fill: $th-white;
+}
+
+.svg-icon circle {
+  stroke: $th-white;
+  stroke-width: 1;
 }

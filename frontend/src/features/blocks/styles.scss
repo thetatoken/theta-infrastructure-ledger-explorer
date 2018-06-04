@@ -6,7 +6,7 @@ $line-height: 50px;
 .th-be-table{
   width: 60%;
   margin: 20px 20%;
-  border: $border-width solid $th-green;
+  border: $border-width solid $th-blue;
 
   &__row{
     display: flex;
@@ -23,7 +23,7 @@ $line-height: 50px;
       width: 70%;
       // margin: 0 -$border-width 0 0;
       margin: 0;
-      border: $border-width solid $th-blue;
+      border: $border-width solid $th-green;
       text-align: center;
       line-height: $line-height;
     }
@@ -63,7 +63,7 @@ $line-height: 50px;
   }
 }
 .th-block-info-brief{
-  width: 95%;
+  width: 100%;
   & table, th, td{
     border: 1px solid $th-blue;
     border-collapse: collapse;

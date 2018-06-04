@@ -20,24 +20,24 @@ export default class BlockInfoRows extends Component {
           <table className="tableContainer" cellSpacing="10px" >
             <tbody>
               <tr>
-                <th width='300'>Creation Timestamp</th>
-                <th width='200'>Block Height</th>
-                <th width='300'>Block Hash</th>
-                <th width='300'>Number of Transactions</th>
-                <th width='300'>Parent Hash</th>
-                <th width='300'>Data Hash</th>
+                <th>Creation Timestamp</th>
+                <th>Block Height</th>
+                <th>Block Hash</th>
+                <th>Number of Transactions</th>
+                <th>Parent Hash</th>
+                <th>Data Hash</th>
               </tr>
               {blockInfoList
                 .sort((a, b) => b.height - a.height)
                 .map(blockInfo => {
                   return (
                     <tr key={blockInfo.height}>
-                      <td width='300'>{blockInfo.timestamp}</td>
-                      <td width='200'>{blockInfo.height}</td>
-                      <td width='300'><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
-                      <td width='300'>{blockInfo.num_txs}</td>
-                      <td width='300'>{blockInfo.parent_hash}</td>
-                      <td width='300'>{blockInfo.data_hash}</td>
+                      <td>{blockInfo.timestamp}</td>
+                      <td>{blockInfo.height}</td>
+                      <td><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
+                      <td>{blockInfo.num_txs}</td>
+                      <td>{blockInfo.parent_hash}</td>
+                      <td>{blockInfo.data_hash}</td>
                     </tr>
                   );
                 })}

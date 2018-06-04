@@ -39,7 +39,7 @@ export default class BlocksOverView extends Component {
   render() {
     const { blockInfoList } = this.state;
     return (
-      <div>
+      <div className="th-overview">
         <div className="th-blocks-overview__title">Blockchains overview</div>
         {blockInfoList !== undefined ?
           <BlockInfoRowsBrief blockInfoList={blockInfoList} /> : <div></div>}
