@@ -11,12 +11,12 @@ export default class BlockExplorerTable extends Component {
     } else
       return content;
   }
-  getInfo(blockInfo, key){
-    if(key !== 'txs') return blockInfo[key];
-    else if(blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].outputs) 
+  getInfo(blockInfo, key) {
+    if (key !== 'txs') return blockInfo[key];
+    else if (blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].outputs)
       return blockInfo[key][blockInfo[key].length - 1].outputs[0].address;
-    else if(blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].data
-      && blockInfo[key][blockInfo[key].length - 1].data.outputs) 
+    else if (blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].data
+      && blockInfo[key][blockInfo[key].length - 1].data.outputs)
       return blockInfo[key][blockInfo[key].length - 1].data.outputs[0].address;
     else return 'Wrong Data';
   }
@@ -30,7 +30,9 @@ export default class BlockExplorerTable extends Component {
             <div className="th-be-table__row" key={key}>
               <div className="th-be-table__row--left">{key}</div>
               <div className="th-be-table__row--right">
-                {this.renderContent(key, content)}
+                <p className="th-be-table-text">
+                  {this.renderContent(key, content)}
+                </p>
               </div>
             </div>
           )

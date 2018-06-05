@@ -14,7 +14,7 @@
 
 .th-dashboard{
   width: 100%;
-  
+
   &__title{
     margin: 20px 0;
     text-align: center;
@@ -23,8 +23,10 @@
   &__container{
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 }
 .th-overview{
   min-width: 45%;
+  margin-bottom: 30px;
 }

@@ -21,11 +21,13 @@ $line-height: 50px;
     }
     &--right{
       width: 70%;
-      // margin: 0 -$border-width 0 0;
+      height: $line-height;
       margin: 0;
       border: $border-width solid $th-green;
       text-align: center;
-      line-height: $line-height;
+      display: flex;
+      justify-content: center;
+      align-self: center;
     }
   }
 }
@@ -121,4 +123,12 @@ $line-height: 50px;
 .th-blocks-pagination{
   display: flex;
   width: 100%;
+}
+.th-be-table-text{
+  margin: 0;
+  word-break: break-all;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-self: center;
 }

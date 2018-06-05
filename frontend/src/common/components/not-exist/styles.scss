@@ -1,11 +1,11 @@
 @import 'styles/_variables.scss';
 
 .th-not-exist{
-    height: calc(100% - 40px);
+    height: calc(100% - 90px);
     text-align: center;
     font-size: 40px;
     color: $th-grey;
     display: flex;
-    align-items: center;
     justify-content: center;
+    padding-top: 30%;
 }

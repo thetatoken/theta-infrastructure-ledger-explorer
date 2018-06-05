@@ -50,7 +50,9 @@ export default class TransactionExplorerTable extends Component {
         <div className="th-be-table__row">
           <div className="th-be-table__row--left">Amount</div>
           <div className="th-be-table__row--right">
-            {this.renderContent('Amount')}
+            <p className="th-be-table-text">
+              {this.renderContent('Amount')}
+            </p>
           </div>
         </div>
         {Object.keys(transactionInfo).map(key => {
@@ -59,7 +61,9 @@ export default class TransactionExplorerTable extends Component {
               <div className="th-be-table__row" key={key}>
                 <div className="th-be-table__row--left">{nameMap[key]}</div>
                 <div className="th-be-table__row--right">
-                  {this.renderContent(key)}
+                  <p className="th-be-table-text">
+                    {this.renderContent(key)}
+                  </p>
                 </div>
               </div>
             )
