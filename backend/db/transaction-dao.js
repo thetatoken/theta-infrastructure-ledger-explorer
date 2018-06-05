@@ -50,7 +50,16 @@ module.exports = class TransactionDAO {
   getTransactionByUuid(uuid, callback) {
     this.client.get(this.transactionInfoSet, uuid, function (error, record) {
       if (error) {
-        console.log(error);
+        switch (error.code) {
+          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
+          // No record is found with the specified namespace/set/key combination.
+          case 2:
+            console.log('NOT_FOUND -', uuid)
+            callback(error);
+            break
+          default:
+            console.log('ERR - ', error, uuid)
+        }
       } else {
         var transactionInfo = {};
         transactionInfo.uuid = record.bins.uuid;

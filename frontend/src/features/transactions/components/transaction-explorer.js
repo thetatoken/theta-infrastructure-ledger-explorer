@@ -4,6 +4,7 @@ import TransactionExplorerTable from './transaction-explorer-table';
 import { transactionsService } from '/common/services/transaction';
 import { Link } from "react-router"
 import LinkButton from "common/components/link-button";
+import NotExist from 'common/components/not-exist';
 import '../styles.scss';
 
 export default class TransactionExplorer extends Component {
@@ -14,7 +15,8 @@ export default class TransactionExplorer extends Component {
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
       transactionInfo: null,
-      totalTransactionsNumber: undefined
+      totalTransactionsNumber: undefined,
+      errorType: null
     };
   }
   componentWillUpdate(nextProps, nextState) {
@@ -36,11 +38,17 @@ export default class TransactionExplorer extends Component {
       || uuid > 0) {
       transactionsService.getOneTransactionByUuid(uuid)
         .then(res => {
-          if (res.data.type == 'transaction') {
-            this.setState({
-              transactionInfo: res.data.body,
-              totalTransactionsNumber: res.data.totalTxsNumber
-            })
+          switch (res.data.type) {
+            case 'transaction':
+              this.setState({
+                transactionInfo: res.data.body,
+                totalTransactionsNumber: res.data.totalTxsNumber
+              })
+              break;
+            case 'error_not_found':
+              this.setState({
+                errorType: 'error_not_found'
+              });
           }
         }).catch(err => {
           console.log(err);
@@ -54,33 +62,36 @@ export default class TransactionExplorer extends Component {
       <div className="th-block-explorer__buttons--no-more">No More</div>
     )
   }
-  render() {
-    const { transactionInfo, totalTransactionsNumber } = this.state;
+  renderContent() {
+    const { transactionInfo, totalTransactionsNumber, errorType } = this.state;
     const uuid = Number(this.props.params.transactionNum);
+    return (
+      errorType === 'error_not_found' ? <NotExist /> :
+        <div>
+          <div className="th-block-explorer__buttons">
+            {uuid > 1 ?
+              <LinkButton className="th-block-explorer__buttons--prev" url={`/txs/${uuid - 1}`} left>Prev</LinkButton>
+              : this.renderNoMoreMsg()
+            }
+            {totalTransactionsNumber > uuid ?
+              <LinkButton className="th-block-explorer__buttons--next" url={`/txs/${uuid + 1}`} right>Next</LinkButton>
+              : this.renderNoMoreMsg()
+            }
+          </div>
+          {transactionInfo !== null ?
+            <TransactionExplorerTable transactionInfo={transactionInfo} /> : <div></div>}
+        </div>
+    )
+  }
+  render() {
+    const { transactionInfo } = this.state;
     const sequence = transactionInfo ? transactionInfo.pmt_sqnc : null;
     return (
       <div className="th-transaction-explorer">
-        {/* <Link to={"/blocks"}><button>Back to Blocks</button></Link> */}
-        {/* <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
-        <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link> */}
-        {/* {blockInfo !== null ?
-          <BlockInfoRows blockInfoList={[blockInfo]} /> : <div></div>} */}
         <div className="th-block-explorer__title">
-          {/* <LinkButton url={"/blocks"} className="th-be-button__back">Back to Blocks</LinkButton> */}
           <span>Transaction Detail: {sequence}</span>
         </div>
-        <div className="th-block-explorer__buttons">
-          {uuid > 1 ?
-            <LinkButton className="th-block-explorer__buttons--prev" url={`/txs/${uuid - 1}`} left>Prev</LinkButton>
-            : this.renderNoMoreMsg()
-          }
-          {totalTransactionsNumber > uuid ?
-            <LinkButton className="th-block-explorer__buttons--next" url={`/txs/${uuid + 1}`} right>Next</LinkButton>
-            : this.renderNoMoreMsg()
-          }
-        </div>
-        {transactionInfo !== null ?
-          <TransactionExplorerTable transactionInfo={transactionInfo} /> : <div></div>}
+        {this.renderContent()}
       </div>
     );
   }

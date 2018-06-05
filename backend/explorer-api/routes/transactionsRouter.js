@@ -20,7 +20,24 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
           totalTxsNumber: latest_transaction_count
         });
         res.status(200).send(data);
-      });
+      })
+      .catch(error => {
+        switch (error.code) {
+          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
+          // No record is found with the specified namespace/set/key combination.
+          case 2:
+            const err = ({
+              type: 'error_not_found',
+              error
+            });
+            // var blockInfo = {};
+            // blockInfo.error = 'Not Found';
+            res.status(200).send(err);
+            break
+          default:
+            console.log('ERR - ', err)
+        }
+      });;
   });
 
   router.get("/transactions", (req, res) => {

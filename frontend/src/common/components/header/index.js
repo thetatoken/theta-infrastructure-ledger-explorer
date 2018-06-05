@@ -18,7 +18,8 @@ export default class Header extends Component {
         this.searchInput.value = '';
         break;
       case 'transaction':
-        console.log("TODO: add transaction search function")
+        browserHistory.push(`/txs/${value}`);
+        this.searchInput.value = '';
         break;
       case 'address':
         break;
