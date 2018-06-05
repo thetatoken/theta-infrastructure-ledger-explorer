@@ -13,11 +13,13 @@ $line-height: 50px;
     height: $line-height;
     &--left{
       width: 30%;
-      // margin: -$border-width 0 0 -$border-width;
+      height: $line-height;
       margin: 0;
       border: $border-width solid $th-green;
       text-align: center;
-      line-height: $line-height
+      display: flex;
+      justify-content: center;
+      align-self: center;
     }
     &--right{
       width: 70%;

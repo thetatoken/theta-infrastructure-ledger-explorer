@@ -48,7 +48,9 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div className="th-be-table">
         <div className="th-be-table__row">
-          <div className="th-be-table__row--left">Amount</div>
+          <div className="th-be-table__row--left">
+            <p className="th-be-table-text">Amount</p>
+          </div>
           <div className="th-be-table__row--right">
             <p className="th-be-table-text">
               {this.renderContent('Amount')}
@@ -59,7 +61,11 @@ export default class TransactionExplorerTable extends Component {
           if (key !== 'uuid') {
             return (
               <div className="th-be-table__row" key={key}>
-                <div className="th-be-table__row--left">{nameMap[key]}</div>
+                <div className="th-be-table__row--left">
+                  <p className="th-be-table-text">
+                    {nameMap[key]}
+                  </p>
+                </div>
                 <div className="th-be-table__row--right">
                   <p className="th-be-table-text">
                     {this.renderContent(key)}

@@ -2,6 +2,18 @@ import React, { Component } from "react";
 import { Link } from "react-router"
 import '../styles.scss';
 
+const nameMap = {
+  'height': 'Height',
+  'timestamp': 'Time Stamp',
+  'hash': 'Hash',
+  'parent_hash': 'Previous Block Hash',
+  'num_txs': 'Number of Transactions',
+  'lst_cmt_hash': 'lst_cmt_hash',
+  'data_hash': 'Data Hash',
+  'vldatr_hash': 'vldatr_hash',
+  'txs': 'Transaction'
+}
+
 export default class BlockExplorerTable extends Component {
   renderContent(key, content) {
     if (key === 'parent_hash') {
@@ -28,7 +40,9 @@ export default class BlockExplorerTable extends Component {
           const content = this.getInfo(blockInfo, key);
           return (
             <div className="th-be-table__row" key={key}>
-              <div className="th-be-table__row--left">{key}</div>
+              <div className="th-be-table__row--left">
+                <p className="th-be-table-text">{nameMap[key]}</p>
+              </div>
               <div className="th-be-table__row--right">
                 <p className="th-be-table-text">
                   {this.renderContent(key, content)}
