@@ -4,9 +4,7 @@ import TransactionExplorerTable from './transaction-explorer-table';
 import { transactionsService } from '/common/services/transaction';
 import { Link } from "react-router"
 import LinkButton from "common/components/link-button";
-
-
-// import './styles.scss';
+import '../styles.scss';
 
 export default class TransactionExplorer extends Component {
   constructor(props) {
@@ -61,7 +59,7 @@ export default class TransactionExplorer extends Component {
     const uuid = Number(this.props.params.transactionNum);
     const sequence = transactionInfo ? transactionInfo.pmt_sqnc : null;
     return (
-      <div>
+      <div className="th-transaction-explorer">
         {/* <Link to={"/blocks"}><button>Back to Blocks</button></Link> */}
         {/* <Link to={`/blocks/${height - 1}`}><button>{height - 1}</button></Link>
         <Link to={`/blocks/${height + 1}`}><button>{height + 1}</button></Link> */}

@@ -4,7 +4,7 @@ import { transactionsService } from '/common/services/transaction';
 import TransactionInfoRows from './components/transaction-info-rows';
 import LinkButton from "common/components/link-button";
 import Pagination from "common/components/pagination"
-// import './styles.scss';
+import './styles.scss';
 
 export default class Blocks extends Component {
   constructor(props) {

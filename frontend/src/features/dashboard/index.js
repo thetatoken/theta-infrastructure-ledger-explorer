@@ -6,7 +6,7 @@ import TransactionsOverView from "./components/transactions-overview";
 export default class Dashboard extends Component {
   render() {
     return (
-      <div>
+      <div className="th-dashboard">
         <div className="th-dashboard__title">Welcome to Theta Explorer</div>
         <div className="th-dashboard__container">
           <BlocksOverView />

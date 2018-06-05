@@ -7,15 +7,9 @@ html, body {
 }
 a {
   color: $th-grey-lighter;
-  // hover function
-  // &:hover{
-  //   @include linearHorizontalGradient($th-blue, $th-green);
-  //   -webkit-background-clip: text;
-  //   -webkit-text-fill-color: transparent;
-  // }
 }
 body {
-  overflow: hidden;
+  overflow: auto;
   color: white;
   background: #1b1f2a;
   font-family: "AlwynNew", sans-serif;
@@ -35,7 +29,9 @@ body {
     z-index: -1;
   }
 }
-
+.theta-app{
+  height: 100%;
+}
 #root{
   &:before{
     content: '';
@@ -53,6 +49,8 @@ body {
   }
 }
 .theta-container{
+  height: 100%;
+
   &:before{
     content: '';
     position: absolute;
@@ -69,6 +67,9 @@ body {
   }
 }
 .theta-content{
+  height: calc(100% - 60px);
   margin: 0 140px 0 140px;
-  overflow: hidden;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
 }

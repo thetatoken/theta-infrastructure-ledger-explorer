@@ -102,13 +102,17 @@
     }
 
     &--button{
-      @include linearHorizontalGradient($th-blue, $th-green);
       height: 42px;
-      width: 42px;
+      width: 32px;
       border-radius: 0 .25rem .25rem 0;
       display: flex;
       align-items: center;
       cursor: pointer;
+      @include linearVerticalGradient($th-blue, $th-green);
+
+      &:hover{
+        @include linearVerticalGradient($th-blue, $th-green);
+      }
     }
   }
 }

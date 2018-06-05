@@ -6,7 +6,7 @@ import BlockExplorerTable from './block-explorer-table';
 import { blocksService } from '/common/services/block';
 import { Link } from "react-router"
 import LinkButton from "common/components/link-button";
-
+import NotExist from 'common/components/not-exist';
 
 // import './styles.scss';
 
@@ -70,7 +70,7 @@ export default class BlocksExplorer extends Component {
     const { blockInfo, totalBlocksNumber, errorType } = this.state;
     const height = Number(this.props.params.blockHeight);
     return (
-      errorType === 'error_not_found' ? <div>Not Found</div> :
+      errorType === 'error_not_found' ? <NotExist /> :
         <div>
           <div className="th-block-explorer__buttons">
             {height > 1 ?
@@ -92,7 +92,7 @@ export default class BlocksExplorer extends Component {
   render() {
     const height = Number(this.props.params.blockHeight);
     return (
-      <div>
+      <div className="th-block-explorer">
         <div className="th-block-explorer__title">
           <span>Block Detail: {height}</span>
         </div>
