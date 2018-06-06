@@ -17,44 +17,43 @@ module.exports = class TransactionDAO {
 
   upsertTransaction(transactionInfo, callback) {
     let bins = {
-      'uuid': transactionInfo.uuid,
-      'fee': transactionInfo.fee,
-      'gas': transactionInfo.gas,
-      'pmt_sqnc': transactionInfo.payment_sequence,
-      'rsv_sqnc': transactionInfo.reserve_sequence,
-      'source': transactionInfo.source,
-      'target': transactionInfo.target,
+      'hash': transactionInfo.hash,
+      'type': transactionInfo.type,
+      'data': transactionInfo.data,
+      'number': transactionInfo.number
     }
-    this.client.put(this.transactionInfoSet, bins.uuid, bins, {}, this.upsertPolicy, callback);
+    this.client.put(this.transactionInfoSet, bins.hash, bins, {}, this.upsertPolicy, callback);
+  }
+  checkTransaction(pk, callback){
+    return this.client.exists(this.transactionInfoSet, pk, (err, res) => {
+      callback(err, res)
+    })
   }
   getTransactions(min, max, callback) {
     // var filter = (min !== null && max !== null) ? this.aerospike.filter.range('uuid', min, max) : null;
-    var filter = this.aerospike.filter.range('uuid', min, max);
+    var filter = this.aerospike.filter.range('number', min, max);
     this.client.query(this.transactionInfoSet, filter, function (error, recordList) {
       var transactionInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var transactionInfo = {};
-        transactionInfo.uuid = recordList[i].bins.uuid;
-        transactionInfo.fee = recordList[i].bins.fee;
-        transactionInfo.gas = recordList[i].bins.gas;
-        transactionInfo.pmt_sqnc = recordList[i].bins.pmt_sqnc;
-        transactionInfo.rsv_sqnc = recordList[i].bins.rsv_sqnc;
-        transactionInfo.source = recordList[i].bins.source;
-        transactionInfo.target = recordList[i].bins.target;
+        transactionInfo.hash = recordList[i].bins.hash;
+        transactionInfo.type = recordList[i].bins.type;
+        transactionInfo.data = recordList[i].bins.data;
+        transactionInfo.number = recordList[i].bins.number;
         transactionInfoList.push(transactionInfo)
       }
       callback(error, transactionInfoList)
     });
   }
 
-  getTransactionByUuid(uuid, callback) {
-    this.client.get(this.transactionInfoSet, uuid, function (error, record) {
+  getTransactionByPk(pk, callback) {
+    this.client.get(this.transactionInfoSet, pk, function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
           // No record is found with the specified namespace/set/key combination.
           case 2:
-            console.log('NOT_FOUND -', uuid)
+            console.log('NOT_FOUND -', pk)
             callback(error);
             break
           default:
@@ -62,13 +61,10 @@ module.exports = class TransactionDAO {
         }
       } else {
         var transactionInfo = {};
-        transactionInfo.uuid = record.bins.uuid;
-        transactionInfo.fee = record.bins.fee;
-        transactionInfo.gas = record.bins.gas;
-        transactionInfo.pmt_sqnc = record.bins.pmt_sqnc;
-        transactionInfo.rsv_sqnc = record.bins.rsv_sqnc;
-        transactionInfo.source = record.bins.source;
-        transactionInfo.target = record.bins.target;
+        transactionInfo.hash = recordList[i].bins.hash;
+        transactionInfo.type = recordList[i].bins.type;
+        transactionInfo.data = recordList[i].bins.data;
+        transactionInfo.number = recordList[i].bins.number;
         callback(error, transactionInfo);
       }
     });

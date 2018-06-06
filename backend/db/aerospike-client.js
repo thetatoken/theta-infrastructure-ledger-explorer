@@ -37,7 +37,10 @@ exports.get = function(set, pk, policy, callback) {
   var key = new Aerospike.Key(ns, set, pk);
   client.get(key, policy, callback);
 }
-
+exports.exists = function(set, pk, policy, callback){
+  var key = new Aerospike.Key(ns, set, pk);
+  client.exists(key, policy, callback);
+}
 exports.query = function(set, filter, callback) {
   var query = client.query(ns, set);
   query.where(filter);

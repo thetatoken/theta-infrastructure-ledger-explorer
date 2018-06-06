@@ -12,6 +12,7 @@ var network_id = 'test_chain_id_txs';
 var max_block_per_crawl = 10;
 var txs_count = 0;
 var target_crawl_height;
+var upsertTransactionAsyncList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -24,7 +25,6 @@ exports.Execute = function (callback) {
 
   rpc.getStatusAsync([]) // read block height from chain
     .then(function (data) {
-      console.log(data);
       var result = JSON.parse(data);
       latest_block_height = result.result.latest_block_height;
       console.log('Latest block height: ' + latest_block_height.toString());
@@ -33,7 +33,7 @@ exports.Execute = function (callback) {
     .then(function (progressInfo) {
       var crawled_block_height_progress = progressInfo.height;
       txs_count = progressInfo.count;
-      console.log('DB block height progress: ' + crawled_block_height_progress.toString());
+      console.log('DB transaction count progress: ' + txs_count.toString());
 
       if (latest_block_height > crawled_block_height_progress) {
         // get target crawl height
@@ -52,36 +52,31 @@ exports.Execute = function (callback) {
         console.log('Block crawling is up to date.');
       }
     })
-    .then(function (blockDataList) {
-      var upsertTransactionAsyncList = []
-      // if (blockDataList !== undefined) {
-      for (var i = 0; i < blockDataList.length; i++) {
-        var result = JSON.parse(blockDataList[i]);
-        var txs = result.result.Txs;
-        // if(txs.length !== 1)console.log(txs.length);
-        if (txs !== undefined && txs.length > 1) {
-          console.log(txs)
-          console.log(txs_count);
-          for (var j = 0; j < txs.length - 1; j++) {
-            console.log(txs[j])
-            var transaction = {
-              uuid: ++txs_count,
-              fee: txs[j].fee,
-              gas: txs[j].gas,
-              payment_sequence: txs[j].payment_sequence,
-              reserve_sequence: txs[j].reserve_sequence,
-              source: txs[j].source,
-              target: txs[j].target,
+    .then(async function (blockDataList) {
+      var checkTransactionAsyncList = [];
+      if (blockDataList !== undefined) {
+        for (var i = 0; i < blockDataList.length; i++) {
+          var result = JSON.parse(blockDataList[i]);
+          var txs = result.result.Txs;
+          if (txs !== undefined && txs.length > 0) {
+            for (var j = 0; j < txs.length; j++) {
+              var transaction = {
+                hash: txs[j].hash,
+                type: txs[j].type,
+                data: txs[j].data,
+              }
+              const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+              if (!isExisted) {
+                transaction.number = ++txs_count;
+                upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
+              }
             }
-            upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
           }
         }
       }
-      // }
       return Promise.all(upsertTransactionAsyncList)
     })
     .then(function () {
-      console.log(target_crawl_height)
       transactionProgressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl transaction progress updated to ' + target_crawl_height.toString());
     })

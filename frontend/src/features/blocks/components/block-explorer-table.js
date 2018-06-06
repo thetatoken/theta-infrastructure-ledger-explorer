@@ -4,7 +4,7 @@ import '../styles.scss';
 
 const nameMap = {
   'height': 'Height',
-  'timestamp': 'Time Stamp',
+  'timestamp': 'Timestamp',
   'hash': 'Hash',
   'parent_hash': 'Previous Block Hash',
   'num_txs': 'Number of Transactions',
