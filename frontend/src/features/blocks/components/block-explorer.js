@@ -36,9 +36,10 @@ export default class BlocksExplorer extends Component {
   }
   gerOneBlockByHeight(height) {
     const { totalBlocksNumber } = this.state;
-    if (totalBlocksNumber === undefined
-      || totalBlocksNumber >= height
-      || height > 0) {
+    if (Number(height)
+      && (totalBlocksNumber === undefined
+        || totalBlocksNumber >= height
+        || height > 0)) {
       blocksService.getBlockByHeight(height)
         .then(res => {
           console.log(res)
@@ -46,7 +47,8 @@ export default class BlocksExplorer extends Component {
             case 'block':
               this.setState({
                 blockInfo: res.data.body,
-                totalBlocksNumber: res.data.totalBlocksNumber
+                totalBlocksNumber: res.data.totalBlocksNumber,
+                errorType: null
               });
               break;
             case 'error_not_found':
@@ -58,6 +60,9 @@ export default class BlocksExplorer extends Component {
           console.log(err);
         })
     } else {
+      this.setState({
+        errorType: 'error_not_found'
+      });
       console.log('Wrong Height')
     }
   }

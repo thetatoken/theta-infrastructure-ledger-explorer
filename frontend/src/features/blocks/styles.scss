@@ -104,7 +104,7 @@ $line-height: 50px;
   width: 80%;
   height: 50px;
   line-height: 50px;
-  margin-left: 10%;
+  margin: 20px 0 20px 10%;
   font-size: 25px;
   text-align: center;
 }
@@ -123,6 +123,7 @@ $line-height: 50px;
   }
 }
 .th-blocks-pagination{
+  margin-top: 20px;
   display: flex;
   width: 100%;
 }

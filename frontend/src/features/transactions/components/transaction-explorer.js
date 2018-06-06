@@ -33,16 +33,18 @@ export default class TransactionExplorer extends Component {
   }
   getOneTransactionByUuid(uuid) {
     const { totalTransactionsNumber } = this.state;
-    if (totalTransactionsNumber === undefined
-      || totalTransactionsNumber >= uuid
-      || uuid > 0) {
+    if (Number(uuid) // TODO: uuid needs to change to hash later
+      && (totalTransactionsNumber === undefined
+        || totalTransactionsNumber >= uuid
+        || uuid > 0)) {
       transactionsService.getOneTransactionByUuid(uuid)
         .then(res => {
           switch (res.data.type) {
             case 'transaction':
               this.setState({
                 transactionInfo: res.data.body,
-                totalTransactionsNumber: res.data.totalTxsNumber
+                totalTransactionsNumber: res.data.totalTxsNumber,
+                errorType: null
               })
               break;
             case 'error_not_found':
@@ -54,6 +56,9 @@ export default class TransactionExplorer extends Component {
           console.log(err);
         })
     } else {
+      this.setState({
+        errorType: 'error_not_found'
+      });
       console.log('Wrong Height')
     }
   }
