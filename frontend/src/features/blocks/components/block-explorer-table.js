@@ -11,7 +11,7 @@ const nameMap = {
   'lst_cmt_hash': 'lst_cmt_hash',
   'data_hash': 'Data Hash',
   'vldatr_hash': 'vldatr_hash',
-  'txs': 'Transaction'
+  'txs': 'Transactions'
 }
 
 export default class BlockExplorerTable extends Component {
@@ -25,12 +25,21 @@ export default class BlockExplorerTable extends Component {
   }
   getInfo(blockInfo, key) {
     if (key !== 'txs') return blockInfo[key];
-    else if (blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].outputs)
-      return blockInfo[key][blockInfo[key].length - 1].outputs[0].address;
-    else if (blockInfo[key] && blockInfo[key][blockInfo[key].length - 1] && blockInfo[key][blockInfo[key].length - 1].data
-      && blockInfo[key][blockInfo[key].length - 1].data.outputs)
-      return blockInfo[key][blockInfo[key].length - 1].data.outputs[0].address;
-    else return 'Wrong Data';
+    else if (blockInfo[key]) {
+      return (
+        <div>
+          {blockInfo[key].map((tx, i) => {
+            return (
+              <div key={i}>
+                <Link to={`/txs/${tx.hash}`} >{tx.hash}</Link>
+                <br />
+              </div>
+            )
+          })}
+        </div>
+        // <Link to={`/txs/${blockInfo[key][blockInfo[key].length - 1].hash}`} >{blockInfo[key][blockInfo[key].length - 1].hash}</Link>
+      )
+    } else return 'Wrong Data';
   }
   render() {
     const { blockInfo } = this.props;
@@ -44,9 +53,9 @@ export default class BlockExplorerTable extends Component {
                 <p className="th-be-table-text">{nameMap[key]}</p>
               </div>
               <div className="th-be-table__row--right">
-                <p className="th-be-table-text">
+                <div className="th-be-table-text">
                   {this.renderContent(key, content)}
-                </p>
+                </div>
               </div>
             </div>
           )
