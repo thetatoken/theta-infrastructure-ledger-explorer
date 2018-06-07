@@ -31,13 +31,10 @@ export default class TransactionExplorer extends Component {
     const { backendAddress } = this.state;
     this.getOneTransactionByUuid(transactionNum);
   }
-  getOneTransactionByUuid(uuid) {
+  getOneTransactionByUuid(hash) {
     const { totalTransactionsNumber } = this.state;
-    if (Number(uuid) // TODO: uuid needs to change to hash later
-      && (totalTransactionsNumber === undefined
-        || totalTransactionsNumber >= uuid
-        || uuid > 0)) {
-      transactionsService.getOneTransactionByUuid(uuid)
+    if (hash) {
+      transactionsService.getOneTransactionByUuid(hash)
         .then(res => {
           switch (res.data.type) {
             case 'transaction':
@@ -73,7 +70,7 @@ export default class TransactionExplorer extends Component {
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
-          <div className="th-block-explorer__buttons">
+          {/* <div className="th-block-explorer__buttons">
             {uuid > 1 ?
               <LinkButton className="th-block-explorer__buttons--prev" url={`/txs/${uuid - 1}`} left>Prev</LinkButton>
               : this.renderNoMoreMsg()
@@ -82,7 +79,7 @@ export default class TransactionExplorer extends Component {
               <LinkButton className="th-block-explorer__buttons--next" url={`/txs/${uuid + 1}`} right>Next</LinkButton>
               : this.renderNoMoreMsg()
             }
-          </div>
+          </div> */}
           {transactionInfo !== null ?
             <TransactionExplorerTable transactionInfo={transactionInfo} /> : <div></div>}
         </div>

@@ -11,14 +11,16 @@ export default class TransactionInfoRows extends Component {
         <table>
           <tbody>
             <tr>
+              <th>Type</th>
               <th>Transaction Payment Sequence</th>
             </tr>
             {transactionInfoList
-              .sort((a, b) => b.uuid - a.uuid)
+              .sort((a, b) => b.number - a.number)
               .map(transactionInfo => {
                 return (
-                  <tr key={transactionInfo.uuid}>
-                    <td><Link to={`/txs/${transactionInfo.uuid}`}>{transactionInfo.pmt_sqnc}</Link></td>
+                  <tr key={transactionInfo.hash}>
+                    <td>{transactionInfo.type}</td>
+                    <td><Link to={`/txs/${transactionInfo.hash}`}>{transactionInfo.hash}</Link></td>
                   </tr>
                 );
               })}

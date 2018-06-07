@@ -61,10 +61,10 @@ module.exports = class TransactionDAO {
         }
       } else {
         var transactionInfo = {};
-        transactionInfo.hash = recordList[i].bins.hash;
-        transactionInfo.type = recordList[i].bins.type;
-        transactionInfo.data = recordList[i].bins.data;
-        transactionInfo.number = recordList[i].bins.number;
+        transactionInfo.hash = record.bins.hash;
+        transactionInfo.type = record.bins.type;
+        transactionInfo.data = record.bins.data;
+        transactionInfo.number = record.bins.number;
         callback(error, transactionInfo);
       }
     });

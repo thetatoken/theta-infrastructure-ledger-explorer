@@ -5,13 +5,13 @@ var bodyParser = require('body-parser');
 var transactionRouter = (app, transactionDao, transactionProgressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
-  router.get("/transaction/:uuid", (req, res) => {
-    let uuid = req.params.uuid;
-    console.log('Querying one transaction by using uuid: ' + uuid);
+  router.get("/transaction/:hash", (req, res) => {
+    let hash = req.params.hash;
+    console.log('Querying one transaction by using uuid: ' + hash);
     transactionProgressDao.getProgressAsync(config.transaction.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
-        return transactionDao.getTransactionByUuidAsync(Number(uuid))
+        return transactionDao.getTransactionByPkAsync(hash)
       })
       .then(transactionInfo => {
         var data = ({
@@ -22,6 +22,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
         res.status(200).send(data);
       })
       .catch(error => {
+        console.log(error)
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
           // No record is found with the specified namespace/set/key combination.
@@ -35,7 +36,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
             res.status(200).send(err);
             break
           default:
-            console.log('ERR - ', err)
+            console.log('ERR - ', error)
         }
       });;
   });
