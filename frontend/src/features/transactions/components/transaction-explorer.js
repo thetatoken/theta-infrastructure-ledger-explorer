@@ -87,11 +87,11 @@ export default class TransactionExplorer extends Component {
   }
   render() {
     const { transactionInfo } = this.state;
-    const sequence = transactionInfo ? transactionInfo.pmt_sqnc : null;
+    const hash = transactionInfo ? transactionInfo.hash : null;
     return (
       <div className="th-transaction-explorer">
         <div className="th-block-explorer__title">
-          <span>Transaction Detail: {sequence}</span>
+          <span>Transaction Detail: {hash}</span>
         </div>
         {this.renderContent()}
       </div>
