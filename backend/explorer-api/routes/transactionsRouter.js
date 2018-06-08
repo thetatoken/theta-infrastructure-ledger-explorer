@@ -65,7 +65,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
         console.log('Latest transaction count: ' + latest_transaction_count.toString());
         var query_txs_count_max = latest_transaction_count;
         var query_txs_count_min = Math.max(0, query_txs_count_max - numberOfTransactions + 1); // pushing 100 blocks initially
-        totalPageNumber = Math.floor(latest_transaction_count / req.query.limit + 1);
+        totalPageNumber = Math.ceil(latest_transaction_count / req.query.limit);
         if (req.query.pageNumber !== undefined && req.query.limit !== undefined) {
           const { limit } = req.query;
           pageNumber = req.query.pageNumber;
