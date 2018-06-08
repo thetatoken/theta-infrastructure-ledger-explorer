@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router"
-// import '../styles.scss';
+import '../styles.scss';
 const nameMap = {
   'fee': 'Fee',
   'gas': 'Gas',
@@ -61,12 +61,22 @@ export default class TransactionExplorerTable extends Component {
       return res.substring(0, res.length - 2);
     }
   }
-  renderIds(ids){
+  renderIds(ids) {
     let res = '';
     ids.forEach(id => {
       res += ids + ', '
     })
     return res.substring(0, res.length - 2);
+  }
+  renderSplits(splits) {
+    return (
+      <div className="th-tx-text__split">
+        {splits.map(split => {
+          return <span key={split.address}>{'Address: ' + split.address + '  ' + split.percentage + '%'}</span>
+        })
+        }
+      </div>
+    )
   }
   renderOneRow(leftContent, rightContent) {
     return (
@@ -75,9 +85,9 @@ export default class TransactionExplorerTable extends Component {
           <p className="th-be-table-text">{leftContent}</p>
         </div>
         <div className="th-be-table__row--right">
-          <p className="th-be-table-text">
+          <div className="th-be-table-text">
             {rightContent}
-          </p>
+          </div>
         </div>
       </div>
     )
@@ -135,6 +145,20 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
+  renderType7(transactionInfo) {
+    return (
+      <div>
+        {this.renderOneRow('Hash', transactionInfo.hash)}
+        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Gas', transactionInfo.data.gas)}
+        {this.renderOneRow('Duration', transactionInfo.data.duration)}
+        {this.renderOneRow('Initiator Address', transactionInfo.data.initiator.address)}
+        {this.renderOneRow('Resource Id', transactionInfo.data.resource_id)}
+        {this.renderOneRow('Splits', this.renderSplits(transactionInfo.data.splits))}
+      </div>
+    )
+  }
   render() {
     const { transactionInfo } = this.props;
     console.log(transactionInfo)
@@ -167,44 +191,16 @@ export default class TransactionExplorerTable extends Component {
           </div>
         )
         break;
+      case 7:
+        return (
+          <div className="th-be-table">
+            {this.renderType7(transactionInfo)}
+          </div>
+        )
+        break;
       default:
         return (<div>Wrong type</div>)
         break;
     }
-    // return (
-    //   <div className="th-be-table">
-    //     {this._renderContent()}
-    //   </div>
-    // <div className="th-be-table">
-    //   <div className="th-be-table__row">
-    //     <div className="th-be-table__row--left">
-    //       <p className="th-be-table-text">Amount</p>
-    //     </div>
-    //     <div className="th-be-table__row--right">
-    //       <p className="th-be-table-text">
-    //         {this.renderContent('Amount')}
-    //       </p>
-    //     </div>
-    //   </div>
-    //   {Object.keys(transactionInfo).map(key => {
-    //     if (key !== 'uuid') {
-    //       return (
-    //         <div className="th-be-table__row" key={key}>
-    //           <div className="th-be-table__row--left">
-    //             <p className="th-be-table-text">
-    //               {nameMap[key]}
-    //             </p>
-    //           </div>
-    //           <div className="th-be-table__row--right">
-    //             <p className="th-be-table-text">
-    //               {this.renderContent(key)}
-    //             </p>
-    //           </div>
-    //         </div>
-    //       )
-    //     } else return <div key={key}></div>
-    //   })}
-    // </div>
-    // );
   }
 }
