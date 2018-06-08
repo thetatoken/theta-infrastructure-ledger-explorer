@@ -12,7 +12,7 @@ export default class TransactionInfoRows extends Component {
           <tbody>
             <tr>
               <th>Type</th>
-              <th>Transaction Payment Sequence</th>
+              <th>Transaction Hash</th>
             </tr>
             {transactionInfoList
               .sort((a, b) => b.number - a.number)

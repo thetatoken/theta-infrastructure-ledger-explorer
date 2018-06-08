@@ -1,3 +1,10 @@
 .th-transaction-explorer{
-    width: 100%;
+  width: 100%;
+}
+.th-tx-text{
+  &__split{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
 }
