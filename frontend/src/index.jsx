@@ -22,7 +22,7 @@ ReactDom.render(
       <Route exact path='/blocks' component={Blocks} backendAddress={backendAddress}/>
       <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/>
       <Route path='/txs' component={Transactions} backendAddress={backendAddress}/>
-      <Route path='/txs/:transactionNum' component={TransactionExplorer} backendAddress={backendAddress}/>
+      <Route path='/txs/:transactionHash' component={TransactionExplorer} backendAddress={backendAddress}/>
       <Route path='/account/:accountAddress' component={AccountExplorer} backendAddress={backendAddress}/>
     </Route>
   </Router>,

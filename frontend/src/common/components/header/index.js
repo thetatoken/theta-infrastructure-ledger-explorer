@@ -13,6 +13,10 @@ export default class Header extends Component {
     const type = this.searchType.value;
     const value = this.searchInput.value;
     switch (this.searchType.value) {
+      case 'address':
+        browserHistory.push(`/account/${value}`);
+        this.searchInput.value = '';
+        break;
       case 'block':
         browserHistory.push(`/blocks/${value}`);
         this.searchInput.value = '';
@@ -54,7 +58,7 @@ export default class Header extends Component {
           <input className="theta-header__search--input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
           <div className="theta-header__search--select">
             <select ref={option => this.searchType = option}>
-              <option value="address" disabled>Address</option>
+              <option value="address">Address</option>
               <option value="block">Block Number</option>
               <option value="transaction">Transaction</option>
             </select>

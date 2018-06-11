@@ -6,7 +6,7 @@ import LinkButton from "common/components/link-button";
 import Pagination from "common/components/pagination"
 import './styles.scss';
 
-export default class Blocks extends Component {
+export default class Transactions extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,7 +14,6 @@ export default class Blocks extends Component {
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
       // backendAddress: "localhost:3000",
-      transactionNum: 0,
       transactionInfoList: [],
       currentPageNumber: 0,
       totalPageNumber: 0

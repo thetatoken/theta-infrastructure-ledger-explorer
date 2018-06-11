@@ -32,7 +32,7 @@ export default class AccountExplorer extends Component {
     if (address) {
       accountService.getOneAccountByAddress(address)
         .then(res => {
-            console.log(res)
+          console.log(res)
           switch (res.data.type) {
             case 'account':
               this.setState({
@@ -70,11 +70,11 @@ export default class AccountExplorer extends Component {
   }
   render() {
     const { accountInfo } = this.state;
-    const address = accountInfo ? accountInfo.address : null;
+    const { accountAddress } = this.props.params;
     return (
       <div className="th-transaction-explorer">
         <div className="th-block-explorer__title">
-          <span>Account Detail: {address}</span>
+          <span>Account Detail: {accountAddress}</span>
         </div>
         {this.renderContent()}
       </div>

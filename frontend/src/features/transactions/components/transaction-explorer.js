@@ -20,16 +20,16 @@ export default class TransactionExplorer extends Component {
     };
   }
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.params.transactionNum !== this.props.params.transactionNum) {
-      this.getOneTransactionByUuid(nextProps.params.transactionNum);
+    if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
+      this.getOneTransactionByUuid(nextProps.params.transactionHash);
     }
   }
   componentDidMount() {
-    const { transactionNum } = this.props.params;
-    browserHistory.push(`/txs/${transactionNum}`);
+    const { transactionHash } = this.props.params;
+    browserHistory.push(`/txs/${transactionHash}`);
 
     const { backendAddress } = this.state;
-    this.getOneTransactionByUuid(transactionNum);
+    this.getOneTransactionByUuid(transactionHash);
   }
   getOneTransactionByUuid(hash) {
     const { totalTransactionsNumber } = this.state;
@@ -66,7 +66,7 @@ export default class TransactionExplorer extends Component {
   }
   renderContent() {
     const { transactionInfo, totalTransactionsNumber, errorType } = this.state;
-    const uuid = Number(this.props.params.transactionNum);
+    const uuid = Number(this.props.params.transactionHash);
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
@@ -87,11 +87,11 @@ export default class TransactionExplorer extends Component {
   }
   render() {
     const { transactionInfo } = this.state;
-    const hash = transactionInfo ? transactionInfo.hash : null;
+    const { transactionHash } = this.props.params;
     return (
       <div className="th-transaction-explorer">
         <div className="th-block-explorer__title">
-          <span>Transaction Detail: {hash}</span>
+          <span>Transaction Detail: {transactionHash}</span>
         </div>
         {this.renderContent()}
       </div>
