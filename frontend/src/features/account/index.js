@@ -1,42 +1,42 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import UserExplorerTable from './components/user-explorer-table';
-import { userService } from '/common/services/user';
+import AccountExplorerTable from './components/account-explorer-table';
+import { accountService } from '/common/services/account';
 import { Link } from "react-router";
 import NotExist from 'common/components/not-exist';
 // import './styles.scss';
 
-export default class TransactionExplorer extends Component {
+export default class AccountExplorer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       // backendAddress: this.props.route.backendAddress,
       // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
-      userInfo: null,
+      accountInfo: null,
       errorType: null
     };
   }
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.params.userAddress !== this.props.params.userAddress) {
-      this.getOneUserByAddress(nextProps.params.userAddress);
+    if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
+      this.getOneAccountByAddress(nextProps.params.accountAddress);
     }
   }
   componentDidMount() {
-    const { userAddress } = this.props.params;
-    browserHistory.push(`/user/${userAddress}`);
-    this.getOneUserByAddress(userAddress);
+    const { accountAddress } = this.props.params;
+    browserHistory.push(`/account/${accountAddress}`);
+    this.getOneAccountByAddress(accountAddress);
   }
 
-  getOneUserByAddress(address) {
+  getOneAccountByAddress(address) {
     if (address) {
-      userService.getOneUserByAddress(address)
+      accountService.getOneAccountByAddress(address)
         .then(res => {
             console.log(res)
           switch (res.data.type) {
-            case 'user':
+            case 'account':
               this.setState({
-                userInfo: res.data.body,
+                accountInfo: res.data.body,
                 errorType: null
               })
               break;
@@ -59,22 +59,22 @@ export default class TransactionExplorer extends Component {
     }
   }
   renderContent() {
-    const { userInfo, errorType } = this.state;
+    const { accountInfo, errorType } = this.state;
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
-          {userInfo !== null ?
-            <UserExplorerTable userInfo={userInfo} /> : <div></div>}
+          {accountInfo !== null ?
+            <AccountExplorerTable accountInfo={accountInfo} /> : <div></div>}
         </div>
     )
   }
   render() {
-    const { userInfo } = this.state;
-    const address = userInfo ? userInfo.address : null;
+    const { accountInfo } = this.state;
+    const address = accountInfo ? accountInfo.address : null;
     return (
       <div className="th-transaction-explorer">
         <div className="th-block-explorer__title">
-          <span>User Detail: {address}</span>
+          <span>Account Detail: {address}</span>
         </div>
         {this.renderContent()}
       </div>

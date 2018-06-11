@@ -8,7 +8,7 @@ import Transactions from './features/transactions'
 import TransactionExplorer from './features/transactions/components/transaction-explorer'
 import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
-import UserExplorer from './features/user'
+import AccountExplorer from './features/account'
 import './styles.scss';
 
 const app = document.querySelector('#root');
@@ -23,7 +23,7 @@ ReactDom.render(
       <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/>
       <Route path='/txs' component={Transactions} backendAddress={backendAddress}/>
       <Route path='/txs/:transactionNum' component={TransactionExplorer} backendAddress={backendAddress}/>
-      <Route path='/user/:userAddress' component={UserExplorer} backendAddress={backendAddress}/>
+      <Route path='/account/:accountAddress' component={AccountExplorer} backendAddress={backendAddress}/>
     </Route>
   </Router>,
   app

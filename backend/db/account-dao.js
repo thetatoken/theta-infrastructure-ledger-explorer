@@ -9,27 +9,27 @@ module.exports = class TransactionDAO {
   constructor(execDir, client) {
     this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
     this.client = client;
-    this.userInfoSet = 'user';
+    this.accountInfoSet = 'account';
     this.upsertPolicy = new this.aerospike.WritePolicy({
       exists: this.aerospike.policy.exists.CREATE_OR_REPLACE
     });
   }
 
-  upsertUser(userInfo, callback) {
+  upsertAccount(accountInfo, callback) {
     let bins = {
-      'address': userInfo.address,
-      'balance': userInfo.balance
+      'address': accountInfo.address,
+      'balance': accountInfo.balance
     }
-    this.client.put(this.userInfoSet, bins.address, bins, {}, this.upsertPolicy, callback);
+    this.client.put(this.accountInfoSet, bins.address, bins, {}, this.upsertPolicy, callback);
   }
-  checkUser(pk, callback){
-    return this.client.exists(this.userInfoSet, pk, (err, res) => {
+  checkAccount(pk, callback){
+    return this.client.exists(this.accountInfoSet, pk, (err, res) => {
       callback(err, res)
     })
   }
 
-  getUserByPk(pk, callback) {
-    this.client.get(this.userInfoSet, pk, function (error, record) {
+  getAccountByPk(pk, callback) {
+    this.client.get(this.accountInfoSet, pk, function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -39,13 +39,13 @@ module.exports = class TransactionDAO {
             callback(error);
             break
           default:
-            console.log('ERR - ', error, uuid)
+            console.log('ERR - ', error, pk)
         }
       } else {
-        var userInfo = {};
-        userInfo.address = record.bins.address;
-        userInfo.balance = record.bins.balance;
-        callback(error, userInfo);
+        var accountInfo = {};
+        accountInfo.address = record.bins.address;
+        accountInfo.balance = record.bins.balance;
+        callback(error, accountInfo);
       }
     });
   }

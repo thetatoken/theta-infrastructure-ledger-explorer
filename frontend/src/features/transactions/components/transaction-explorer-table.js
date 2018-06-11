@@ -79,7 +79,7 @@ export default class TransactionExplorerTable extends Component {
     )
   }
   renderOneRow(leftContent, rightContent, isAddress) {
-    const content = !isAddress ? rightContent : <Link to={`/user/${rightContent}`} >{rightContent}</Link>;
+    const content = !isAddress ? rightContent : <Link to={`/account/${rightContent}`} >{rightContent}</Link>;
     return (
       <div className="th-be-table__row">
         <div className="th-be-table__row--left">

@@ -9,11 +9,11 @@ var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
 var transactionDaoLib = require('../db/transaction-dao.js');
 var transactionProgressDaoLib = require('../db/transaction-progress-dao.js');
-var userDaoLib = require('../db/user-dao.js');
+var accountDaoLib = require('../db/account-dao.js');
 var bodyParser = require("body-parser");
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
-var userRouter = require("./routes/userRouter");
+var accountRouter = require("./routes/accountRouter");
 var cors = require('cors')
 
 //------------------------------------------------------------------------------
@@ -66,8 +66,8 @@ function main() {
       bluebird.promisifyAll(transactionDao);
       transactionProgressDao = new transactionProgressDaoLib(__dirname, asClient);
       bluebird.promisifyAll(transactionProgressDao);
-      userDao = new userDaoLib(__dirname, asClient);
-      bluebird.promisifyAll(userDao);
+      accountDao = new accountDaoLib(__dirname, asClient);
+      bluebird.promisifyAll(accountDao);
 
       // start server program
       io.on('connection', onClientConnect);
@@ -79,8 +79,8 @@ function main() {
       blocksRouter(app, blockDao, progressDao, config);
       // transactions router       
       transactionsRouter(app, transactionDao, transactionProgressDao, config);
-      // user router
-      userRouter(app, userDao, config);
+      // account router
+      accountRouter(app, accountDao, config);
       // keep push block data
       // pushTopBlocks();
     }

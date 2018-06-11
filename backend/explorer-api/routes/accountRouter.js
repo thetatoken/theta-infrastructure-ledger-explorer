@@ -2,24 +2,24 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var userRouter = (app, userDao, config) => {
+var accountRouter = (app, accountDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
-  router.get("/user/:address", (req, res) => {
+  router.get("/account/:address", (req, res) => {
     let address = req.params.address;
-    console.log('Querying one User by using address: ' + address);
+    console.log('Querying one Account by using address: ' + address);
     const data = ({
-        type: 'user',
+        type: 'account',
         body: {
             address,
             balance: 'many'
         },
     });
     res.status(200).send(data);
-    // userDao.getUserByPkAsync(address)
-    //   .then(userInfo => {
+    // accountDao.getAccountByPkAsync(address)
+    //   .then(accountInfo => {
     //     const data = ({
-    //       type: 'user',
-    //       body: userDao,
+    //       type: 'account',
+    //       body: accountDao,
     //     });
     //     res.status(200).send(data);
     //   })
@@ -45,4 +45,4 @@ var userRouter = (app, userDao, config) => {
   app.use('/api', router);
 }
 
-module.exports = userRouter;
+module.exports = accountRouter;

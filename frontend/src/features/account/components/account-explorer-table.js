@@ -7,12 +7,12 @@ const nameMap = {
   'balance': 'Balance',
 }
 
-export default class UserExplorerTable extends Component {
+export default class AccountExplorerTable extends Component {
   render() {
-    const { userInfo } = this.props;
+    const { accountInfo } = this.props;
     return (
       <div className="th-be-table">
-        {Object.keys(userInfo).map(key => {
+        {Object.keys(accountInfo).map(key => {
           return (
             <div className="th-be-table__row" key={key}>
               <div className="th-be-table__row--left">
@@ -20,7 +20,7 @@ export default class UserExplorerTable extends Component {
               </div>
               <div className="th-be-table__row--right">
                 <div className="th-be-table-text">
-                  {userInfo[key]}
+                  {accountInfo[key]}
                 </div>
               </div>
             </div>
