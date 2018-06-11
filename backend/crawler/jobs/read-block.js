@@ -23,7 +23,7 @@ exports.Execute = function(callback) {
 
   rpc.getStatusAsync([]) // read block height from chain
   .then(function (data) {
-    console.log(data);
+    // console.log(data);
     var result = JSON.parse(data);
     latest_block_height = result.result.latest_block_height;
     console.log('Latest block height: ' + latest_block_height.toString());
@@ -55,7 +55,7 @@ exports.Execute = function(callback) {
     var upsertBlockAsyncList = []
     for (var i = 0; i < blockDataList.length; i++) {
       var result = JSON.parse(blockDataList[i]);
-      console.log(blockDataList[i]);
+      // console.log(blockDataList[i]);
       blockInfo = {
         height:       result.result.block_meta.header.height,
         timestamp:    result.result.block_meta.header.time,

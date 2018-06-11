@@ -20,7 +20,7 @@ module.exports = class txsProgressDAO {
     let bins = {
       'network':         network,
       'lst_blk_height':  block_height,
-      // 'lst_blk_height': 4140000,
+      // 'lst_blk_height': 24130,
       'total_count': count
     }
     this.client.put(this.progressInfoSet, network, bins, {}, this.upsertPolicy, callback);

@@ -1,7 +1,7 @@
 var rpc = require('../api/rpc.js');
 var bluebird = require("bluebird");
-var Aerospike = require('aerospike')
-
+var Aerospike = require('aerospike');
+var accountHelp = require('../helper/account-helper');
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
@@ -13,12 +13,14 @@ var max_block_per_crawl = 10;
 var txs_count = 0;
 var target_crawl_height;
 var upsertTransactionAsyncList = [];
+var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (transactionProgressDaoInstance, transactionDaoInstance, callback) {
+exports.Initialize = function (transactionProgressDaoInstance, transactionDaoInstance, accountDaoInstance, callback) {
   transactionDao = transactionDaoInstance;
   transactionProgressDao = transactionProgressDaoInstance;
+  accountDao = accountDaoInstance;
 }
 
 exports.Execute = function (callback) {
@@ -68,6 +70,7 @@ exports.Execute = function (callback) {
               const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
               if (!isExisted) {
                 transaction.number = ++txs_count;
+                validTransactionList.push(transaction);
                 upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
               }
             }
@@ -75,6 +78,9 @@ exports.Execute = function (callback) {
         }
       }
       return Promise.all(upsertTransactionAsyncList)
+    })
+    .then(() => {
+      accountHelp.updateAccount(accountDao, validTransactionList);
     })
     .then(function () {
       transactionProgressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);

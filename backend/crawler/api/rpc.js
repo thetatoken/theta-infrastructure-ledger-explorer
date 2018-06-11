@@ -31,6 +31,15 @@ exports.getStatus = function(params, callback) {
   }
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
+exports.getAccount = function(params, callback) {
+  body = {
+    jsonrpc: '2.0',
+    method: 'theta.GetAccount',
+    params: params,
+    id: RandomIdGenerator()
+  }
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+}
 
 //------------------------------------------------------------------------------
 //  Utils
