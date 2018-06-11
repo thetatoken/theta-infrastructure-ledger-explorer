@@ -4,7 +4,7 @@ var path = require('path');
 //  DAO for transaction
 //------------------------------------------------------------------------------
 
-module.exports = class TransactionDAO {
+module.exports = class AccountDAO {
 
   constructor(execDir, client) {
     this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));

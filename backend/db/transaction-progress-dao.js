@@ -4,7 +4,7 @@ var path = require('path');
 //  DAO for chain status
 //------------------------------------------------------------------------------
 
-module.exports = class txsProgressDAO {
+module.exports = class TransactionProgressDAO {
 
   constructor(execDir, client) {
     console.log(path.join(execDir, 'node_modules', 'aerospike'))

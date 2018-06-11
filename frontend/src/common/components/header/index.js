@@ -14,8 +14,10 @@ export default class Header extends Component {
     const value = this.searchInput.value;
     switch (this.searchType.value) {
       case 'address':
-        browserHistory.push(`/account/${value}`);
-        this.searchInput.value = '';
+        if(value !== ''){
+          browserHistory.push(`/account/${value}`);
+          this.searchInput.value = '';
+        }
         break;
       case 'block':
         browserHistory.push(`/blocks/${value}`);

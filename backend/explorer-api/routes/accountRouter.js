@@ -4,17 +4,9 @@ var bodyParser = require('body-parser');
 
 var accountRouter = (app, accountDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
+  
   router.get("/account/:address", (req, res) => {
     let address = req.params.address;
-    // console.log('Querying one Account by using address: ' + address);
-    // const data = ({
-    //     type: 'account',
-    //     body: {
-    //         address,
-    //         balance: 'many'
-    //     },
-    // });
-    // res.status(200).send(data);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
         const data = ({
