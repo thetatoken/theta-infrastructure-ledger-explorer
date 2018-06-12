@@ -41,7 +41,6 @@ export default class Transactions extends Component {
     // this.socket.disconnect();
   }
   receivedTransactionsEvent(data) {
-    console.log(data);
     if (data.data.type == 'transaction_list') {
       this.setState({
         transactionInfoList: data.data.body,

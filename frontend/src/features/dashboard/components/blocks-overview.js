@@ -30,7 +30,6 @@ export default class BlocksOverView extends Component {
     this.socket.disconnect();
   }
   onSocketEvent(data) {
-    // console.log(data);
     if (data.type == 'block_list') {
       this.setState({ blockInfoList: data.body })
     }

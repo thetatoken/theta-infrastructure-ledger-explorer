@@ -162,7 +162,6 @@ export default class TransactionExplorerTable extends Component {
   }
   render() {
     const { transactionInfo } = this.props;
-    console.log(transactionInfo)
     switch (transactionInfo.type) {
       case 1:
         return (

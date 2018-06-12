@@ -29,7 +29,6 @@ export default class TransactionsOverView extends Component {
     this.socket.disconnect();
   }
   onSocketEvent(data) {
-    // console.log(data);
     if (data.type == 'transaction_list') {
       this.setState({ transactionInfoList: data.body })
     }

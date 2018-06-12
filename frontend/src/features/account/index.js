@@ -32,7 +32,6 @@ export default class AccountExplorer extends Component {
     if (address) {
       accountService.getOneAccountByAddress(address)
         .then(res => {
-          console.log(res)
           switch (res.data.type) {
             case 'account':
               this.setState({

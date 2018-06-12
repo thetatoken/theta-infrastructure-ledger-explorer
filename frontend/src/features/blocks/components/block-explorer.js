@@ -42,7 +42,6 @@ export default class BlocksExplorer extends Component {
         || height > 0)) {
       blocksService.getBlockByHeight(height)
         .then(res => {
-          // console.log(res.data.body.txs)
           switch (res.data.type) {
             case 'block':
               this.setState({

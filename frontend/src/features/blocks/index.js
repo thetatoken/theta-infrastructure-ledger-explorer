@@ -42,7 +42,6 @@ export default class Blocks extends Component {
     // this.socket.disconnect();
   }
   receivedBlocksEvent(data) {
-    console.log(data);
     if (data.data.type == 'block_list') {
       this.setState({
         blockInfoList: data.data.body,
