@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import socketClient from 'socket.io-client';
-import BlockInfoRowsBrief from 'features/blocks/components/block-info-rows-brief';
+import BlockOverviewTable from 'features/blocks/components/block-overview-table';
 import LinkButton from "common/components/link-button";
 import '../styles.scss';
 
@@ -40,7 +40,7 @@ export default class BlocksOverView extends Component {
       <div className="th-overview">
         <div className="th-overview__title">Blockchains overview</div>
         {blockInfoList !== undefined ?
-          <BlockInfoRowsBrief blockInfoList={blockInfoList} /> : <div></div>}
+          <BlockOverviewTable blockInfoList={blockInfoList} /> : <div></div>}
         <div className="th-overview__button">
           <LinkButton className="th-overview__button--a" url="/blocks">View All</LinkButton>
         </div>

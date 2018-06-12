@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import { transactionsService } from '/common/services/transaction';
-import TransactionInfoRows from './components/transaction-info-rows';
-import LinkButton from "common/components/link-button";
+import TransactionOverviewTable from './components/transaction-overview-table';
 import Pagination from "common/components/pagination"
 import './styles.scss';
 
@@ -44,7 +43,7 @@ export default class Transactions extends Component {
     }
   }
 
-  handleGetTransactionsByPage(pageNumber, type) {
+  handleGetTransactionsByPage(pageNumber) {
     transactionsService.getTransactionsByPage(pageNumber)
       .then(res => {
         this.receivedTransactionsEvent(res);
@@ -53,38 +52,17 @@ export default class Transactions extends Component {
       })
   }
 
-  renderPrevPageButton() {
-    let { currentPageNumber } = this.state;
-    currentPageNumber = Number(currentPageNumber);
-    return (
-      Number(currentPageNumber) !== 1 ?
-        <LinkButton className="th-blocks-button__left" left handleOnClick={() => this.handleGetTransactionsByPage(currentPageNumber - 1)}>Prev</LinkButton>
-        : <div></div>
-    );
-  }
-
-  renderNextPageButton() {
-    let { currentPageNumber, totalPageNumber } = this.state;
-    currentPageNumber = Number(currentPageNumber);
-    totalPageNumber = Number(totalPageNumber);
-    return (
-      currentPageNumber !== totalPageNumber ?
-        <LinkButton className="th-blocks-button__right" right handleOnClick={() => this.handleGetTransactionsByPage(currentPageNumber + 1)} >Next</LinkButton>
-        : <div></div>
-    );
-  }
-
   render() {
     const { transactionInfoList } = this.state;
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
     return (
-      <div className="th-blocks">
-        <div className="th-blocks-title">Transactions listing. Page: #{currentPageNumber + 1}</div>
+      <div className="theta-content__container">
+        <div className="theta-content__container--title">Transactions listing. Page: #{currentPageNumber + 1}</div>
         {transactionInfoList !== undefined ?
-          <TransactionInfoRows transactionInfoList={transactionInfoList} size='full' /> : <div></div>}
-        <div className="th-blocks-pagination">
+          <TransactionOverviewTable transactionInfoList={transactionInfoList} size='full' /> : <div></div>}
+        <div className="theta-content__container--pagination">
           <Pagination
             size={'lg'}
             totalPages={totalPageNumber}

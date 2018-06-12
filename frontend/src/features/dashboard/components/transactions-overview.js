@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import socketClient from 'socket.io-client';
-import TransactionInfoRows from 'features/transactions/components/transaction-info-rows';
+import TransactionOverviewTable from 'features/transactions/components/transaction-overview-table';
 import LinkButton from "common/components/link-button";
 import '../styles.scss';
 
@@ -39,7 +39,7 @@ export default class TransactionsOverView extends Component {
       <div className="th-overview">
         <div className="th-overview__title">Transactions overview</div>
         {transactionInfoList !== undefined ?
-          <TransactionInfoRows transactionInfoList={transactionInfoList} /> : <div></div>}
+          <TransactionOverviewTable transactionInfoList={transactionInfoList} /> : <div></div>}
         <div className="th-overview__button">
           <LinkButton className="th-overview__button--a" url="/txs">View All</LinkButton>
         </div>

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router"
+import { Link } from "react-router";
 // import '../styles.scss';
 
-export default class TransactionInfoRows extends Component {
+export default class TransactionOverviewTable extends Component {
   render() {
     const { transactionInfoList, size } = this.props;
-    const className = size === 'full' ? "th-block-info-brief full" : "th-block-info-brief"
+    const className = size === 'full' ? "th-overview-table full" : "th-overview-table"
     return (
       <div className={className}>
         <table>

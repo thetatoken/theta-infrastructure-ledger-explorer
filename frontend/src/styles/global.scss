@@ -72,4 +72,23 @@ body {
   overflow: auto;
   display: flex;
   justify-content: center;
+
+  &__container{
+    width: 100%;
+  
+    &--title{
+      width: 80%;
+      height: 50px;
+      line-height: 50px;
+      margin: 20px 0 20px 10%;
+      font-size: 25px;
+      text-align: center;
+    }
+  
+    &--pagination{
+      margin-top: 20px;
+      display: flex;
+      width: 100%;
+    }
+  }
 }

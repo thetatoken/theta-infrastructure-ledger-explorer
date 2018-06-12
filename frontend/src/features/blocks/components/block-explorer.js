@@ -19,7 +19,7 @@ export default class BlocksExplorer extends Component {
       errorType: null
     };
   }
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
       this.gerOneBlockByHeight(nextProps.params.blockHeight);
     }
