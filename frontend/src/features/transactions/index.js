@@ -32,14 +32,8 @@ export default class Transactions extends Component {
       }).catch(err => {
         console.log(err);
       })
-    // Initial the socket
-    // this.socket = socketClient(backendAddress);
-    // this.socket.on('event', this.onSocketEvent)
+  }
 
-  }
-  componentWillUnmount() {
-    // this.socket.disconnect();
-  }
   receivedTransactionsEvent(data) {
     if (data.data.type == 'transaction_list') {
       this.setState({
@@ -49,17 +43,16 @@ export default class Transactions extends Component {
       })
     }
   }
+
   handleGetTransactionsByPage(pageNumber, type) {
     transactionsService.getTransactionsByPage(pageNumber)
       .then(res => {
         this.receivedTransactionsEvent(res);
-        // this.setState({
-        //   pageNumber: type === 'Prev' ? pageNumber - 1 : pageNumber + 1,
-        // })
       }).catch(err => {
         console.log(err);
       })
   }
+
   renderPrevPageButton() {
     let { currentPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
@@ -69,6 +62,7 @@ export default class Transactions extends Component {
         : <div></div>
     );
   }
+
   renderNextPageButton() {
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
@@ -79,6 +73,7 @@ export default class Transactions extends Component {
         : <div></div>
     );
   }
+
   render() {
     const { transactionInfoList } = this.state;
     let { currentPageNumber, totalPageNumber } = this.state;
@@ -86,8 +81,6 @@ export default class Transactions extends Component {
     totalPageNumber = Number(totalPageNumber);
     return (
       <div className="th-blocks">
-        {/* {blockInfoList !== undefined ?
-          <BlockInfoRows blockInfoList={blockInfoList} /> : <div></div>} */}
         <div className="th-blocks-title">Transactions listing. Page: #{currentPageNumber + 1}</div>
         {transactionInfoList !== undefined ?
           <TransactionInfoRows transactionInfoList={transactionInfoList} size='full' /> : <div></div>}
@@ -99,10 +92,6 @@ export default class Transactions extends Component {
             callback={this.handleGetTransactionsByPage}
           />
         </div>
-        {/* <div className="th-blocks-button">
-          {this.renderPrevPageButton()}
-          {this.renderNextPageButton()}
-        </div> */}
       </div>
     );
   }

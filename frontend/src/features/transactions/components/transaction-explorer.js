@@ -70,16 +70,6 @@ export default class TransactionExplorer extends Component {
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
-          {/* <div className="th-block-explorer__buttons">
-            {uuid > 1 ?
-              <LinkButton className="th-block-explorer__buttons--prev" url={`/txs/${uuid - 1}`} left>Prev</LinkButton>
-              : this.renderNoMoreMsg()
-            }
-            {totalTransactionsNumber > uuid ?
-              <LinkButton className="th-block-explorer__buttons--next" url={`/txs/${uuid + 1}`} right>Next</LinkButton>
-              : this.renderNoMoreMsg()
-            }
-          </div> */}
           {transactionInfo !== null ?
             <TransactionExplorerTable transactionInfo={transactionInfo} /> : <div></div>}
         </div>
@@ -93,7 +83,9 @@ export default class TransactionExplorer extends Component {
         <div className="th-block-explorer__title">
           <span>Transaction Detail: {transactionHash}</span>
         </div>
-        {this.renderContent()}
+        <div className="th-be-table">
+          {this.renderContent()}
+        </div>
       </div>
     );
   }

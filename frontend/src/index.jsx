@@ -19,7 +19,7 @@ ReactDom.render(
       <IndexRoute component={Dashboard}/>
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} />
-      <Route exact path='/blocks' component={Blocks} backendAddress={backendAddress}/>
+      <Route path='/blocks' component={Blocks} backendAddress={backendAddress}/>
       <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendAddress}/>
       <Route path='/txs' component={Transactions} backendAddress={backendAddress}/>
       <Route path='/txs/:transactionHash' component={TransactionExplorer} backendAddress={backendAddress}/>

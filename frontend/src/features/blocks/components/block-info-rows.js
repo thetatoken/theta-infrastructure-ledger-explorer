@@ -1,19 +1,10 @@
 import React, { Component } from "react";
-import { Link } from "react-router"
+import { Link } from "react-router";
 // import '../styles.scss';
 
 export default class BlockInfoRows extends Component {
     render() {
       const { blockInfoList } = this.props;
-      // var blocks = [].concat(blockInfoList)
-      //   .sort((a,b) => a.height > b.height)
-      //   .map((blockInfo) => {
-      //   return (
-      //     <React.Fragment key={blockInfo.height}>
-      //       <p>{blockInfo.height}  {blockInfo.hash}.  {blockInfo.timestamp}</p>
-      //     </React.Fragment>
-      //   );
-      // });  <p>Height        Hash        Timestamp</p>
   
       return (
         <div>

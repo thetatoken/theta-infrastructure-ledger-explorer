@@ -20,28 +20,6 @@ const typeMap = {
   '8': 'Update Validators'
 }
 export default class TransactionExplorerTable extends Component {
-  renderContent(key) {
-    const { transactionInfo } = this.props;
-    switch (key) {
-      case 'fee':
-        return transactionInfo['fee'].amount;
-        break;
-      case 'gas':
-        return transactionInfo['gas'];
-      case 'pmt_sqnc':
-        return transactionInfo['pmt_sqnc'];
-      case 'rsv_sqnc':
-        return transactionInfo['rsv_sqnc'];
-      case 'source':
-        return transactionInfo['source'].address;
-      case 'target':
-        return transactionInfo['target'].address;
-      case 'Amount':
-        return this.getAmount();
-      default:
-        return null;
-    }
-  }
   renderAmount(coins, type) {
     let sum = 0, coinType;
     if (type === 'single') {
@@ -162,45 +140,19 @@ export default class TransactionExplorerTable extends Component {
   }
   render() {
     const { transactionInfo } = this.props;
-    switch (transactionInfo.type) {
+    switch (transactionInfo.type) { // TODO: Add other type cases
       case 1:
-        return (
-          <div className="th-be-table">
-            {this.renderType1(transactionInfo)}
-          </div>
-        )
-        break;
+        return this.renderType1(transactionInfo)
       case 3:
-        return (
-          <div className="th-be-table">
-            {this.renderType3(transactionInfo)}
-          </div>
-        )
-        break;
+        return this.renderType3(transactionInfo)
       case 4:
-        return (
-          <div className="th-be-table">
-            {this.renderType4(transactionInfo)}
-          </div>
-        )
-        break;
+        return this.renderType4(transactionInfo)
       case 6:
-        return (
-          <div className="th-be-table">
-            {this.renderType6(transactionInfo)}
-          </div>
-        )
-        break;
+        return this.renderType6(transactionInfo)
       case 7:
-        return (
-          <div className="th-be-table">
-            {this.renderType7(transactionInfo)}
-          </div>
-        )
-        break;
+        return this.renderType7(transactionInfo)
       default:
-        return (<div>Wrong type</div>)
-        break;
+        return <div>Wrong type</div>
     }
   }
 }

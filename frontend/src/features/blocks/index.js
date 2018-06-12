@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router';
 import { blocksService } from '/common/services/block';
 import BlockInfoRowsBrief from './components/block-info-rows-brief';
 import LinkButton from "common/components/link-button";
-import Pagination from "common/components/pagination"
+import Pagination from "common/components/pagination";
 // import './styles.scss';
 
 export default class Blocks extends Component {
@@ -33,14 +33,8 @@ export default class Blocks extends Component {
       }).catch(err => {
         console.log(err);
       })
-    // Initial the socket
-    // this.socket = socketClient(backendAddress);
-    // this.socket.on('event', this.onSocketEvent)
+  }
 
-  }
-  componentWillUnmount() {
-    // this.socket.disconnect();
-  }
   receivedBlocksEvent(data) {
     if (data.data.type == 'block_list') {
       this.setState({
@@ -54,9 +48,6 @@ export default class Blocks extends Component {
     blocksService.getBlocksByPage(pageNumber)
       .then(res => {
         this.receivedBlocksEvent(res);
-        // this.setState({
-        //   pageNumber: type === 'Prev' ? pageNumber - 1 : pageNumber + 1,
-        // })
       }).catch(err => {
         console.log(err);
       })
@@ -98,10 +89,6 @@ export default class Blocks extends Component {
             callback={this.handleGetBlocksByPage}
           />
         </div>
-        {/* <div className="th-blocks-button">
-          {this.renderPrevPageButton()}
-          {this.renderNextPageButton()}
-        </div> */}
       </div>
     );
   }

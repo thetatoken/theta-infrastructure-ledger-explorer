@@ -3,6 +3,9 @@ import { Link } from "react-router"
 import './styles.scss';
 
 export default class LinkButton extends Component {
+  constructor(props){
+    super(props);
+  }
   renderLeftArrow(left){
     return(
       left ? <div>&#8678;</div> : null
