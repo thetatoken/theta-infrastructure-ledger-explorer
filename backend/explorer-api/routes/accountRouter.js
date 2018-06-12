@@ -24,8 +24,6 @@ var accountRouter = (app, accountDao) => {
               type: 'error_not_found',
               error
             });
-            // var blockInfo = {};
-            // blockInfo.error = 'Not Found';
             res.status(200).send(err);
             break
           default:

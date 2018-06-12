@@ -10,9 +10,7 @@ export default class Blocks extends Component {
     super(props);
     this.state = {
       // backendAddress: this.props.route.backendAddress,
-      // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
-      // backendAddress: "localhost:3000",
       blockHeight: 0,
       blockInfoList: [],
       currentPageNumber: 0,

@@ -10,7 +10,6 @@ export default class AccountExplorer extends Component {
     super(props);
     this.state = {
       // backendAddress: this.props.route.backendAddress,
-      // backendAddress: "52.53.243.120:9000",
       backendAddress: "localhost:9000",
       accountInfo: null,
       errorType: null

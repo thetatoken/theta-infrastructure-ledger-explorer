@@ -1,5 +1,4 @@
 var rpc = require('../api/rpc.js');
-var bluebird = require("bluebird");
 var Aerospike = require('aerospike')
 
 //------------------------------------------------------------------------------
