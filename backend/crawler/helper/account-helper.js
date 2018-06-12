@@ -1,6 +1,6 @@
 var rpc = require('../api/rpc.js');
 
-exports.updateAccount = function (accountDao, transactionList, callback) {
+exports.updateAccount = function (accountDao, transactionList) {
   transactionList.forEach(async function (tx) {
     switch (tx.type) { // TODO: Add other type cases
       case 1:

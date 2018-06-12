@@ -9,7 +9,7 @@ var statusDao = null;
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function(statusDaoInstance, callback) {
+exports.Initialize = function(statusDaoInstance) {
   statusDao = statusDaoInstance;
 }
 

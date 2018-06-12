@@ -15,13 +15,13 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (transactionProgressDaoInstance, transactionDaoInstance, accountDaoInstance, callback) {
+exports.Initialize = function (transactionProgressDaoInstance, transactionDaoInstance, accountDaoInstance) {
   transactionDao = transactionDaoInstance;
   transactionProgressDao = transactionProgressDaoInstance;
   accountDao = accountDaoInstance;
 }
 
-exports.Execute = function (callback) {
+exports.Execute = function () {
 
   rpc.getStatusAsync([]) // read block height from chain
     .then(function (data) {

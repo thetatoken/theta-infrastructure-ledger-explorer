@@ -12,12 +12,12 @@ var target_crawl_height;
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function(progressDaoInstance, blockDaoInstance, callback) {
+exports.Initialize = function(progressDaoInstance, blockDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
 }
 
-exports.Execute = function(callback) {
+exports.Execute = function() {
 
   rpc.getStatusAsync([]) // read block height from chain
   .then(function (data) {
