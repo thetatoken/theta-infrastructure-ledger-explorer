@@ -38,11 +38,11 @@ export default class BlocksOverView extends Component {
     const { blockInfoList } = this.state;
     return (
       <div className="th-overview">
-        <div className="th-blocks-overview__title">Blockchains overview</div>
+        <div className="th-overview__title">Blockchains overview</div>
         {blockInfoList !== undefined ?
           <BlockInfoRowsBrief blockInfoList={blockInfoList} /> : <div></div>}
-        <div className="th-blocks-overview__button">
-          <LinkButton className="th-blocks-overview__button--a" url="/blocks">View All</LinkButton>
+        <div className="th-overview__button">
+          <LinkButton className="th-overview__button--a" url="/blocks">View All</LinkButton>
         </div>
       </div>
     );

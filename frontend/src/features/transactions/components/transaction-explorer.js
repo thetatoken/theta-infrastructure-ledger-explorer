@@ -17,7 +17,7 @@ export default class TransactionExplorer extends Component {
       errorType: null
     };
   }
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
       this.getOneTransactionByUuid(nextProps.params.transactionHash);
     }
@@ -28,7 +28,6 @@ export default class TransactionExplorer extends Component {
     this.getOneTransactionByUuid(transactionHash);
   }
   getOneTransactionByUuid(hash) {
-    const { totalTransactionsNumber } = this.state;
     if (hash) {
       transactionsService.getOneTransactionByUuid(hash)
         .then(res => {
@@ -55,14 +54,8 @@ export default class TransactionExplorer extends Component {
       console.log('Wrong Height')
     }
   }
-  renderNoMoreMsg() {
-    return (
-      <div className="th-block-explorer__buttons--no-more">No More</div>
-    )
-  }
   renderContent() {
     const { transactionInfo, errorType } = this.state;
-    const uuid = Number(this.props.params.transactionHash);
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
@@ -74,11 +67,11 @@ export default class TransactionExplorer extends Component {
   render() {
     const { transactionHash } = this.props.params;
     return (
-      <div className="th-transaction-explorer">
-        <div className="th-block-explorer__title">
+      <div className="th-explorer">
+        <div className="th-explorer__title">
           <span>Transaction Detail: {transactionHash}</span>
         </div>
-        <div className="th-be-table">
+        <div className="th-explorer-table">
           {this.renderContent()}
         </div>
       </div>

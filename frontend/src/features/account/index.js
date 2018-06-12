@@ -16,7 +16,7 @@ export default class AccountExplorer extends Component {
       errorType: null
     };
   }
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
       this.getOneAccountByAddress(nextProps.params.accountAddress);
     }
@@ -67,11 +67,10 @@ export default class AccountExplorer extends Component {
     )
   }
   render() {
-    const { accountInfo } = this.state;
     const { accountAddress } = this.props.params;
     return (
-      <div className="th-transaction-explorer">
-        <div className="th-block-explorer__title">
+      <div className="th-explorer">
+        <div className="th-explorer__title">
           <span>Account Detail: {accountAddress}</span>
         </div>
         {this.renderContent()}

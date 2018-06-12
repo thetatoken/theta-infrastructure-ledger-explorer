@@ -44,16 +44,16 @@ export default class BlockExplorerTable extends Component {
   render() {
     const { blockInfo } = this.props;
     return (
-      <div className="th-be-table">
+      <div className="th-explorer-table">
         {Object.keys(blockInfo).map(key => {
           const content = this.getInfo(blockInfo, key);
           return (
-            <div className="th-be-table__row" key={key}>
-              <div className="th-be-table__row--left">
-                <p className="th-be-table-text">{nameMap[key]}</p>
+            <div className="th-explorer-table__row" key={key}>
+              <div className="th-explorer-table__row--left">
+                <p className="th-explorer-table-text">{nameMap[key]}</p>
               </div>
-              <div className="th-be-table__row--right">
-                <div className="th-be-table-text">
+              <div className="th-explorer-table__row--right">
+                <div className="th-explorer-table-text">
                   {this.renderContent(key, content)}
                 </div>
               </div>

@@ -3,7 +3,7 @@
 $border-width: 1px;
 $line-height: 50px;
 
-.th-be-table{
+.th-explorer-table{
   width: 60%;
   margin: 20px 20%;
   border: $border-width solid $th-blue;
@@ -37,7 +37,7 @@ $line-height: 50px;
 .th-be-button__back{
   width: 110px !important;
 }
-.th-block-explorer{
+.th-explorer{
   height: 100%;
   width: 100%;
 
@@ -120,7 +120,7 @@ $line-height: 50px;
   display: flex;
   width: 100%;
 }
-.th-be-table-text{
+.th-explorer-table-text{
   margin: 0;
   word-break: break-all;
   text-align: center;

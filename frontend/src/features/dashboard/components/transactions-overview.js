@@ -37,11 +37,11 @@ export default class TransactionsOverView extends Component {
     const { transactionInfoList } = this.state;
     return (
       <div className="th-overview">
-        <div className="th-blocks-overview__title">Transactions overview</div>
+        <div className="th-overview__title">Transactions overview</div>
         {transactionInfoList !== undefined ?
           <TransactionInfoRows transactionInfoList={transactionInfoList} /> : <div></div>}
-        <div className="th-blocks-overview__button">
-          <LinkButton className="th-blocks-overview__button--a" url="/txs">View All</LinkButton>
+        <div className="th-overview__button">
+          <LinkButton className="th-overview__button--a" url="/txs">View All</LinkButton>
         </div>
       </div>
     );

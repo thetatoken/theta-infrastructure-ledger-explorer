@@ -34,7 +34,7 @@ export default class TransactionExplorerTable extends Component {
   renderIds(ids) {
     let res = '';
     ids.forEach(id => {
-      res += ids + ', '
+      res += id + ', '
     })
     return res.substring(0, res.length - 2);
   }
@@ -51,12 +51,12 @@ export default class TransactionExplorerTable extends Component {
   renderOneRow(leftContent, rightContent, isAddress) {
     const content = !isAddress ? rightContent : <Link to={`/account/${rightContent}`} >{rightContent}</Link>;
     return (
-      <div className="th-be-table__row">
-        <div className="th-be-table__row--left">
-          <p className="th-be-table-text">{leftContent}</p>
+      <div className="th-explorer-table__row">
+        <div className="th-explorer-table__row--left">
+          <p className="th-explorer-table-text">{leftContent}</p>
         </div>
-        <div className="th-be-table__row--right">
-          <div className="th-be-table-text">
+        <div className="th-explorer-table__row--right">
+          <div className="th-explorer-table-text">
             {content}
           </div>
         </div>

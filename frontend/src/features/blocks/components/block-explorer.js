@@ -62,7 +62,7 @@ export default class BlocksExplorer extends Component {
   }
   renderNoMoreMsg() {
     return (
-      <div className="th-block-explorer__buttons--no-more">No More</div>
+      <div className="th-explorer__buttons--no-more">No More</div>
     )
   }
   renderContent() {
@@ -71,13 +71,13 @@ export default class BlocksExplorer extends Component {
     return (
       errorType === 'error_not_found' ? <NotExist /> :
         <div>
-          <div className="th-block-explorer__buttons">
+          <div className="th-explorer__buttons">
             {height > 1 ?
-              <LinkButton className="th-block-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+              <LinkButton className="th-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
               : this.renderNoMoreMsg()
             }
             {totalBlocksNumber > height ?
-              <LinkButton className="th-block-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
+              <LinkButton className="th-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
               : this.renderNoMoreMsg()
             }
           </div>
@@ -91,8 +91,8 @@ export default class BlocksExplorer extends Component {
   render() {
     const height = Number(this.props.params.blockHeight);
     return (
-      <div className="th-block-explorer">
-        <div className="th-block-explorer__title">
+      <div className="th-explorer">
+        <div className="th-explorer__title">
           <span>Block Detail: {height}</span>
         </div>
         {this.renderContent()}
