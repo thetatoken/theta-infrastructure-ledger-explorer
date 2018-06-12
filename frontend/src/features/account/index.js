@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import AccountExplorerTable from './components/account-explorer-table';
 import { accountService } from '/common/services/account';
-import { Link } from "react-router";
 import NotExist from 'common/components/not-exist';
 // import './styles.scss';
 

@@ -1,7 +1,5 @@
 var statusDao = require('../db/status-dao.js');
 var rpc = require('../api/rpc.js');
-var bluebird = require("bluebird");
-
 
 //------------------------------------------------------------------------------
 //  Global variables

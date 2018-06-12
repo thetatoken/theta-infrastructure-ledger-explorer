@@ -25,7 +25,7 @@ export default class Transactions extends Component {
   componentDidMount() {
     browserHistory.push('/txs');
 
-    const { backendAddress, currentPageNumber } = this.state;
+    const { currentPageNumber } = this.state;
     transactionsService.getTransactionsByPage(currentPageNumber)
       .then(res => {
         this.receivedTransactionsEvent(res);

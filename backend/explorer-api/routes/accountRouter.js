@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var accountRouter = (app, accountDao, config) => {
+var accountRouter = (app, accountDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   
   router.get("/account/:address", (req, res) => {

@@ -7,7 +7,6 @@ var accountHelp = require('../helper/account-helper');
 //------------------------------------------------------------------------------
 var transactionProgressDao = null;
 var transactionDao = null;
-var current_block_hight = 0;
 var network_id = 'test_chain_id_txs';
 var max_block_per_crawl = 10;
 var txs_count = 0;
@@ -55,7 +54,6 @@ exports.Execute = function (callback) {
       }
     })
     .then(async function (blockDataList) {
-      var checkTransactionAsyncList = [];
       if (blockDataList !== undefined) {
         for (var i = 0; i < blockDataList.length; i++) {
           var result = JSON.parse(blockDataList[i]);

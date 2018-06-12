@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import socketClient from 'socket.io-client';
-import BlockInfoRows from './block-info-rows';
 import BlockExplorerTable from './block-explorer-table';
 import { blocksService } from '/common/services/block';
-import { Link } from "react-router"
 import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist';
 
@@ -30,8 +27,6 @@ export default class BlocksExplorer extends Component {
   componentDidMount() {
     const { blockHeight } = this.props.params;
     browserHistory.push(`/blocks/${blockHeight}`);
-
-    const { backendAddress } = this.state;
     this.gerOneBlockByHeight(blockHeight);
   }
   gerOneBlockByHeight(height) {

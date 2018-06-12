@@ -2,7 +2,6 @@ var rpc = require('../api/rpc.js');
 
 exports.updateAccount = function (accountDao, transactionList, callback) {
   transactionList.forEach(async function (tx) {
-    let address, coin;
     switch (tx.type) { // TODO: Add other type cases
       case 1:
         await updateAccountByAddress(tx.data.outputs[0].address, accountDao);

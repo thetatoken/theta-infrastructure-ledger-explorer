@@ -1,14 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router"
 import '../styles.scss';
-const nameMap = {
-  'fee': 'Fee',
-  'gas': 'Gas',
-  'pmt_sqnc': 'Payment Sequence',
-  'rsv_sqnc': 'Reserve Sequence',
-  'source': 'Source Address',
-  'target': 'Target Address'
-}
 const typeMap = {
   '1': 'Coinbase',
   '2': 'Slash',

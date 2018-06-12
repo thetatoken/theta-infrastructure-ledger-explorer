@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import TransactionExplorerTable from './transaction-explorer-table';
 import { transactionsService } from '/common/services/transaction';
-import { Link } from "react-router"
-import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist';
 import '../styles.scss';
 
@@ -27,8 +25,6 @@ export default class TransactionExplorer extends Component {
   componentDidMount() {
     const { transactionHash } = this.props.params;
     browserHistory.push(`/txs/${transactionHash}`);
-
-    const { backendAddress } = this.state;
     this.getOneTransactionByUuid(transactionHash);
   }
   getOneTransactionByUuid(hash) {
@@ -65,7 +61,7 @@ export default class TransactionExplorer extends Component {
     )
   }
   renderContent() {
-    const { transactionInfo, totalTransactionsNumber, errorType } = this.state;
+    const { transactionInfo, errorType } = this.state;
     const uuid = Number(this.props.params.transactionHash);
     return (
       errorType === 'error_not_found' ? <NotExist /> :
@@ -76,7 +72,6 @@ export default class TransactionExplorer extends Component {
     )
   }
   render() {
-    const { transactionInfo } = this.state;
     const { transactionHash } = this.props.params;
     return (
       <div className="th-transaction-explorer">

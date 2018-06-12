@@ -10,7 +10,6 @@ var progressDaoLib = require('../db/progress-dao.js');
 var transactionDaoLib = require('../db/transaction-dao.js');
 var transactionProgressDaoLib = require('../db/transaction-progress-dao.js');
 var accountDaoLib = require('../db/account-dao.js');
-var bodyParser = require("body-parser");
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
@@ -33,7 +32,7 @@ app.use(cors());
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 
-var restServer = app.listen(config.server.port, () => {
+app.listen(config.server.port, () => {
   console.log("rest api running on port.", 9000);
 });
 //------------------------------------------------------------------------------
@@ -135,17 +134,6 @@ function pushTopTransactions() {
     });
 
   if (isPushingTxs) setTimeout(pushTopTransactions, 1000);
-}
-function onReceiveBlockQuery(req, res) {
-  var min_block_height = req.query.min_block_height;
-  var max_block_height = req.query.max_block_height;
-  blockDao.getBlocksByRangeAsync()
-
-  new Long(parseInt(req.query.partner_id, 10), 0x1100001).toString();
-  var recipientTradeToken = req.query.trade_token;
-  var inventoryAppId = req.query.app_id;
-  var tradeItemMarketName = req.query.market_name;
-  var tradeReferenceId = req.query.transaction_id;
 }
 
 function onClientDisconnect() {

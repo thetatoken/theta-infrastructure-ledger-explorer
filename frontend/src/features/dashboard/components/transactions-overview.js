@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import socketClient from 'socket.io-client';
 import TransactionInfoRows from 'features/transactions/components/transaction-info-rows';
-import { blocksService } from '/common/services/block';
 import LinkButton from "common/components/link-button";
 import '../styles.scss';
 

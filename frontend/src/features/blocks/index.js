@@ -26,7 +26,7 @@ export default class Blocks extends Component {
   componentDidMount() {
     browserHistory.push('/blocks');
 
-    const { backendAddress, currentPageNumber } = this.state;
+    const { currentPageNumber } = this.state;
     blocksService.getBlocksByPage(currentPageNumber)
       .then(res => {
         this.receivedBlocksEvent(res);
