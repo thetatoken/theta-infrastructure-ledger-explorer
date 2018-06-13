@@ -6,7 +6,6 @@ import TransactionsOverView from "./components/transactions-overview";
 export default class Dashboard extends Component {
   render() {
     const { backendAddress } = this.props.route;
-    console.log(backendAddress)
     return (
       <div className="th-dashboard">
         <div className="th-dashboard__title">Welcome to Theta Explorer</div>
