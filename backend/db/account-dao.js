@@ -18,11 +18,14 @@ module.exports = class AccountDAO {
   upsertAccount(accountInfo, callback) {
     let bins = {
       'address': accountInfo.address,
-      'balance': accountInfo.balance
+      'balance': accountInfo.balance,
+      'sequence': accountInfo.sequence,
+      'reserved_funds': accountInfo.reserved_funds === null ? 'null' : accountInfo.reserved_funds,
+      'lst_updt_blk': accountInfo.last_updated_block_height
     }
     this.client.put(this.accountInfoSet, bins.address, bins, {}, this.upsertPolicy, callback);
   }
-  checkAccount(pk, callback){
+  checkAccount(pk, callback) {
     return this.client.exists(this.accountInfoSet, pk, (err, res) => {
       callback(err, res)
     })
@@ -45,6 +48,9 @@ module.exports = class AccountDAO {
         var accountInfo = {};
         accountInfo.address = record.bins.address;
         accountInfo.balance = record.bins.balance;
+        accountInfo.sequence = record.bins.sequence;
+        // accountInfo.reserved_funds = record.bins.reserved_funds;
+        accountInfo.last_updated_block_height = record.bins.lst_updt_blk;
         callback(error, accountInfo);
       }
     });

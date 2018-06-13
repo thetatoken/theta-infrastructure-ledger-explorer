@@ -98,6 +98,7 @@ exports.Execute = function () {
       accountHelp.updateAccount(accountDao, validTransactionList);
     })
     .then(function () {
+      validTransactionList = [];
       progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl progress updated to ' + target_crawl_height.toString());
     })

@@ -34,6 +34,12 @@ function updateAccountByAddress(address, accountDao) {
   rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
       let tmp = JSON.parse(data);
-      await accountDao.upsertAccount({ address, 'balance': tmp.result.coins });
+      await accountDao.upsertAccount({
+        address,
+        'balance': tmp.result.coins,
+        'sequence':  tmp.result.sequence,
+        'reserved_funds': tmp.result.reserved_funds,
+        'last_updated_block_height': tmp.result.last_updated_block_height
+      });
     })
 }
