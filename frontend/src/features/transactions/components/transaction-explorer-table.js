@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router"
+import { Link } from "react-router";
 import '../styles.scss';
 const typeMap = {
   '1': 'Coinbase',
@@ -78,7 +78,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.inputs[0].coins))}
         {this.renderOneRow('Input address', transactionInfo.data.inputs[0].address, true)}
