@@ -1,0 +1,25 @@
+@import 'styles/_variables.scss';
+$button-line-height: 40px;
+
+.th-link-button{
+  text-decoration: none;
+  height: $button-line-height;
+  width: 83px;
+  display: flex;
+
+  &:hover{
+    @include linearHorizontalGradient($th-blue, $th-green);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  &__container{
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    border: 2px solid $th-blue;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-evenly;
+    line-height: 36px;
+    border-radius: 5px;
+  }
+}

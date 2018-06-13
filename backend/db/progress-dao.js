@@ -16,10 +16,12 @@ module.exports = class ProgressDAO {
     });
   }
 
-  upsertProgress(network, block_height, callback) {
+  upsertProgress(network, block_height, count, callback) {
     let bins = {
       'network':         network,
-      'lst_blk_height':  block_height
+      'lst_blk_height':  block_height,
+      // 'lst_blk_height': 24130,
+      'txs_count': count
     }
     this.client.put(this.progressInfoSet, network, bins, {}, this.upsertPolicy, callback);
   }
@@ -32,6 +34,7 @@ module.exports = class ProgressDAO {
       } else {
         var progressInfo = {};
         progressInfo.height = record.bins.lst_blk_height;
+        progressInfo.count = record.bins.txs_count;
         callback(error, progressInfo);
       }
     });

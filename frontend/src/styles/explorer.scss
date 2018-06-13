@@ -1,0 +1,73 @@
+@import 'styles/_variables.scss';
+@import 'common/components/link-button/styles.scss';
+$border-width: 1px;
+$line-height: 50px;
+
+// Theta explorer related CSS styles
+.th-explorer{
+  height: 100%;
+  width: 100%;
+
+  &__title{
+    margin: 30px 0 20px 20%;
+    width: 60%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    span{
+      font-size: 20px;
+      text-align: center;
+    }
+  }
+  &__buttons{
+    width: 60%;
+    margin-left: 20%;
+    display: flex;
+    justify-content: space-between;
+    &--no-more{
+      color: $th-grey;
+      line-height: $button-line-height;
+    }
+  }
+}
+
+// Theta explorer table related CSS styles
+.th-explorer-table-text{
+  margin: 0;
+  word-break: break-word;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-self: center;
+}
+.th-explorer-table{
+  width: 60%;
+  margin: 20px 20%;
+  border: $border-width solid $th-blue;
+
+  &__row{
+    display: flex;
+    height: $line-height;
+    &--left{
+      width: 30%;
+      height: $line-height;
+      margin: 0;
+      border: $border-width solid $th-green;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-self: center;
+    }
+    &--right{
+      width: 70%;
+      height: $line-height;
+      margin: 0;
+      border: $border-width solid $th-green;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-self: center;
+    }
+  }
+}

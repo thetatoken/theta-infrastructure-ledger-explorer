@@ -3,10 +3,11 @@ var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
 var aerospikeClient = require('../db/aerospike-client.js');
-var statusDaoLib = require('../db/status-dao.js');
 var blockDaoLib = require('../db/block-dao.js');
-var progressDaoLib = require('../db/progress-dao.js')
-//var readStatusCronJob = require('./jobs/read-status.js');
+var progressDaoLib = require('../db/progress-dao.js');
+var transactionDaoLib = require('../db/transaction-dao.js');
+var accountDaoLib = require('../db/account-dao.js');
+
 var readBlockCronJob = require('./jobs/read-block.js');
 
 //------------------------------------------------------------------------------
@@ -14,7 +15,6 @@ var readBlockCronJob = require('./jobs/read-block.js');
 //------------------------------------------------------------------------------
 var config = null;
 var configFileName = 'config.cfg'
-var statusDao = null;
 var blockDao = null;
 
 //------------------------------------------------------------------------------
@@ -63,15 +63,16 @@ function setupGetBlockCronJob(aerospikeClient) {
   progressDao = new progressDaoLib(__dirname, aerospikeClient);
   bluebird.promisifyAll(progressDao);
 
-  // statusDao = new statusDaoLib(aerospikeClient);
-  // bluebird.promisifyAll(statusDao);
+  transactionDao = new transactionDaoLib(__dirname, aerospikeClient);
+  bluebird.promisifyAll(transactionDao);
 
-  // start cron jobs
-  // readStatusCronJob.Initialize(statusDao);
-  // schedule.scheduleJob('*/3 * * * * *', readStatusCronJob.Execute);
+  accountDao = new accountDaoLib(__dirname, aerospikeClient);
+  bluebird.promisifyAll(accountDao);
   
-  readBlockCronJob.Initialize(progressDao, blockDao);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao);
   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
+
+
 }
 
 
