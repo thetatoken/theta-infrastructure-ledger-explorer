@@ -25,7 +25,6 @@ exports.Execute = function(callback) {
       latest_block_time:   result.result.latest_block_time,
       latest_block_height: result.result.latest_block_height
     }
-    //return statusDao.upsertStatusAsync(statusInfo);
     return statusDao.getStatusAsync('test_chain_id');
   })
   .then(function (err, result) {

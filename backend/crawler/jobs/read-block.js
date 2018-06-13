@@ -35,6 +35,8 @@ exports.Execute = function () {
     })
     .then(function (progressInfo) {
       var crawled_block_height_progress = progressInfo.height;
+      txs_count = progressInfo.count;
+      console.log('DB transaction count progress: ' + txs_count.toString());
       console.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
       if (latest_block_height > crawled_block_height_progress) {
@@ -104,7 +106,7 @@ exports.Execute = function () {
         switch (error.code) {
           case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
             console.log('Initializng progress record..');
-            progressDao.upsertProgressAsync(network_id, 0)
+            progressDao.upsertProgressAsync(network_id, 0, 0)
             break;
           default:
             console.log(error);
