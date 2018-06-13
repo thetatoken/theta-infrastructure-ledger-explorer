@@ -91,7 +91,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Collateral', this.renderAmount(transactionInfo.data.collateral))}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
@@ -106,7 +106,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
         {this.renderOneRow('Reserve Sequence', transactionInfo.data.reserve_sequence)}
@@ -121,7 +121,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Initiator Address', transactionInfo.data.initiator.address, true)}

@@ -9,8 +9,8 @@ export default class Transactions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // backendAddress: this.props.route.backendAddress,
-      backendAddress: "localhost:9000",
+      backendAddress: this.props.route.backendAddress,
+      // backendAddress: "localhost:9000",
       transactionInfoList: [],
       currentPageNumber: 0,
       totalPageNumber: 0

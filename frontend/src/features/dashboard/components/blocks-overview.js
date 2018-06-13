@@ -8,8 +8,8 @@ export default class BlocksOverView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // backendAddress: this.props.route.backendAddress,
-      backendAddress: "localhost:3000",
+      backendAddress: this.props.backendAddress,
+      // backendAddress: "localhost:3000",
       blockHeight: 0,
       blockInfoList: []
     };

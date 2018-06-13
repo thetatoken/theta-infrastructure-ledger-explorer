@@ -15,7 +15,6 @@ var readBlockCronJob = require('./jobs/read-block.js');
 //------------------------------------------------------------------------------
 var config = null;
 var configFileName = 'config.cfg'
-var statusDao = null;
 var blockDao = null;
 
 //------------------------------------------------------------------------------

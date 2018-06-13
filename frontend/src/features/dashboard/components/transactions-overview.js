@@ -8,9 +8,8 @@ export default class TransactionsOverView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // backendAddress: this.props.route.backendAddress,
-      // backendAddress: "52.53.243.120:9000",
-      backendAddress: "localhost:3000",
+      backendAddress: this.props.backendAddress,
+      // backendAddress: "localhost:3000",
       transactionInfoList: []
     };
     this.onSocketEvent = this.onSocketEvent.bind(this);

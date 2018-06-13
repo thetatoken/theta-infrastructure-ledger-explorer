@@ -11,9 +11,8 @@ export default class BlocksExplorer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // backendAddress: this.props.route.backendAddress,
-      // backendAddress: "52.53.243.120:9000",
-      backendAddress: "localhost:9000",
+      backendAddress: this.props.route.backendAddress,
+      // backendAddress: "localhost:9000",
       blockInfo: null,
       totalBlocksNumber: undefined,
       errorType: null
