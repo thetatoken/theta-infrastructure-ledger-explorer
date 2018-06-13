@@ -49,7 +49,7 @@ module.exports = class AccountDAO {
         accountInfo.address = record.bins.address;
         accountInfo.balance = record.bins.balance;
         accountInfo.sequence = record.bins.sequence;
-        // accountInfo.reserved_funds = record.bins.reserved_funds;
+        accountInfo.reserved_funds = record.bins.reserved_funds;
         accountInfo.last_updated_block_height = record.bins.lst_updt_blk;
         callback(error, accountInfo);
       }
