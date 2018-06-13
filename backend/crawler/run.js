@@ -6,11 +6,9 @@ var aerospikeClient = require('../db/aerospike-client.js');
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
 var transactionDaoLib = require('../db/transaction-dao.js');
-var transactionProgressDaoLib = require('../db/transaction-progress-dao.js');
 var accountDaoLib = require('../db/account-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
-var readTransactionCronJob = require('./jobs/read-transaction.js');
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -69,16 +67,10 @@ function setupGetBlockCronJob(aerospikeClient) {
   transactionDao = new transactionDaoLib(__dirname, aerospikeClient);
   bluebird.promisifyAll(transactionDao);
 
-  transactionProgressDao = new transactionProgressDaoLib(__dirname, aerospikeClient);
-  bluebird.promisifyAll(transactionProgressDao);
-
   accountDao = new accountDaoLib(__dirname, aerospikeClient);
   bluebird.promisifyAll(accountDao);
-
-  readTransactionCronJob.Initialize(transactionProgressDao, transactionDao, accountDao);
-  schedule.scheduleJob('* * * * * *', readTransactionCronJob.Execute);
   
-  readBlockCronJob.Initialize(progressDao, blockDao);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao);
   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
 
 

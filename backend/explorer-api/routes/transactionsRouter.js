@@ -2,13 +2,13 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var transactionRouter = (app, transactionDao, transactionProgressDao, config) => {
+var transactionRouter = (app, transactionDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/transaction/:hash", (req, res) => {
     let hash = req.params.hash;
     console.log('Querying one transaction by using uuid: ' + hash);
-    transactionProgressDao.getProgressAsync(config.transaction.network_id)
+    progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
         return transactionDao.getTransactionByPkAsync(hash)
@@ -40,7 +40,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
   });
 
   router.get("/transactions", (req, res) => {
-    transactionProgressDao.getProgressAsync(config.transaction.network_id)
+    progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
         return transactionDao.getTransactionsAsync(1, latest_transaction_count)
@@ -57,7 +57,7 @@ var transactionRouter = (app, transactionDao, transactionProgressDao, config) =>
   router.get("/transactions/range", (req, res) => {
     numberOfTransactions = 10;
     let totalPageNumber, pageNumber = 1;
-    transactionProgressDao.getProgressAsync(config.transaction.network_id)
+    progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
         console.log('Latest transaction count: ' + latest_transaction_count.toString());

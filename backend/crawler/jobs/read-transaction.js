@@ -4,7 +4,7 @@ var accountHelp = require('../helper/account-helper');
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
-var transactionProgressDao = null;
+var progressDao = null;
 var transactionDao = null;
 var network_id = 'test_chain_id_txs';
 var max_block_per_crawl = 10;
@@ -15,9 +15,9 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (transactionProgressDaoInstance, transactionDaoInstance, accountDaoInstance) {
+exports.Initialize = function (progressDaoInstance, transactionDaoInstance, accountDaoInstance) {
   transactionDao = transactionDaoInstance;
-  transactionProgressDao = transactionProgressDaoInstance;
+  progressDao = progressDaoInstance;
   accountDao = accountDaoInstance;
 }
 
@@ -28,7 +28,7 @@ exports.Execute = function () {
       var result = JSON.parse(data);
       latest_block_height = result.result.latest_block_height;
       console.log('Latest block height: ' + latest_block_height.toString());
-      return transactionProgressDao.getProgressAsync(network_id);
+      return progressDao.getProgressAsync(network_id);
     })
     .then(function (progressInfo) {
       var crawled_block_height_progress = progressInfo.height;
@@ -80,7 +80,7 @@ exports.Execute = function () {
       accountHelp.updateAccount(accountDao, validTransactionList);
     })
     .then(function () {
-      transactionProgressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
+      progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl transaction progress updated to ' + target_crawl_height.toString());
     })
     .catch(function (error) {
@@ -88,7 +88,7 @@ exports.Execute = function () {
         switch (error.code) {
           case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
             console.log('Initializng progress record..');
-            transactionProgressDao.upsertProgressAsync(network_id, 0, 0)
+            progressDao.upsertProgressAsync(network_id, 0, 0)
             break;
           default:
             console.log(error);

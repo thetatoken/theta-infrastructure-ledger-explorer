@@ -8,7 +8,6 @@ var asClient = require('../db/aerospike-client.js')
 var blockDaoLib = require('../db/block-dao.js');
 var progressDaoLib = require('../db/progress-dao.js');
 var transactionDaoLib = require('../db/transaction-dao.js');
-var transactionProgressDaoLib = require('../db/transaction-progress-dao.js');
 var accountDaoLib = require('../db/account-dao.js');
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -63,8 +62,6 @@ function main() {
       bluebird.promisifyAll(progressDao);
       transactionDao = new transactionDaoLib(__dirname, asClient);
       bluebird.promisifyAll(transactionDao);
-      transactionProgressDao = new transactionProgressDaoLib(__dirname, asClient);
-      bluebird.promisifyAll(transactionProgressDao);
       accountDao = new accountDaoLib(__dirname, asClient);
       bluebird.promisifyAll(accountDao);
 
@@ -77,7 +74,7 @@ function main() {
       // blocks router
       blocksRouter(app, blockDao, progressDao, config);
       // transactions router       
-      transactionsRouter(app, transactionDao, transactionProgressDao, config);
+      transactionsRouter(app, transactionDao, progressDao, config);
       // account router
       accountRouter(app, accountDao, config);
       // keep push block data
@@ -119,7 +116,7 @@ function pushTopBlocks() {
 function pushTopTransactions() {
   numberOfTransactions = 10;
 
-  transactionProgressDao.getProgressAsync(config.transaction.network_id)
+  progressDao.getProgressAsync(config.blockchain.network_id)
     .then((progressInfo) => {
       latest_transaction_count = progressInfo.count;
       console.log('Latest transaction count: ' + latest_transaction_count.toString());
