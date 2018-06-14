@@ -29,7 +29,7 @@ export default class AccountExplorerTable extends Component {
   }
   render() {
     const { accountInfo } = this.props;
-    console.log(accountInfo)
+    // console.log(accountInfo)
     return (
       <div className="th-explorer-table">
         {this.renderOneRow('Address', accountInfo.address)}
