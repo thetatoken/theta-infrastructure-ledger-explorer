@@ -57,7 +57,7 @@ export default class TransactionExplorer extends Component {
     const { transactionInfo, errorType } = this.state;
     return (
       errorType === 'error_not_found' ? <NotExist /> :
-        <div>
+        <div className="th-explorer-table">
           {transactionInfo !== null ?
             <TransactionExplorerTable transactionInfo={transactionInfo} /> : <div></div>}
         </div>
@@ -70,9 +70,7 @@ export default class TransactionExplorer extends Component {
         <div className="th-explorer__title">
           <span>Transaction Detail: {transactionHash}</span>
         </div>
-        <div className="th-explorer-table">
-          {this.renderContent()}
-        </div>
+        {this.renderContent()}
       </div>
     );
   }
