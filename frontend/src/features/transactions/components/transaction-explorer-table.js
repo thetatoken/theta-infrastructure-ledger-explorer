@@ -48,6 +48,9 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
+  renderBlockHeight(height) {
+    return <Link to={`/blocks/${height}`} >{height}</Link>;
+  }
   renderOneRow(leftContent, rightContent, isAddress) {
     const content = !isAddress ? rightContent : <Link to={`/account/${rightContent}`} >{rightContent}</Link>;
     return (
@@ -68,8 +71,9 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.outputs[0].coins))}
-        {this.renderOneRow('Output address', transactionInfo.data.outputs[0].address, true)}
+        {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
       </div>
     )
   }
@@ -78,11 +82,12 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.inputs[0].coins))}
-        {this.renderOneRow('Input address', transactionInfo.data.inputs[0].address, true)}
-        {this.renderOneRow('Output address', transactionInfo.data.outputs[0].address, true)}
+        {this.renderOneRow('Input Address', transactionInfo.data.inputs[0].address, true)}
+        {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
       </div>
     )
   }
@@ -91,12 +96,13 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Collateral', this.renderAmount(transactionInfo.data.collateral))}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.source.coins))}
-        {this.renderOneRow('Source address', transactionInfo.data.source.address, true)}
+        {this.renderOneRow('Source Address', transactionInfo.data.source.address, true)}
         {this.renderOneRow('Resource Ids', this.renderIds(transactionInfo.data.resource_ids))}
       </div>
     )
@@ -106,13 +112,14 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
         {this.renderOneRow('Reserve Sequence', transactionInfo.data.reserve_sequence)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.source.coins))}
-        {this.renderOneRow('Source address', transactionInfo.data.source.address, true)}
-        {this.renderOneRow('Target address', transactionInfo.data.target.address, true)}
+        {this.renderOneRow('Source Address', transactionInfo.data.source.address, true)}
+        {this.renderOneRow('Target Address', transactionInfo.data.target.address, true)}
       </div>
     )
   }
@@ -121,6 +128,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
@@ -132,6 +140,7 @@ export default class TransactionExplorerTable extends Component {
   }
   render() {
     const { transactionInfo } = this.props;
+    console.log(transactionInfo)
     switch (transactionInfo.type) { // TODO: Add other type cases
       case 1:
         return this.renderType1(transactionInfo)

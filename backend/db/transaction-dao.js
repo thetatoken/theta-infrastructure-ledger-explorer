@@ -20,7 +20,8 @@ module.exports = class TransactionDAO {
       'hash': transactionInfo.hash,
       'type': transactionInfo.type,
       'data': transactionInfo.data,
-      'number': transactionInfo.number
+      'number': transactionInfo.number,
+      'block_height': transactionInfo.block_height,
     }
     this.client.put(this.transactionInfoSet, bins.hash, bins, {}, this.upsertPolicy, callback);
   }
@@ -40,6 +41,7 @@ module.exports = class TransactionDAO {
         transactionInfo.type = recordList[i].bins.type;
         transactionInfo.data = recordList[i].bins.data;
         transactionInfo.number = recordList[i].bins.number;
+        transactionInfo.block_height = recordList[i].bins.block_height;
         transactionInfoList.push(transactionInfo)
       }
       callback(error, transactionInfoList)
@@ -65,6 +67,7 @@ module.exports = class TransactionDAO {
         transactionInfo.type = record.bins.type;
         transactionInfo.data = record.bins.data;
         transactionInfo.number = record.bins.number;
+        transactionInfo.block_height = record.bins.block_height;
         callback(error, transactionInfo);
       }
     });

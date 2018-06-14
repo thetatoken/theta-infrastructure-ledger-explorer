@@ -8,7 +8,7 @@ var accountHelp = require('../helper/account-helper');
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 10;
+var max_block_per_crawl = 50;
 var target_crawl_height;
 var txs_count = 0;
 var upsertTransactionAsyncList = [];
@@ -78,10 +78,11 @@ exports.Execute = function () {
         var txs = blockInfo.txs;
         if (txs !== undefined && txs.length > 0) {
           for (var j = 0; j < txs.length; j++) {
-            var transaction = {
+            const transaction = {
               hash: txs[j].hash,
               type: txs[j].type,
               data: txs[j].data,
+              block_height: blockInfo.height,
             }
             const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
             if (!isExisted) {
