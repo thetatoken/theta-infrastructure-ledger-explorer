@@ -51,6 +51,30 @@ export default class TransactionExplorerTable extends Component {
   renderBlockHeight(height) {
     return <Link to={`/blocks/${height}`} >{height}</Link>;
   }
+  renderTimeStamp(timestamp) {
+    const now = new Date(Date.now())
+    const pre = new Date(timestamp)
+    // const res = this.getTimeString(now - 1528990059783);
+    const res = this.getTimeString(now - pre);
+    return res;
+  }
+  getTimeString(diff){
+    let res;
+    let cur = diff;
+    cur /= 1000;
+    const diffSecs = Math.round(cur % 60);
+    cur /= 60;
+    const diffMins = Math.round(cur % 60);
+    cur /= 60;
+    const diffHrs = Math.round(cur % 24);
+    cur = Math.round(cur / 24);
+    if(cur > 0) res = cur + ' days ' + diffHrs + ' hrs ago';
+    else if(diffHrs > 0) res = diffHrs + ' hrs ' + diffMins + ' mins ago';
+    else if(diffMins > 0) res = diffMins + ' mins ' + diffSecs + ' secs ago';
+    else res = diffSecs + ' secs ago';
+    // console.log(cur + 'days ' + diffHrs + ' hrs ' + diffMins + ' mins ' + diffSecs + ' secs ago.')
+    return res;
+  }
   renderOneRow(leftContent, rightContent, isAddress) {
     const content = !isAddress ? rightContent : <Link to={`/account/${rightContent}`} >{rightContent}</Link>;
     return (
@@ -66,12 +90,20 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType1(transactionInfo) {
+  renderCommonRows(transactionInfo) {
     return (
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
         {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
         {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
+        {this.renderOneRow('TimeStamp', this.renderTimeStamp(transactionInfo.timestamp))}
+      </div>
+    )
+  }
+  renderType1(transactionInfo) {
+    return (
+      <div>
+        {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.outputs[0].coins))}
         {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
       </div>
@@ -80,9 +112,7 @@ export default class TransactionExplorerTable extends Component {
   renderType3(transactionInfo) {
     return (
       <div>
-        {this.renderOneRow('Hash', transactionInfo.hash)}
-        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
+        {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.inputs[0].coins))}
@@ -94,9 +124,7 @@ export default class TransactionExplorerTable extends Component {
   renderType4(transactionInfo) {
     return (
       <div>
-        {this.renderOneRow('Hash', transactionInfo.hash)}
-        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
+        {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Collateral', this.renderAmount(transactionInfo.data.collateral))}
@@ -110,9 +138,7 @@ export default class TransactionExplorerTable extends Component {
   renderType6(transactionInfo) {
     return (
       <div>
-        {this.renderOneRow('Hash', transactionInfo.hash)}
-        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
+        {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
@@ -126,9 +152,7 @@ export default class TransactionExplorerTable extends Component {
   renderType7(transactionInfo) {
     return (
       <div>
-        {this.renderOneRow('Hash', transactionInfo.hash)}
-        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
-        {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
+        {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}

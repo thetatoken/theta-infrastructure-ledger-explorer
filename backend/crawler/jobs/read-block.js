@@ -83,6 +83,7 @@ exports.Execute = function () {
               type: txs[j].type,
               data: txs[j].data,
               block_height: blockInfo.height,
+              timestamp: blockInfo.timestamp
             }
             const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
             if (!isExisted) {
