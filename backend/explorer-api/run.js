@@ -68,7 +68,7 @@ function main() {
       // start server program
       io.on('connection', onClientConnect);
       // server.listen(config.server.port);
-      server.listen('3000');
+      server.listen('3030');
 
       // REST services
       // blocks router
