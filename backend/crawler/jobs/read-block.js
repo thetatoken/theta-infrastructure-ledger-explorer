@@ -57,44 +57,46 @@ exports.Execute = function () {
       }
     })
     .then(async function (blockDataList) {
-      var upsertBlockAsyncList = []
-      for (var i = 0; i < blockDataList.length; i++) {
-        // Store the block data
-        var result = JSON.parse(blockDataList[i]);
-        // console.log(blockDataList[i]);
-        const blockInfo = {
-          height: result.result.block_meta.header.height,
-          timestamp: result.result.block_meta.header.time,
-          parent_hash: result.result.block_meta.header.last_block_id.hash,
-          num_txs: result.result.block_meta.header.num_txs,
-          lst_cmt_hash: result.result.block_meta.header.last_commit_hash,
-          data_hash: result.result.block_meta.header.data_hash,
-          vldatr_hash: result.result.block_meta.header.validators_hash,
-          hash: result.result.block_meta.block_id.hash,
-          txs: result.result.Txs
-        }
-        upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
-        // Store the transaction data
-        var txs = blockInfo.txs;
-        if (txs !== undefined && txs.length > 0) {
-          for (var j = 0; j < txs.length; j++) {
-            const transaction = {
-              hash: txs[j].hash,
-              type: txs[j].type,
-              data: txs[j].data,
-              block_height: blockInfo.height,
-              timestamp: blockInfo.timestamp
-            }
-            const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
-            if (!isExisted) {
-              transaction.number = ++txs_count;
-              validTransactionList.push(transaction);
-              upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
+      if (blockDataList) {
+        var upsertBlockAsyncList = []
+        for (var i = 0; i < blockDataList.length; i++) {
+          // Store the block data
+          var result = JSON.parse(blockDataList[i]);
+          // console.log(blockDataList[i]);
+          const blockInfo = {
+            height: result.result.block_meta.header.height,
+            timestamp: result.result.block_meta.header.time,
+            parent_hash: result.result.block_meta.header.last_block_id.hash,
+            num_txs: result.result.block_meta.header.num_txs,
+            lst_cmt_hash: result.result.block_meta.header.last_commit_hash,
+            data_hash: result.result.block_meta.header.data_hash,
+            vldatr_hash: result.result.block_meta.header.validators_hash,
+            hash: result.result.block_meta.block_id.hash,
+            txs: result.result.Txs
+          }
+          upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
+          // Store the transaction data
+          var txs = blockInfo.txs;
+          if (txs !== undefined && txs.length > 0) {
+            for (var j = 0; j < txs.length; j++) {
+              const transaction = {
+                hash: txs[j].hash,
+                type: txs[j].type,
+                data: txs[j].data,
+                block_height: blockInfo.height,
+                timestamp: blockInfo.timestamp
+              }
+              const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+              if (!isExisted) {
+                transaction.number = ++txs_count;
+                validTransactionList.push(transaction);
+                upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
+              }
             }
           }
         }
+        return Promise.all(upsertBlockAsyncList, upsertTransactionAsyncList)
       }
-      return Promise.all(upsertBlockAsyncList, upsertTransactionAsyncList)
     })
     .then(() => {
       accountHelp.updateAccount(accountDao, validTransactionList);
