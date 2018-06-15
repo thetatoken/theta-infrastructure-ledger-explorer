@@ -1,38 +1,46 @@
 @import "styles/_variables";
 
 .th-pagination {  
-  width: 80%;
-  margin-left: 10%;
-  padding: 0;
-  list-style: none;
   display: flex;
-  justify-content: space-between;
-  .page-link {
-    text-align: center;
-    color: $th-blue;
-    border-color: $th-grey;
-    &:hover {
-      color: $th-blue;
-      border-color: $th-grey;
-      cursor: pointer;
-    }  
-    &.active{
-      color: $th-green;
-    }
-  }
-  &--lg {
+  width: 100%;
+  & ul{
+    width: 80%;
+    margin-left: 10%;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
     .page-link {
-      padding-top: 10px;
-      min-width: 38px;
-      height: 38px;
       text-align: center;
       color: $th-blue;
       border-color: $th-grey;
+      background-color: transparent;
+      font-size: 16px;
+      outline: none;
       &:hover {
-        color: $th-green;
-        border-color: $th-grey;
+        color: $th-blue;
+        border-color: transparent;
         cursor: pointer;
       }  
+      &.active{
+        color: $th-green;
+      }
+    }
+  }
+  &--lg {
+    & ul{
+      .page-link {
+        min-width: 38px;
+        height: 38px;
+        text-align: center;
+        color: $th-blue;
+        border-color: transparent;
+        &:hover {
+          color: $th-green;
+          border-color: transparent;
+          cursor: pointer;
+        }  
+      }
     }
   }
 }
