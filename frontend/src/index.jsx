@@ -12,8 +12,9 @@ import AccountExplorer from './features/account'
 import './styles.scss';
 
 const app = document.querySelector('#root');
-const backendRESTAddress = "52.53.243.120:9000";
-const backendSocketAddress = "52.53.243.120:3000";
+const backendRESTAddress = "ec2-52-53-243-120.us-west-1.compute.amazonaws.com:9000";
+const backendSocketAddress = "ec2-52-53-243-120.us-west-1.compute.amazonaws.com:3030";
+
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
