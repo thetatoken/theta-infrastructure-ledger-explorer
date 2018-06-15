@@ -17,7 +17,7 @@ const backendSocketAddress = "52.53.243.120:3000";
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
-      <IndexRoute component={Dashboard}/>
+      <IndexRoute component={Dashboard} backendAddress={backendSocketAddress}/>
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} backendAddress={backendSocketAddress}/>
       <Route path='/blocks' component={Blocks} backendAddress={backendRESTAddress}/>

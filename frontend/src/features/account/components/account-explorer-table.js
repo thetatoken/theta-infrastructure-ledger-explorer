@@ -29,14 +29,14 @@ export default class AccountExplorerTable extends Component {
   }
   render() {
     const { accountInfo } = this.props;
-    console.log(accountInfo)
+    // console.log(accountInfo)
     return (
       <div className="th-explorer-table">
         {this.renderOneRow('Address', accountInfo.address)}
-        {this.renderOneRow('Balance', this.renderBalance(accountInfo.balance))}
         {this.renderOneRow('Sequence', accountInfo.sequence)}
         {/* {this.renderOneRow('Reserved Funds', this.renderReservedFunds(accountInfo.reserved_funds))} */}
         {this.renderOneRow('Last Updated Block Height', accountInfo.last_updated_block_height)}
+        {this.renderOneRow('Balance', this.renderBalance(accountInfo.balance))}
       </div>
     );
   }
