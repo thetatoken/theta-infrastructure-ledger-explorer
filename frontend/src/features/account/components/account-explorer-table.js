@@ -19,7 +19,13 @@ export default class AccountExplorerTable extends Component {
   renderBalance(balance){
     let content = '';
     balance.forEach( coin => {
-      content += coin.amount + ' ' + coin.denom + ', '; 
+      let denom = coin.denom;
+      let amount = coin.amount;
+      if(denom.includes('Wei') && amount > 100000){
+        denom = denom.substring(0, denom.length - 3);
+        amount /= 1000000;
+      }
+      content += amount + ' ' + denom + ', '; 
     });
     return content.substring(0, content.length - 2);;
   }

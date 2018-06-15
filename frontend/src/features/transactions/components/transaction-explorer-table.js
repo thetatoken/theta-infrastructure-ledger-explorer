@@ -26,7 +26,13 @@ export default class TransactionExplorerTable extends Component {
         else coinMap[coinType] = coin.amount;
       });
       Object.keys(coinMap).forEach(coinType => {
-        res += coinMap[coinType] + ' ' + coinType + ', ';
+        let denom = coinType;
+        let amount = coinMap[coinType];
+        if (denom.includes('Wei') && amount > 99999) {
+          denom = denom.substring(0, denom.length - 3);
+          amount /= 1000000;
+        }
+        res += amount + ' ' + denom + ', ';
       })
       return res.substring(0, res.length - 2);
     }
@@ -58,7 +64,7 @@ export default class TransactionExplorerTable extends Component {
     const res = this.getTimeString(now - pre);
     return res;
   }
-  getTimeString(diff){
+  getTimeString(diff) {
     let res;
     let cur = diff;
     cur /= 1000;
@@ -68,9 +74,9 @@ export default class TransactionExplorerTable extends Component {
     cur /= 60;
     const diffHrs = Math.round(cur % 24);
     cur = Math.round(cur / 24);
-    if(cur > 0) res = cur + ' days ' + diffHrs + ' hrs ago';
-    else if(diffHrs > 0) res = diffHrs + ' hrs ' + diffMins + ' mins ago';
-    else if(diffMins > 0) res = diffMins + ' mins ' + diffSecs + ' secs ago';
+    if (cur > 0) res = cur + ' days ' + diffHrs + ' hrs ago';
+    else if (diffHrs > 0) res = diffHrs + ' hrs ' + diffMins + ' mins ago';
+    else if (diffMins > 0) res = diffMins + ' mins ' + diffSecs + ' secs ago';
     else res = diffSecs + ' secs ago';
     // console.log(cur + 'days ' + diffHrs + ' hrs ' + diffMins + ' mins ' + diffSecs + ' secs ago.')
     return res;
