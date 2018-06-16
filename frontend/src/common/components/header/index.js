@@ -47,10 +47,10 @@ export default class Header extends Component {
             Overview
           </Link>
           <Link to="/blocks" className="theta-header__navigator--button">
-            <div>Blocks</div>
+            Blocks
           </Link>
           <Link to="/txs" className="theta-header__navigator--button">
-            <div>Transaction</div>
+            Transaction
           </Link>
         </div>
         <div className="theta-header__blank"></div>
