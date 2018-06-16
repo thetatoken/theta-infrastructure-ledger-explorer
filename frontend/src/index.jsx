@@ -12,7 +12,6 @@ import AccountExplorer from './features/account'
 import './styles.scss';
 
 const app = document.querySelector('#root');
-const backendRESTAddress = "ec2-52-53-243-120.us-west-1.compute.amazonaws.com:9000";
 const backendSocketAddress = "ec2-52-53-243-120.us-west-1.compute.amazonaws.com:3030";
 
 ReactDom.render(
@@ -21,11 +20,11 @@ ReactDom.render(
       <IndexRoute component={Dashboard} backendAddress={backendSocketAddress}/>
       {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} backendAddress={backendSocketAddress}/>
-      <Route path='/blocks' component={Blocks} backendAddress={backendRESTAddress}/>
-      <Route path='/blocks/:blockHeight' component={BlockExplorer} backendAddress={backendRESTAddress}/>
-      <Route path='/txs' component={Transactions} backendAddress={backendRESTAddress}/>
-      <Route path='/txs/:transactionHash' component={TransactionExplorer} backendAddress={backendRESTAddress}/>
-      <Route path='/account/:accountAddress' component={AccountExplorer} backendAddress={backendRESTAddress}/>
+      <Route path='/blocks' component={Blocks} />
+      <Route path='/blocks/:blockHeight' component={BlockExplorer} />
+      <Route path='/txs' component={Transactions} />
+      <Route path='/txs/:transactionHash' component={TransactionExplorer} />
+      <Route path='/account/:accountAddress' component={AccountExplorer} />
     </Route>
   </Router>,
   app

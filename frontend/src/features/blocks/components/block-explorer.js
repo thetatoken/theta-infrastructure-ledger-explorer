@@ -30,6 +30,7 @@ export default class BlocksExplorer extends Component {
   }
   gerOneBlockByHeight(height) {
     const { totalBlocksNumber } = this.state;
+    const msg = this.props.location.state;
     if (Number(height)
       && (totalBlocksNumber === undefined
         || totalBlocksNumber >= height
@@ -45,8 +46,9 @@ export default class BlocksExplorer extends Component {
               });
               break;
             case 'error_not_found':
+              console.log(res)
               this.setState({
-                errorType: 'error_not_found'
+                errorType: msg ? 'error_coming_soon' : 'error_not_found'
               });
           }
         }).catch(err => {
@@ -67,28 +69,35 @@ export default class BlocksExplorer extends Component {
   renderContent() {
     const { blockInfo, totalBlocksNumber, errorType } = this.state;
     const height = Number(this.props.params.blockHeight);
-    return (
-      errorType === 'error_not_found' ? <NotExist /> :
-        <div>
-          <div className="th-explorer__buttons">
-            {height > 1 ?
-              <LinkButton className="th-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
-              : this.renderNoMoreMsg()
-            }
-            {totalBlocksNumber > height ?
-              <LinkButton className="th-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
-              : this.renderNoMoreMsg()
+    switch (errorType) {
+      case 'error_not_found':
+        return <NotExist />;
+      case 'error_coming_soon':
+        return <NotExist msg="This block information is coming soon." />
+      default:
+        return (
+          <div>
+            <div className="th-explorer__buttons">
+              {height > 1 ?
+                <LinkButton className="th-explorer__buttons--prev" url={`/blocks/${height - 1}`} left>Prev</LinkButton>
+                : this.renderNoMoreMsg()
+              }
+              {totalBlocksNumber > height ?
+                <LinkButton className="th-explorer__buttons--next" url={`/blocks/${height + 1}`} right>Next</LinkButton>
+                : this.renderNoMoreMsg()
+              }
+            </div>
+            {
+              blockInfo !== null ?
+                <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>
             }
           </div>
-          {
-            blockInfo !== null ?
-              <BlockExplorerTable blockInfo={blockInfo} /> : <div></div>
-          }
-        </div>
-    )
+        )
+    }
   }
   render() {
     const height = Number(this.props.params.blockHeight);
+
     return (
       <div className="th-explorer">
         <div className="th-explorer__title">

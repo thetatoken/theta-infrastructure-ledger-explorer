@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Link } from "react-router";
+
 // import '../styles.scss';
 
 export default class AccountExplorerTable extends Component {
@@ -16,22 +18,29 @@ export default class AccountExplorerTable extends Component {
       </div>
     )
   }
-  renderBalance(balance){
+  renderBalance(balance) {
     let content = '';
-    balance.forEach( coin => {
+    balance.forEach(coin => {
       let denom = coin.denom;
       let amount = coin.amount;
-      if(denom.includes('Wei') && amount > 100000){
+      if (denom.includes('Wei') && amount > 100000) {
         denom = denom.substring(0, denom.length - 3);
         amount /= 1000000;
       }
-      content += amount + ' ' + denom + ', '; 
+      content += amount + ' ' + denom + ', ';
     });
     return content.substring(0, content.length - 2);;
   }
-  renderReservedFunds(funds){
+  renderReservedFunds(funds) {
     // TODO: NEED TO REVISE LATER
     return funds === "null" ? 'null' : 'Such a complex object';
+  }
+  renderToBlock(height) {
+    const newTo = { 
+      pathname: `/blocks/${height}`, 
+      state: 'Coming Soon'
+    };
+    return (<Link to={newTo}>{height}</Link>)
   }
   render() {
     const { accountInfo } = this.props;
@@ -41,7 +50,7 @@ export default class AccountExplorerTable extends Component {
         {this.renderOneRow('Address', accountInfo.address)}
         {this.renderOneRow('Sequence', accountInfo.sequence)}
         {/* {this.renderOneRow('Reserved Funds', this.renderReservedFunds(accountInfo.reserved_funds))} */}
-        {this.renderOneRow('Last Updated Block Height', accountInfo.last_updated_block_height)}
+        {this.renderOneRow('Last Updated Block Height', this.renderToBlock(accountInfo.last_updated_block_height))}
         {this.renderOneRow('Balance', this.renderBalance(accountInfo.balance))}
       </div>
     );
