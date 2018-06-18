@@ -19,25 +19,27 @@ export default class AccountExplorerTable extends Component {
     )
   }
   renderBalance(balance) {
-    let content = '';
-    balance.forEach(coin => {
-      let denom = coin.denom;
-      let amount = coin.amount;
-      if (denom.includes('Wei') && amount > 100000) {
-        denom = denom.substring(0, denom.length - 3);
-        amount /= 1000000;
-      }
-      content += amount + ' ' + denom + ', ';
-    });
-    return content.substring(0, content.length - 2);;
+    return (
+      <div>
+        {balance.map(coin => {
+          let denom = coin.denom;
+          let amount = coin.amount;
+          if (denom.includes('Wei') && amount > 100000) {
+            denom = denom.substring(0, denom.length - 3);
+            amount /= 1000000;
+          }
+          return <div key={coin.denom}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + denom}</div>
+        })}
+      </div>
+    )
   }
   renderReservedFunds(funds) {
     // TODO: NEED TO REVISE LATER
     return funds === "null" ? 'null' : 'Such a complex object';
   }
   renderToBlock(height) {
-    const newTo = { 
-      pathname: `/blocks/${height}`, 
+    const newTo = {
+      pathname: `/blocks/${height}`,
       state: 'Coming Soon'
     };
     return (<Link to={newTo}>{height}</Link>)
