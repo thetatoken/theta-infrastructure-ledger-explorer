@@ -19,17 +19,32 @@ export default class AccountExplorerTable extends Component {
     )
   }
   renderBalance(balance) {
+    let denoms = [];
+    let amounts = [];
+    balance.forEach(coin => {
+      const denom = (coin.denom.includes('Wei') && coin.amount > 100000) ?
+        coin.denom.substring(0, coin.denom.length - 3) : coin.denom;
+      const amount = (coin.denom.includes('Wei') && coin.amount > 100000) ?
+        coin.amount / 1000000 : coin.amount;
+      denoms.push(denom);
+      amounts.push(amount);
+    });
     return (
-      <div>
-        {balance.map(coin => {
-          let denom = coin.denom;
-          let amount = coin.amount;
-          if (denom.includes('Wei') && amount > 100000) {
-            denom = denom.substring(0, denom.length - 3);
-            amount /= 1000000;
-          }
-          return <div key={coin.denom}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + ' ' + denom}</div>
-        })}
+      <div className="th-explorer-table-text__balance">
+        <div className="th-explorer-table-text__balance--left">
+          {amounts.map(amount => {
+            return (
+              <p key={amount}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</p>
+            )
+          })}
+        </div>
+        <div className="th-explorer-table-text__balance--right">
+          {denoms.map(denom => {
+            return (
+              <p key={denom}>{denom}</p>
+            )
+          })}
+        </div>
       </div>
     )
   }

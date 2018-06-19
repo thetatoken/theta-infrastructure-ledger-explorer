@@ -40,6 +40,25 @@ $line-height: 50px;
   display: flex;
   justify-content: center;
   align-self: center;
+  &__balance{
+    display: flex;
+    &--left{
+      display: flex;
+      flex-direction: column;
+      & p{
+        margin: 0 10px;
+        text-align: right;
+      }
+    }
+    &--right{
+      display: flex;
+      flex-direction: column;
+      & p{
+        margin: 0;
+        text-align: left;
+      }
+    }
+  }
 }
 .th-explorer-table{
   width: 60%;
