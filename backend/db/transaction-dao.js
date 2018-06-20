@@ -26,7 +26,7 @@ module.exports = class TransactionDAO {
     }
     this.client.put(this.transactionInfoSet, bins.hash, bins, {}, this.upsertPolicy, callback);
   }
-  checkTransaction(pk, callback){
+  checkTransaction(pk, callback) {
     return this.client.exists(this.transactionInfoSet, pk, (err, res) => {
       callback(err, res)
     })
