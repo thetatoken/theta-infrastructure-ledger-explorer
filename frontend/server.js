@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var webpack = require('webpack');
 var config = require('./webpack.config.dev.js');
+var fs = require('fs')
+
 
 var app = express();
 var compiler = webpack(config);
@@ -19,11 +21,18 @@ app.use(require('webpack-hot-middleware')(compiler));
 
 app.use('/public', express.static('public'));
 
-app.get('*', function(req, res) {
+app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname, 'index.html'));
 });
+var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');
+var certificate = fs.readFileSync('./cert/star_thetatoken_org.crt');
+var options = {
+  key: privateKey,
+  cert: certificate
+};
+var https = require('https').createServer(options, app);
 
-app.listen(process.env.PORT || 80, function(err) {
+https.listen(process.env.PORT || 443, function (err) {
   if (err) {
     console.log(err);
     return;

@@ -1,8 +1,6 @@
 var fs = require('fs')
 var express = require('express');
 var app = express();
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
 var bluebird = require("bluebird");
 var asClient = require('../db/aerospike-client.js')
 var blockDaoLib = require('../db/block-dao.js');
@@ -13,7 +11,7 @@ var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
 var cors = require('cors')
-
+var io;
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
@@ -27,13 +25,7 @@ var isPushingTxs = false;
 //------------------------------------------------------------------------------
 
 main();
-app.use(cors());
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 
-app.listen(config.server.port, () => {
-  console.log("rest api running on port.", 9000);
-});
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -65,11 +57,30 @@ function main() {
       accountDao = new accountDaoLib(__dirname, asClient);
       bluebird.promisifyAll(accountDao);
 
+      //
+      var privateKey = fs.readFileSync(config.cert.key, 'utf8');
+      var certificate = fs.readFileSync(config.cert.crt, 'utf8');
+      var options = {
+        key: privateKey,
+        cert: certificate
+      };
       // start server program
+      var server = require('https').createServer(options, app);
+      io = require('socket.io')(server);
+
       io.on('connection', onClientConnect);
       // server.listen(config.server.port);
       server.listen('3030');
+      // 
+      app.use(cors());
+      // app.use(bodyParser.json());
+      // app.use(bodyParser.urlencoded({ extended: true }));
 
+      var https = require('https').createServer(options, app);
+
+      https.listen(config.server.port, () => {
+        console.log("rest api running on port.", 9000);
+      });
       // REST services
       // blocks router
       blocksRouter(app, blockDao, progressDao, config);
