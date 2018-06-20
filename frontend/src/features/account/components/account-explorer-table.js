@@ -32,9 +32,9 @@ export default class AccountExplorerTable extends Component {
     return (
       <div className="th-explorer-table-text__balance">
         <div className="th-explorer-table-text__balance--left">
-          {amounts.map(amount => {
+          {amounts.map((amount, i) => {
             return (
-              <p key={amount}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</p>
+              <p key={i}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</p>
             )
           })}
         </div>
@@ -70,7 +70,6 @@ export default class AccountExplorerTable extends Component {
   }
   render() {
     const { accountInfo } = this.props;
-    console.log(accountInfo)
     return (
       <div className="th-explorer-table">
         {this.renderOneRow('Address', accountInfo.address)}

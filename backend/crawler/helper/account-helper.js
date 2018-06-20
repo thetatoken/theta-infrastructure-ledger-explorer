@@ -36,7 +36,7 @@ function updateAccountByAddress(address, accountDao, hash) {
       let tmp = JSON.parse(data);
       const isExist = await accountDao.checkAccountAsync(address);
       const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
-      const txs_hash_list = accountInfo ? accountInfo.txs_hash_list.slice().concat(hash) : [hash];
+      const txs_hash_list = accountInfo ? [hash].concat(accountInfo.txs_hash_list.slice()) : [hash];
       await accountDao.upsertAccount({
         address,
         'balance': tmp.result.coins,
