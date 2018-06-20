@@ -34,9 +34,9 @@ function updateAccountByAddress(address, accountDao, hash) {
   rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
       let tmp = JSON.parse(data);
-      const isExist = await accountDao.checkAccountAsync(hash);
-      const txs_hash_list = isExist ? await accountDao.getAccountAsync(hash).txs_hash_list.push(hash) : [hash];
-      // txs_hash_list.push(hash);
+      const isExist = await accountDao.checkAccountAsync(address);
+      const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
+      const txs_hash_list = accountInfo ? accountInfo.txs_hash_list.slice().concat(hash) : [hash];
       await accountDao.upsertAccount({
         address,
         'balance': tmp.result.coins,

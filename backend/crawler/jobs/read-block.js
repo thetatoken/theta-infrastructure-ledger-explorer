@@ -8,7 +8,7 @@ var accountHelp = require('../helper/account-helper');
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 50;
+var max_block_per_crawl = 20;
 var target_crawl_height;
 var txs_count = 0;
 var upsertTransactionAsyncList = [];

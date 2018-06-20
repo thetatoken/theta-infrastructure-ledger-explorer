@@ -48,6 +48,15 @@ export default class AccountExplorerTable extends Component {
       </div>
     )
   }
+  renderTransactionsHash(txsHashList) {
+    return (
+      <div className="th-explorer-table-text__txs_hash_list">
+        {txsHashList.map(hash => {
+          return (<Link key={hash} to={`/txs/${hash}`}>{hash}</Link>)
+        })}
+      </div>
+    )
+  }
   renderReservedFunds(funds) {
     // TODO: NEED TO REVISE LATER
     return funds === "null" ? 'null' : 'Such a complex object';
@@ -61,7 +70,7 @@ export default class AccountExplorerTable extends Component {
   }
   render() {
     const { accountInfo } = this.props;
-    // console.log(accountInfo)
+    console.log(accountInfo)
     return (
       <div className="th-explorer-table">
         {this.renderOneRow('Address', accountInfo.address)}
@@ -69,6 +78,7 @@ export default class AccountExplorerTable extends Component {
         {/* {this.renderOneRow('Reserved Funds', this.renderReservedFunds(accountInfo.reserved_funds))} */}
         {this.renderOneRow('Last Updated Block Height', this.renderToBlock(accountInfo.last_updated_block_height))}
         {this.renderOneRow('Balance', this.renderBalance(accountInfo.balance))}
+        {this.renderOneRow('Most Recent Transactions', this.renderTransactionsHash(accountInfo.txs_hash_list))}
       </div>
     );
   }
