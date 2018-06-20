@@ -59,6 +59,10 @@ $line-height: 50px;
       }
     }
   }
+  &__txs_hash_list{
+    display: flex;
+    flex-direction: column;
+  }
 }
 .th-explorer-table{
   width: 60%;
@@ -67,26 +71,26 @@ $line-height: 50px;
 
   &__row{
     display: flex;
-    height: $line-height;
+
     &--left{
       width: 30%;
-      height: $line-height;
+      flex: 0.3;
       margin: 0;
+      padding: 15px 0;
       border: $border-width solid $th-green;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-self: center;
+      // text-align: center;
+      // display: flex;
+      // justify-content: center;
     }
     &--right{
       width: 70%;
-      height: $line-height;
+      flex: 0.7;
+      padding: 15px 0;
       margin: 0;
       border: $border-width solid $th-green;
-      text-align: center;
-      display: flex;
-      justify-content: center;
-      align-self: center;
+      // text-align: center;
+      // display: flex;
+      // justify-content: center;
     }
   }
 }
