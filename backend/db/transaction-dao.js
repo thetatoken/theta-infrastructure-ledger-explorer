@@ -17,7 +17,7 @@ module.exports = class TransactionDAO {
 
   upsertTransaction(transactionInfo, callback) {
     let bins = {
-      'hash': transactionInfo.hash,
+      'hash': transactionInfo.hash.toUpperCase(),
       'type': transactionInfo.type,
       'data': transactionInfo.data,
       'number': transactionInfo.number,
@@ -51,7 +51,7 @@ module.exports = class TransactionDAO {
   }
 
   getTransactionByPk(pk, callback) {
-    this.client.get(this.transactionInfoSet, pk, function (error, record) {
+    this.client.get(this.transactionInfoSet, pk.toUpperCase(), function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND

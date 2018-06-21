@@ -17,7 +17,7 @@ module.exports = class AccountDAO {
 
   upsertAccount(accountInfo, callback) {
     let bins = {
-      'address': accountInfo.address,
+      'address': accountInfo.address.toUpperCase(),
       'balance': accountInfo.balance,
       'sequence': accountInfo.sequence,
       'reserved_funds': accountInfo.reserved_funds === null ? 'null' : accountInfo.reserved_funds,
@@ -27,13 +27,13 @@ module.exports = class AccountDAO {
     this.client.put(this.accountInfoSet, bins.address, bins, {}, this.upsertPolicy, callback);
   }
   checkAccount(pk, callback) {
-    return this.client.exists(this.accountInfoSet, pk, (err, res) => {
+    return this.client.exists(this.accountInfoSet, pk.toUpperCase(), (err, res) => {
       callback(err, res)
     })
   }
 
   getAccountByPk(pk, callback) {
-    this.client.get(this.accountInfoSet, pk, function (error, record) {
+    this.client.get(this.accountInfoSet, pk.toUpperCase(), function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
