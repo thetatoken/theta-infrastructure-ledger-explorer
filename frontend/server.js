@@ -24,6 +24,16 @@ app.use('/public', express.static('public'));
 app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname, 'index.html'));
 });
+// healthy check from ELB 
+app.get('/ping', function (req, res) {
+  log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+  res.writeHead(200, {
+    'Content-Type': 'text/plain',
+    'Content-Length': 2
+  });
+  res.write('OK');
+  res.end();
+});
 var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');
 var certificate = fs.readFileSync('./cert/star_thetatoken_org.crt');
 var options = {
