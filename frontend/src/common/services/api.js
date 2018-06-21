@@ -1,7 +1,6 @@
 import { httpClient } from './http';
 import Raven from 'raven-js';
-const API_URI = 'https://beta-explorer.thetatoken.org:9000/api'
-
+const API_URI = 'https://explorer.thetatoken.org:9000/api'
 export const apiService = {
     get(uri, config = {}) {
       return new Promise((resolve, reject) => {

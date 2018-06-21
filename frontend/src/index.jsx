@@ -12,7 +12,7 @@ import AccountExplorer from './features/account'
 import './styles.scss';
 
 const app = document.querySelector('#root');
-const backendSocketAddress = "https://beta-explorer.thetatoken.org:3030";
+const backendSocketAddress = "https://explorer.thetatoken.org:3030";
 
 ReactDom.render(
   <Router history={browserHistory}>
