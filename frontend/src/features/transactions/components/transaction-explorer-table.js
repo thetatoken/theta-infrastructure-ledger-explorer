@@ -124,7 +124,6 @@ export default class TransactionExplorerTable extends Component {
     )
   }
   getAddressShortHash(address) {
-    console.log(address)
     return address.substring(12) + '...';
   }
   renderType1(transactionInfo) {
