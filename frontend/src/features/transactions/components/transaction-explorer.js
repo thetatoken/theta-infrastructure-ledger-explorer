@@ -24,11 +24,11 @@ export default class TransactionExplorer extends Component {
   componentDidMount() {
     const { transactionHash } = this.props.params;
     browserHistory.push(`/txs/${transactionHash}`);
-    this.getOneTransactionByUuid(transactionHash);
+    this.getOneTransactionByUuid(transactionHash.toUpperCase());
   }
   getOneTransactionByUuid(hash) {
     if (hash) {
-      transactionsService.getOneTransactionByUuid(hash)
+      transactionsService.getOneTransactionByUuid(hash.toUpperCase())
         .then(res => {
           switch (res.data.type) {
             case 'transaction':

@@ -59,7 +59,7 @@ export default class Header extends Component {
           <div className="theta-header__search--select">
             <select ref={option => this.searchType = option}>
               <option value="address">Address</option>
-              <option value="block">Block Number</option>
+              <option value="block">Block Height</option>
               <option value="transaction">Transaction</option>
             </select>
           </div>

@@ -28,7 +28,7 @@ export default class AccountExplorer extends Component {
 
   getOneAccountByAddress(address) {
     if (address) {
-      accountService.getOneAccountByAddress(address)
+      accountService.getOneAccountByAddress(address.toUpperCase())
         .then(res => {
           switch (res.data.type) {
             case 'account':
