@@ -62,6 +62,8 @@ $line-height: 50px;
   &__txs_hash_list{
     display: flex;
     flex-direction: column;
+    max-height: 300px;
+    overflow: scroll;
   }
 }
 .th-explorer-table{
@@ -79,8 +81,8 @@ $line-height: 50px;
       padding: 15px 0;
       border: $border-width solid $th-green;
       // text-align: center;
-      // display: flex;
-      // justify-content: center;
+      display: flex;
+      justify-content: center;
     }
     &--right{
       width: 70%;
@@ -89,8 +91,8 @@ $line-height: 50px;
       margin: 0;
       border: $border-width solid $th-green;
       // text-align: center;
-      // display: flex;
-      // justify-content: center;
+      display: flex;
+      justify-content: center;
     }
   }
 }

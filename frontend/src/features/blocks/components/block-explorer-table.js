@@ -8,9 +8,9 @@ const nameMap = {
   'hash': 'Hash',
   'parent_hash': 'Previous Block Hash',
   'num_txs': 'Number of Transactions',
-  'lst_cmt_hash': 'lst_cmt_hash',
+  'lst_cmt_hash': 'Last commit hash',
   'data_hash': 'Data Hash',
-  'vldatr_hash': 'vldatr_hash',
+  'vldatr_hash': 'Validators hash',
   'txs': 'Transactions'
 }
 

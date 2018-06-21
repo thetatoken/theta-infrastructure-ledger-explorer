@@ -100,7 +100,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash)}
-        {this.renderOneRow('Coin Type', typeMap[transactionInfo.type])}
+        {this.renderOneRow('Type', typeMap[transactionInfo.type])}
         {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Age', this.renderTimeStamp(transactionInfo.timestamp))}
       </div>
