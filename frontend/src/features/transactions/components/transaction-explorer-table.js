@@ -15,8 +15,10 @@ export default class TransactionExplorerTable extends Component {
   renderAmount(coins, type) {
     let sum = 0, coinType;
     if (type === 'single') {
-      sum = coins.amount;
-      coinType = coins.denom;
+      coinType = (coins.denom.includes('Wei') && coins.amount > 100000) ?
+        coins.denom.substring(0, coins.denom.length - 3) : coins.denom;
+      sum = (coins.denom.includes('Wei') && coins.amount > 100000) ?
+        coins.amount / 1000000 : coins.amount;
       return sum + ' ' + coinType;
     } else {
       let res = '', coinMap = {};
@@ -106,12 +108,32 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
+  renderType1Amount(outputs) {
+    return (
+      <div>
+        {outputs.map(output => {
+          return output.coins.map((coin, i) => {
+            return (
+              <div key={i} className="th-explorer-table-text__type1_amount">
+                {this.renderAmount(coin, 'single') + ' To '}
+                <Link to={`/account/${output.address}`}>{this.getAddressShortHash(output.address)}</Link>
+              </div>)
+          })
+        })}
+      </div>
+    )
+  }
+  getAddressShortHash(address) {
+    console.log(address)
+    return address.substring(12) + '...';
+  }
   renderType1(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.outputs[0].coins))}
-        {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
+        {this.renderOneRow('Amount', this.renderType1Amount(transactionInfo.data.outputs))}
+        {/* {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.outputs[0].coins))}
+        {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)} */}
       </div>
     )
   }
