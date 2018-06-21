@@ -64,8 +64,14 @@ function main() {
         key: privateKey,
         cert: certificate
       };
-      // healthy check from ELB 
-      app.get('/ping', function (req, res) {
+      // start server program
+      var server = require('https').createServer(options, app);
+      io = require('socket.io')(server);
+
+      io.on('connection', onClientConnect);
+      // server.listen(config.server.port);
+      server.listen('3030');
+      server.get('/ping', function (req, res) {
         log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
         res.writeHead(200, {
           'Content-Type': 'text/plain',
@@ -74,13 +80,6 @@ function main() {
         res.write('OK');
         res.end();
       });
-      // start server program
-      var server = require('https').createServer(options, app);
-      io = require('socket.io')(server);
-
-      io.on('connection', onClientConnect);
-      // server.listen(config.server.port);
-      server.listen('3030');
       // 
       app.use(cors());
 
@@ -88,7 +87,16 @@ function main() {
       // app.use(bodyParser.urlencoded({ extended: true }));
 
       var https = require('https').createServer(options, app);
-
+      // healthy check from ELB 
+      https.get('/ping', function (req, res) {
+        log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': 2
+        });
+        res.write('OK');
+        res.end();
+      });
       https.listen(config.server.port, () => {
         console.log("rest api running on port.", 9000);
       });
