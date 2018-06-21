@@ -1,6 +1,6 @@
 import { httpClient } from './http';
 import Raven from 'raven-js';
-const API_URI = 'https://ec2-52-53-243-120.us-west-1.compute.amazonaws.com:9000/api'
+const API_URI = 'https://beta-explorer.thetatoken.org:9000/api'
 
 export const apiService = {
     get(uri, config = {}) {

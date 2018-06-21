@@ -37,5 +37,5 @@ https.listen(process.env.PORT || 443, function (err) {
     console.log(err);
     return;
   }
-  console.log('Listening at http://localhost:80');
+  console.log('Listening at {hostname}:443');
 });
