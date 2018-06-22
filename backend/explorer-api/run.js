@@ -80,32 +80,13 @@ function main() {
       io.on('connection', onClientConnect);
       // server.listen(config.server.port);
       server.listen('3030');
-      server.get('/ping', function (req, res) {
-        log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          'Content-Length': 2
-        });
-        res.write('OK');
-        res.end();
-      });
-      // 
+      
       app.use(cors());
       
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
       var https = require('https').createServer(options, app);
-      // healthy check from ELB 
-      https.get('/ping', function (req, res) {
-        log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
-        res.writeHead(200, {
-          'Content-Type': 'text/plain',
-          'Content-Length': 2
-        });
-        res.write('OK');
-        res.end();
-      });
       https.listen(config.server.port, () => {
         console.log("rest api running on port.", 9000);
       });
