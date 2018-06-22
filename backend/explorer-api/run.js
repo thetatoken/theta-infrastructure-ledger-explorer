@@ -64,6 +64,15 @@ function main() {
         key: privateKey,
         cert: certificate
       };
+      app.get('/ping', function (req, res) {
+        log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': 2
+        });
+        res.write('OK');
+        res.end();
+      });
       // start server program
       var server = require('https').createServer(options, app);
       io = require('socket.io')(server);
@@ -82,7 +91,7 @@ function main() {
       });
       // 
       app.use(cors());
-
+      
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
