@@ -16,30 +16,38 @@
 
   // Theta overview table related CSS styles
 .th-overview-table{
+  width: 100%;
+  & table, th, td{
+    border: 1px solid $th-blue;
+    border-collapse: collapse;
+    text-align: center;
+    padding: 5px;
+  }
+  & table{
     width: 100%;
+  }
+  &.full{
+    width: 60%;
+    margin-left: 20%;
     & table, th, td{
-      border: 1px solid $th-blue;
+      border: 2px solid $th-blue;
       border-collapse: collapse;
       text-align: center;
-      padding: 5px;
+      padding: 10px;
     }
     & table{
       width: 100%;
     }
-    &.full{
-      width: 60%;
-      margin-left: 20%;
-      & table, th, td{
-        border: 2px solid $th-blue;
-        border-collapse: collapse;
-        text-align: center;
-        padding: 10px;
-      }
-      & table{
-        width: 100%;
-      }
-      & tr{
-        height: 40px;
-      }
+    & tr{
+      height: 40px;
     }
   }
+}
+.th-overview-th{
+  &__left{
+    width: 20%;
+  }
+  &__right{
+    width: 80%;
+  }
+}

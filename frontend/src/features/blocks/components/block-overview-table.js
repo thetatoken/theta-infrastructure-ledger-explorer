@@ -11,8 +11,8 @@ export default class BlockOverviewTable extends Component {
         <table>
           <tbody>
             <tr>
-              <th>Height</th>
-              <th>Block Hash</th>
+              <th className="th-overview-th__left">Height</th>
+              <th className="th-overview-th__right">Block Hash</th>
             </tr>
             {blockInfoList
               .sort((a, b) => b.height - a.height)

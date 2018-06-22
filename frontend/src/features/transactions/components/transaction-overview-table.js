@@ -11,8 +11,8 @@ export default class TransactionOverviewTable extends Component {
         <table>
           <tbody>
             <tr>
-              <th>Type</th>
-              <th>Transaction Hash</th>
+              <th className="th-overview-th__left">Type</th>
+              <th className="th-overview-th__right">Transaction Hash</th>
             </tr>
             {transactionInfoList
               .sort((a, b) => b.number - a.number)

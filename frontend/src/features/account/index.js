@@ -70,7 +70,7 @@ export default class AccountExplorer extends Component {
     return (
       <div className="th-explorer">
         <div className="th-explorer__title">
-          <span>Account Detail: {accountAddress}</span>
+          <span>Account Detail: {accountAddress.toUpperCase()}</span>
         </div>
         {this.renderContent()}
       </div>
