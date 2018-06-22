@@ -58,7 +58,7 @@ export default class AccountExplorer extends Component {
   renderContent() {
     const { accountInfo, errorType } = this.state;
     return (
-      errorType === 'error_not_found' ? <NotExist /> :
+      errorType === 'error_not_found' ? <NotExist msg="Tips: An account will not be created until the first time it receives some tokens."/> :
         <div>
           {accountInfo !== null ?
             <AccountExplorerTable accountInfo={accountInfo} /> : <div></div>}
