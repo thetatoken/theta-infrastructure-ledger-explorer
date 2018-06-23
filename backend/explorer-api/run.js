@@ -65,7 +65,7 @@ function main() {
         cert: certificate
       };
       app.get('/ping', function (req, res) {
-        log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+        console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
         res.writeHead(200, {
           'Content-Type': 'text/plain',
           'Content-Length': 2
