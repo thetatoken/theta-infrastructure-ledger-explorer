@@ -1,5 +1,5 @@
 # Theta Ledger Explorer
-The Theta Ledger Explorer project contains a frontend web application for the Theta explorer, a backend api application to provide data to the frontend, and a crawler api to download data from the blockchain.
+The Theta Ledger Explorer project contains a frontend web application for the Theta explorer, a backend api application to provide data to the frontend, and a blockchain data crawler to download data from the blockchain.
 
 Please click [here to see the Theta Ledger Explorer in action](https://explorer.thetatoken.org/).
 
@@ -21,7 +21,7 @@ node run
 ```
 Now the crawler starts to read the data from blockchain, perform necessary transformation, and stores the converted data in the database. Next we can launch the backend API microservice, and the frontend application microservice following the procedure below.
  
-## Explorer API application
+## Backend API Application
 ### Setup
 
 ``` 
@@ -32,7 +32,7 @@ node run
 Now the explorer API application is running at https://localhost:9000
 
 
-## Frontend application
+## Frontend Web Application
 ### Setup
 ``` 
 cd frontend
