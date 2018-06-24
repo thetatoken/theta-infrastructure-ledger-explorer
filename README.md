@@ -1,5 +1,7 @@
 # Theta explorer
-Theta explorer application contains a web application for Theta explorer, a backend api application to provide frontend application apis and a crawler api to read data from block chain server.
+The Theta explorer project contains a web application for Theta explorer, a backend api application to provide frontend application apis, and a crawler api to read data from block chain server.
+
+Please click [here](https://explorer.thetatoken.org/) to see the Theta ledger explorer in action.
 ## Frontend application
 ### Setup
 ``` 
@@ -15,7 +17,7 @@ cd backend/explorer-api
 npm install
 node run
 ```
-Now the explorer API application is listening to https://localhost:9000
+Now the explorer API application listens to https://localhost:9000
 ## Explorer crawler
 ### Setup
 ```
@@ -23,7 +25,7 @@ cd backend/crawler
 npm install
 node run
 ```
-Now the crawler is reading the data from blockchain
+Now the crawler reads the data from blockchain, perform necessary transformation, and stores the data in the database. In our current implementation, we use a NoSQL database Aerospike for data storage. Below is the instruction to install Aerospike.
 ## Aerospike database
 ### Setup
 #### Install on ubuntu
@@ -33,9 +35,4 @@ tar -xvf aerospike.tgz
 cd aerospike-server-community-<version>-ubuntu14.04
 sudo ./asinstall
 ```
-Now the aerospike is installed on ubuntun
-### Run Aerospike
-```
-aql
-```
-For more information of install aerospike on different systems, check https://www.aerospike.com/docs/operations/install
+For more information of install aerospike on different systems, please check [here](https://www.aerospike.com/docs/operations/install).
