@@ -1,7 +1,7 @@
 # Theta explorer
 The Theta explorer project contains a web application for Theta explorer, a backend api application to provide frontend application apis, and a crawler api to read data from block chain server.
 
-Please click [here](https://explorer.thetatoken.org/) to see the Theta ledger explorer in action.
+Please click [here to see the Theta ledger explorer in action](https://explorer.thetatoken.org/).
 ## Frontend application
 ### Setup
 ``` 
