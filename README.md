@@ -31,7 +31,6 @@ node run
 ```
 Now the explorer API application is running at https://localhost:9000
 
-
 ## Frontend Web Application
 ### Setup
 ``` 
@@ -41,4 +40,5 @@ sudo node server.js
 ```
 Now the frontend application is running at https://localhost
 
-
+## License
+The vault reference implementation is licensed under the [MIT License](https://opensource.org/licenses/MIT).
