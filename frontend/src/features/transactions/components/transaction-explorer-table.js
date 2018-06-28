@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Link } from "react-router";
+import classnames from 'classnames';
 import '../styles.scss';
+
 const typeMap = {
   '1': 'Coinbase',
   '2': 'Slash',
@@ -83,7 +85,7 @@ export default class TransactionExplorerTable extends Component {
     // console.log(cur + 'days ' + diffHrs + ' hrs ' + diffMins + ' mins ' + diffSecs + ' secs ago.')
     return res;
   }
-  renderOneRow(leftContent, rightContent, isAddress) {
+  renderOneRow(leftContent, rightContent, isAddress, toolTipText) {
     const content = !isAddress ? rightContent : <Link to={`/account/${rightContent}`} >{rightContent}</Link>;
     return (
       <div className="th-explorer-table__row">
@@ -91,7 +93,8 @@ export default class TransactionExplorerTable extends Component {
           <p className="th-explorer-table-text">{leftContent}</p>
         </div>
         <div className="th-explorer-table__row--right">
-          <div className="th-explorer-table-text">
+          <div className={classnames('th-explorer-table-text',
+            { 'th-explorer-table-text-tooltip': toolTipText })} title={toolTipText}>
             {content}
           </div>
         </div>
@@ -142,7 +145,8 @@ export default class TransactionExplorerTable extends Component {
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Proposer Address', transactionInfo.data.proposer.address, true)}
         {this.renderOneRow('Reserved Sequence', transactionInfo.data.reserved_sequence)}
-        {this.renderOneRow('Slash Proof', transactionInfo.data.slash_proof.substring(0, 12) + '...')}
+        {this.renderOneRow('Slash Proof', transactionInfo.data.slash_proof.substring(0, 12) + '.......'
+          , false, transactionInfo.data.slash_proof)}
         {this.renderOneRow('Slashed Address', transactionInfo.data.slashed_address)}
       </div>
     )
