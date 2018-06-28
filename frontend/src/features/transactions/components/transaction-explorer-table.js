@@ -136,6 +136,17 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
+  renderType2(transactionInfo) {
+    return (
+      <div>
+        {this.renderCommonRows(transactionInfo)}
+        {this.renderOneRow('Proposer Address', transactionInfo.data.proposer.address, true)}
+        {this.renderOneRow('Reserved Sequence', transactionInfo.data.reserved_sequence)}
+        {this.renderOneRow('Slash Proof', transactionInfo.data.slash_proof.substring(0, 12) + '...')}
+        {this.renderOneRow('Slashed Address', transactionInfo.data.slashed_address)}
+      </div>
+    )
+  }
   renderType3(transactionInfo) {
     return (
       <div>
@@ -195,6 +206,8 @@ export default class TransactionExplorerTable extends Component {
     switch (transactionInfo.type) { // TODO: Add other type cases
       case 1:
         return this.renderType1(transactionInfo)
+      case 2:
+        return this.renderType2(transactionInfo)
       case 3:
         return this.renderType3(transactionInfo)
       case 4:
