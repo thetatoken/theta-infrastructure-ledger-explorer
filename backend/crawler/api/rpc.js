@@ -54,7 +54,33 @@ var RandomIdGenerator = function() {
   return id;
 }
 
-var ProcessHttpRequest = function(host, port, method, path, requestBody, callback) {
+const MAX_CONCURRENCY = 100;
+
+var ProcessHttpRequest = (function(maxConcurrency) {
+    var requestQueue = [];
+    var outstandingRequests = 0;
+
+    var tryExecuteNextRequest = function() {
+        if (outstandingRequests < maxConcurrency && requestQueue.length > 0) {
+            var request = requestQueue.shift();
+            outstandingRequests++;
+            var originalCallback = request[request.length - 1];
+            request[request.length - 1] = function () {
+                outstandingRequests--;
+                originalCallback.apply(null, arguments);
+                tryExecuteNextRequest();
+            }
+            processHttpRequest.apply(null, request);
+        }
+    }
+
+    return function(host, port, method, path, requestBody, callback) {
+        requestQueue.push(arguments);
+        tryExecuteNextRequest();
+    };
+})(MAX_CONCURRENCY);
+
+var processHttpRequest = function(host, port, method, path, requestBody, callback) {
 
   var options = {
     host: host,
