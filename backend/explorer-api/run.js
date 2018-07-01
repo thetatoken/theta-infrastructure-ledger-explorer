@@ -96,7 +96,7 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, progressDao, config);
       // account router
-      accountRouter(app, accountDao, config);
+      accountRouter(app, accountDao, transactionDao, config);
       // keep push block data
       // pushTopBlocks();
     }

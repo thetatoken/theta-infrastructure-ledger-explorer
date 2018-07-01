@@ -34,7 +34,7 @@ module.exports = class TransactionDAO {
   getTransactions(min, max, callback) {
     // var filter = (min !== null && max !== null) ? this.aerospike.filter.range('uuid', min, max) : null;
     var filter = this.aerospike.filter.range('number', min, max);
-    this.client.query(this.transactionInfoSet, filter, function (error, recordList) {
+    this.client.query(this.transactionInfoSet, filter, (error, recordList) => {
       var transactionInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var transactionInfo = {};
@@ -51,7 +51,7 @@ module.exports = class TransactionDAO {
   }
 
   getTransactionByPk(pk, callback) {
-    this.client.get(this.transactionInfoSet, pk.toUpperCase(), function (error, record) {
+    this.client.get(this.transactionInfoSet, pk.toUpperCase(), (error, record) => {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -61,18 +61,45 @@ module.exports = class TransactionDAO {
             callback(error);
             break
           default:
-            console.log('ERR - ', error, uuid)
+            console.log('ERR - ', error)
         }
       } else {
-        var transactionInfo = {};
-        transactionInfo.hash = record.bins.hash;
-        transactionInfo.type = record.bins.type;
-        transactionInfo.data = record.bins.data;
-        transactionInfo.number = record.bins.number;
-        transactionInfo.block_height = record.bins.block_height;
-        transactionInfo.timestamp = record.bins.timestamp;
+        const transactionInfo = normalizeTransactionRecord(record);
         callback(error, transactionInfo);
       }
     });
   }
+  getTransactionsByPkArr(pkArr, callback) {
+    this.client.batchGet(this.transactionInfoSet, pkArr, (error, records) => {
+      if (error) {
+        switch (error.code) {
+          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
+          // No record is found with the specified namespace/set/key combination.
+          case 2:
+            console.log('NOT_FOUND -', pkArr.join(', '))
+            callback(error);
+            break
+          default:
+            console.log('ERR - ', error)
+        }
+      } else {
+        const transactions = records.map(result => {
+          const transactionInfo = normalizeTransactionRecord(result.record);
+          return transactionInfo;
+        })
+        callback(error, transactions)
+      }
+    });
+  }
+}
+
+function normalizeTransactionRecord(record) {
+  const transactionInfo = {};
+  transactionInfo.hash = record.bins.hash;
+  transactionInfo.type = record.bins.type;
+  transactionInfo.data = record.bins.data;
+  transactionInfo.number = record.bins.number;
+  transactionInfo.block_height = record.bins.block_height;
+  transactionInfo.timestamp = record.bins.timestamp;
+  return transactionInfo;
 }

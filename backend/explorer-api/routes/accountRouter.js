@@ -2,18 +2,26 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var accountRouter = (app, accountDao) => {
+var accountRouter = (app, accountDao, transactionDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   
   router.get("/account/:address", (req, res) => {
     let address = req.params.address;
+    let verbose = req.query.verbose && req.query.verbose == 'true';
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
         const data = ({
           type: 'account',
           body: accountInfo,
         });
-        res.status(200).send(data);
+        if (verbose && accountInfo.txs_hash_list.length) {
+          transactionDao.getTransactionsByPkArr(accountInfo.txs_hash_list, (error, transactions) => {
+            data.body.txs_verbose = transactions;
+            res.status(200).send(data);
+          })
+        } else {
+          res.status(200).send(data);
+        }
       })
       .catch(error => {
         switch (error.code) {
@@ -27,7 +35,7 @@ var accountRouter = (app, accountDao) => {
             res.status(200).send(err);
             break
           default:
-            console.log('ERR - ', err)
+            console.log('ERR - ', error)
         }
       });
   });
