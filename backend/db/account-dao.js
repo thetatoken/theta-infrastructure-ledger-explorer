@@ -24,16 +24,16 @@ module.exports = class AccountDAO {
       'lst_updt_blk': accountInfo.last_updated_block_height,
       'txs_hash_list': accountInfo.txs_hash_list
     }
-    this.client.put(this.accountInfoSet, bins.address, bins, {}, this.upsertPolicy, callback);
+    this.client.tryQuery(this.accountInfoSet, bins.address, bins, {}, this.upsertPolicy, callback, 'put');
   }
   checkAccount(pk, callback) {
-    return this.client.exists(this.accountInfoSet, pk.toUpperCase(), (err, res) => {
+    return this.client.tryQuery(this.accountInfoSet, pk.toUpperCase(), (err, res) => {
       callback(err, res)
-    })
+    }, 'exists')
   }
 
   getAccountByPk(pk, callback) {
-    this.client.get(this.accountInfoSet, pk.toUpperCase(), function (error, record) {
+    this.client.tryQuery(this.accountInfoSet, pk.toUpperCase(), function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -55,7 +55,7 @@ module.exports = class AccountDAO {
         accountInfo.txs_hash_list = record.bins.txs_hash_list;
         callback(error, accountInfo);
       }
-    });
+    }, 'get');
   }
 
 }

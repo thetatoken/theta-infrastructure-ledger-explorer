@@ -27,11 +27,11 @@ module.exports = class BlockDAO {
       'txs': blockInfo.txs
     }
 
-    this.client.put(this.blockInfoSet, blockInfo.height, bins, {}, this.upsertPolicy, callback);
+    this.client.tryQuery(this.blockInfoSet, blockInfo.height, bins, {}, this.upsertPolicy, callback, 'put');
   }
 
   getBlock(height, callback) {
-    this.client.get(this.blockInfoSet, height, null, function (error, record) {
+    this.client.tryQuery('get', this.blockInfoSet, height, null, function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -61,7 +61,7 @@ module.exports = class BlockDAO {
 
   getBlocksByRange(min, max, callback) {
     var filter = this.aerospike.filter.range('height', min, max);
-    this.client.query(this.blockInfoSet, filter, function (error, recordList) {
+    this.client.tryQuery(this.blockInfoSet, filter, function (error, recordList) {
       var blockInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var blockInfo = {};
@@ -77,6 +77,6 @@ module.exports = class BlockDAO {
         blockInfoList.push(blockInfo);
       }
       callback(error, blockInfoList)
-    });
+    }, 'query');
   }
 }

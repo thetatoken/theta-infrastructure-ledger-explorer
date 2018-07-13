@@ -24,17 +24,17 @@ module.exports = class TransactionDAO {
       'block_height': transactionInfo.block_height,
       'timestamp': transactionInfo.timestamp
     }
-    this.client.put(this.transactionInfoSet, bins.hash, bins, {}, this.upsertPolicy, callback);
+    this.client.tryQuery(this.transactionInfoSet, bins.hash, bins, {}, this.upsertPolicy, callback, 'put');
   }
   checkTransaction(pk, callback) {
-    return this.client.exists(this.transactionInfoSet, pk, (err, res) => {
+    return this.client.tryQuery(this.transactionInfoSet, pk, (err, res) => {
       callback(err, res)
-    })
+    }, 'exists')
   }
   getTransactions(min, max, callback) {
     // var filter = (min !== null && max !== null) ? this.aerospike.filter.range('uuid', min, max) : null;
     var filter = this.aerospike.filter.range('number', min, max);
-    this.client.query(this.transactionInfoSet, filter, function (error, recordList) {
+    this.client.tryQuery(this.transactionInfoSet, filter, function (error, recordList) {
       var transactionInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var transactionInfo = {};
@@ -47,11 +47,11 @@ module.exports = class TransactionDAO {
         transactionInfoList.push(transactionInfo)
       }
       callback(error, transactionInfoList)
-    });
+    }, 'query');
   }
 
   getTransactionByPk(pk, callback) {
-    this.client.get(this.transactionInfoSet, pk.toUpperCase(), function (error, record) {
+    this.client.tryQuery(this.transactionInfoSet, pk.toUpperCase(), function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -73,6 +73,6 @@ module.exports = class TransactionDAO {
         transactionInfo.timestamp = record.bins.timestamp;
         callback(error, transactionInfo);
       }
-    });
+    }, 'get');
   }
 }

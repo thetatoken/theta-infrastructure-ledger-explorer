@@ -8,11 +8,11 @@ var config = null;
 //------------------------------------------------------------------------------
 //  APIs
 //------------------------------------------------------------------------------
-exports.setConfig = function(cfg) {
+exports.setConfig = function (cfg) {
   config = cfg;
 }
 
-exports.getBlock = function(params, callback) {
+exports.getBlock = function (params, callback) {
   body = {
     jsonrpc: '2.0',
     method: 'theta.GetBlock',
@@ -22,7 +22,7 @@ exports.getBlock = function(params, callback) {
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
 
-exports.getStatus = function(params, callback) {
+exports.getStatus = function (params, callback) {
   body = {
     jsonrpc: '2.0',
     method: 'theta.GetStatus',
@@ -31,7 +31,7 @@ exports.getStatus = function(params, callback) {
   }
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
-exports.getAccount = function(params, callback) {
+exports.getAccount = function (params, callback) {
   body = {
     jsonrpc: '2.0',
     method: 'theta.GetAccount',
@@ -45,7 +45,7 @@ exports.getAccount = function(params, callback) {
 //  Utils
 //------------------------------------------------------------------------------
 
-var RandomIdGenerator = function() {
+var RandomIdGenerator = function () {
   var id = '';
   var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var length = 8;
@@ -56,68 +56,68 @@ var RandomIdGenerator = function() {
 
 const MAX_CONCURRENCY = 100;
 
-var ProcessHttpRequest = (function(maxConcurrency) {
-    var requestQueue = [];
-    var outstandingRequests = 0;
+var ProcessHttpRequest = (function (maxConcurrency) {
+  var requestQueue = [];
+  var outstandingRequests = 0;
 
-    var tryExecuteNextRequest = function() {
-        if (outstandingRequests < maxConcurrency && requestQueue.length > 0) {
-            var request = requestQueue.shift();
-            outstandingRequests++;
-            var originalCallback = request[request.length - 1];
-            request[request.length - 1] = function () {
-                outstandingRequests--;
-                originalCallback.apply(null, arguments);
-                tryExecuteNextRequest();
-            }
-            processHttpRequest.apply(null, request);
-        }
-    }
-
-    return function(host, port, method, path, requestBody, callback) {
-        requestQueue.push(arguments);
+  var tryExecuteNextRequest = function () {
+    if (outstandingRequests < maxConcurrency && requestQueue.length > 0) {
+      var request = requestQueue.shift();
+      outstandingRequests++;
+      var originalCallback = request[request.length - 1];
+      request[request.length - 1] = function () {
+        outstandingRequests--;
+        originalCallback.apply(null, arguments);
         tryExecuteNextRequest();
-    };
+      }
+      processHttpRequest.apply(null, request);
+    }
+  }
+
+  return function (host, port, method, path, requestBody, callback) {
+    requestQueue.push(arguments);
+    tryExecuteNextRequest();
+  };
 })(MAX_CONCURRENCY);
 
-var processHttpRequest = function(host, port, method, path, requestBody, callback) {
+var processHttpRequest = function (host, port, method, path, requestBody, callback) {
 
   var options = {
     host: host,
     port: port,
     method: method,
     path: path,
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' }
   };
-  if (config.log.level == 'debug'){
-    console.log('[Debug] ____');
-    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
-  }
+  // if (config.log.level == 'debug'){
+  //   console.log('[Debug] ____');
+  //   console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
+  // }
 
   try {
-    var req = http.request(options, function(res) { 
+    var req = http.request(options, function (res) {
       var body = '';
       res.setEncoding('utf8');
-      res.on('data', function(dataBlock) {
+      res.on('data', function (dataBlock) {
         body += dataBlock;
       });
-      res.on('end', function() {
-        if (config.log.log_level == 'debug'){
-          console.log('[Debug]' + body);
-          console.log('[Debug] ____');
-        }
+      res.on('end', function () {
+        // if (config.log.log_level == 'debug'){
+        //   console.log('[Debug]' + body);
+        //   console.log('[Debug] ____');
+        // }
 
         if (callback) { callback(null, body); }
       });
     });
 
-    req.setTimeout(10000, function() {
+    req.setTimeout(10000, function () {
       req.abort();
       callback('Request Timeout: ' + path, null);
       callback = null;
     });
 
-    req.on('error', function(error) {
+    req.on('error', function (error) {
       console.log('req error: ' + error)
       if (callback) { callback(error, null); }
     });
@@ -125,7 +125,7 @@ var processHttpRequest = function(host, port, method, path, requestBody, callbac
     req.write(requestBody);
     req.end();
   }
-  catch(error) {
+  catch (error) {
     callback(error.stack, null);
   }
 }

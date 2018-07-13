@@ -18,16 +18,16 @@ module.exports = class ProgressDAO {
 
   upsertProgress(network, block_height, count, callback) {
     let bins = {
-      'network':         network,
-      'lst_blk_height':  block_height,
-      // 'lst_blk_height': 24130,
+      'network': network,
+      'lst_blk_height': block_height,
+      // 'lst_blk_height': 455835,
       'txs_count': count
     }
-    this.client.put(this.progressInfoSet, network, bins, {}, this.upsertPolicy, callback);
+    this.client.tryQuery(this.progressInfoSet, network, bins, {}, this.upsertPolicy, callback, 'put');
   }
 
   getProgress(network, callback) {
-    this.client.get(this.progressInfoSet, network, null, function(error, record) {
+    this.client.tryQuery(this.progressInfoSet, network, null, function (error, record) {
       if (error) {
         console.log(error);
         callback(error);
@@ -37,6 +37,6 @@ module.exports = class ProgressDAO {
         progressInfo.count = record.bins.txs_count;
         callback(error, progressInfo);
       }
-    });
+    }, 'get');
   }
 }

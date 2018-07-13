@@ -22,11 +22,11 @@ module.exports = class StatusDAO {
       'lst_blk_time':    statusInfo.latest_block_time,
       'lst_blk_ht':      statusInfo.latest_block_height
     }
-    this.client.put(this.statusInfoSet, statusInfo.network, bins, {}, this.upsertPolicy, callback);
+    this.client.tryQuery(this.statusInfoSet, statusInfo.network, bins, {}, this.upsertPolicy, callback, 'put');
   }
 
   getStatus(network, callback) {
-    this.client.get(this.statusInfoSet, network, null, function (error, record) {
+    this.client.tryQuery(this.statusInfoSet, network, null, function (error, record) {
       if (error) {
         console.log('status dao catch')
         console.log(error);
@@ -39,6 +39,6 @@ module.exports = class StatusDAO {
         statusInfo.latest_block_height  = record.bins.lst_blk_ht;
         callback(statusInfo);
       }
-    });
+    }, 'get');
   }
 }
