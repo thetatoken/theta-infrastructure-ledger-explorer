@@ -31,7 +31,7 @@ module.exports = class BlockDAO {
   }
 
   getBlock(height, callback) {
-    this.client.tryQuery('get', this.blockInfoSet, height, null, function (error, record) {
+    this.client.tryQuery(this.blockInfoSet, height, null, function (error, record) {
       if (error) {
         switch (error.code) {
           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
@@ -56,7 +56,7 @@ module.exports = class BlockDAO {
         blockInfo.txs = record.bins.txs;
         callback(error, blockInfo);
       }
-    });
+    }, 'get');
   }
 
   getBlocksByRange(min, max, callback) {

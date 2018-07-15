@@ -27,7 +27,7 @@ exports.aerospikeDBParams = function () {
     defaultSet: 'test'
   }
 }
-const MAX_CONCURRENCY = 100;
+const MAX_CONCURRENCY = 150;
 
 exports.tryQuery = (function (maxConcurrency) {
 
