@@ -9,7 +9,7 @@ var Aerospike = null;
 
 exports.init = function (execDir, hostIp, hostPort, namespace) {
   Aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
-  client = Aerospike.client({ hosts: hostIp + ':' + hostPort.toString(), maxConnsPerNode: 30 });
+  client = Aerospike.client({ hosts: hostIp + ':' + hostPort.toString(), maxConnsPerNode: 300 });
   ns = namespace;
 }
 

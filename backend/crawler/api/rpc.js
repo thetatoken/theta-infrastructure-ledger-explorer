@@ -89,10 +89,10 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
     path: path,
     headers: { 'Content-Type': 'application/json' }
   };
-  // if (config.log.level == 'debug'){
-  //   console.log('[Debug] ____');
-  //   console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
-  // }
+  if (config.log.level == 'debug'){
+    console.log('[Debug] ____');
+    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
+  }
 
   try {
     var req = http.request(options, function (res) {
@@ -102,10 +102,10 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
         body += dataBlock;
       });
       res.on('end', function () {
-        // if (config.log.log_level == 'debug'){
-        //   console.log('[Debug]' + body);
-        //   console.log('[Debug] ____');
-        // }
+        if (config.log.log_level == 'debug'){
+          console.log('[Debug]' + body);
+          console.log('[Debug] ____');
+        }
 
         if (callback) { callback(null, body); }
       });
