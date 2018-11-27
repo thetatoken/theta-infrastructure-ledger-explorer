@@ -22,6 +22,16 @@ exports.getBlock = function (params, callback) {
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
 
+exports.getBlockByHeight = function (params, callback) {
+  body = {
+    jsonrpc: '2.0',
+    method: 'theta.GetBlockByHeight',
+    params: params,
+    id: RandomIdGenerator()
+  }
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+}
+
 exports.getStatus = function (params, callback) {
   body = {
     jsonrpc: '2.0',
@@ -89,9 +99,9 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
     path: path,
     headers: { 'Content-Type': 'application/json' }
   };
-  if (config.log.level == 'debug'){
+  if (config.log.level == 'debug') {
     console.log('[Debug] ____');
-    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);    
+    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);
   }
 
   try {
@@ -102,7 +112,7 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
         body += dataBlock;
       });
       res.on('end', function () {
-        if (config.log.log_level == 'debug'){
+        if (config.log.log_level == 'debug') {
           console.log('[Debug]' + body);
           console.log('[Debug] ____');
         }

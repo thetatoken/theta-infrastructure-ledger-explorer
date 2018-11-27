@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router";
+import { BigNumber } from 'bignumber.js';
 
 // import '../styles.scss';
 
@@ -19,22 +20,14 @@ export default class AccountExplorerTable extends Component {
     )
   }
   renderBalance(balance) {
-    let denoms = [];
-    let amounts = [];
-    balance.forEach(coin => {
-      const denom = (coin.denom.includes('Wei') && coin.amount > 100000) ?
-        coin.denom.substring(0, coin.denom.length - 3) : coin.denom;
-      const amount = (coin.denom.includes('Wei') && coin.amount > 100000) ?
-        coin.amount / 1000000 : coin.amount;
-      denoms.push(denom);
-      amounts.push(amount);
-    });
+    let denoms = ['ThetaWei', 'GammaWei'];
+    let amounts = [balance.thetawei, balance.gammawei];
     return (
       <div className="th-explorer-table-text__balance">
         <div className="th-explorer-table-text__balance--left">
           {amounts.map((amount, i) => {
             return (
-              <p key={i}>{amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</p>
+              <p key={i}>{BigNumber(amount, 10).toFormat(0)}</p>
             )
           })}
         </div>

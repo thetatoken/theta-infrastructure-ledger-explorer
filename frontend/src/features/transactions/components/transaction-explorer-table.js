@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router";
 import classnames from 'classnames';
+import { BigNumber } from 'bignumber.js';
 import '../styles.scss';
 
 const typeMap = {
@@ -14,32 +15,11 @@ const typeMap = {
   '8': 'Update Validators'
 }
 export default class TransactionExplorerTable extends Component {
-  renderAmount(coins, type) {
-    let sum = 0, coinType;
-    if (type === 'single') {
-      coinType = (coins.denom.includes('Wei') && coins.amount > 100000) ?
-        coins.denom.substring(0, coins.denom.length - 3) : coins.denom;
-      sum = (coins.denom.includes('Wei') && coins.amount > 100000) ?
-        coins.amount / 1000000 : coins.amount;
-      return sum + ' ' + coinType;
-    } else {
-      let res = '', coinMap = {};
-      coins.forEach(coin => {
-        coinType = coin.denom;
-        if (coinMap[coinType]) coinMap[coinType] += coin.amount;
-        else coinMap[coinType] = coin.amount;
-      });
-      Object.keys(coinMap).forEach(coinType => {
-        let denom = coinType;
-        let amount = coinMap[coinType];
-        if (denom.includes('Wei') && amount > 99999) {
-          denom = denom.substring(0, denom.length - 3);
-          amount /= 1000000;
-        }
-        res += amount + ' ' + denom + ', ';
-      })
-      return res.substring(0, res.length - 2);
-    }
+  renderAmount(amount) {
+    return BigNumber(amount, 10).toFormat(0);
+  }
+  renderCoins(coins) {
+    return this.renderAmount(coins.thetawei) + " ThetaWei, " + this.renderAmount(coins.gammawei) + " GammaWei";
   }
   renderIds(ids) {
     let res = '';
@@ -63,7 +43,7 @@ export default class TransactionExplorerTable extends Component {
   }
   renderTimeStamp(timestamp) {
     const now = new Date(Date.now())
-    const pre = new Date(timestamp)
+    const pre = new Date(timestamp * 1000)
     // const res = this.getTimeString(now - 1528990059783);
     const res = this.getTimeString(now - pre);
     return res;
@@ -114,14 +94,12 @@ export default class TransactionExplorerTable extends Component {
   renderType1Amount(outputs) {
     return (
       <div>
-        {outputs.map(output => {
-          return output.coins.map((coin, i) => {
-            return (
-              <div key={i} className="th-explorer-table-text__type1_amount">
-                {this.renderAmount(coin, 'single') + ' To '}
-                <Link to={`/account/${output.address}`}>{this.getAddressShortHash(output.address)}</Link>
-              </div>)
-          })
+        {outputs.map((output, i) => {
+          return (
+            <div key={i} className="th-explorer-table-text__type1_amount">
+              {this.renderCoins(output.coins) + ' To '}
+              <Link to={`/account/${output.address}`}>{this.getAddressShortHash(output.address)}</Link>
+            </div>)
         })}
       </div>
     )
@@ -155,9 +133,9 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
-        {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.inputs[0].coins))}
+        {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.inputs[0].coins))}
         {this.renderOneRow('Input Address', transactionInfo.data.inputs[0].address, true)}
         {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
       </div>
@@ -167,11 +145,11 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
-        {this.renderOneRow('Collateral', this.renderAmount(transactionInfo.data.collateral))}
+        {this.renderOneRow('Collateral', this.renderCoins(transactionInfo.data.collateral))}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
-        {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.source.coins))}
+        {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.source.coins))}
         {this.renderOneRow('Source Address', transactionInfo.data.source.address, true)}
         {this.renderOneRow('Resource Ids', this.renderIds(transactionInfo.data.resource_ids))}
       </div>
@@ -181,11 +159,11 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
         {this.renderOneRow('Reserve Sequence', transactionInfo.data.reserve_sequence)}
-        {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.source.coins))}
+        {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.source.coins))}
         {this.renderOneRow('Source Address', transactionInfo.data.source.address, true)}
         {this.renderOneRow('Target Address', transactionInfo.data.target.address, true)}
       </div>
@@ -195,7 +173,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee, 'single'))}
+        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Initiator Address', transactionInfo.data.initiator.address, true)}

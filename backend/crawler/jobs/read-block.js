@@ -29,8 +29,8 @@ exports.Execute = function () {
     .then(function (data) {
       // console.log(data);
       var result = JSON.parse(data);
-      latest_block_height = result.result.latest_block_height;
-      console.log('Latest block height: ' + latest_block_height.toString());
+      latest_block_height = +result.result.latest_finalized_block_height;
+      console.log('Latest block height: ' + latest_block_height);
       return progressDao.getProgressAsync(network_id);
     })
     .then(function (progressInfo) {
@@ -39,7 +39,7 @@ exports.Execute = function () {
       console.log('DB transaction count progress: ' + txs_count.toString());
       console.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
-      if (latest_block_height > crawled_block_height_progress) {
+      if (latest_block_height >= crawled_block_height_progress) {
         // get target crawl height
         target_crawl_height = crawled_block_height_progress + max_block_per_crawl;
         if (latest_block_height < target_crawl_height) {
@@ -49,7 +49,7 @@ exports.Execute = function () {
         var getBlockAsyncList = []
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           console.log('Crawling new block: ' + i.toString());
-          getBlockAsyncList.push(rpc.getBlockAsync([{ 'height': i }]))
+          getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]))
         }
         return Promise.all(getBlockAsyncList)
       } else {
@@ -62,17 +62,17 @@ exports.Execute = function () {
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
-          // console.log(blockDataList[i]);
+          console.log(blockDataList[i]);
           const blockInfo = {
-            height: result.result.block_meta.header.height,
-            timestamp: result.result.block_meta.header.time,
-            parent_hash: result.result.block_meta.header.last_block_id.hash,
-            num_txs: result.result.block_meta.header.num_txs,
-            lst_cmt_hash: result.result.block_meta.header.last_commit_hash,
-            data_hash: result.result.block_meta.header.data_hash,
-            vldatr_hash: result.result.block_meta.header.validators_hash,
-            hash: result.result.block_meta.block_id.hash,
-            txs: result.result.Txs
+            height: +result.result.height,
+            timestamp: +result.result.timestamp,
+            parent_hash: result.result.parent,
+            num_txs: result.result.transactions.length,
+            lst_cmt_hash: "",
+            data_hash: result.result.state_hash,
+            vldatr_hash: "",
+            hash: result.result.hash,
+            txs: result.result.transactions
           }
           upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
           // Store the transaction data
@@ -82,7 +82,7 @@ exports.Execute = function () {
               const transaction = {
                 hash: txs[j].hash,
                 type: txs[j].type,
-                data: txs[j].data,
+                data: txs[j].raw,
                 block_height: blockInfo.height,
                 timestamp: blockInfo.timestamp
               }
