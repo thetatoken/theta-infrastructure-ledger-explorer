@@ -38,7 +38,7 @@
     "style-loader": "^0.13.1",
     "webpack": "^2.2.1",
     "webpack-dev-middleware": "^1.10.0",
-    "webpack-dev-server": "^2.3.0",
+    "webpack-dev-server": "^3.1.11",
     "webpack-hot-middleware": "^2.22.2"
   },
   "babel": {
