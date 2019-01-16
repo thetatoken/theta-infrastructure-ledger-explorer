@@ -32,8 +32,9 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log(error);
         callback(error);
+      } else if (!record) {
+        callback(Error('No progress record'));
       } else {
-        console.log("record is: ", record);
         var progressInfo = {};
         progressInfo.height = record.lst_blk_height;
         progressInfo.count = record.txs_count;
@@ -42,17 +43,4 @@ module.exports = class ProgressDAO {
     })
   }
 
-  // getProgress(network, callback) {
-  //   this.client.tryQuery(this.progressInfoSet, network, null, function (error, record) {
-  //     if (error) {
-  //       console.log(error);
-  //       callback(error);
-  //     } else {
-  //       var progressInfo = {};
-  //       progressInfo.height = record.bins.lst_blk_height;
-  //       progressInfo.count = record.bins.txs_count;
-  //       callback(error, progressInfo);
-  //     }
-  //   }, 'get');
-  // }
 }

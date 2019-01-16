@@ -30,7 +30,7 @@ module.exports = class AccountDAO {
     return this.client.exist(this.accountInfoCollection, queryObject, function (err, res) {
       if (err) {
         console.log('error in checkAccount: ', err);
-        throw err;
+        callback(err);
       }
       callback(err, res);
     });
@@ -39,15 +39,10 @@ module.exports = class AccountDAO {
     const queryObject = { 'address': address };
     this.client.findOne(this.accountInfoCollection, queryObject, function (error, record) {
       if (error) {
-        switch (error.code) {
-          // TODO: check the  not found error code in mongoDc
-          case 2:
-            console.log('NOT_FOUND -', pk)
-            callback(error);
-            break
-          default:
-            console.log('ERR - ', error, pk)
-        }
+        console.log('ERR - ', error, pk);
+        // callback(error);
+      } else if (!record) {
+        callback(Error('NOT_FOUND -', pk));
       } else {
         // console.log('account info in record: ', record)
         var accountInfo = {};
@@ -61,30 +56,5 @@ module.exports = class AccountDAO {
       }
     })
   }
-  //   getAccountByPk(pk, callback) {
-  //     this.client.tryQuery(this.accountInfoCollection, pk.toUpperCase(), function (error, record) {
-  //       if (error) {
-  //         switch (error.code) {
-  //           // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
-  //           // No record is found with the specified namespace/set/key combination.
-  //           case 2:
-  //             console.log('NOT_FOUND -', pk)
-  //             callback(error);
-  //             break
-  //           default:
-  //             console.log('ERR - ', error, pk)
-  //         }
-  //       } else {
-  //         var accountInfo = {};
-  //         accountInfo.address = record.bins.address;
-  //         accountInfo.balance = record.bins.balance;
-  //         accountInfo.sequence = record.bins.sequence;
-  //         accountInfo.reserved_funds = record.bins.reserved_funds;
-  //         accountInfo.last_updated_block_height = record.bins.lst_updt_blk;
-  //         accountInfo.txs_hash_list = record.bins.txs_hash_list;
-  //         callback(error, accountInfo);
-  //       }
-  //     }, 'get');
-  //   }
-
+  
 }

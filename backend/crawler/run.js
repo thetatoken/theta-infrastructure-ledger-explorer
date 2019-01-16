@@ -4,11 +4,6 @@ var fs = require('fs');
 var rpc = require('./api/rpc.js');
 // var aerospikeClient = require('../db/aerospike-client.js');
 var mongoClient = require('../mongo-db/mongo-client.js')
-// var blockDaoLib = require('../db/block-dao.js');
-// var progressDaoLib = require('../db/progress-dao.js');
-// var transactionDaoLib = require('../db/transaction-dao.js');
-// var accountDaoLib = require('../db/account-dao.js');
-
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');

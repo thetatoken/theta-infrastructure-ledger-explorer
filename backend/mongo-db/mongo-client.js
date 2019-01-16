@@ -43,7 +43,7 @@ exports.close = function (callback) {
 exports.insertOne = function (collectionName, object, callback) {
   var collection = _db.collection(collectionName);
   collection.insertOne(object, function (err, res) {
-    if (err) throw err;
+    if (err) callback(err);
     console.log("1 document inserted");
     callback(err, res);
   });
@@ -51,7 +51,7 @@ exports.insertOne = function (collectionName, object, callback) {
 exports.upsert = function (collectionName, queryObject, updateObject, callback) {
   var collection = _db.collection(collectionName);
   collection.update(queryObject, { $set: updateObject }, { upsert: true }, function (err, res) {
-    if (err) throw err;
+    if (err) callback(err);
     // console.log(res);
     callback(err, res);
   });
@@ -59,15 +59,14 @@ exports.upsert = function (collectionName, queryObject, updateObject, callback) 
 exports.find = function (collectionName, callback) {
   var collection = _db.collection(collectionName);
   collection.findOne({}, function (err, res) {
-    if (err) throw err;
-    console.log(res);
+    if (err) callback(err);
     callback(err, res);
   });
 }
 exports.findOne = function (collectionName, queryObject, callback) {
   var collection = _db.collection(collectionName);
   collection.findOne(queryObject, function (err, res) {
-    if (err) throw err;
+    if (err) callback(err);
     // console.log(res);
     callback(err, res);
   });
@@ -75,7 +74,14 @@ exports.findOne = function (collectionName, queryObject, callback) {
 exports.exist = function (collectionName, queryObject, callback) {
   var collection = _db.collection(collectionName);
   collection.find(queryObject).limit(1).each(function (err, res) {
-    if (err) throw err;
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
+exports.query = function (collectionName, queryObject, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find(queryObject).toArray(function (err, res) {
+    if (err) callback(err);
     callback(err, res);
   });
 }

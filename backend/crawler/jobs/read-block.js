@@ -110,14 +110,20 @@ exports.Execute = function () {
     })
   .catch(function (error) {
     if (error) {
-      switch (error.code) {
-        // case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-        //   console.log('Initializng progress record..');
-        //   progressDao.upsertProgressAsync(network_id, 0, 0)
-        //   break;
-        default:
-          console.log(error);
+      if(error.message === 'No progress record'){
+        console.log('Initializng progress record..');
+        progressDao.upsertProgressAsync(network_id, 0, 0);
+      }else{
+        console.log(error);
       }
+      // switch (error.code) {
+      //   case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
+      //     console.log('Initializng progress record..');
+      //     progressDao.upsertProgressAsync(network_id, 0, 0)
+      //     break;
+      //   default:
+      //     console.log(error);
+      // }
     }
   });
 }

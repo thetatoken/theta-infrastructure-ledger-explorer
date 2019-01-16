@@ -2,11 +2,13 @@ var fs = require('fs')
 var express = require('express');
 var app = express();
 var bluebird = require("bluebird");
-var asClient = require('../db/aerospike-client.js')
-var blockDaoLib = require('../db/block-dao.js');
-var progressDaoLib = require('../db/progress-dao.js');
-var transactionDaoLib = require('../db/transaction-dao.js');
-var accountDaoLib = require('../db/account-dao.js');
+// var asClient = require('../db/aerospike-client.js')
+var mongoClient = require('../mongo-db/mongo-client.js')
+var blockDaoLib = require('../mongo-db/block-dao.js');
+var progressDaoLib = require('../mongo-db/progress-dao.js');
+var transactionDaoLib = require('../mongo-db/transaction-dao.js');
+var accountDaoLib = require('../mongo-db/account-dao.js');
+
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
@@ -41,20 +43,20 @@ function main() {
   }
   console.log(config);
 
-  asClient.init(__dirname, config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
-  asClient.connect(function (err) {
+  mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
+  mongoClient.connect(function (err) {
     if (err) {
-      console.log('Aerospike connection failed');
+      console.log('Mongo connection failed');
       process.exit(1);
     } else {
-      console.log('Aerospike connection succeeded');
-      blockDao = new blockDaoLib(__dirname, asClient);
+      console.log('Mongo connection succeeded');
+      blockDao = new blockDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(blockDao);
-      progressDao = new progressDaoLib(__dirname, asClient);
+      progressDao = new progressDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(progressDao);
-      transactionDao = new transactionDaoLib(__dirname, asClient);
+      transactionDao = new transactionDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(transactionDao);
-      accountDao = new accountDaoLib(__dirname, asClient);
+      accountDao = new accountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountDao);
 
       //
@@ -114,7 +116,7 @@ function onClientConnect(client) {
 }
 
 function pushTopBlocks() {
-  numberOfBlocks = 10;
+  const numberOfBlocks = 10;
 
   progressDao.getProgressAsync(config.blockchain.network_id)
     .then(function (progressInfo) {

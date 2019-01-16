@@ -27,53 +27,49 @@ module.exports = class BlockDAO {
     this.client.upsert(this.blockInfoCollection, queryObject, newObject, callback);
   }
 
-  // getBlock(height, callback) {
-  //   this.client.tryQuery(this.blockInfoSet, height, null, function (error, record) {
-  //     if (error) {
-  //       switch (error.code) {
-  //         // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
-  //         // No record is found with the specified namespace/set/key combination.
-  //         case 2:
-  //           console.log('NOT_FOUND -', height)
-  //           callback(error);
-  //           break
-  //         default:
-  //           console.log('ERR - ', error, height)
-  //       }
-  //     } else {
-  //       var blockInfo = {};
-  //       blockInfo.height = record.bins.height;
-  //       blockInfo.timestamp = record.bins.timestamp;
-  //       blockInfo.hash = record.bins.hash;
-  //       blockInfo.parent_hash = record.bins.parent_hash;
-  //       blockInfo.num_txs = record.bins.num_txs;
-  //       blockInfo.lst_cmt_hash = record.bins.lst_cmt_hash;
-  //       blockInfo.data_hash = record.bins.data_hash;
-  //       blockInfo.vldatr_hash = record.bins.vldatr_hash;
-  //       blockInfo.txs = record.bins.txs;
-  //       callback(error, blockInfo);
-  //     }
-  //   }, 'get');
-  // }
+  getBlock(height, callback) {
+    const queryObject = { 'height': height };
+    this.client.findOne(this.blockInfoCollection, queryObject, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error, height);
+        // callback(error);
+      } else if (!record) {
+        callback(Error('NOT_FOUND -', height));
+      } else {
+        var blockInfo = {};
+        blockInfo.height = record.height;
+        blockInfo.timestamp = record.timestamp;
+        blockInfo.hash = record.hash;
+        blockInfo.parent_hash = record.parent_hash;
+        blockInfo.num_txs = record.num_txs;
+        blockInfo.lst_cmt_hash = record.lst_cmt_hash;
+        blockInfo.data_hash = record.data_hash;
+        blockInfo.vldatr_hash = record.vldatr_hash;
+        blockInfo.txs = record.txs;
+        callback(error, blockInfo);
+      }
+    })
 
-  // getBlocksByRange(min, max, callback) {
-  //   var filter = this.aerospike.filter.range('height', min, max);
-  //   this.client.tryQuery(this.blockInfoSet, filter, function (error, recordList) {
-  //     var blockInfoList = []
-  //     for (var i = 0; i < recordList.length; i++) {
-  //       var blockInfo = {};
-  //       blockInfo.height = recordList[i].bins.height;
-  //       blockInfo.timestamp = recordList[i].bins.timestamp;
-  //       blockInfo.hash = recordList[i].bins.hash;
-  //       blockInfo.parent_hash = recordList[i].bins.parent_hash;
-  //       blockInfo.num_txs = recordList[i].bins.num_txs;
-  //       blockInfo.lst_cmt_hash = recordList[i].bins.lst_cmt_hash;
-  //       blockInfo.data_hash = recordList[i].bins.data_hash;
-  //       blockInfo.vldatr_hash = recordList[i].bins.vldatr_hash;
-  //       blockInfo.txs = recordList[i].bins.txs;
-  //       blockInfoList.push(blockInfo);
-  //     }
-  //     callback(error, blockInfoList)
-  //   }, 'query');
-  // }
+  }
+
+  getBlocksByRange(min, max, callback) {
+    const queryObject = { 'height': { $gte: min, $lte: max } };
+    this.client.query(this.blockInfoCollection, queryObject, function (error, recordList) {
+      var blockInfoList = []
+      for (var i = 0; i < recordList.length; i++) {
+        var blockInfo = {};
+        blockInfo.height = recordList[i].height;
+        blockInfo.timestamp = recordList[i].timestamp;
+        blockInfo.hash = recordList[i].hash;
+        blockInfo.parent_hash = recordList[i].parent_hash;
+        blockInfo.num_txs = recordList[i].num_txs;
+        blockInfo.lst_cmt_hash = recordList[i].lst_cmt_hash;
+        blockInfo.data_hash = recordList[i].data_hash;
+        blockInfo.vldatr_hash = recordList[i].vldatr_hash;
+        blockInfo.txs = recordList[i].txs;
+        blockInfoList.push(blockInfo);
+      }
+      callback(error, blockInfoList)
+    })
+  }
 }

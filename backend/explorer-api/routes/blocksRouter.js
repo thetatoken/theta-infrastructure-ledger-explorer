@@ -33,7 +33,7 @@ var blockRouter = (app, blockDao, progressDao, config) => {
             res.status(200).send(err);
             break
           default:
-            console.log('ERR - ', err)
+            console.log('ERR - ', error)
         }
       });
   });
