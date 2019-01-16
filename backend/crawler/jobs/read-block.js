@@ -35,6 +35,7 @@ exports.Execute = function () {
     })
     .then(function (progressInfo) {
       var crawled_block_height_progress = progressInfo.height;
+      console.log('crawled_block_height_progress: ', crawled_block_height_progress);
       txs_count = progressInfo.count;
       console.log('DB transaction count progress: ' + txs_count.toString());
       console.log('DB block height progress: ' + crawled_block_height_progress.toString());
@@ -62,7 +63,7 @@ exports.Execute = function () {
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
-          console.log(blockDataList[i]);
+          // console.log(blockDataList[i]);
           const blockInfo = {
             height: +result.result.height,
             timestamp: +result.result.timestamp,
@@ -80,17 +81,17 @@ exports.Execute = function () {
           if (txs !== undefined && txs.length > 0) {
             for (var j = 0; j < txs.length; j++) {
               const transaction = {
-                hash: txs[j].hash,
+                hash: txs[j].hash.toUpperCase(),
                 type: txs[j].type,
                 data: txs[j].raw,
                 block_height: blockInfo.height,
                 timestamp: blockInfo.timestamp
               }
-              const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+              const isExisted = await transactionDao.checkTransactionAsync({ 'hash': transaction.hash });
               if (!isExisted) {
                 transaction.number = ++txs_count;
                 validTransactionList.push(transaction);
-                upsertTransactionAsyncList.push(transactionDao.upsertTransaction(transaction));
+                upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
               }
             }
           }
@@ -103,19 +104,20 @@ exports.Execute = function () {
     })
     .then(function () {
       validTransactionList = [];
+      console.log('target_crawl_height: ', target_crawl_height, '. txs_count: ', txs_count)
       progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl progress updated to ' + target_crawl_height.toString());
     })
-    .catch(function (error) {
-      if (error) {
-        switch (error.code) {
-          case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-            console.log('Initializng progress record..');
-            progressDao.upsertProgressAsync(network_id, 0, 0)
-            break;
-          default:
-            console.log(error);
-        }
+  .catch(function (error) {
+    if (error) {
+      switch (error.code) {
+        // case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
+        //   console.log('Initializng progress record..');
+        //   progressDao.upsertProgressAsync(network_id, 0, 0)
+        //   break;
+        default:
+          console.log(error);
       }
-    });
+    }
+  });
 }

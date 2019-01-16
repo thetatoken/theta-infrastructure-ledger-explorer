@@ -2,11 +2,17 @@ var schedule = require('node-schedule');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
-var aerospikeClient = require('../db/aerospike-client.js');
-var blockDaoLib = require('../db/block-dao.js');
-var progressDaoLib = require('../db/progress-dao.js');
-var transactionDaoLib = require('../db/transaction-dao.js');
-var accountDaoLib = require('../db/account-dao.js');
+// var aerospikeClient = require('../db/aerospike-client.js');
+var mongoClient = require('../mongo-db/mongo-client.js')
+// var blockDaoLib = require('../db/block-dao.js');
+// var progressDaoLib = require('../db/progress-dao.js');
+// var transactionDaoLib = require('../db/transaction-dao.js');
+// var accountDaoLib = require('../db/account-dao.js');
+
+var progressDaoLib = require('../mongo-db/progress-dao.js');
+var blockDaoLib = require('../mongo-db/block-dao.js');
+var transactionDaoLib = require('../mongo-db/transaction-dao.js');
+var accountDaoLib = require('../mongo-db/account-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
 
@@ -43,39 +49,74 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   // connect to db
-  aerospikeClient.init(__dirname, config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
-  aerospikeClient.connect(function (error) {
+  // aerospikeClient.init(__dirname, config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
+  // aerospikeClient.connect(function (error) {
+  //   if (error) {
+  //     console.log('DB connection failed');
+  //     process.exit();
+  //   } else {
+  //     console.log('DB connection succeeded');
+  //     setupGetBlockCronJob(aerospikeClient);
+  //   }
+  // });
+
+  // connect to mongoDB
+  mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
+  mongoClient.connect(function (error) {
     if (error) {
-      console.log('DB connection failed');
+      console.log('Mongo DB connection failed with err: ', error);
       process.exit();
     } else {
-      console.log('DB connection succeeded');
-      setupGetBlockCronJob(aerospikeClient);
+      console.log('Mongo DB connection succeeded');
+      // const mongoDB = mongoClient.getDB();
+      // const queryObject = { 'network': 'testnet_chain_id' };
+      // const newObject = {
+      //   'network': 'testnet_chain_id',
+      //   'lst_blk_height': 1213,
+      //   'txs_count': 451
+      // }
+      // mongoClient.upsert('progress', queryObject, newObject, function () { });
+      // mongoClient.find('progress', function () { });
+      setupGetBlockCronJob(mongoClient);
     }
   });
 }
 
-function setupGetBlockCronJob(aerospikeClient) {
-  // initialize DAOs
-  blockDao = new blockDaoLib(__dirname, aerospikeClient);
-  bluebird.promisifyAll(blockDao);
+// function setupGetBlockCronJob(aerospikeClient) {
+//   // initialize DAOs
+//   progressDao = new progressDaoLib(__dirname, aerospikeClient);
+//   bluebird.promisifyAll(progressDao);
 
-  progressDao = new progressDaoLib(__dirname, aerospikeClient);
+//   blockDao = new blockDaoLib(__dirname, aerospikeClient);
+//   bluebird.promisifyAll(blockDao);
+
+//   transactionDao = new transactionDaoLib(__dirname, aerospikeClient);
+//   bluebird.promisifyAll(transactionDao);
+
+//   accountDao = new accountDaoLib(__dirname, aerospikeClient);
+//   bluebird.promisifyAll(accountDao);
+
+//   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao);
+//   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
+// }
+
+function setupGetBlockCronJob(mongoClient) {
+  // initialize DAOs
+  progressDao = new progressDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(progressDao);
 
-  transactionDao = new transactionDaoLib(__dirname, aerospikeClient);
+  blockDao = new blockDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(blockDao);
+
+  transactionDao = new transactionDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(transactionDao);
 
-  accountDao = new accountDaoLib(__dirname, aerospikeClient);
+  accountDao = new accountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountDao);
-  
+
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao);
   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
-
-
 }
-
-
 
 
 
