@@ -1,6 +1,7 @@
 var rpc = require('../api/rpc.js');
 
 exports.updateAccount = function (accountDao, transactionList) {
+  // console.log('transactionList', transactionList);
   transactionList.forEach(async function (tx) {
     switch (tx.type) { // TODO: Add other type cases
       case 1:
@@ -33,11 +34,12 @@ exports.updateAccount = function (accountDao, transactionList) {
 function updateAccountByAddress(address, accountDao, hash) {
   rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
+      address = address.toUpperCase();
       let tmp = JSON.parse(data);
       const isExist = await accountDao.checkAccountAsync(address);
       const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
       const txs_hash_list = accountInfo ? [hash].concat(accountInfo.txs_hash_list.slice(0,99)) : [hash];
-      await accountDao.upsertAccount({
+      await accountDao.upsertAccountAsync({
         address,
         'balance': tmp.result.coins,
         'sequence':  tmp.result.sequence,
