@@ -12,7 +12,7 @@ class Pagination extends React.Component {
   }
   handlePrevious() {
     const previous = this.props.currentPage - 1;
-    if (previous >= 1) {
+    if (previous >= 0) {
       this.handleOnPage(previous);
     }
   }
