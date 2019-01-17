@@ -12,7 +12,7 @@ module.exports = class BlockDAO {
   }
 
   upsertBlock(blockInfo, callback) {
-    const queryObject = { 'height': blockInfo.height };
+    const queryObject = { '_id': blockInfo.height };
     const newObject = {
       'height': blockInfo.height,
       'timestamp': blockInfo.timestamp,
@@ -28,7 +28,7 @@ module.exports = class BlockDAO {
   }
 
   getBlock(height, callback) {
-    const queryObject = { 'height': height };
+    const queryObject = { '_id': height };
     this.client.findOne(this.blockInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - ', error, height);
@@ -53,7 +53,7 @@ module.exports = class BlockDAO {
   }
 
   getBlocksByRange(min, max, callback) {
-    const queryObject = { 'height': { $gte: min, $lte: max } };
+    const queryObject = { '_id': { $gte: min, $lte: max } };
     this.client.query(this.blockInfoCollection, queryObject, function (error, recordList) {
       var blockInfoList = []
       for (var i = 0; i < recordList.length; i++) {

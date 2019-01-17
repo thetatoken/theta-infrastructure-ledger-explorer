@@ -24,15 +24,17 @@ module.exports = class TransactionDAO {
       'block_height': transactionInfo.block_height,
       'timestamp': transactionInfo.timestamp
     }
-    const queryObject = { 'hash': newObject.hash };
+    const queryObject = { '_id': newObject.hash };
     this.client.upsert(this.transactionInfoCollection, queryObject, newObject, callback);
   }
-  checkTransaction(queryObject, callback) {
-    return this.client.exist(this.transactionInfoCollection, queryObject, function (err, res) {
+  checkTransaction(hash, callback) {
+    const queryObject = { '_id': hash };
+    this.client.exist(this.transactionInfoCollection, queryObject, function (err, res) {
       if (err) {
         console.log('error in checkTransaction: ', err);
         callback(err);
       }
+      // console.log('result in check transaction: ', res);
       callback(err, res);
     });
   }
@@ -55,7 +57,7 @@ module.exports = class TransactionDAO {
   }
 
   getTransactionByPk(pk, callback) {
-    const queryObject = { 'hash': pk.toUpperCase() };
+    const queryObject = { '_id': pk.toUpperCase() };
     this.client.findOne(this.transactionInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - ', error, pk);

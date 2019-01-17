@@ -17,7 +17,7 @@ module.exports = class ProgressDAO {
   }
 
   upsertProgress(network, block_height, count, callback) {
-    const queryObject = { 'network': network };
+    const queryObject = { '_id': network };
     const newObject = {
       'network': network,
       'lst_blk_height': block_height,
@@ -27,7 +27,7 @@ module.exports = class ProgressDAO {
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);
   }
   getProgress(network, callback) {
-    const queryObject = { 'network': network };
+    const queryObject = { '_id': network };
     this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log(error);

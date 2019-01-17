@@ -22,11 +22,11 @@ module.exports = class AccountDAO {
       'lst_updt_blk': accountInfo.last_updated_block_height,
       'txs_hash_list': accountInfo.txs_hash_list
     }
-    const queryObject = { 'address': newObject.address };
+    const queryObject = { '_id': newObject.address };
     this.client.upsert(this.accountInfoCollection, queryObject, newObject, callback);
   }
   checkAccount(address, callback) {
-    const queryObject = { 'address': address };
+    const queryObject = { '_id': address };
     return this.client.exist(this.accountInfoCollection, queryObject, function (err, res) {
       if (err) {
         console.log('error in checkAccount: ', err);
@@ -36,13 +36,13 @@ module.exports = class AccountDAO {
     });
   }
   getAccountByPk(address, callback) {
-    const queryObject = { 'address': address };
+    const queryObject = { '_id': address };
     this.client.findOne(this.accountInfoCollection, queryObject, function (error, record) {
       if (error) {
-        console.log('ERR - ', error, pk);
+        console.log('ERR - ', error, address);
         // callback(error);
       } else if (!record) {
-        callback(Error('NOT_FOUND -', pk));
+        callback(Error('NOT_FOUND -', address));
       } else {
         // console.log('account info in record: ', record)
         var accountInfo = {};
@@ -56,5 +56,5 @@ module.exports = class AccountDAO {
       }
     })
   }
-  
+
 }

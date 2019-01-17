@@ -49,7 +49,7 @@ exports.Execute = function () {
 
         var getBlockAsyncList = []
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
-          console.log('Crawling new block: ' + i.toString());
+          // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]))
         }
         return Promise.all(getBlockAsyncList)
@@ -87,7 +87,7 @@ exports.Execute = function () {
                 block_height: blockInfo.height,
                 timestamp: blockInfo.timestamp
               }
-              const isExisted = await transactionDao.checkTransactionAsync({ 'hash': transaction.hash });
+              const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
               if (!isExisted) {
                 transaction.number = ++txs_count;
                 validTransactionList.push(transaction);
@@ -108,22 +108,22 @@ exports.Execute = function () {
       progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl progress updated to ' + target_crawl_height.toString());
     })
-  .catch(function (error) {
-    if (error) {
-      if(error.message === 'No progress record'){
-        console.log('Initializng progress record..');
-        progressDao.upsertProgressAsync(network_id, 0, 0);
-      }else{
-        console.log(error);
+    .catch(function (error) {
+      if (error) {
+        if (error.message === 'No progress record') {
+          console.log('Initializng progress record..');
+          progressDao.upsertProgressAsync(network_id, 0, 0);
+        } else {
+          console.log(error);
+        }
+        // switch (error.code) {
+        //   case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
+        //     console.log('Initializng progress record..');
+        //     progressDao.upsertProgressAsync(network_id, 0, 0)
+        //     break;
+        //   default:
+        //     console.log(error);
+        // }
       }
-      // switch (error.code) {
-      //   case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-      //     console.log('Initializng progress record..');
-      //     progressDao.upsertProgressAsync(network_id, 0, 0)
-      //     break;
-      //   default:
-      //     console.log(error);
-      // }
-    }
-  });
+    });
 }

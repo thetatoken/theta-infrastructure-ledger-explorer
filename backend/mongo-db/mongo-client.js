@@ -40,29 +40,76 @@ exports.close = function (callback) {
     })
   }
 }
-exports.insertOne = function (collectionName, object, callback) {
-  var collection = _db.collection(collectionName);
-  collection.insertOne(object, function (err, res) {
-    if (err) callback(err);
-    console.log("1 document inserted");
-    callback(err, res);
-  });
-}
+const MAX_CONCURRENCY = 150;
+
+exports.tryQuery = (function (maxConcurrency) {
+
+  var requestQueue = [];
+  var outstandingRequests = 0;
+
+  var tryExecuteNextRequest = function () {
+    if (outstandingRequests < maxConcurrency && requestQueue.length > 0) {
+      var request = requestQueue.shift();
+      outstandingRequests++;
+      var originalCallback = request[request.length - 2];
+      request[request.length - 2] = function () {
+        outstandingRequests--;
+        if (originalCallback) originalCallback.apply(null, arguments);
+        tryExecuteNextRequest();
+      }
+      //processHttpRequest.apply(null, request);
+
+      const method = request[request.length - 1];
+      // console.log(request)
+      switch (method) {
+        case 'put':
+          put.apply(null, request);
+          break;
+        case 'get':
+          get.apply(null, request);
+          break;
+        case 'exists':
+          exists.apply(null, request);
+          break;
+        case 'query':
+          query.apply(null, request);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  return function () {
+    // console.log(arguments)
+    requestQueue.push(arguments);
+    tryExecuteNextRequest();
+  };
+})(MAX_CONCURRENCY);
+
+// exports.insertOne = function (collectionName, object, callback) {
+//   var collection = _db.collection(collectionName);
+//   collection.insertOne(object, function (err, res) {
+//     if (err) callback(err);
+//     console.log("1 document inserted");
+//     callback(err, res);
+//   });
+// }
 exports.upsert = function (collectionName, queryObject, updateObject, callback) {
   var collection = _db.collection(collectionName);
-  collection.update(queryObject, { $set: updateObject }, { upsert: true }, function (err, res) {
+  collection.updateOne(queryObject, { $set: updateObject }, { upsert: true }, function (err, res) {
     if (err) callback(err);
     // console.log(res);
     callback(err, res);
   });
 }
-exports.find = function (collectionName, callback) {
-  var collection = _db.collection(collectionName);
-  collection.findOne({}, function (err, res) {
-    if (err) callback(err);
-    callback(err, res);
-  });
-}
+// exports.find = function (collectionName, callback) {
+//   var collection = _db.collection(collectionName);
+//   collection.findOne({}, function (err, res) {
+//     if (err) callback(err);
+//     callback(err, res);
+//   });
+// }
 exports.findOne = function (collectionName, queryObject, callback) {
   var collection = _db.collection(collectionName);
   collection.findOne(queryObject, function (err, res) {
