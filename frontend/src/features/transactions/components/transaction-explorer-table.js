@@ -87,7 +87,7 @@ export default class TransactionExplorerTable extends Component {
   renderCommonRows(transactionInfo) {
     return (
       <div>
-        {this.renderOneRow('Hash', transactionInfo.hash)}
+        {this.renderOneRow('Hash', transactionInfo.hash.toLowerCase())}
         {this.renderOneRow('Type', typeMap[transactionInfo.type])}
         {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Age', this.renderTimeStamp(transactionInfo.timestamp))}

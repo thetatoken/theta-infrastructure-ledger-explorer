@@ -45,7 +45,7 @@ export default class AccountExplorerTable extends Component {
     return (
       <div className="th-explorer-table-text__txs_hash_list">
         {txsHashList.map(hash => {
-          return (<Link key={hash} to={`/txs/${hash}`}>{hash}</Link>)
+          return (<Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link>)
         })}
       </div>
     )
@@ -65,7 +65,7 @@ export default class AccountExplorerTable extends Component {
     const { accountInfo } = this.props;
     return (
       <div className="th-explorer-table">
-        {this.renderOneRow('Address', accountInfo.address)}
+        {this.renderOneRow('Address', accountInfo.address.toLowerCase())}
         {this.renderOneRow('Sequence', accountInfo.sequence)}
         {/* {this.renderOneRow('Reserved Funds', this.renderReservedFunds(accountInfo.reserved_funds))} */}
         {this.renderOneRow('Last Updated Block Height', this.renderToBlock(accountInfo.last_updated_block_height))}
