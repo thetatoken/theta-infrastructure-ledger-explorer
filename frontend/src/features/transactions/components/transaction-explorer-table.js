@@ -18,6 +18,9 @@ export default class TransactionExplorerTable extends Component {
   renderAmount(amount) {
     return BigNumber(amount, 10).toFormat(0);
   }
+  renderFee(fee){
+    return this.renderAmount(fee.gammawei) + " GammaWei";
+  }
   renderCoins(coins) {
     return this.renderAmount(coins.thetawei) + " ThetaWei, " + this.renderAmount(coins.gammawei) + " GammaWei";
   }
@@ -133,7 +136,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
+        {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.inputs[0].coins))}
         {this.renderOneRow('Input Address', transactionInfo.data.inputs[0].address, true)}
@@ -145,7 +148,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
+        {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Collateral', this.renderCoins(transactionInfo.data.collateral))}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
@@ -159,7 +162,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
+        {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
         {this.renderOneRow('Reserve Sequence', transactionInfo.data.reserve_sequence)}
@@ -173,7 +176,7 @@ export default class TransactionExplorerTable extends Component {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Fee', this.renderAmount(transactionInfo.data.fee))}
+        {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
         {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Initiator Address', transactionInfo.data.initiator.address, true)}
