@@ -5,7 +5,7 @@ import { Link } from "react-router";
 export default class TransactionOverviewTable extends Component {
   render() {
     const { transactionInfoList, size } = this.props;
-    const className = size === 'full' ? "th-overview-table full" : "th-overview-table"
+    const className = size === 'full' ? "th-overview-table full" : "th-overview-table";
     return (
       <div className={className}>
         <table>
@@ -20,7 +20,7 @@ export default class TransactionOverviewTable extends Component {
                 return (
                   <tr key={transactionInfo.hash}>
                     <td>{transactionInfo.type}</td>
-                    <td><Link to={`/txs/${transactionInfo.hash}`}>{transactionInfo.hash}</Link></td>
+                    <td><Link to={`/txs/${transactionInfo.hash.toLowerCase()}`}>{transactionInfo.hash.toLowerCase()}</Link></td>
                   </tr>
                 );
               })}

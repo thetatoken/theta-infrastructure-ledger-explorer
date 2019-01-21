@@ -68,7 +68,7 @@ export default class TransactionExplorer extends Component {
     return (
       <div className="th-explorer">
         <div className="th-explorer__title">
-          <span>Transaction Detail: {transactionHash.toUpperCase()}</span>
+          <span>Transaction Detail: {transactionHash.toLowerCase()}</span>
         </div>
         {this.renderContent()}
       </div>
