@@ -63,7 +63,7 @@ module.exports = class TransactionDAO {
         console.log('ERR - ', error, pk);
         // callback(error);
       } else if (!record) {
-        callback(Error('NOT_FOUND -', pk));
+        callback(Error('NOT_FOUND - ' + pk));
       } else {
         var transactionInfo = {};
         transactionInfo.hash = record.hash;

@@ -34,7 +34,7 @@ module.exports = class BlockDAO {
         console.log('ERR - ', error, height);
         // callback(error);
       } else if (!record) {
-        callback(Error('NOT_FOUND -', height));
+        callback(Error('NOT_FOUND - ' + height));
       } else {
         var blockInfo = {};
         blockInfo.height = record.height;

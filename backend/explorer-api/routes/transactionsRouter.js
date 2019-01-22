@@ -22,19 +22,14 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
         res.status(200).send(data);
       })
       .catch(error => {
-        console.log(error)
-        switch (error.code) {
-          // Code 2 means AS_PROTO_RESULT_FAIL_NOTFOUND
-          // No record is found with the specified namespace/set/key combination.
-          case 2:
-            const err = ({
-              type: 'error_not_found',
-              error
-            });
-            res.status(200).send(err);
-            break
-          default:
-            console.log('ERR - ', error)
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(200).send(err);
+        } else {
+          console.log('ERR - ', error)
         }
       });;
   });

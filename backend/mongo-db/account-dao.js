@@ -42,7 +42,7 @@ module.exports = class AccountDAO {
         console.log('ERR - ', error, address);
         // callback(error);
       } else if (!record) {
-        callback(Error('NOT_FOUND -', address));
+        callback(Error('NOT_FOUND - ' + address));
       } else {
         // console.log('account info in record: ', record)
         var accountInfo = {};

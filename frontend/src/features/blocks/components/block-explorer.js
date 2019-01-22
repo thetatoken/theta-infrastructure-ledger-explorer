@@ -20,15 +20,15 @@ export default class BlocksExplorer extends Component {
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
-      this.gerOneBlockByHeight(nextProps.params.blockHeight);
+      this.getOneBlockByHeight(nextProps.params.blockHeight);
     }
   }
   componentDidMount() {
     const { blockHeight } = this.props.params;
     browserHistory.push(`/blocks/${blockHeight}`);
-    this.gerOneBlockByHeight(blockHeight);
+    this.getOneBlockByHeight(blockHeight);
   }
-  gerOneBlockByHeight(height) {
+  getOneBlockByHeight(height) {
     const { totalBlocksNumber } = this.state;
     const msg = this.props.location.state;
     if (Number(height)
