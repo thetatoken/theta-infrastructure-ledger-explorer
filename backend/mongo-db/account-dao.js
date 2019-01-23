@@ -19,7 +19,7 @@ module.exports = class AccountDAO {
       'balance': accountInfo.balance,
       'sequence': accountInfo.sequence,
       'reserved_funds': accountInfo.reserved_funds === null ? 'null' : accountInfo.reserved_funds,
-      'lst_updt_blk': accountInfo.last_updated_block_height,
+      // 'lst_updt_blk': accountInfo.last_updated_block_height,
       'txs_hash_list': accountInfo.txs_hash_list
     }
     const queryObject = { '_id': newObject.address };
@@ -50,7 +50,7 @@ module.exports = class AccountDAO {
         accountInfo.balance = record.balance;
         accountInfo.sequence = record.sequence;
         accountInfo.reserved_funds = record.reserved_funds;
-        accountInfo.last_updated_block_height = record.lst_updt_blk;
+        // accountInfo.last_updated_block_height = record.lst_updt_blk;
         accountInfo.txs_hash_list = record.txs_hash_list;
         callback(error, accountInfo);
       }

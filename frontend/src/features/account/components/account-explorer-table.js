@@ -68,7 +68,7 @@ export default class AccountExplorerTable extends Component {
         {this.renderOneRow('Address', accountInfo.address.toLowerCase())}
         {this.renderOneRow('Sequence', accountInfo.sequence)}
         {/* {this.renderOneRow('Reserved Funds', this.renderReservedFunds(accountInfo.reserved_funds))} */}
-        {this.renderOneRow('Last Updated Block Height', this.renderToBlock(accountInfo.last_updated_block_height))}
+        {/* {this.renderOneRow('Last Updated Block Height', this.renderToBlock(accountInfo.last_updated_block_height))} */}
         {this.renderOneRow('Balance', this.renderBalance(accountInfo.balance))}
         {this.renderOneRow('Most Recent Transactions', this.renderTransactionsHash(accountInfo.txs_hash_list))}
       </div>

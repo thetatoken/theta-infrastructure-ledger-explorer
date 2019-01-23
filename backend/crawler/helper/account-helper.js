@@ -44,7 +44,7 @@ function updateAccountByAddress(address, accountDao, hash) {
         'balance': tmp.result.coins,
         'sequence':  tmp.result.sequence,
         'reserved_funds': tmp.result.reserved_funds,
-        'last_updated_block_height': tmp.result.last_updated_block_height,
+        // 'last_updated_block_height': tmp.result.last_updated_block_height,
         'txs_hash_list': txs_hash_list
       });
     })
