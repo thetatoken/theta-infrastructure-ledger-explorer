@@ -21,7 +21,7 @@ export default class AccountExplorerTable extends Component {
   }
   renderBalance(balance) {
     let denoms = ['ThetaWei', 'TFuelWei'];
-    let amounts = [balance.thetawei, balance.TFuelwei];
+    let amounts = [balance.thetawei, balance.tfuelwei];
     return (
       <div className="th-explorer-table-text__balance">
         <div className="th-explorer-table-text__balance--left">
