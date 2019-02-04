@@ -19,10 +19,10 @@ export default class TransactionExplorerTable extends Component {
     return BigNumber(amount, 10).toFormat(0);
   }
   renderFee(fee){
-    return this.renderAmount(fee.gammawei) + " GammaWei";
+    return this.renderAmount(fee.tfuelwei) + " TFuelWei";
   }
   renderCoins(coins) {
-    return this.renderAmount(coins.thetawei) + " ThetaWei, " + this.renderAmount(coins.gammawei) + " GammaWei";
+    return this.renderAmount(coins.thetawei) + " ThetaWei, " + this.renderAmount(coins.tfuelwei) + " TFuelWei";
   }
   renderIds(ids) {
     let res = '';
