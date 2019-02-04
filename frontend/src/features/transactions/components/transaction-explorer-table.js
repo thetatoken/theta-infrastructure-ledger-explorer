@@ -5,14 +5,14 @@ import { BigNumber } from 'bignumber.js';
 import '../styles.scss';
 
 const typeMap = {
-  '1': 'Coinbase',
-  '2': 'Slash',
-  '3': 'Send',
-  '4': 'Reserve fund',
-  '5': 'Release fund',
-  '6': 'Service Payment',
-  '7': 'Split Contract',
-  '8': 'Update Validators'
+  '0': 'Coinbase',
+  '1': 'Slash',
+  '2': 'Send',
+  '3': 'Reserve fund',
+  '4': 'Release fund',
+  '5': 'Service Payment',
+  '6': 'Split Contract',
+  '7': 'Update Validators'
 }
 export default class TransactionExplorerTable extends Component {
   renderAmount(amount) {
@@ -94,12 +94,12 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType1Amount(outputs) {
+  renderCoinBaseAmount(outputs) {
     return (
       <div>
         {outputs.map((output, i) => {
           return (
-            <div key={i} className="th-explorer-table-text__type1_amount">
+            <div key={i} className="th-explorer-table-text__coinbase_amount">
               {this.renderCoins(output.coins) + ' To '}
               <Link to={`/account/${output.address}`}>{this.getAddressShortHash(output.address)}</Link>
             </div>)
@@ -110,17 +110,17 @@ export default class TransactionExplorerTable extends Component {
   getAddressShortHash(address) {
     return address.substring(12) + '...';
   }
-  renderType1(transactionInfo) {
+  renderCoinBase(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
-        {this.renderOneRow('Amount', this.renderType1Amount(transactionInfo.data.outputs))}
+        {this.renderOneRow('Amount', this.renderCoinBaseAmount(transactionInfo.data.outputs))}
         {/* {this.renderOneRow('Amount', this.renderAmount(transactionInfo.data.outputs[0].coins))}
         {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)} */}
       </div>
     )
   }
-  renderType2(transactionInfo) {
+  renderSlash(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
@@ -132,7 +132,7 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType3(transactionInfo) {
+  renderSend(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
@@ -144,7 +144,7 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType4(transactionInfo) {
+  renderReserveFund(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
@@ -158,7 +158,7 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType6(transactionInfo) {
+  renderServicePayment(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
@@ -172,7 +172,7 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
-  renderType7(transactionInfo) {
+  renderSplitContract(transactionInfo) {
     return (
       <div>
         {this.renderCommonRows(transactionInfo)}
@@ -189,18 +189,18 @@ export default class TransactionExplorerTable extends Component {
     const { transactionInfo } = this.props;
     // console.log(transactionInfo)
     switch (transactionInfo.type) { // TODO: Add other type cases
+      case 0:
+        return this.renderCoinBase(transactionInfo)
       case 1:
-        return this.renderType1(transactionInfo)
+        return this.renderSlash(transactionInfo)
       case 2:
-        return this.renderType2(transactionInfo)
+        return this.renderSend(transactionInfo)
       case 3:
-        return this.renderType3(transactionInfo)
-      case 4:
-        return this.renderType4(transactionInfo)
+        return this.renderReserveFund(transactionInfo)
+      case 5:
+        return this.renderServicePayment(transactionInfo)
       case 6:
-        return this.renderType6(transactionInfo)
-      case 7:
-        return this.renderType7(transactionInfo)
+        return this.renderSplitContract(transactionInfo)
       default:
         return <div>Wrong type</div>
     }

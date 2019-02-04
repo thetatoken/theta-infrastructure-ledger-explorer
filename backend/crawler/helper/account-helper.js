@@ -4,25 +4,25 @@ exports.updateAccount = function (accountDao, transactionList) {
   // console.log('transactionList', transactionList);
   transactionList.forEach(async function (tx) {
     switch (tx.type) { // TODO: Add other type cases
-      case 1:
+      case 0:
         await updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
         break;
-      case 3:
+      case 2:
         // Update inputs account
         await updateAccountByAddress(tx.data.inputs[0].address, accountDao, tx.hash);
         // Update outputs account
         await updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
         break;
-      case 4:
+      case 3:
         await updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
         break;
-      case 6:
+      case 5:
         // Update source account
         await updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
         // Update target account
         await updateAccountByAddress(tx.data.target.address, accountDao, tx.hash);
         break;
-      case 7:
+      case 6:
         await updateAccountByAddress(tx.data.initiator.address, accountDao, tx.hash);
         break;
       default:
