@@ -46,7 +46,6 @@ export default class BlocksExplorer extends Component {
               });
               break;
             case 'error_not_found':
-              console.log(res)
               this.setState({
                 errorType: msg ? 'error_coming_soon' : 'error_not_found'
               });

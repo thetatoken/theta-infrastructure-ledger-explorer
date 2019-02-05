@@ -23,11 +23,11 @@ var blockRouter = (app, blockDao, progressDao, config) => {
       })
       .catch(error => {
         if (error.message.includes('NOT_FOUND')) {
-          const err = ({
+          const err = {
             type: 'error_not_found',
             error
-          });
-          res.status(200).send(err);
+          };
+          res.status(404).send(err);
         } else {
           console.log('ERR - ', error)
         }

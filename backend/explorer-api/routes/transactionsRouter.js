@@ -27,7 +27,7 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
             type: 'error_not_found',
             error
           });
-          res.status(200).send(err);
+          res.status(404).send(err);
         } else {
           console.log('ERR - ', error)
         }
