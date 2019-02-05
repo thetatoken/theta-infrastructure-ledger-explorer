@@ -6,7 +6,7 @@ var accountRouter = (app, accountDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   
   router.get("/account/:address", (req, res) => {
-    let address = req.params.address;
+    let address = req.params.address.toUpperCase();
     console.log('Querying one account by using Id: ' + address);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
