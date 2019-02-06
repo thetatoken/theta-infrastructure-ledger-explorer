@@ -137,7 +137,6 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
-        {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.inputs[0].coins))}
         {this.renderOneRow('Input Address', transactionInfo.data.inputs[0].address, true)}
         {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
@@ -149,7 +148,6 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
-        {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Collateral', this.renderCoins(transactionInfo.data.collateral))}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.source.coins))}
@@ -163,7 +161,6 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
-        {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Payment Sequence', transactionInfo.data.payment_sequence)}
         {this.renderOneRow('Reserve Sequence', transactionInfo.data.reserve_sequence)}
         {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.source.coins))}
@@ -177,7 +174,6 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
-        {this.renderOneRow('Gas', transactionInfo.data.gas)}
         {this.renderOneRow('Duration', transactionInfo.data.duration)}
         {this.renderOneRow('Initiator Address', transactionInfo.data.initiator.address, true)}
         {this.renderOneRow('Resource Id', transactionInfo.data.resource_id)}
