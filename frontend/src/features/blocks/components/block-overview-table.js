@@ -17,10 +17,11 @@ export default class BlockOverviewTable extends Component {
             {blockInfoList
               .sort((a, b) => b.height - a.height)
               .map(blockInfo => {
+                const hash = size === 'full' ? blockInfo.hash : blockInfo.hash.substring(0, 35) + '...';
                 return (
                   <tr key={blockInfo.height}>
                     <td>{blockInfo.height}</td>
-                    <td><Link to={`/blocks/${blockInfo.height}`}>{blockInfo.hash}</Link></td>
+                    <td><Link to={`/blocks/${blockInfo.height}`}>{hash}</Link></td>
                   </tr>
                 );
               })}

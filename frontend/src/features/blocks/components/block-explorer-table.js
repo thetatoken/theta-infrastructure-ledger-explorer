@@ -23,7 +23,7 @@ const statusMap = {
   5: 'Finalized',
   6: 'Finalized'
 }
-const nameOrder = ['height','status','timestamp','hash','parent_hash','proposer','state_hash','transactions_hash','num_txs','txs'];
+const nameOrder = ['height', 'status', 'timestamp', 'hash', 'parent_hash', 'proposer', 'state_hash', 'transactions_hash', 'num_txs', 'txs'];
 export default class BlockExplorerTable extends Component {
   renderContent(key, content) {
     if (key === 'parent_hash') {
