@@ -3,17 +3,27 @@ import { Link } from "react-router";
 // import '../styles.scss';
 
 const nameMap = {
+  'status': 'Status',
   'height': 'Height',
   'timestamp': 'Timestamp',
   'hash': 'Hash',
   'parent_hash': 'Previous Block Hash',
+  'proposer': 'Proposer',
+  'state_hash': 'State Hash',
+  'transactions_hash': 'Transactions Hash',
   'num_txs': 'Number of Transactions',
-  'lst_cmt_hash': 'Last commit hash',
-  'data_hash': 'Data Hash',
-  'vldatr_hash': 'Validators hash',
   'txs': 'Transactions'
 }
-
+const statusMap = {
+  0: 'Pending',
+  1: 'Valid',
+  2: 'Invalid',
+  3: 'Committed',
+  4: 'Finalized',
+  5: 'Finalized',
+  6: 'Finalized'
+}
+const nameOrder = ['height','status','timestamp','hash','parent_hash','proposer','state_hash','transactions_hash','num_txs','txs'];
 export default class BlockExplorerTable extends Component {
   renderContent(key, content) {
     if (key === 'parent_hash') {
@@ -24,7 +34,8 @@ export default class BlockExplorerTable extends Component {
       return content;
   }
   getInfo(blockInfo, key) {
-    if (key !== 'txs') return blockInfo[key];
+    if (key === 'status') return statusMap[blockInfo[key]];
+    else if (key !== 'txs') return blockInfo[key];
     else if (blockInfo[key]) {
       return (
         <div>
@@ -45,7 +56,7 @@ export default class BlockExplorerTable extends Component {
     const { blockInfo } = this.props;
     return (
       <div className="th-explorer-table">
-        {Object.keys(blockInfo).map(key => {
+        {nameOrder.map(key => {
           const content = this.getInfo(blockInfo, key);
           return (
             <div className="th-explorer-table__row" key={key}>

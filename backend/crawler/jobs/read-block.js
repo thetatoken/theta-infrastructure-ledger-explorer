@@ -65,14 +65,16 @@ exports.Execute = function () {
           var result = JSON.parse(blockDataList[i]);
           // console.log(blockDataList[i]);
           const blockInfo = {
-            height: +result.result.height,
-            timestamp: +result.result.timestamp,
-            parent_hash: result.result.parent,
-            num_txs: result.result.transactions.length,
-            lst_cmt_hash: "",
-            data_hash: result.result.state_hash,
-            vldatr_hash: "",
+            epoch: result.result.epoch,
+            status: result.result.status,
+            height: result.result.height,
+            timestamp: result.result.timestamp,
             hash: result.result.hash,
+            parent_hash: result.result.parent,
+            proposer: result.result.proposer,
+            state_hash: result.result.state_hash,
+            transactions_hash: result.result.transactions_hash,
+            num_txs: result.result.transactions.length,
             txs: result.result.transactions
           }
           upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
