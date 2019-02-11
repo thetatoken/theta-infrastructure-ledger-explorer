@@ -38,7 +38,7 @@ module.exports = class BlockDAO {
       } else if (!record) {
         callback(Error('NOT_FOUND - ' + height));
       } else {
-        console.log(record);
+        // console.log(record);
         var blockInfo = {};
         blockInfo.epoch = record.epoch;
         blockInfo.status = record.status;
