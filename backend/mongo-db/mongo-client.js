@@ -103,13 +103,13 @@ exports.upsert = function (collectionName, queryObject, updateObject, callback) 
     callback(err, res);
   });
 }
-// exports.find = function (collectionName, callback) {
-//   var collection = _db.collection(collectionName);
-//   collection.findOne({}, function (err, res) {
-//     if (err) callback(err);
-//     callback(err, res);
-//   });
-// }
+exports.findAll = function (collectionName, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find({}).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
 exports.findOne = function (collectionName, queryObject, callback) {
   var collection = _db.collection(collectionName);
   collection.findOne(queryObject, function (err, res) {

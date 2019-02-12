@@ -8,10 +8,12 @@ var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
+var vcpDaoLib = require('../mongo-db/vcp-dao.js');
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
+var vcpRouter = require("./routes/vcpRouter");
 var cors = require('cors')
 var io;
 //------------------------------------------------------------------------------
@@ -58,7 +60,8 @@ function main() {
       bluebird.promisifyAll(transactionDao);
       accountDao = new accountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountDao);
-
+      vcpDao = new vcpDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(vcpDao);
       //
       var privateKey = fs.readFileSync(config.cert.key, 'utf8');
       var certificate = fs.readFileSync(config.cert.crt, 'utf8');
@@ -99,6 +102,8 @@ function main() {
       transactionsRouter(app, transactionDao, progressDao, config);
       // account router
       accountRouter(app, accountDao, config);
+      // vcp router
+      vcpRouter(app, vcpDao, config);
       // keep push block data
       // pushTopBlocks();
     }
