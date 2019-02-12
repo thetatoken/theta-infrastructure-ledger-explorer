@@ -11,7 +11,6 @@ var accountDaoLib = require('../mongo-db/account-dao.js');
 var vcpDaoLib = require('../mongo-db/vcp-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
-var readVcpCronJob = require('./jobs/read-vcp.js');
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------

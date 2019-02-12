@@ -12,7 +12,7 @@ var accountFileName = 'theta-balance-height-small.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 2;
+var max_block_per_crawl = 10;
 var target_crawl_height;
 var txs_count = 0;
 var upsertTransactionAsyncList = [];
@@ -73,14 +73,12 @@ exports.Execute = function () {
           var result = JSON.parse(blockDataList[i]);
           // console.log(blockDataList[i]);
           if (result.result.BlockHashVcpPairs) {  // handle vcp response
-            console.log('BlockHashVcpPairs return true');
             result.result.BlockHashVcpPairs.forEach(vcpPair => {
               vcpPair.Vcp.SortedCandidates.forEach(candidate => {
                 upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
               })
             })
           } else {  //handle block response
-            console.log('BlockHashVcpPairs return false');
             const blockInfo = {
               epoch: result.result.epoch,
               status: result.result.status,
@@ -120,7 +118,7 @@ exports.Execute = function () {
       }
     })
     .then(() => {
-      // accountHelper.updateAccount(accountDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, validTransactionList);
     })
     .then(function () {
       validTransactionList = [];
