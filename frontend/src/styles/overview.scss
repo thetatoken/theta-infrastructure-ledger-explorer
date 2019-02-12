@@ -15,7 +15,9 @@
       display: flex;
     }
   }
-
+.th-status-overview{
+  width: 100%;
+}
   // Theta overview table related CSS styles
 .th-overview-table{
   width: 100%;
@@ -42,6 +44,63 @@
     }
     & tr{
       height: 40px;
+    }
+  }
+
+  &.full-screen{
+    width: 100%;
+    & table, th, td{
+      border: 2px solid $th-blue;
+      border-collapse: collapse;
+      text-align: center;
+      padding: 10px;
+    }
+    & table{
+      width: 100%;
+    }
+    & tr{
+      height: 40px;
+      & .tooltip{
+        position: relative;
+        & .tooltiptext{
+          visibility: hidden;
+          width: 50%;
+          background-color: #1b1f29;
+          color: #fff;
+          text-align: center;
+          border: 1px solid $th-blue;
+          border-radius: 6px;
+          padding: 15px 0;
+          position: absolute;
+          z-index: 1;
+          bottom: 150%;
+          left: 50%;
+          margin-left: -25%;
+          &::before {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: $th-blue transparent transparent transparent;
+          }
+          &::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -4px;
+            border-width: 4px;
+            border-style: solid;
+            border-color: #1b1f29 transparent transparent transparent;
+          }
+        }
+        &:hover .tooltiptext {
+          visibility: visible;
+        }
+      }
     }
   }
 }
