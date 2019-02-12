@@ -14,7 +14,6 @@ module.exports = class VcpDAO {
   upsertVcp(vcpInfo, callback) {
     const queryObject = { '_id': vcpInfo.source };
     const newObject = {
-      'source': vcpInfo.source,
       'stakes': vcpInfo.stakes
     };
     this.client.upsert(this.vcpInfoCollection, queryObject, newObject, callback);
@@ -29,9 +28,7 @@ module.exports = class VcpDAO {
       } else if (!record) {
         callback(Error('NOT_FOUND - ' + height));
       } else {
-        console.log(record);
         var vcpInfo = {};
-        vcpInfo.source = record.source;
         vcpInfo.stakes = record.stakes;
         callback(error, vcpInfo);
       }

@@ -1,14 +1,18 @@
 var rpc = require('../api/rpc.js');
 var Aerospike = require('aerospike')
-var accountHelp = require('../helper/account-helper');
+var accountHelper = require('../helper/account-helper');
+var vcpHelper = require('../helper/vcp-helper');
+var fs = require('fs');
 
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
+var initialAccounts = null;
+var accountFileName = 'theta-balance-height-small.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 20;
+var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
 var upsertTransactionAsyncList = [];
@@ -16,11 +20,12 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, vcpDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
+  vcpDao = vcpDaoInstance;
 }
 
 exports.Execute = function () {
@@ -47,62 +52,75 @@ exports.Execute = function () {
           target_crawl_height = latest_block_height;
         }
 
-        var getBlockAsyncList = []
+        var getBlockAsyncList = [];
+        var getVcpAsyncList = [];
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
-          getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]))
+          getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
+          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
-        return Promise.all(getBlockAsyncList)
+        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
         console.log('Block crawling is up to date.');
       }
     })
     .then(async function (blockDataList) {
       if (blockDataList) {
-        var upsertBlockAsyncList = []
+        var upsertBlockAsyncList = [];
+        var upsertVcpAsyncList = [];
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
           // console.log(blockDataList[i]);
-          const blockInfo = {
-            epoch: result.result.epoch,
-            status: result.result.status,
-            height: result.result.height,
-            timestamp: result.result.timestamp,
-            hash: result.result.hash,
-            parent_hash: result.result.parent,
-            proposer: result.result.proposer,
-            state_hash: result.result.state_hash,
-            transactions_hash: result.result.transactions_hash,
-            num_txs: result.result.transactions.length,
-            txs: result.result.transactions
-          }
-          upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
-          // Store the transaction data
-          var txs = blockInfo.txs;
-          if (txs !== undefined && txs.length > 0) {
-            for (var j = 0; j < txs.length; j++) {
-              const transaction = {
-                hash: txs[j].hash.toUpperCase(),
-                type: txs[j].type,
-                data: txs[j].raw,
-                block_height: blockInfo.height,
-                timestamp: blockInfo.timestamp
-              }
-              const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
-              if (!isExisted) {
-                transaction.number = ++txs_count;
-                validTransactionList.push(transaction);
-                upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+          if (result.result.BlockHashVcpPairs) {  // handle vcp response
+            console.log('BlockHashVcpPairs return true');
+            result.result.BlockHashVcpPairs.forEach(vcpPair => {
+              vcpPair.Vcp.SortedCandidates.forEach(candidate => {
+                upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
+              })
+            })
+          } else {  //handle block response
+            console.log('BlockHashVcpPairs return false');
+            const blockInfo = {
+              epoch: result.result.epoch,
+              status: result.result.status,
+              height: result.result.height,
+              timestamp: result.result.timestamp,
+              hash: result.result.hash,
+              parent_hash: result.result.parent,
+              proposer: result.result.proposer,
+              state_hash: result.result.state_hash,
+              transactions_hash: result.result.transactions_hash,
+              num_txs: result.result.transactions.length,
+              txs: result.result.transactions
+            }
+            upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
+            // Store the transaction data
+            var txs = blockInfo.txs;
+            if (txs !== undefined && txs.length > 0) {
+              for (var j = 0; j < txs.length; j++) {
+                const transaction = {
+                  hash: txs[j].hash.toUpperCase(),
+                  type: txs[j].type,
+                  data: txs[j].raw,
+                  block_height: blockInfo.height,
+                  timestamp: blockInfo.timestamp
+                }
+                const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+                if (!isExisted) {
+                  transaction.number = ++txs_count;
+                  validTransactionList.push(transaction);
+                  upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+                }
               }
             }
           }
         }
-        return Promise.all(upsertBlockAsyncList, upsertTransactionAsyncList)
+        return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertTransactionAsyncList)
       }
     })
     .then(() => {
-      accountHelp.updateAccount(accountDao, validTransactionList);
+      // accountHelper.updateAccount(accountDao, validTransactionList);
     })
     .then(function () {
       validTransactionList = [];
@@ -115,6 +133,24 @@ exports.Execute = function () {
         if (error.message === 'No progress record') {
           console.log('Initializng progress record..');
           progressDao.upsertProgressAsync(network_id, 0, 0);
+
+          // console.log('Loading initial accounts file: ' + accountFileName)
+          // try {
+          //   initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
+          // } catch (err) {
+          //   console.log('Error: unable to load ' + accountFileName);
+          //   console.log(err);
+          //   process.exit(1);
+          // }
+          // // console.log(initialAccounts);
+          // let getAccountAysncList = [];
+          // Object.keys(initialAccounts).forEach(address => {
+          //   getAccountAysncList.push(rpc.getAccountAsync([{ 'address': address }]));
+          // })
+          // return Promise.all(getAccountAysncList)
+          // console.log(accountList);
+          // console.log(accountList.length)
+
         } else {
           console.log(error);
         }
@@ -128,4 +164,10 @@ exports.Execute = function () {
         // }
       }
     });
+    // .then(function (res) {
+    //   if (res) {
+    //     console.log(`get account result:`, res.length)
+    //     progressDao.upsertProgressAsync(network_id, 0, 0);
+    //   }
+    // });
 }
