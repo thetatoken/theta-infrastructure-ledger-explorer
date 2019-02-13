@@ -8,7 +8,7 @@ var fs = require('fs');
 //  Global variables
 //------------------------------------------------------------------------------
 var initialAccounts = null;
-var accountFileName = 'theta-balance-height-small.json'
+var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
@@ -132,40 +132,26 @@ exports.Execute = function () {
           console.log('Initializng progress record..');
           progressDao.upsertProgressAsync(network_id, 0, 0);
 
-          // console.log('Loading initial accounts file: ' + accountFileName)
-          // try {
-          //   initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
-          // } catch (err) {
-          //   console.log('Error: unable to load ' + accountFileName);
-          //   console.log(err);
-          //   process.exit(1);
-          // }
-          // // console.log(initialAccounts);
-          // let getAccountAysncList = [];
-          // Object.keys(initialAccounts).forEach(address => {
-          //   getAccountAysncList.push(rpc.getAccountAsync([{ 'address': address }]));
-          // })
-          // return Promise.all(getAccountAysncList)
-          // console.log(accountList);
-          // console.log(accountList.length)
-
+          console.log('Loading initial accounts file: ' + accountFileName)
+          try {
+            initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
+          } catch (err) {
+            console.log('Error: unable to load ' + accountFileName);
+            console.log(err);
+            process.exit(1);
+          }
+          // console.log(initialAccounts);
+          let getAccountAysncList = [];
+          Object.keys(initialAccounts).forEach(function (address, i) {
+            setTimeout(function(){
+              console.log(i)
+              accountHelper.updateAccountByAddress(address, accountDao)
+            }, i * 10);
+          })
+          return Promise.all(getAccountAysncList)
         } else {
           console.log(error);
         }
-        // switch (error.code) {
-        //   case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-        //     console.log('Initializng progress record..');
-        //     progressDao.upsertProgressAsync(network_id, 0, 0)
-        //     break;
-        //   default:
-        //     console.log(error);
-        // }
       }
-    });
-    // .then(function (res) {
-    //   if (res) {
-    //     console.log(`get account result:`, res.length)
-    //     progressDao.upsertProgressAsync(network_id, 0, 0);
-    //   }
-    // });
+    })
 }

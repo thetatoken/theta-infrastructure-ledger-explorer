@@ -5,25 +5,25 @@ exports.updateAccount = function (accountDao, transactionList) {
   transactionList.forEach(async function (tx) {
     switch (tx.type) { // TODO: Add other type cases
       case 0:
-        await updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
         break;
       case 2:
         // Update inputs account
-        await updateAccountByAddress(tx.data.inputs[0].address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.inputs[0].address, accountDao, tx.hash);
         // Update outputs account
-        await updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
         break;
       case 3:
-        await updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
         break;
       case 5:
         // Update source account
-        await updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
         // Update target account
-        await updateAccountByAddress(tx.data.target.address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.target.address, accountDao, tx.hash);
         break;
       case 6:
-        await updateAccountByAddress(tx.data.initiator.address, accountDao, tx.hash);
+        await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.hash);
         break;
       default:
         break;
@@ -31,14 +31,16 @@ exports.updateAccount = function (accountDao, transactionList) {
   });
 };
 
-function updateAccountByAddress(address, accountDao, hash) {
+exports.updateAccountByAddress = _updateAccountByAddress;
+
+function _updateAccountByAddress(address, accountDao, hash) {
   rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
       address = address.toUpperCase();
       let tmp = JSON.parse(data);
       const isExist = await accountDao.checkAccountAsync(address);
       const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
-      const txs_hash_list = accountInfo ? [hash].concat(accountInfo.txs_hash_list.slice(0,99)) : [hash];
+      const txs_hash_list = accountInfo ? [hash].concat(accountInfo.txs_hash_list.slice(0,99)) : hash ? [hash] : [];
       await accountDao.upsertAccountAsync({
         address,
         'balance': tmp.result.coins,

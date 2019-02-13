@@ -114,7 +114,11 @@ function setupGetBlockCronJob(mongoClient) {
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, vcpDao);
   // readVcpCronJob.Initialize(progressDao);
-  schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
+  setTimeout(function run() {
+    readBlockCronJob.Execute();
+    setTimeout(run, 1000);
+  }, 1000);
+  // schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
   // schedule.scheduleJob('* * * * * *', readVcpCronJob.Execute);
 }
 
