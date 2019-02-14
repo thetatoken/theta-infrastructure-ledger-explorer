@@ -1,5 +1,4 @@
 var rpc = require('../api/rpc.js');
-var Aerospike = require('aerospike')
 var accountHelper = require('../helper/account-helper');
 var vcpHelper = require('../helper/vcp-helper');
 var fs = require('fs');

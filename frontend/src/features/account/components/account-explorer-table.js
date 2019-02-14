@@ -45,7 +45,8 @@ export default class AccountExplorerTable extends Component {
     return (
       <div className="th-explorer-table-text__txs_hash_list">
         {txsHashList.map(hash => {
-          return (<Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link>)
+          if (has)
+            return (<Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link>)
         })}
       </div>
     )
