@@ -47,7 +47,7 @@ export default class BlockchainOverView extends Component {
           <table>
             <tbody>
               <tr>
-                <th className="th-overview-th__left">Holders</th>
+                <th className="th-overview-th__left">Validators</th>
                 <th className="th-overview-th__right">
                   {vcpInfoList ? vcpInfoList.map(vcp => {
                     return (
