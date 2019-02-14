@@ -53,7 +53,7 @@ function _updateAccountByAddress(address, accountDao, hash) {
     .catch(err => {
       console.log(`Getting ${address} with:`, err);
       console.log('Start retry in 100ms.');
-      setTimeout(function retry(address, accountDao, hash) {
+      setTimeout(function retry() {
         console.log('Retry of getting address:', address);
         _updateAccountByAddress(address, accountDao, hash)
       }, 100);

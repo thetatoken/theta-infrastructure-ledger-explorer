@@ -13,7 +13,7 @@ export default class Dashboard extends Component {
         <div className="th-dashboard__container">
           <BlocksOverView backendAddress={backendAddress} />
           <TransactionsOverView backendAddress={backendAddress} />
-          <BlockchainOverView />
+          {/* <BlockchainOverView /> */}
         </div>
       </div>
     );
