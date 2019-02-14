@@ -12,12 +12,9 @@ exports.updateVcp = async function (candidate, vcpDao) {
       stakeList[stake.Source] = stake.Amount;
     } else {
       if (!stake.Withdrawn) {
-        stakeList[stake.Source] += stake.Amount;
+        stakeList[stake.Source] = stake.Amount;
       } else {
-        stakeList[stake.Source] -= stake.Amount;
-        if (stakeList[stake.Source] < 0) {
-          console.log(`stake amount is less than 0, something wrong.`);
-        }
+        stakeList[stake.Source] = null;
       }
     }
   });
