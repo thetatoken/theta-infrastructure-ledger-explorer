@@ -137,7 +137,7 @@ export default class TransactionExplorerTable extends Component {
       <div>
         {this.renderCommonRows(transactionInfo)}
         {this.renderOneRow('Fee', this.renderFee(transactionInfo.data.fee))}
-        {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.inputs[0].coins))}
+        {this.renderOneRow('Amount', this.renderCoins(transactionInfo.data.outputs[0].coins))}
         {this.renderOneRow('Input Address', transactionInfo.data.inputs[0].address, true)}
         {this.renderOneRow('Output Address', transactionInfo.data.outputs[0].address, true)}
       </div>
