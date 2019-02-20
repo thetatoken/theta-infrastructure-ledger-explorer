@@ -13,6 +13,9 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
 		- [GetTransactionsByRange](#gettransactionsbyrange)
 	- [Account APIs](#account-apis)
 		- [GetAccount](#getaccount)
+   - [Supply APIs](#supply-apis)
+		- [GetThetaAmount](#getthetaamount)
+      - [GetTFuelAmount](#gettfuelamount)
 
 ## Theta Explorer APIs
 
@@ -581,5 +584,43 @@ curl https://explorer.thetatoken.org:9000/api/account/0X3A77BAE927B9B6A5AF0A2340
          "0XC42D3F3CDA89E1A86E71E05B2BDBAB7DDE3B000F93E8E874A3B3702B917B6079"
       ]
    }
+}
+```
+
+## Supply APIs
+
+### GetThetaAmount
+
+This API returns the total amount and circulation amount of Theta.
+
+**REST Uri**: /supply/theta
+
+**Returns**
+
+- total_supply: the total amount of theta supplied
+- circulation_supply: the circulation amount of theta supplied
+
+**Example**
+```
+{
+   "total_supply":1000000000,
+   "circulation_supply":1000000000
+}
+```
+
+### GetTFuelAmount
+
+This API returns the circulation amount of TFuel.
+
+**REST Uri**: /supply/tfuel
+
+**Returns**
+
+- circulation_supply: the circulation amount of tfuel supplied
+
+**Example**
+```
+{
+   "circulation_supply":5000000000
 }
 ```
