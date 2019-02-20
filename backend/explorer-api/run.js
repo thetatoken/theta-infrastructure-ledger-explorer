@@ -2,6 +2,7 @@ var fs = require('fs')
 var express = require('express');
 var app = express();
 var bluebird = require("bluebird");
+var rpc = require('../crawler/api/rpc.js');
 // var asClient = require('../db/aerospike-client.js')
 var mongoClient = require('../mongo-db/mongo-client.js')
 var blockDaoLib = require('../mongo-db/block-dao.js');
@@ -45,6 +46,9 @@ function main() {
     process.exit(1);
   }
   console.log(config);
+
+  rpc.setConfig(config);
+  bluebird.promisifyAll(rpc);
 
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(function (err) {
