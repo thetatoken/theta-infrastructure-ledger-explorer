@@ -14,6 +14,7 @@ var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
 var vcpRouter = require("./routes/vcpRouter");
+var supplyRouter = require("./routes/supplyRouter");
 var cors = require('cors')
 var io;
 //------------------------------------------------------------------------------
@@ -104,6 +105,8 @@ function main() {
       accountRouter(app, accountDao, config);
       // vcp router
       vcpRouter(app, vcpDao, config);
+      // supply router
+      supplyRouter(app, config);
       // keep push block data
       // pushTopBlocks();
     }
