@@ -10,15 +10,15 @@ import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
 import AccountExplorer from './features/account'
 import './styles.scss';
+import config from '../config'
 
 const app = document.querySelector('#root');
-const backendSocketAddress = "https://explorer.thetatoken.org:3030";
+const backendSocketAddress = `${config.socketApi.host}:${config.socketApi.port}`;
 
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
       <IndexRoute component={Dashboard} backendAddress={backendSocketAddress}/>
-      {/* <Route path='*' component={Home} backendAddress="52.53.243.120:9000"/> */}
       <Route path='/dashboard' component={Dashboard} backendAddress={backendSocketAddress}/>
       <Route path='/blocks' component={Blocks} />
       <Route path='/blocks/:blockHeight' component={BlockExplorer} />

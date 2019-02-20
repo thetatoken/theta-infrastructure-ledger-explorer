@@ -1,6 +1,8 @@
 import { httpClient } from './http';
 import Raven from 'raven-js';
-const API_URI = 'https://explorer.thetatoken.org:9000/api'
+import config from '../../../config';
+
+const API_URI = `${config.restApi.host}:${config.restApi.port}/api`;
 
 export const apiService = {
   get(uri, config = {}) {
