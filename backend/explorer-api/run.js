@@ -106,7 +106,7 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, progressDao, config);
       // account router
-      accountRouter(app, accountDao, config);
+      accountRouter(app, accountDao, rpc, config);
       // vcp router
       vcpRouter(app, vcpDao, config);
       // supply router
