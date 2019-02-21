@@ -3,7 +3,8 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var webpack = require('webpack');
 var config = require('./webpack.config.dev.js');
-var fs = require('fs')
+var fs = require('fs');
+let port = process.env.PORT || 443;
 
 
 var app = express();
@@ -21,9 +22,13 @@ app.use(require('webpack-hot-middleware')(compiler));
 
 app.use('/public', express.static('public'));
 
+
 app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname, 'index.html'));
 });
+
+
+
 // healthy check from ELB 
 app.get('/ping', function (req, res) {
   log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -34,6 +39,8 @@ app.get('/ping', function (req, res) {
   res.write('OK');
   res.end();
 });
+
+
 var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');
 var certificate = fs.readFileSync('./cert/star_thetatoken_org.crt');
 var options = {
@@ -42,10 +49,11 @@ var options = {
 };
 var https = require('https').createServer(options, app);
 
-https.listen(process.env.PORT || 443, function (err) {
+
+https.listen(port, function (err) {
   if (err) {
     console.log(err);
     return;
   }
-  console.log('Listening at {hostname}:443');
+  console.log(`Listening at {hostname}:${port}`);
 });
