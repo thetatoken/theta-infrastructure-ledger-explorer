@@ -9,12 +9,11 @@ import TransactionExplorer from './features/transactions/components/transaction-
 import Blocks from './features/blocks'
 import BlockExplorer from './features/blocks/components/block-explorer'
 import AccountExplorer from './features/account'
-import './styles.scss';
-import config from '../config'
+import config from '../config';
 
 const app = document.querySelector('#root');
 const backendSocketAddress = `${config.socketApi.host}:${config.socketApi.port}`;
-
+ 
 ReactDom.render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>

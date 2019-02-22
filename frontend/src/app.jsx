@@ -7,7 +7,7 @@ export default class App extends Component {
         <Header />
         <div className="theta-content">
           {this.props.children}
-        </div>
+        </div> 
       </div>
     );
   }

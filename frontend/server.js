@@ -2,7 +2,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var express = require('express');
 var webpack = require('webpack');
-var config = require('./webpack.config.dev.js');
+var config = require('./webpack.config.js');
 var fs = require('fs');
 let port = process.env.PORT || 443;
 
@@ -12,21 +12,16 @@ var compiler = webpack(config);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
+/*
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: true,
   publicPath: config.output.publicPath
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
-
-app.use('/public', express.static('public'));
-
-
-app.get('*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, 'index.html'));
-});
-
+*/
 
 
 // healthy check from ELB 
@@ -39,6 +34,13 @@ app.get('/ping', function (req, res) {
   res.write('OK');
   res.end();
 });
+
+
+
+app.get('*', function (req, res) {
+  res.sendFile(path.resolve(__dirname, 'index.html'));
+});
+
 
 
 var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');

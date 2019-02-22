@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import TransactionExplorerTable from './transaction-explorer-table';
-import { transactionsService } from '/common/services/transaction';
+import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
-import '../styles.scss';
+
 
 export default class TransactionExplorer extends Component {
   constructor(props) {
