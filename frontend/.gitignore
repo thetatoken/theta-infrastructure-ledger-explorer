@@ -3,3 +3,6 @@ config.cfg
 cert/*
 package-lock.json
 config.js
+public/js/*
+public/css/*
+*.map
