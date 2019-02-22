@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pagination as ReactstrapPagination, PaginationItem, PaginationLink } from 'reactstrap';
 import classnames from 'classnames';
-import './styles.scss';
+
 
 class Pagination extends React.Component {
   constructor(props) {

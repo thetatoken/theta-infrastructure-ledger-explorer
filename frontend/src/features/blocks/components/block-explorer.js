@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import BlockExplorerTable from './block-explorer-table';
-import { blocksService } from '/common/services/block';
+import { blocksService } from 'common/services/block';
 import LinkButton from "common/components/link-button";
-import NotExist from 'common/components/not-exist';
-
-// import './styles.scss';
+import NotExist from 'common/components/not-exist'; 
 
 export default class BlocksExplorer extends Component {
   constructor(props) {

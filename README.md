@@ -36,9 +36,30 @@ Now the explorer API application is running at https://localhost:9000
 ``` 
 cd frontend
 npm install
-sudo node server.js
 ```
-Now the frontend application is running at https://localhost
+
+### Development
+``` 
+npm run dev
+gulp (in a new console window)
+``` 
+
+Gulp will tell you where to view the webpage for Live Reloading and automatically open a browser pointing there. (It proxies the original server in order to enable the live reloading) 
+It should be https://localhost:3000. Any changes you make to scss or js files should be automatically refreshed in the browser.
+
+To skip Live reloading:
+``` 
+gulp nosync
+```
+Then browse to the node server directly at: https://localhost:4000
+
+Other Gulp tasks:
+``` 
+gulp build-js
+gulp build-sass
+gulp clean
+gulp watch
+``` 
 
 ## License
 The Theta Ledger Explorer reference implementation is licensed under the [MIT License](https://opensource.org/licenses/MIT).

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import socketClient from 'socket.io-client';
 import BlockOverviewTable from 'features/blocks/components/block-overview-table';
 import LinkButton from "common/components/link-button";
-import '../styles.scss';
+
 
 export default class BlocksOverView extends Component {
   constructor(props) {

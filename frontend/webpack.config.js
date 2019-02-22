@@ -1,47 +1,45 @@
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-var webpack = require('webpack');
+var path = require("path");
+let webpack = require('webpack');
+
+let srcDir = path.join(__dirname, "src/");
+let distDir = path.join(__dirname, "public/js");
 
 module.exports = {
-  context: __dirname,
-  entry: "./src/index.jsx",
+  mode: 'development',
+  entry: path.join(srcDir, 'index.jsx'),
   output: {
-    path: __dirname + '/public',
-    filename: "bundle.js",
-    publicPath: '/public/'
+    path: distDir,
+    publicPath: '/public/',
+    filename: "app.js",
+    sourceMapFilename: "[file].map"
   },
   module: {
-    loaders: [
-      {
-        test: /\.js|.jsx?$/,
-        exclude: /(node_modules)/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['react', 'es2015']
-        }
-      },
-      {
-        test: /\.scss$/,
+    rules: [
+      { test: /\.js|.jsx?$/,
+        exclude: /node_modules/,
         use: [{
-          loader: 'style-loader' // creates style nodes from JS strings
-        }, {
-          loader: 'css-loader' // translates CSS into CommonJS
-        }, {
-          loader: 'sass-loader', // compiles Sass to CSS
+          loader: 'babel-loader',
           options: {
-            includePaths: ['src/']
+            cacheDirectory: true,
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-react',
+            ]
           }
         }]
-      }
-    ]
+    }]
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    modules: [
+      'node_modules',
+      path.resolve(srcDir),
+      path.resolve(path.join(srcDir, 'common')),
+    ],
+    extensions: [".js", ".jsx"]
   },
-  plugins: [
-    new ExtractTextPlugin({ filename: 'app.css', allChunks: true })
-  ],
   devServer: {
     historyApiFallback: true,
     contentBase: './'
-  }
+  },
+  devtool: 'sourcemap'
 };

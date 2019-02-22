@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import { blocksService } from '/common/services/block';
+import { blocksService } from 'common/services/block';
 import BlockOverviewTable from './components/block-overview-table';
 import Pagination from "common/components/pagination";
 // import './styles.scss';

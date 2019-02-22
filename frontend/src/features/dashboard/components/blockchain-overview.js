@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import { vcpService } from '/common/services/vcp';
+import { vcpService } from 'common/services/vcp';
 import { BigNumber } from 'bignumber.js';
-import '../styles.scss';
+
 
 export default class BlockchainOverView extends Component {
   constructor(props) {

@@ -1,5 +1,5 @@
-@import 'styles/_variables.scss';
-@import 'common/components/link-button/styles.scss';
+
+
 $border-width: 1px;
 $line-height: 50px;
 
@@ -26,8 +26,7 @@ $line-height: 50px;
     display: flex;
     justify-content: space-between;
     &--no-more{
-      color: $th-grey;
-      line-height: $button-line-height;
+      
     }
   }
 }
@@ -45,7 +44,7 @@ $line-height: 50px;
     &--left{
       display: flex;
       flex-direction: column;
-      & p{
+      & p {
         margin: 0 10px;
         text-align: right;
       }

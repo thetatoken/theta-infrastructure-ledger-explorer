@@ -3,6 +3,7 @@ config.cfg
 cert/*
 package-lock.json
 config.js
+.sass-cache
 public/js/*
 public/css/*
 *.map

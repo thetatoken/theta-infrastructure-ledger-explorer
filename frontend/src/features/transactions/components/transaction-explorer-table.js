@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router";
 import classnames from 'classnames';
 import { BigNumber } from 'bignumber.js';
-import '../styles.scss';
 
 const typeMap = {
   '0': 'Coinbase',

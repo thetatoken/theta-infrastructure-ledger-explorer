@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import { transactionsService } from '/common/services/transaction';
+import { transactionsService } from 'common/services/transaction';
 import TransactionOverviewTable from './components/transaction-overview-table';
 import Pagination from "common/components/pagination"
-import './styles.scss';
+
 
 export default class Transactions extends Component {
   constructor(props) {
