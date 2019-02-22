@@ -6,8 +6,7 @@ let distDir = path.join(__dirname, "public/js");
 
 module.exports = {
   mode: 'development',
-  context: __dirname,
-  entry: "./src/index.jsx",
+  entry: path.join(srcDir, 'index.jsx'),
   output: {
     path: distDir,
     publicPath: '/public/',
@@ -34,8 +33,9 @@ module.exports = {
     modules: [
       'node_modules',
       path.resolve(srcDir),
+      path.resolve(path.join(srcDir, 'common')),
     ],
-    extensions: ['.js', '.jsx']
+    extensions: [".js", ".jsx"]
   },
   devServer: {
     historyApiFallback: true,
