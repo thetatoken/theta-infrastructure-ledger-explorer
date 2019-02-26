@@ -49,7 +49,7 @@ module.exports = class TransactionDAO {
         transactionInfo.data = recordList[i].data;
         transactionInfo.number = recordList[i].number;
         transactionInfo.block_height = recordList[i].block_height;
-        transactionInfo.timestamp = transactionInfo.timestamp;
+        transactionInfo.timestamp = recordList[i].timestamp;
         transactionInfoList.push(transactionInfo)
       }
       callback(error, transactionInfoList)
