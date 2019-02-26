@@ -29,6 +29,7 @@ var accountRouter = (app, accountDao, rpc) => {
         }
       });
   });
+
   router.get("/account/update/:address", async (req, res) => {
     let address = req.params.address.toUpperCase();
     console.log('Updating one account by Id:', address);
@@ -59,6 +60,28 @@ var accountRouter = (app, accountDao, rpc) => {
           res.status(404).send(err);
         }
       })
+  });
+
+  router.get("/account/total/number", async (req, res) => {
+    console.log('Querying the total number of accounts');
+    accountDao.getTotalNumberAsync()
+      .then(number => {
+        const data = ({
+          'total_account_number': number,
+        });
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
   });
   //the / route of router will get mapped to /api
   app.use('/api', router);

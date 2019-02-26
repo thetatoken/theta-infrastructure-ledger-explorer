@@ -35,6 +35,15 @@ module.exports = class AccountDAO {
       callback(err, res);
     });
   }
+  getTotalNumber(callback) {
+    this.client.getTotal(this.accountInfoCollection, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error, address);
+      } else {
+        callback(error, record);
+      }
+    });
+  }
   getAccountByPk(address, callback) {
     const queryObject = { '_id': address };
     this.client.findOne(this.accountInfoCollection, queryObject, function (error, record) {

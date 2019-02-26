@@ -132,3 +132,10 @@ exports.query = function (collectionName, queryObject, callback) {
     callback(err, res);
   });
 }
+exports.getTotal = function (collectionName, callback) {
+  var collection = _db.collection(collectionName);
+  collection.count(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
