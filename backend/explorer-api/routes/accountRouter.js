@@ -8,7 +8,7 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/:address", async (req, res) => {
     let address = req.params.address.toUpperCase();
-    console.log('Querying one account by using Id: ' + address);
+    // console.log('Querying one account by using Id: ' + address);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
         const data = ({
@@ -32,7 +32,7 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/update/:address", async (req, res) => {
     let address = req.params.address.toUpperCase();
-    console.log('Updating one account by Id:', address);
+    // console.log('Updating one account by Id:', address);
     rpc.getAccountAsync([{ 'address': address }])
       .then(async function (data) {
         let tmp = JSON.parse(data);
