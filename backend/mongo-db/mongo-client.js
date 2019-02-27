@@ -139,3 +139,10 @@ exports.getTotal = function (collectionName, callback) {
     callback(err, res);
   });
 }
+exports.getTopRecords = function (collectionName, queryObject, limitNumber, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find().sort(queryObject).collation({ locale: "en_US", numericOrdering: true }).limit(limitNumber).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}

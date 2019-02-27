@@ -67,7 +67,7 @@ var accountRouter = (app, accountDao, rpc) => {
     accountDao.getTotalNumberAsync()
       .then(number => {
         const data = ({
-          'total_account_number': number,
+          'total_number_account': number,
         });
         res.status(200).send(data);
       })
@@ -82,6 +82,35 @@ var accountRouter = (app, accountDao, rpc) => {
           console.log('ERR - ', error)
         }
       });
+  });
+
+  router.get("/account/top/:tokenType/:limit", async (req, res) => {
+    const limitNumber = parseInt(req.params.limit);
+    const tokenType = req.params.tokenType;
+    if (!isNaN(limitNumber) && limitNumber > 0 && limitNumber < 1001 && (tokenType === 'theta' || tokenType === 'tfuel')) {
+      console.log(`Querying the top ${limitNumber} ${tokenType} holders`);
+      accountDao.getTopAccountsAsync(tokenType + 'wei', limitNumber)
+        .then(accountInfoList => {
+          var data = ({
+            type: 'account_list',
+            body: accountInfoList,
+          });
+          res.status(200).send(data);
+        })
+        .catch(error => {
+          if (error.message.includes('NOT_FOUND')) {
+            const err = ({
+              type: 'error_not_found',
+              error
+            });
+            res.status(404).send(err);
+          } else {
+            console.log('ERR - ', error)
+          }
+        });
+    } else {
+      res.status(400).send('Wrong parameter.');
+    }
   });
   //the / route of router will get mapped to /api
   app.use('/api', router);
