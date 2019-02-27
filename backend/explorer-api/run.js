@@ -24,8 +24,7 @@ var io;
 var config = null;
 var configFileName = 'config.cfg';
 var blockDao = null;
-var isPushingBlock = false;
-var isPushingTxs = false;
+var isPushingData = false;
 //------------------------------------------------------------------------------
 //  Start from here
 //------------------------------------------------------------------------------
@@ -90,9 +89,9 @@ function main() {
       io.on('connection', onClientConnect);
       // server.listen(config.server.port);
       server.listen('3030');
-      
+
       app.use(cors());
-      
+
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -119,10 +118,10 @@ function main() {
 
 function onClientConnect(client) {
   console.log('client connected.');
-  isPushingBlock = true;
-  isPushingTxs = true;
+  isPushingData = true;
   pushTopBlocks();
   pushTopTransactions();
+  pushTotalTxsNum();
   // setup client event listeners
   client.on('disconnect', onClientDisconnect);
 }
@@ -133,19 +132,19 @@ function pushTopBlocks() {
   progressDao.getProgressAsync(config.blockchain.network_id)
     .then(function (progressInfo) {
       latest_block_height = progressInfo.height;
-      console.log('Latest block height: ' + latest_block_height.toString());
+      // console.log('Latest block height: ' + latest_block_height.toString());
 
       var query_block_height_max = latest_block_height;
       var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 100 blocks initially
-      console.log('Querying blocks from' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
+      console.log('Querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
       //return blockDao.getBlockAsync(123) 
       return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
     })
     .then(function (blockInfoList) {
-      io.sockets.emit('event', { type: 'block_list', body: blockInfoList });
+      io.sockets.emit('PUSH_TOP_BLOCKS', { type: 'block_list', body: blockInfoList });
     });
 
-  if (isPushingBlock) setTimeout(pushTopBlocks, 1000);
+  if (isPushingData) setTimeout(pushTopBlocks, 3000);
 }
 function pushTopTransactions() {
   numberOfTransactions = 10;
@@ -153,22 +152,31 @@ function pushTopTransactions() {
   progressDao.getProgressAsync(config.blockchain.network_id)
     .then((progressInfo) => {
       latest_transaction_count = progressInfo.count;
-      console.log('Latest transaction count: ' + latest_transaction_count.toString());
+      // console.log('Latest transaction count: ' + latest_transaction_count.toString());
       var query_txs_count_max = latest_transaction_count;
       var query_txs_count_min = Math.max(0, query_txs_count_max - numberOfTransactions + 1); // pushing 100 blocks initially
-      console.log('REST api querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
+      // console.log('REST api querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
       //return blockDao.getBlockAsync(123) 
       return transactionDao.getTransactionsAsync(query_txs_count_min, query_txs_count_max)
     })
     .then(function (transactionInfoList) {
-      io.sockets.emit('event', { type: 'transaction_list', body: transactionInfoList });
+      io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });
 
-  if (isPushingTxs) setTimeout(pushTopTransactions, 1000);
+  if (isPushingData) setTimeout(pushTopTransactions, 3000);
 }
 
+function pushTotalTxsNum() {
+  transactionDao.getTotalNumberAsync()
+    .then(number => {
+      io.sockets.emit('PUSH_TOTAL_NUM_TXS', { type: 'total_number_transaction', body: { total_num_tx: number } });
+    })
+    .catch(err => {
+      console.log('Error - Push total number of transaction', err);
+    });
+  if (isPushingData) setTimeout(pushTotalTxsNum, 3000);
+}
 function onClientDisconnect() {
-  isPushingBlock = false;
-  isPushingTxs = false;
+  isPushingData = false;
   console.log('client disconnect');
 }

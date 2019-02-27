@@ -21,8 +21,7 @@ export default class BlocksOverView extends Component {
 
     // Initial the socket
     this.socket = socketClient(backendAddress);
-    this.socket.on('event', this.onSocketEvent)
-
+    this.socket.on('PUSH_TOP_BLOCKS', this.onSocketEvent)
   }
   componentWillUnmount() {
     this.socket.disconnect();

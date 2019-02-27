@@ -20,7 +20,7 @@ export default class TransactionsOverView extends Component {
 
     // Initial the socket
     this.socket = socketClient(backendAddress);
-    this.socket.on('event', this.onSocketEvent)
+    this.socket.on('PUSH_TOP_TXS', this.onSocketEvent)
 
   }
   componentWillUnmount() {

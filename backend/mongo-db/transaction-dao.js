@@ -55,7 +55,6 @@ module.exports = class TransactionDAO {
       callback(error, transactionInfoList)
     })
   }
-
   getTransactionByPk(pk, callback) {
     const queryObject = { '_id': pk.toUpperCase() };
     this.client.findOne(this.transactionInfoCollection, queryObject, function (error, record) {
@@ -75,5 +74,15 @@ module.exports = class TransactionDAO {
         callback(error, transactionInfo);
       }
     })
+  }
+  getTotalNumber(callback) {
+    this.client.getTotal(this.transactionInfoCollection, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error);
+      } else {
+        console.log('Calling get total number of txs')
+        callback(error, record);
+      }
+    });
   }
 }

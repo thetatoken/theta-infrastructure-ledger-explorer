@@ -38,7 +38,7 @@ module.exports = class AccountDAO {
   getTotalNumber(callback) {
     this.client.getTotal(this.accountInfoCollection, function (error, record) {
       if (error) {
-        console.log('ERR - ', error, address);
+        console.log('ERR - ', error);
       } else {
         callback(error, record);
       }
