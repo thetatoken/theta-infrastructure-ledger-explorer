@@ -107,7 +107,7 @@ export default class TransactionExplorerTable extends Component {
     )
   }
   getAddressShortHash(address) {
-    return address.substring(12) + '...';
+    return address.substring(0, address.length - 12) + '...';
   }
   renderCoinBase(transactionInfo) {
     return (
