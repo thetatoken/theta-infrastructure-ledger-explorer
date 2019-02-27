@@ -1,0 +1,27 @@
+.content.blocks {
+
+}
+.content.block-details {
+  .button-list {
+    margin-top: 2rem;
+  }
+  table tr.transactions {
+    th { vertical-align: top; }
+  }
+  .block-txn {
+    @include row();
+    border-bottom: 1px solid $color-line-light;
+    padding: .5rem 0;
+    &:last-child {
+      border: none;
+    }
+  }
+  .txn-type {
+    margin-right: .5rem;
+    width: 150px;
+    white-space: nowrap;
+    
+  }
+
+
+}

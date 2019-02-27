@@ -1,7 +1,62 @@
-.th-tx-text{
-  &__split{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-  }
+
+.content.transactions {
+  
 }
+
+.content.transaction-details {
+  .txn-type {
+    margin: 3rem 0 .75rem;
+    font-family: $font-title;
+    font-weight: $weight-bold;
+    font-size: 1.125rem;
+    color: $color-font-main;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    &:before {
+      top: 3px;
+      margin-right: .75rem;
+    }
+  }
+  .txn-details {
+    
+  }
+  .coinbase-output {
+    @include row($align: flex-start);
+    border-bottom: 1px solid $color-line;
+    padding: .5rem 0;
+    &:last-child {
+      border-bottom: none;
+    }
+    & > *:first-child {
+      margin-right: 1rem;
+    }
+
+  }
+  
+}
+
+
+// In the global space since the icons are everywhere
+.txn-type {
+  &:before {
+    content: '';
+    display: inline-block;
+    top: 4px;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    margin-right: .5rem;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }  
+}
+  
+.txn-type.coinbase:before { background-image: url('/images/icons/icon_coinbase@2x.png'); }
+.txn-type.send:before { background-image: url('/images/icons/icon_send@2x.png'); }
+.txn-type.service-payment:before { background-image: url('/images/icons/icon_servicepayment@2x.png'); }
+.txn-type.split-contract:before { background-image: url('/images/icons/icon_splitcontract@2x.png'); }
+.txn-type.reserve:before { background-image: url('/images/icons/icon_reservefund@2x.png'); }
+.txn-type.release:before { background-image: url('/images/icons/icon_releasefund@2x.png'); }
+.txn-type.slash:before { background-image: url('/images/icons/icon_slash@2x.png'); }
+.txn-type.update-validators:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }

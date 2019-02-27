@@ -1,25 +1,63 @@
 $color-white: #fff;
-$color-theta-green: #21edba;
-$color-theta-blue: #33ccff;
+$color-black: #1B1F2A;
+$color-theta-green: #21EDBA;
+$color-theta-blue: #29B3EB;
+
+$color-page: #1b1f2a;
+$color-panel: rgba(#D6D8FF, .05);
 
 $color-font-main: #ffffff;
-$color-font-sub: #ffffff;
-$color-font-highlight: $color-theta-green;
+$color-font-light: #8A8FB5;
+$color-font-highlight: $color-theta-blue;
 
 $color-font-title: $color-font-main;
-$color-font-body: $color-font-sub;
+$color-font-body: $color-font-main;
+$color-font-link: $color-font-main;
+$color-font-link-hover: $color-font-highlight;
+$color-font-button: $color-black;
+
+$color-line: darken(#7C81A3, 25%);
+$color-line-main: $color-line;
+$color-line-light: darken(#7C81A3, 35%);
 
 $color-select-back: $color-font-highlight;
 $color-select-type: $color-font-main;
 
+$color-input-background: rgba(#7C81A3, .35);
+$color-input-text: $color-font-main;
+$color-input-placeholder: rgba($color-font-main, .5);
+$color-input-border: $color-line-main;
+
+$color-table-row: rgba(#D6D8FF, .05);
+$color-table-row-alt: rgba(#D6D8FF, .02);
+
+
+
+//Gradient helpers
+
+@mixin linearVerticalGradient($top, $bottom){
+  background: $top; /* Old browsers */
+  background: -moz-linear-gradient(top,  $top 0%, $bottom 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$top), color-stop(100%,$bottom)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  $top 0%,$bottom 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  $top 0%,$bottom 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  $top 0%,$bottom 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  $top 0%,$bottom 100%); /* W3C */
+}
+
+@mixin linearHorizontalGradient($left, $right){
+  background: $left; /* Old browsers */
+  background: -moz-linear-gradient(left, $left 0%, $right 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, $left 0%,$right 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, $left 0%,$right 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
+@mixin buttonGradient() { @include linearHorizontalGradient($color-theta-blue, $color-theta-green); }
 
 
 
 
-
-
-
-
+// DEPRECATED
 $th-body: #1b1f2a;
 
 $th-white: white;
@@ -69,22 +107,3 @@ $th-modal-background: rgba(27, 31, 42, 1.0);
 
 
 
-
-//Gradient helpers
-
-@mixin linearVerticalGradient($top, $bottom){
-  background: $top; /* Old browsers */
-  background: -moz-linear-gradient(top,  $top 0%, $bottom 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$top), color-stop(100%,$bottom)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  $top 0%,$bottom 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  $top 0%,$bottom 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  $top 0%,$bottom 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  $top 0%,$bottom 100%); /* W3C */
-}
-
-@mixin linearHorizontalGradient($left, $right){
-  background: $left; /* Old browsers */
-  background: -moz-linear-gradient(left, $left 0%, $right 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(left, $left 0%,$right 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to right, $left 0%,$right 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-}

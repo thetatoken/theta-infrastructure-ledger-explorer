@@ -16,254 +16,87 @@ $line-height: 1.4;
 
 @font-face {
     font-family: 'Rift';
-    src: url('../public/fonts/Rift-Bold.otf') format('otf'),
-         url('../public/fonts/Rift-Bold.woff') format('woff');
+    src: url('../fonts/Rift-Bold.otf') format('otf'),
+         url('../fonts/Rift-Bold.woff') format('woff');
     font-weight: $weight-bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Rift';
-    src: url('../public/fonts/Rift-Demi.otf') format('otf'),
-         url('../public/fonts/Rift-Demi.woff') format('woff');
+    src: url('../fonts/Rift-Demi.otf') format('otf'),
+         url('../fonts/Rift-Demi.woff') format('woff');
     font-weight: $weight-semi;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Rift';
-    src: url('../public/fonts/Rift-Medium.otf') format('otf'),
-         url('../public/fonts/Rift-Medium.woff') format('woff');
+    src: url('../fonts/Rift-Medium.otf') format('otf'),
+         url('../fonts/Rift-Medium.woff') format('woff');
     font-weight: $weight-medium;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Rift';
-    src: url('../public/fonts/Rift-Regular.otf') format('otf'),
-         url('../public/fonts/Rift-Regular.woff') format('woff');
+    src: url('../fonts/Rift-Regular.otf') format('otf'),
+         url('../fonts/Rift-Regular.woff') format('woff');
     font-weight: $weight-regular;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Rift';
-    src: url('../public/fonts/Rift-Light.otf') format('otf'),
-         url('../public/fonts/Rift-Light.woff') format('woff');
+    src: url('../fonts/Rift-Light.otf') format('otf'),
+         url('../fonts/Rift-Light.woff') format('woff');
     font-weight: $weight-light;
     font-style: normal;
 }
 
 
+
+
+
 @font-face {
     font-family: 'Alwyn';
-    src: url('../public/fonts/Alwyn-New-Bold.otf') format('otf'),
-         url('../public/fonts/Alwyn-New-Bold.woff') format('woff');
+    src: url('../fonts/Alwyn-New-Bold.otf') format('otf'),
+         url('../fonts/Alwyn-New-Bold.woff') format('woff');
     font-weight: $weight-bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Alwyn';
-    src: url('../public/fonts/Alwyn-New-Medium.otf') format('otf'),
-         url('../public/fonts/Alwyn-New-Medium.woff') format('woff');
+    src: url('../fonts/Alwyn-New-Medium.otf') format('otf'),
+         url('../fonts/Alwyn-New-Medium.woff') format('woff');
+    font-weight: $weight-semi;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Alwyn';
+    src: url('../fonts/Alwyn-New-Medium.otf') format('otf'),
+         url('../fonts/Alwyn-New-Medium.woff') format('woff');
     font-weight: $weight-medium;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Alwyn';
-    src: url('../public/fonts/Alwyn-New-Regular.otf') format('otf'),
-         url('../public/fonts/Alwyn-New-Regular.woff') format('woff');
+    src: url('../fonts/Alwyn-New-Regular.otf') format('otf'),
+         url('../fonts/Alwyn-New-Regular.woff') format('woff');
     font-weight: $weight-regular;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Alwyn';
-    src: url('../public/fonts/Alwyn-New-Light.otf') format('otf'),
-         url('../public/fonts/Alwyn-New-Light.woff') format('woff');
+    src: url('../fonts/Alwyn-New-Light.otf') format('otf'),
+         url('../fonts/Alwyn-New-Light.woff') format('woff');
     font-weight: $weight-light;
     font-style: normal;
 }
-
-
-
-
-/**
- *
- * =======================================================================
-     Description
- * =======================================================================
- *
- 
- Contains the general typographic styling of the site. Specific typographic tweaks for a given element should 
- remain with the rest of the CSS. 
- 
- Note: Normalize.css also contains some typographic styles as part of it's purpose of normalizing base stlying across browsers. 
- 
- */
-
-
-
-/**
- *
- * =======================================================================
-     Base Type
- * =======================================================================
- *
- */
-
-html {
-    font: {
-        family: $font-body;
-        weight: $weight-regular;
-        size: 16px;        
-    }
-    line-height: 1.42857143;     
-    -webkit-font-smoothing: antialiased;   
-}
-
-body {
-    hyphens: auto;
-    word-wrap: break-word;
-    color: $color-font-body;
-}
-
-
-/**
- *
- * =======================================================================
-     Headings
- * =======================================================================
- */
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: $font-title;
-    color: $color-font-title;
-    font-weight: $weight-regular;
-    line-height: 1.1;
-    margin: 0px 0px $line-height*.5rem;
-    letter-spacing: 0px;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility; /*  voodoo to enable ligatures and kerning | https://developer.mozilla.org/en-US/docs/CSS/text-rendering */
-}
-h1,
-h2,
-h3 {
-    letter-spacing: 0px;
-}
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1rem; }
-h5 { font-size: .875rem; }
-h6 { font-size: .75rem; }
-
-h5,
-h6 {
-    font-weight: $weight-light;
-
-}
-
-.small {
-    font-size: .75rem;
-    font-weight: $weight-light;
-}
-
-/**
- *
- * =======================================================================
-     Paragraphs and Indentation
- * =======================================================================
- */
-
-p {
-    margin: 0 0 0em; /* bottom margin for paragraphs */
-    hyphens: auto;
-    line-height: 1.375rem;
-    font-weight: $weight-light;
-}
-p + p {
-    margin-top: 1.0em; /* no top margin on subsequent paragraphs */
-}
-
-
-/**
- *
- * =======================================================================
-     Links
- * =======================================================================
- */
-
-a,
-a:visited {
-    text-decoration: none;
-    color: $color-font-highlight;
-    transition: all .20s;
-    i {
-        transition: all .20s;
-    }
-}
-p a {
-    text-decoration: none;
-}
-a:hover { 
-    color: $color-font-highlight !important;
-    text-decoration: none; 
-    i {
-        color: $color-font-highlight !important;
-    }
-}
-
-
-/**
- *
- * =======================================================================
-     Hyphens
- * =======================================================================
- */
-
-abbr,
-acronym,
-blockquote,
-code,
-dir,
-kbd,
-listing,
-plaintext,
-q,
-samp,
-tt,
-var,
-xmp {
-    hyphens: none;
-}
-
-
-/**
- *
- * =======================================================================
-     Selection
- * =======================================================================
- */ 
- 
- ::selection {
-   background-color: $color-select-back !important;
-   color: $color-select-type !important; /* WebKit/Blink Browsers */
-   text-shadow: none;
- }
- ::-moz-selection {
-   background-color: $color-select-back !important;
-   color: $color-select-type !important; /* Gecko Browsers */
-   text-shadow: none;
- }
 
 
 

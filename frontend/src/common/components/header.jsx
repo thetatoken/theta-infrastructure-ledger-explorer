@@ -38,31 +38,22 @@ export default class Header extends Component {
   render() {
     return (
       <div className="theta-header">
-        <Link to="/" className="theta-header__logo">
-          <div className="theta-logo"></div>
-        </Link>
-        <div className="theta-header__navigator">
-          <Link to="/dashboard" className="theta-header__navigator--button">
-            Overview
-          </Link>
-          <Link to="/blocks" className="theta-header__navigator--button">
-            Blocks
-          </Link>
-          <Link to="/txs" className="theta-header__navigator--button">
-            Transaction
-          </Link>
+        <Link to="/" className="theta-logo"></Link>
+        <div className="nav">
+          <Link to="/blocks">Blocks</Link>
+          <Link to="/txs">Transactions</Link>
         </div>
-        <div className="theta-header__blank"></div>
-        <div className="theta-header__search">
-          <input className="theta-header__search--input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
-          <div className="theta-header__search--select">
+        <div className="flex-spacer"></div>
+        <div className="nav-search">
+          <input type="text" className="search-input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
+          <div className="search-select">
             <select ref={option => this.searchType = option}>
               <option value="address">Address</option>
               <option value="block">Block Height</option>
               <option value="transaction">Transaction</option>
             </select>
           </div>
-          <div className="theta-header__search--button" onClick={this.handleSearch}>
+          <div className="search-button" onClick={this.handleSearch}>
             <svg className="svg-icon" viewBox="0 0 20 20">
               <path fill="none" d="M19.129,18.164l-4.518-4.52c1.152-1.373,1.852-3.143,1.852-5.077c0-4.361-3.535-7.896-7.896-7.896
 								c-4.361,0-7.896,3.535-7.896,7.896s3.535,7.896,7.896,7.896c1.934,0,3.705-0.698,5.078-1.853l4.52,4.519

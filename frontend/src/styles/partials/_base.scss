@@ -1,0 +1,177 @@
+
+/**
+ *
+ * =======================================================================
+     BASE SETTINGS & TYPOGRAPHY
+ * =======================================================================
+ *
+ */
+
+
+* {
+  position: relative;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font: {
+    family: $font-body;
+    weight: $weight-regular;
+    size: 16px;        
+  }
+  color: $color-font-main;
+  line-height: 1.42857143;     
+  -webkit-font-smoothing: antialiased;   
+}
+body {
+  overflow: auto;
+  background: $color-page;
+  hyphens: auto;
+  word-wrap: break-word;
+  color: $color-font-body;
+}
+
+
+/**
+ *
+ * =======================================================================
+     Headings
+ * =======================================================================
+ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: $font-title;
+    color: $color-font-title;
+    font-weight: $weight-regular;
+    line-height: 1.1;
+    margin: 0px 0px $line-height*.5rem;
+    letter-spacing: 0px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility; /*  voodoo to enable ligatures and kerning | https://developer.mozilla.org/en-US/docs/CSS/text-rendering */
+}
+h1,
+h2,
+h3 {
+    letter-spacing: 0px;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1rem; }
+h5 { font-size: .875rem; }
+h6 { font-size: .75rem; }
+
+h5,
+h6 {
+    font-weight: $weight-light;
+
+}
+
+.small {
+    font-size: .75rem;
+    font-weight: $weight-light;
+}
+
+/**
+ *
+ * =======================================================================
+     Paragraphs and Indentation
+ * =======================================================================
+ */
+
+p {
+    margin: 0 0 0em; /* bottom margin for paragraphs */
+    hyphens: auto;
+    line-height: 1.375rem;
+    font-weight: $weight-light;
+}
+p + p {
+    margin-top: 1.0em; /* no top margin on subsequent paragraphs */
+}
+
+
+/**
+ *
+ * =======================================================================
+     Links
+ * =======================================================================
+ */
+
+a,
+a:visited {
+    text-decoration: none;
+    color: $color-font-link;
+    transition: all .20s;
+    i {
+        transition: all .20s;
+    }
+    &:hover {
+      color: $color-font-link-hover;
+    }
+}
+p a {
+    text-decoration: none;
+}
+
+
+/**
+ *
+ * =======================================================================
+     Hyphens
+ * =======================================================================
+ */
+
+abbr,
+acronym,
+blockquote,
+code,
+dir,
+kbd,
+listing,
+plaintext,
+q,
+samp,
+tt,
+var,
+xmp {
+    hyphens: none;
+}
+
+
+/**
+ *
+ * =======================================================================
+     Selection
+ * =======================================================================
+ */ 
+ 
+ ::selection {
+   background-color: $color-select-back !important;
+   color: $color-select-type !important; /* WebKit/Blink Browsers */
+   text-shadow: none;
+ }
+ ::-moz-selection {
+   background-color: $color-select-back !important;
+   color: $color-select-type !important; /* Gecko Browsers */
+   text-shadow: none;
+ }
+
+
+
+
+
+
+
+
+
+

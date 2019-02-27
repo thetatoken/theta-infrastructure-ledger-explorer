@@ -10,6 +10,9 @@ class Pagination extends React.Component {
     this.handleNext = this.handleNext.bind(this);
     this.handleOnPage = this.handleOnPage.bind(this);
   }
+  static defaultProps = {
+    size: 'lg',
+  }
   handlePrevious() {
     const previous = this.props.currentPage - 1;
     if (previous >= 0) {
@@ -97,9 +100,9 @@ class Pagination extends React.Component {
   }
 
   render() {
+    let { size } = this.props;
     return (
-      <ReactstrapPagination className={classnames('th-pagination',
-        { 'th-pagination--lg': this.props.size === 'lg' })}>
+      <ReactstrapPagination className={classnames('th-pagination', size)}>
         <PaginationItem disabled={this.props.isDisabled}>
           <PaginationLink onClick={() => this.handleOnPage(0)}>
             First

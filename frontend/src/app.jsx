@@ -3,9 +3,9 @@ import Header from 'common/components/header'
 export default class App extends Component {
   render() {
     return (
-      <div className="theta-container">
+      <div id="app-container">
         <Header />
-        <div className="theta-content">
+        <div id="app-content">
           {this.props.children}
         </div> 
       </div>

@@ -1,0 +1,27 @@
+.home {
+  .overview {
+  	margin-top: 5rem;
+    @include row($justify: space-between, $align: flex-start);
+
+    & > * {
+      @include column($align: center);
+      width: 50%;
+      &:first-child {
+        margin-right: 3rem;
+      }
+      .btn {
+        margin: 1rem 0 0;
+      }
+      .block-table,
+      .transaction-table {
+        width: 100%;
+      }
+    }
+    
+    .txn-table td.type:before {
+      width: 14px;
+      height: 14px;
+      top: 2px;
+    }
+  }
+}

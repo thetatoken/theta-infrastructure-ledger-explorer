@@ -1,15 +1,28 @@
+// MODULES
 @import 'modules/colors';
 @import 'modules/fonts';
-@import 'modules/global';
+@import 'modules/input-types';
+
+// PARTIALS
+@import 'partials/utils';
+@import 'partials/base';
+@import 'partials/layout';
+@import 'partials/forms';
+@import 'partials/buttons';
+@import 'partials/tables';
+@import 'partials/misc-ui';
 
 // COMPONENTS
 @import 'components/header';
 @import 'components/link-button';
 @import 'components/not-exist';
 @import 'components/pagination';
+@import 'components/transaction-table';
+@import 'components/blocks-table';
 
 // SECTIONS 
+@import 'sections/home';
+@import 'sections/transactions';
+@import 'sections/blocks';
 @import 'sections/explorer';
 @import 'sections/overview';
-@import 'sections/dashboard';
-@import 'sections/transactions';

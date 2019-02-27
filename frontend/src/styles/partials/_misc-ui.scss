@@ -1,0 +1,26 @@
+// Misc UI elements. Not a component, but reusable pieces that can be used globally
+
+
+.currency {
+  &:before {
+    content: '';
+    display: inline-block;
+    position: relative;
+    width: 15px;
+    height: 15px;
+    margin-right: .375rem;
+    top: 2px;
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+
+  }
+  &.tfuel,
+  &.tfuelwei {
+    &:before { background-image: url('/images/icons/tfuel-icon@2x.png'); }
+  }
+  &.theta,
+  &.thetawei {
+    &:before { background-image: url('/images/icons/theta-icon@2x.png'); }
+  }
+}
