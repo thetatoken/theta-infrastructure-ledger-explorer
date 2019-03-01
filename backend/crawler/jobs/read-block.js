@@ -61,6 +61,10 @@ exports.Execute = function () {
     .then(() => {
       return rpc.getStatusAsync([]) // read block height from chain
     })
+    // .catch(err => {
+    //   console.log(err)
+    //   console.log('Met error after get status.')
+    // })
     .then(function (data) {
       // console.log(data);
       var result = JSON.parse(data);
@@ -88,6 +92,10 @@ exports.Execute = function () {
         console.log('Block crawling is up to date.');
       }
     })
+    // .catch(err => {
+    //   console.log(err)
+    //   console.log('Met error after get blocks.')
+    // })
     .then(async function (blockDataList) {
       if (blockDataList) {
         var upsertBlockAsyncList = [];
@@ -135,6 +143,9 @@ exports.Execute = function () {
                   validTransactionList.push(transaction);
                   upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                 } else {
+                  // TODO: get transaction's number
+                  const tx = await transactionDao.getTransactionByPkAsync(transaction.hash);
+                  transaction.number = tx.number;
                   validTransactionList.push(transaction);
                   upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                 }
