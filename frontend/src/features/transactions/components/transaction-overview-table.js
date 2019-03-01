@@ -17,10 +17,11 @@ export default class TransactionOverviewTable extends Component {
             {transactionInfoList
               .sort((a, b) => b.number - a.number)
               .map(transactionInfo => {
-                const hash = size === 'full' ? transactionInfo.hash.toLowerCase() : transactionInfo.hash.toLowerCase().substring(0,35) + '...';
+                const hash = size === 'full' ? transactionInfo.hash.toLowerCase() : transactionInfo.hash.toLowerCase().substring(0, 35) + '...';
+                const type = transactionInfo.type !== null ? transactionInfo.type : 'Pending';
                 return (
                   <tr key={transactionInfo.hash}>
-                    <td>{transactionInfo.type}</td>
+                    <td>{type}</td>
                     <td><Link to={`/txs/${transactionInfo.hash.toLowerCase()}`}>{hash}</Link></td>
                   </tr>
                 );

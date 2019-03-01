@@ -144,7 +144,7 @@ function pushTopBlocks() {
       io.sockets.emit('PUSH_TOP_BLOCKS', { type: 'block_list', body: blockInfoList });
     });
 
-  if (isPushingData) setTimeout(pushTopBlocks, 3000);
+  if (isPushingData) setTimeout(pushTopBlocks, 1000);
 }
 function pushTopTransactions() {
   numberOfTransactions = 10;
@@ -163,7 +163,7 @@ function pushTopTransactions() {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });
 
-  if (isPushingData) setTimeout(pushTopTransactions, 3000);
+  if (isPushingData) setTimeout(pushTopTransactions, 1000);
 }
 
 function pushTotalTxsNum() {
@@ -174,7 +174,7 @@ function pushTotalTxsNum() {
     .catch(err => {
       console.log('Error - Push total number of transaction', err);
     });
-  if (isPushingData) setTimeout(pushTotalTxsNum, 3000);
+  if (isPushingData) setTimeout(pushTotalTxsNum, 1000);
 }
 function onClientDisconnect() {
   isPushingData = false;

@@ -40,7 +40,7 @@ exports.Execute = function () {
     })
     .then(async function (data) {
       const result = JSON.parse(data);
-      console.log(result)
+      // console.log(result)
       const pendingTxList = result.result.tx_hashes;
       // const pendingTxList = ["12311", "23411", "34511", "45611", "56711", "67811", "78911", "89011", "90111", "12211", "12411", "12511"];
       let upsertTransactionAsyncList = [];
@@ -56,7 +56,6 @@ exports.Execute = function () {
           upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
         }
       }
-      console.log('end')
       return Promise.all(upsertTransactionAsyncList)
     })
     .then(() => {

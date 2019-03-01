@@ -17,7 +17,7 @@ export default class TransactionExplorerTable extends Component {
   renderAmount(amount) {
     return BigNumber(amount, 10).toFormat(0);
   }
-  renderFee(fee){
+  renderFee(fee) {
     return this.renderAmount(fee.tfuelwei) + " TFuelWei";
   }
   renderCoins(coins) {
@@ -84,9 +84,11 @@ export default class TransactionExplorerTable extends Component {
     )
   }
   renderCommonRows(transactionInfo) {
+    const status = transactionInfo.status ? transactionInfo.status : 'finalized';
     return (
       <div>
         {this.renderOneRow('Hash', transactionInfo.hash.toLowerCase())}
+        {this.renderOneRow('Status', status.replace(/\b\w/g, l => l.toUpperCase()))}
         {this.renderOneRow('Type', typeMap[transactionInfo.type])}
         {this.renderOneRow('Block Height', this.renderBlockHeight(transactionInfo.block_height))}
         {this.renderOneRow('Age', this.renderTimeStamp(transactionInfo.timestamp))}
@@ -180,8 +182,19 @@ export default class TransactionExplorerTable extends Component {
       </div>
     )
   }
+  renderPendingTransaction(transactionInfo) {
+    return (
+      <div>
+        {this.renderOneRow('Hash', transactionInfo.hash.toLowerCase())}
+        {this.renderOneRow('Status', transactionInfo.status.replace(/\b\w/g, l => l.toUpperCase()))}
+      </div>
+    )
+  }
   render() {
     const { transactionInfo } = this.props;
+    if (transactionInfo.status === 'pending') {
+      return this.renderPendingTransaction(transactionInfo);
+    }
     // console.log(transactionInfo)
     switch (transactionInfo.type) { // TODO: Add other type cases
       case 0:

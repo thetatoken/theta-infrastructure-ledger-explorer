@@ -57,5 +57,5 @@ https.listen(port, function (err) {
     console.log(err);
     return;
   }
-  console.log(`Listening at {hostname}:${port}`);
+  console.log(`Listening at port: ${port}`);
 });
