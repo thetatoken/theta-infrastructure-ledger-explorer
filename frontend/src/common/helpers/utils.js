@@ -14,5 +14,9 @@ export function truncateMiddle(str, maxLength = 20, separator = '...' ) {
 }
 
 export function formatCoin(weiAmount) {
-  return new BigNumber(weiAmount).dividedBy(WEI).toString(10);
+  return new BigNumber(weiAmount).dividedBy(WEI).toFormat({
+    decimalSeparator: '.',
+    groupSeparator: ',',
+    groupSize: 3,
+  });
 }

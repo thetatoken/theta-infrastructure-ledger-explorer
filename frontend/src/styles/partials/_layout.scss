@@ -83,7 +83,7 @@ body {
       }
       &.transactions:before { @include backgroundImage($url: '/images/icons/icon_transactions@2x.png'); }
       &.blocks:before { @include backgroundImage($url: '/images/icons/icon_blocks@2x.png'); }
-      &.account:before { @include backgroundImage($url: '/images/icons/icon_transactions@2x.png'); }
+      &.account:before { @include backgroundImage($url: '/images/icons/icon_account@2x.png'); }
     }
   }
 }

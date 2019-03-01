@@ -70,12 +70,12 @@ export default class BlockOverviewTable extends Component {
             <th className="txns ">Txns</th>
           </tr>
         </thead>
-        <tbody className="clickable-row">
+        <tbody>
           {blocks
             .sort((a, b) => b.height - a.height)
             .map(b => {
               return (
-                <tr key={b.height} onClick={e=>this.handleRowClick(b.height)}>
+                <tr key={b.height}>
                   <td className="height">{b.height}</td>
                   <td className="hash"><Link to={`/blocks/${b.height}`}>{ hash(b, truncate ? truncate : undefined) }</Link></td>
                   {includeDetails && 

@@ -27,7 +27,6 @@ export default class BlocksExplorer extends Component {
   }
   componentDidMount() {
     const { blockHeight } = this.props.params;
-    browserHistory.push(`/blocks/${blockHeight}`);
     this.getOneBlockByHeight(blockHeight);
   }
   getOneBlockByHeight(height) {
@@ -145,7 +144,7 @@ const Transaction = props => {
   return(
     <div className="block-txn">
       <span className={cx("txn-type",TxnClasses[type])}>{ TxnTypes[type] }</span>
-      <span>{ hash }</span>
+      <a href={`/txs/${hash}`}>{ hash }</a>
     </div>)
 }
 

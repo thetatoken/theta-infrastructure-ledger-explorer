@@ -20,7 +20,6 @@ export default class Transactions extends Component {
   }
 
   componentDidMount() {
-    browserHistory.push('/txs');
     const { currentPageNumber } = this.state;
     transactionsService.getTransactionsByPage(currentPageNumber, NUM_TRANSACTIONS)
       .then(res => this.receivedTransactionsEvent(res))
@@ -58,13 +57,11 @@ export default class Transactions extends Component {
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>
         <TransactionTable transactions={transactions} />
-        <div className="theta-content__container--pagination">
-          <Pagination
-            size={'lg'}
-            totalPages={totalPageNumber}
-            currentPage={currentPageNumber}
-            callback={this.handleGetTransactionsByPage} />
-        </div>
+        <Pagination
+          size={'lg'}
+          totalPages={totalPageNumber}
+          currentPage={currentPageNumber}
+          callback={this.handleGetTransactionsByPage} />
       </div>
     );
   }

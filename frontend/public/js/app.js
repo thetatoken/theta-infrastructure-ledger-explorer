@@ -95788,8 +95788,6 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
-
       var _this$props = this.props,
           className = _this$props.className,
           includeDetails = _this$props.includeDetails,
@@ -95807,16 +95805,11 @@ function (_Component) {
         className: "fee"
       }, "Avg Fee")), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("th", {
         className: "txns "
-      }, "Txns"))), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tbody", {
-        className: "clickable-row"
-      }, blocks.sort(function (a, b) {
+      }, "Txns"))), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tbody", null, blocks.sort(function (a, b) {
         return b.height - a.height;
       }).map(function (b) {
         return react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tr", {
-          key: b.height,
-          onClick: function onClick(e) {
-            return _this2.handleRowClick(b.height);
-          }
+          key: b.height
         }, react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("td", {
           className: "height"
         }, b.height), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("td", {
@@ -96466,8 +96459,6 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
-
       var _this$props = this.props,
           className = _this$props.className,
           includeDetails = _this$props.includeDetails,
@@ -96485,14 +96476,9 @@ function (_Component) {
         className: "to"
       }, "To"), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("th", {
         className: "value"
-      }, "value")))), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tbody", {
-        className: "clickable-row"
-      }, lodash__WEBPACK_IMPORTED_MODULE_10___default.a.map(transactions, function (txn) {
+      }, "value")))), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tbody", null, lodash__WEBPACK_IMPORTED_MODULE_10___default.a.map(transactions, function (txn) {
         return react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("tr", {
           key: txn.hash,
-          onClick: function onClick(e) {
-            return _this2.handleRowClick(txn.hash);
-          },
           className: common_constants__WEBPACK_IMPORTED_MODULE_14__["TxnClasses"][txn.type]
         }, react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("td", {
           className: "type"
@@ -96769,7 +96755,11 @@ function truncateMiddle(str) {
   return str.substr(0, front) + separator + str.substr(str.length - back);
 }
 function formatCoin(weiAmount) {
-  return new bignumber_js__WEBPACK_IMPORTED_MODULE_1___default.a(weiAmount).dividedBy(common_constants__WEBPACK_IMPORTED_MODULE_2__["WEI"]).toString(10);
+  return new bignumber_js__WEBPACK_IMPORTED_MODULE_1___default.a(weiAmount).dividedBy(common_constants__WEBPACK_IMPORTED_MODULE_2__["WEI"]).toFormat({
+    decimalSeparator: '.',
+    groupSeparator: ',',
+    groupSize: 3
+  });
 }
 
 /***/ }),
@@ -97137,7 +97127,6 @@ function (_Component) {
     key: "componentDidMount",
     value: function componentDidMount() {
       var accountAddress = this.props.params.accountAddress;
-      react_router__WEBPACK_IMPORTED_MODULE_6__["browserHistory"].push("/account/".concat(accountAddress));
       this.getOneAccountByAddress(accountAddress);
     }
   }, {
@@ -97189,27 +97178,24 @@ function (_Component) {
         className: "page-title account"
       }, "Account Detail"), errorType === 'error_not_found' && react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_not_exist__WEBPACK_IMPORTED_MODULE_13__["default"], {
         msg: "Note: An account will not be created until the first time it receives some tokens."
-      }), account && !errorType && react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("table", {
+      }), account && !errorType && react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("table", {
         className: "details account-info"
-      }, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
-        label: "Address",
-        data: react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(Address, {
-          hash: account.address
-        })
-      }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
-        label: "Sequence",
-        data: account.sequence
-      }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
+      }, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("thead", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tr", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("th", null, "Address"), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("th", null, account.address))), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
         label: "Balance",
         data: react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(Balance, {
           balance: account.balance
         })
       }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
+        label: "Sequence",
+        data: account.sequence
+      }))), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("table", {
+        className: "details account-txns"
+      }, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("tbody", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
         label: "Recent Transactions",
         data: react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(HashList, {
           hashes: account.txs_hash_list
         })
-      }))));
+      })))));
     }
   }]);
 
@@ -97238,8 +97224,10 @@ var Address = function Address(_ref2) {
 
 var HashList = function HashList(_ref3) {
   var hashes = _ref3.hashes;
-  return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, hashes.map(function (hash) {
-    if (hash) return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_6__["Link"], {
+  return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_5___default.a.Fragment, null, _.map(_.compact(hashes), function (hash, i) {
+    return react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("div", {
+      key: i
+    }, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(react_router__WEBPACK_IMPORTED_MODULE_6__["Link"], {
       key: hash,
       to: "/txs/".concat(hash.toLowerCase())
     }, hash.toLowerCase()));
@@ -97452,7 +97440,6 @@ function (_Component) {
     key: "componentDidMount",
     value: function componentDidMount() {
       var blockHeight = this.props.params.blockHeight;
-      react_router__WEBPACK_IMPORTED_MODULE_6__["browserHistory"].push("/blocks/".concat(blockHeight));
       this.getOneBlockByHeight(blockHeight);
     }
   }, {
@@ -97551,7 +97538,9 @@ var Transaction = function Transaction(props) {
     className: "block-txn"
   }, react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", {
     className: classnames__WEBPACK_IMPORTED_MODULE_7___default()("txn-type", common_constants__WEBPACK_IMPORTED_MODULE_12__["TxnClasses"][type])
-  }, common_constants__WEBPACK_IMPORTED_MODULE_12__["TxnTypes"][type]), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("span", null, hash));
+  }, common_constants__WEBPACK_IMPORTED_MODULE_12__["TxnTypes"][type]), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement("a", {
+    href: "/txs/".concat(hash)
+  }, hash));
 };
 
 var nameMap = {
@@ -97703,7 +97692,6 @@ function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      react_router__WEBPACK_IMPORTED_MODULE_7__["browserHistory"].push('/blocks');
       var currentPageNumber = this.state.currentPageNumber;
       common_services_block__WEBPACK_IMPORTED_MODULE_8__["blocksService"].getBlocksByPage(currentPageNumber, MAX_BLOCKS).then(function (res) {
         _this2.receivedBlocksEvent(res);
@@ -98053,7 +98041,6 @@ function (_Component) {
     key: "componentDidMount",
     value: function componentDidMount() {
       var transactionHash = this.props.params.transactionHash;
-      react_router__WEBPACK_IMPORTED_MODULE_6__["browserHistory"].push("/txs/".concat(transactionHash));
       this.getOneTransactionByUuid(transactionHash.toUpperCase());
     }
   }, {
@@ -98292,12 +98279,12 @@ var Send = function Send(props) {
       coins: data.outputs[0].coins
     })
   }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
-    label: "Input Address",
+    label: "From Address",
     data: react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(Address, {
       hash: data.inputs[0].address
     })
   }), react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(common_components_details_row__WEBPACK_IMPORTED_MODULE_14__["default"], {
-    label: "Output Address",
+    label: "To Address",
     data: react__WEBPACK_IMPORTED_MODULE_5___default.a.createElement(Address, {
       hash: data.outputs[0].address
     })
@@ -98439,7 +98426,6 @@ function (_Component) {
     value: function componentDidMount() {
       var _this2 = this;
 
-      react_router__WEBPACK_IMPORTED_MODULE_8__["browserHistory"].push('/txs');
       var currentPageNumber = this.state.currentPageNumber;
       common_services_transaction__WEBPACK_IMPORTED_MODULE_9__["transactionsService"].getTransactionsByPage(currentPageNumber, NUM_TRANSACTIONS).then(function (res) {
         return _this2.receivedTransactionsEvent(res);
@@ -98463,14 +98449,12 @@ function (_Component) {
         className: "page-title transactions"
       }, "Transactions"), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(common_components_transactions_table__WEBPACK_IMPORTED_MODULE_11__["default"], {
         transactions: transactions
-      }), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement("div", {
-        className: "theta-content__container--pagination"
-      }, react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(common_components_pagination__WEBPACK_IMPORTED_MODULE_10__["default"], {
+      }), react__WEBPACK_IMPORTED_MODULE_7___default.a.createElement(common_components_pagination__WEBPACK_IMPORTED_MODULE_10__["default"], {
         size: 'lg',
         totalPages: totalPageNumber,
         currentPage: currentPageNumber,
         callback: this.handleGetTransactionsByPage
-      })));
+      }));
     }
   }]);
 

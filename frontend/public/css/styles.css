@@ -307,7 +307,7 @@ body:before {
         background-repeat: no-repeat;
         background-size: contain; }
       #app-content .content .page-title.account:before {
-        background-image: url("/images/icons/icon_transactions@2x.png");
+        background-image: url("/images/icons/icon_account@2x.png");
         background-position: center center;
         background-repeat: no-repeat;
         background-size: contain; }
@@ -447,8 +447,6 @@ table.data {
   width: 100%; }
   table.data .clickable-row tr td {
     cursor: pointer; }
-  table.data .clickable-row tr:hover td {
-    background-color: rgba(240, 240, 255, 0.05); }
   table.data thead th,
   table.data tbody td,
   table.data tbody th {
@@ -464,10 +462,10 @@ table.data {
     background-color: rgba(214, 216, 255, 0.05); }
     table.data tbody tr:nth-child(2n) {
       background-color: rgba(214, 216, 255, 0.02); }
+    table.data tbody tr:hover td {
+      background-color: rgba(240, 240, 255, 0.05); }
   table.data tbody td,
-  table.data tbody th,
-  table.data tbody td a,
-  table.data tbody th a {
+  table.data tbody th {
     color: #ffffff; }
   table.data tbody td.hash {
     white-space: nowrap; }
@@ -506,6 +504,7 @@ table.details {
     padding: 1rem 1rem 1rem 0; }
   table.details tbody tr th {
     width: 150px;
+    white-space: nowrap;
     text-align: left;
     text-transform: uppercase;
     color: #8A8FB5;
@@ -708,7 +707,16 @@ table.details {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  width: 100%;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
   margin-top: 2rem; }
   .th-pagination ul {
     width: 100%;
@@ -899,6 +907,11 @@ table.data.blocks-table table {
 
 .txn-type.update-validators:before {
   background-image: url("/images/icons/icon_updatevalidators@2x.png"); }
+
+.content.account table.details.account-txns {
+  margin-top: 2rem; }
+  .content.account table.details.account-txns tbody th {
+    width: 200px; }
 
 .content.block-details .button-list {
   margin-top: 2rem; }

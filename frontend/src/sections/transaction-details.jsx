@@ -29,7 +29,6 @@ export default class TransactionExplorer extends Component {
   }
   componentDidMount() {
     const { transactionHash } = this.props.params;
-    browserHistory.push(`/txs/${transactionHash}`);
     this.getOneTransactionByUuid(transactionHash.toUpperCase());
   }
   getOneTransactionByUuid(hash) {
@@ -209,8 +208,8 @@ const Send = props => {
       <tbody>
         <DetailsRow label="Fee" data={ <Fee transaction={transaction} /> } />
         <DetailsRow label="Amount" data={ <Amount coins={data.outputs[0].coins} /> } />
-        <DetailsRow label="Input Address" data={ <Address hash={data.inputs[0].address} /> } />
-        <DetailsRow label="Output Address" data={ <Address hash={data.outputs[0].address} /> } />
+        <DetailsRow label="From Address" data={ <Address hash={data.inputs[0].address} /> } />
+        <DetailsRow label="To Address" data={ <Address hash={data.outputs[0].address} /> } />
       </tbody>
     </table>);
 }

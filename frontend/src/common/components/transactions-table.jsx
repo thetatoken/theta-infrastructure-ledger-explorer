@@ -74,10 +74,10 @@ export default class TransactionTable extends Component {
             </React.Fragment>}
           </tr>
         </thead>
-        <tbody className="clickable-row">
+        <tbody>
           {_.map(transactions, txn => {
             return (
-              <tr key={txn.hash} onClick={e=>this.handleRowClick(txn.hash)} className={ TxnClasses[txn.type] }>
+              <tr key={txn.hash} className={ TxnClasses[txn.type] }>
                 <td className="type">{ TxnTypes[txn.type] }</td>
                 <td className="overflow"><Link to={`/txs/${txn.hash}`}>{ hash(txn, truncate) }</Link></td>
                 { includeDetails &&

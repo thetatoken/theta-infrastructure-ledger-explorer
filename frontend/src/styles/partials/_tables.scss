@@ -6,9 +6,7 @@ table.data {
     tr td {
       cursor: pointer;
     }
-    tr:hover td {
-      background-color: lighten($color-table-row, 5%);
-    }
+    
   }
   
   thead th,
@@ -32,11 +30,12 @@ table.data {
       &:nth-child(2n) {
         background-color: $color-table-row-alt;
       }
+      &:hover td {
+        background-color: lighten($color-table-row, 5%);
+      }
     }
     td, 
-    th, 
-    td a, 
-    th a {
+    th {
       color: $color-font-main;
     }
   }
@@ -87,6 +86,7 @@ table.details {
     }
     th {
       width: $th-width;
+      white-space: nowrap;
       text-align: left;
       text-transform: uppercase;
       color: $color-font-light;

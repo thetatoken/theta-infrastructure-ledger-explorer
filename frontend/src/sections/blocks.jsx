@@ -22,8 +22,6 @@ export default class Blocks extends Component {
   }
 
   componentDidMount() {
-    browserHistory.push('/blocks');
-
     const { currentPageNumber } = this.state;
     blocksService.getBlocksByPage(currentPageNumber, MAX_BLOCKS)
       .then(res => {

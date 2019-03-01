@@ -1,7 +1,5 @@
 .th-pagination { 
-
-  display: flex;
-  width: 100%;
+  @include row();
   margin-top: 2rem;
 
   & ul {

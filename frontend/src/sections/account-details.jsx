@@ -28,7 +28,6 @@ export default class AccountDetails extends Component {
   }
   componentDidMount() {
     const { accountAddress } = this.props.params;
-    browserHistory.push(`/account/${accountAddress}`);
     this.getOneAccountByAddress(accountAddress);
   }
 
@@ -70,14 +69,25 @@ export default class AccountDetails extends Component {
         { errorType === 'error_not_found' && 
         <NotExist msg="Note: An account will not be created until the first time it receives some tokens."/>}
         { account && !errorType && 
-        <table className="details account-info">
-          <tbody>
-            <DetailsRow label="Address" data={ <Address hash={account.address} /> } />
-            <DetailsRow label="Sequence" data={ account.sequence } />
-            <DetailsRow label="Balance" data={ <Balance balance={account.balance} /> } />
-            <DetailsRow label="Recent Transactions" data={ <HashList hashes={account.txs_hash_list} /> } />
-          </tbody>
-        </table>}
+        <React.Fragment>
+          <table className="details account-info">
+            <thead>
+              <tr>
+                <th>Address</th>
+                <th>{account.address}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <DetailsRow label="Balance" data={ <Balance balance={account.balance} /> } />
+              <DetailsRow label="Sequence" data={ account.sequence } />
+            </tbody>
+          </table>
+          <table className="details account-txns">
+            <tbody>
+              <DetailsRow label="Recent Transactions" data={ <HashList hashes={account.txs_hash_list} /> } />
+            </tbody>
+          </table>
+        </React.Fragment>}
       </div>
     );
   }
@@ -97,10 +107,7 @@ const Address = ({ hash }) => {
 const HashList = ({hashes}) => {
   return (
     <React.Fragment>
-      {hashes.map(hash => {
-        if (hash)
-          return (<div><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)
-      })}
+      {_.map(_.compact(hashes), (hash,i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
     </React.Fragment>
   )
 }
