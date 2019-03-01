@@ -11,9 +11,11 @@ var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 10;
+var max_block_per_crawl = 1;
 var target_crawl_height;
 var txs_count = 0;
+var crawled_block_height_progress = 0;
+var latest_block_height = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 //------------------------------------------------------------------------------
@@ -28,20 +30,44 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
 }
 
 exports.Execute = function () {
-
-  rpc.getStatusAsync([]) // read block height from chain
+  progressDao.getProgressAsync(network_id)
+    .then(function (progressInfo) {
+      txs_count = progressInfo.count;
+      crawled_block_height_progress = progressInfo.height;
+      console.log('DB transaction count progress: ' + txs_count.toString());
+      console.log('crawled_block_height_progress: ', crawled_block_height_progress);
+      return rpc.getPendingTxsAsync([])
+    })
+    .then(async function (data) {
+      const result = JSON.parse(data);
+      console.log(result)
+      const pendingTxList = result.result.tx_hashes;
+      // const pendingTxList = ["12311", "23411", "34511", "45611", "56711", "67811", "78911", "89011", "90111", "12211", "12411", "12511"];
+      let upsertTransactionAsyncList = [];
+      for (let hash of pendingTxList) {
+        const transaction = {
+          hash: hash.toUpperCase(),
+          status: 'pending'
+        }
+        const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+        if (!isExisted) {
+          transaction.number = ++txs_count;
+          validTransactionList.push(transaction);
+          upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+        }
+      }
+      console.log('end')
+      return Promise.all(upsertTransactionAsyncList)
+    })
+    .then(() => {
+      return rpc.getStatusAsync([]) // read block height from chain
+    })
     .then(function (data) {
       // console.log(data);
       var result = JSON.parse(data);
       latest_block_height = +result.result.latest_finalized_block_height;
       console.log('Latest block height: ' + latest_block_height);
-      return progressDao.getProgressAsync(network_id);
-    })
-    .then(function (progressInfo) {
-      var crawled_block_height_progress = progressInfo.height;
-      console.log('crawled_block_height_progress: ', crawled_block_height_progress);
-      txs_count = progressInfo.count;
-      console.log('DB transaction count progress: ' + txs_count.toString());
+
       console.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
       if (latest_block_height >= crawled_block_height_progress) {
@@ -56,7 +82,7 @@ exports.Execute = function () {
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
@@ -101,11 +127,15 @@ exports.Execute = function () {
                   type: txs[j].type,
                   data: txs[j].raw,
                   block_height: blockInfo.height,
-                  timestamp: blockInfo.timestamp
+                  timestamp: blockInfo.timestamp,
+                  status: 'finalized'
                 }
                 const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
                 if (!isExisted) {
                   transaction.number = ++txs_count;
+                  validTransactionList.push(transaction);
+                  upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+                } else {
                   validTransactionList.push(transaction);
                   upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                 }
@@ -142,7 +172,7 @@ exports.Execute = function () {
           // console.log(initialAccounts);
           let getAccountAysncList = [];
           Object.keys(initialAccounts).forEach(function (address, i) {
-            setTimeout(function(){
+            setTimeout(function () {
               console.log(i)
               accountHelper.updateAccountByAddress(address, accountDao)
             }, i * 10);

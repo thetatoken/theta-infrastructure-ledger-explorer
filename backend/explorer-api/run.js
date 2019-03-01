@@ -155,7 +155,7 @@ function pushTopTransactions() {
       // console.log('Latest transaction count: ' + latest_transaction_count.toString());
       var query_txs_count_max = latest_transaction_count;
       var query_txs_count_min = Math.max(0, query_txs_count_max - numberOfTransactions + 1); // pushing 100 blocks initially
-      // console.log('REST api querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
+      console.log('Querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
       //return blockDao.getBlockAsync(123) 
       return transactionDao.getTransactionsAsync(query_txs_count_min, query_txs_count_max)
     })
