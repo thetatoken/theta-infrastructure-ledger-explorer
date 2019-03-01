@@ -38,17 +38,21 @@ function _updateAccountByAddress(address, accountDao, hash) {
     .then(async function (data) {
       address = address.toUpperCase();
       let tmp = JSON.parse(data);
-      const isExist = await accountDao.checkAccountAsync(address);
-      const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
-      const txs_hash_list = accountInfo ? [hash].concat(accountInfo.txs_hash_list.slice(0, 99)) : hash ? [hash] : [];
-      await accountDao.upsertAccountAsync({
-        address,
-        'balance': tmp.result.coins,
-        'sequence': tmp.result.sequence,
-        'reserved_funds': tmp.result.reserved_funds,
-        // 'last_updated_block_height': tmp.result.last_updated_block_height,
-        'txs_hash_list': txs_hash_list
-      });
+      if (tmp.result) {
+        const isExist = await accountDao.checkAccountAsync(address);
+        const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
+        const txs_hash_list = accountInfo ? hash ? [hash].concat(accountInfo.txs_hash_list.slice(0, 99)) : accountInfo.txs_hash_list : hash ? [hash] : [];
+        await accountDao.upsertAccountAsync({
+          address,
+          'balance': tmp.result.coins,
+          'sequence': tmp.result.sequence,
+          'reserved_funds': tmp.result.reserved_funds,
+          // 'last_updated_block_height': tmp.result.last_updated_block_height,
+          'txs_hash_list': txs_hash_list
+        });
+      }else{
+        return;
+      }
     })
     .catch(err => {
       console.log(`Getting ${address} with:`, err);

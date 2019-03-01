@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aerospike": "^3.2.0",
     "bluebird": "^3.5.1",
     "express": "^4.16.2",
     "mongodb": "^3.1.10",
