@@ -5,8 +5,14 @@ import moment from 'moment';
 import { WEI } from 'common/constants';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
+
+export function totalCoinValue(set, key = 'tfuelwei') {
+  //_.forEach(set, v => console.log(_.get(v, `coins.${key}`, 0)))
+  return _.reduce(set, (acc,v) => acc + parseInt(_.get(v, `coins.${key}`, 0)), 0)
+}
+
 export function from(txn, trunc = null) {
-  let a = _.get(txn, 'data.source.address')
+  let a = _.get(txn, 'data.inputs[0].address')
   if(trunc && trunc > 0) {
     a = _.truncate(a, trunc);
   }
@@ -14,7 +20,7 @@ export function from(txn, trunc = null) {
 }
 
 export function to(txn, trunc = null) {
-  let a = _.get(txn, 'data.target.address')
+  let a = _.get(txn, 'data.outputs[0].address')
   if(trunc && trunc > 0) {
     a = _.truncate(a, trunc);
   }
@@ -29,10 +35,10 @@ export function fee(txn) {
 
 export function value(txn) {
   let values = [
-    _.get(txn, 'data.source.coins.tfuelwei'),
-    _.get(txn, 'data.source.coins.thetawei')];
+    totalCoinValue(_.get(txn, 'data.inputs'), 'tfuelwei'),
+    totalCoinValue(_.get(txn, 'data.inputs'), 'thetawei')];
   return _.chain(values)
-    .map(v => v ? new BigNumber(v).dividedBy(WEI) : undefined)
+    .map(v => v ? new BigNumber(v).dividedBy(WEI) : "0")
     .filter(Boolean)
     .map(v => v.toString(10))
     .value();

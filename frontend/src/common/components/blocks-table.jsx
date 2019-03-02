@@ -36,7 +36,7 @@ export default class BlockOverviewTable extends Component {
     // Initial the socket
     if(updateLive && backendAddress) {
       this.socket = socketClient(backendAddress);
-      this.socket.on('event', this.onSocketEvent)
+      this.socket.on('PUSH_TOP_BLOCKS', this.onSocketEvent)
     }
   }
   componentWillUnmount() {

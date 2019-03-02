@@ -29,7 +29,7 @@ export default class Transactions extends Component {
   receivedTransactionsEvent = (data) => {
     if (data.data.type == 'transaction_list') {
       this.setState({
-        transactions: data.data.body,
+        transactions: _.orderBy(data.data.body, 'number', 'desc'),
         currentPageNumber: data.data.currentPageNumber,
         totalPageNumber: data.data.totalPageNumber
       })
@@ -52,7 +52,7 @@ export default class Transactions extends Component {
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
 
-    console.log(transactions)
+    //console.log(transactions);
     return (
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>

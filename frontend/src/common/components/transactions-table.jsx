@@ -37,7 +37,7 @@ export default class TransactionTable extends Component {
     // Initial the socket
     if(updateLive && backendAddress) {
       this.socket = socketClient(backendAddress);
-      this.socket.on('event', this.onSocketEvent) 
+      this.socket.on('PUSH_TOP_TXS', this.onSocketEvent) 
     }
   }
   componentWillUnmount() {
@@ -58,6 +58,7 @@ export default class TransactionTable extends Component {
   render() {
     const { className, includeDetails, truncate } = this.props;
     const { transactions } = this.state;
+    console.log(transactions)
     return (
       <table className={cx("data txn-table", className)}>
         <thead>
@@ -70,7 +71,7 @@ export default class TransactionTable extends Component {
               <th className="age">Age</th>
               <th className="from">From</th>
               <th className="to">To</th>
-              <th className="value">value</th>
+              { /* <th className="value">value</th> */ }
             </React.Fragment>}
           </tr>
         </thead>
@@ -86,7 +87,7 @@ export default class TransactionTable extends Component {
                   <td className="age" title={ date(txn) }>{ age(txn) }</td>
                   <td className="from"><a href={`/account/${from(txn)}`}>{ from(txn, 16) }</a></td>
                   <td className="to"><a href={`/account/${to(txn)}`}>{ to(txn, 16) }</a></td>
-                  <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td>
+                  { /* <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td> */ }
                 </React.Fragment>}
               </tr>);
           })}
