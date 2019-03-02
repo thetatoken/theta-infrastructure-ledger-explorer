@@ -7,7 +7,7 @@ import cx from 'classnames';
 
 import { truncateMiddle } from 'common/helpers/utils';
 import { from, to, fee, value, hash, age, date, type } from 'common/helpers/transactions';
-import { TxnTypes, TxnClasses } from 'common/constants';
+import { TxnTypeText, TxnClasses } from 'common/constants';
 
 
 
@@ -58,6 +58,7 @@ export default class TransactionTable extends Component {
   render() {
     const { className, includeDetails, truncate } = this.props;
     const { transactions } = this.state;
+    console.log(transactions)
     return (
       <table className={cx("data txn-table", className)}>
         <thead>

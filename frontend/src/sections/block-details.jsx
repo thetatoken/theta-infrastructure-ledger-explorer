@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { blocksService } from 'common/services/block';
 import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist'; 
-import { BlockStatus, TxnTypes, TxnClasses } from 'common/constants';
+import { BlockStatus, TxnTypeText, TxnClasses } from 'common/constants';
 import { date, hash } from 'common/helpers/blocks';
 
 
@@ -142,7 +142,7 @@ const Transaction = props => {
   console.log(txn)
   return(
     <div className="block-txn">
-      <span className={cx("txn-type",TxnClasses[type])}>{ TxnTypes[type] }</span>
+      <span className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</span>
       <a href={`/txs/${hash}`}>{ hash }</a>
     </div>)
 }

@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 
-import { TxnTypes, TxnStatus, WEI } from 'common/constants';
+import { TxnTypes, TxnTypeText, TxnStatus, WEI } from 'common/constants';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
 
@@ -12,7 +12,29 @@ export function totalCoinValue(set, key = 'tfuelwei') {
 }
 
 export function from(txn, trunc = null) {
-  let a = _.get(txn, 'data.inputs[0].address')
+  let a;
+  if([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
+    a = _.get(txn, 'data.source.address');
+  } else if(txn.type === TxnTypes.SPLIT_CONTRACT) {
+    a = _.get(txn, 'data.initiator.address');
+  } else {
+    a = _.get(txn, 'data.inputs[0].address');
+  }
+  
+  if(trunc && trunc > 0) {
+    a = _.truncate(a, trunc);
+  }
+  return a;
+}
+
+export function to(txn, trunc = null) {
+  let a;
+  if(txn.type === TxnTypes.SERVICE_PAYMENT) {
+    a = _.get(txn, 'data.target.address');
+  } else {
+    a = _.get(txn, 'data.outputs[0].address');
+  }
+
   if(trunc && trunc > 0) {
     a = _.truncate(a, trunc);
   }
@@ -23,7 +45,7 @@ export function type(txn) {
   if(txn.status === TxnStatus.PENDING) {
     return status(txn);
   }
-  return TxnTypes[txn.type];
+  return TxnTypeText[txn.type];
 }
 
 
@@ -34,13 +56,7 @@ export function status(txn) {
   return _.capitalize(txn.status);
 }
 
-export function to(txn, trunc = null) {
-  let a = _.get(txn, 'data.outputs[0].address')
-  if(trunc && trunc > 0) {
-    a = _.truncate(a, trunc);
-  }
-  return a;
-}
+
 
 export function fee(txn) {
   let f = _.get(txn, 'data.fee.tfuelwei');

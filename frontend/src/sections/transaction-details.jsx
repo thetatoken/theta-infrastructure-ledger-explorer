@@ -3,8 +3,8 @@ import { Link, browserHistory } from 'react-router';
 import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
-import { TxnTypes, TxnClasses } from 'common/constants';
-import { date, age, fee, status } from 'common/helpers/transactions';
+import { TxnTypeText, TxnClasses } from 'common/constants';
+import { date, age, fee, status, type } from 'common/helpers/transactions';
 import { formatCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
@@ -78,7 +78,7 @@ export default class TransactionExplorer extends Component {
             <tbody>
               <tr>
                 <th>Type</th>
-                <td>{ TxnTypes[transaction.type] }</td>
+                <td>{ type(transaction) }</td>
               </tr>
               <tr>
                 <th>status</th>
@@ -95,7 +95,7 @@ export default class TransactionExplorer extends Component {
             </tbody>
           </table>
 
-          <div className={cx("txn-type", TxnClasses[transaction.type])}>{ TxnTypes[transaction.type] }</div>
+          <div className={cx("txn-type", TxnClasses[transaction.type])}>{ type(transaction) }</div>
           { transaction.type === 0 && 
           <Coinbase transaction={transaction} /> }
           { transaction.type === 1 && 
