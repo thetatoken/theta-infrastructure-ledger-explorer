@@ -19,6 +19,10 @@ export function from(txn, trunc = null) {
   return a;
 }
 
+export function status(txn) {
+  return _.capitalize(txn.status);
+}
+
 export function to(txn, trunc = null) {
   let a = _.get(txn, 'data.outputs[0].address')
   if(trunc && trunc > 0) {

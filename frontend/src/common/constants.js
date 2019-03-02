@@ -34,6 +34,7 @@ export const BlockStatus = {
   6: 'Finalized'
 }
 
+
 export const CurrencyLabels = {
   thetawei: 'Theta',
   tfuelwei: 'TFuel',

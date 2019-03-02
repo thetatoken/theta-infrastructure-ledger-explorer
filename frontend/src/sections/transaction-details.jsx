@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
 import { TxnTypes, TxnClasses } from 'common/constants';
-import { date, age, fee } from 'common/helpers/transactions';
+import { date, age, fee, status } from 'common/helpers/transactions';
 import { formatCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
@@ -80,6 +80,10 @@ export default class TransactionExplorer extends Component {
               <tr>
                 <th>Type</th>
                 <td>{ TxnTypes[transaction.type] }</td>
+              </tr>
+              <tr>
+                <th>status</th>
+                <td>{ status(transaction) }</td>
               </tr>
               <tr>
                 <th>Block</th>

@@ -52,7 +52,6 @@ export default class Transactions extends Component {
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
 
-    //console.log(transactions);
     return (
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>
