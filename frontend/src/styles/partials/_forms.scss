@@ -1,0 +1,44 @@
+#{$all-text-inputs},
+textarea {
+  font-size: .875rem;
+  padding: .5rem .5rem;
+  background-color: $color-input-background;
+  color: $color-input-text;
+  border-radius: 0;
+  border: none;
+
+  &:focus {
+    outline: 0;
+  }
+  &[disabled] {
+    background-color: rgba($color-input-background, .20);
+  }
+  &::placeholder {
+      color: $color-input-placeholder;
+  }
+}
+
+select {
+  padding: 5px 10px;
+
+  font-size: .75rem;
+  line-height: .875rem;
+  color: $color-input-text;
+  font-weight: $weight-semi;
+
+  background: transparent;
+  border: 1px solid $color-input-border;
+  border-radius: 0.25rem;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  &:focus {
+    outline: 0;
+  }
+}
+
+.select-container {
+  
+}
+

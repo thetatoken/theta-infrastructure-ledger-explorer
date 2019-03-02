@@ -10,7 +10,7 @@ export const transactionsService = {
   getTopTransactions() {
     return apiService.get(`transactions/range`, { params: { pageNumber: 0, limit: 10 } });
   },
-  getTransactionsByPage(pageNumber) {
-    return apiService.get('transactions/range', { params: { pageNumber: pageNumber, limit: 10 } });
+  getTransactionsByPage(pageNumber, limit = 10) {
+    return apiService.get('transactions/range', { params: { pageNumber, limit } });
   }
 };

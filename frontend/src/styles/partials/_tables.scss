@@ -1,0 +1,107 @@
+table.data {
+  border-collapse: collapse;
+  width: 100%;
+
+  .clickable-row {
+    tr td {
+      cursor: pointer;
+    }
+    
+  }
+  
+  thead th,
+  tbody td,
+  tbody th {
+    text-align: left;
+    padding: .75rem .75rem;
+    font-size: .875rem;
+  }
+  thead {
+    th {
+      text-transform: uppercase;
+      font-size: .75rem;
+      font-weight: $weight-semi;
+      color: $color-font-light;
+    }
+  }
+  tbody {
+    tr {
+      background-color: $color-table-row;
+      &:nth-child(2n) {
+        background-color: $color-table-row-alt;
+      }
+      &:hover td {
+        background-color: lighten($color-table-row, 5%);
+      }
+    }
+    td, 
+    th {
+      color: $color-font-main;
+    }
+  }
+
+  tbody td.hash {
+    white-space: nowrap;
+  }
+
+  tbody td.overflow {
+    white-space: nowrap;
+    overflow-x: hidden; 
+  }
+
+  th.left,
+  td.left { text-align: left; }
+  th.center,
+  td.center { text-align: center; }
+  th.right,
+  td.right { text-align: right; }
+}
+
+$th-width: 150px;
+table.details {
+  width: 100%;
+  table-layout: fixed;
+  background-color: $color-panel;
+  thead tr {
+    th:first-child {
+      width: 7rem;
+      border-bottom: none;
+      padding-left: 1rem;
+    }
+    th {
+      font-family: $font-body;
+      color: $color-font-light;
+      text-align: left;
+      text-transform: uppercase;
+      border-bottom: 1px solid $color-line;
+      padding: 1rem 1rem 1rem 0;
+      font-size: 1.125rem;
+      font-weight: $weight-semi;
+    }
+  }
+  tbody tr {
+    th,
+    td {
+      padding: 1rem 1rem 1rem 0;
+    }
+    th {
+      width: $th-width;
+      white-space: nowrap;
+      text-align: left;
+      text-transform: uppercase;
+      color: $color-font-light;
+      font-size: .875rem;
+      font-weight: $weight-medium;
+      padding-left: 1rem;
+      vertical-align: top;
+    }
+    td {
+      width: 75%;
+      text-align: left;
+      border-bottom: 1px solid $color-line;
+    }
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}

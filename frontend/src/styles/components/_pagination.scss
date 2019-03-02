@@ -1,9 +1,10 @@
-.th-pagination {  
-  display: flex;
-  width: 100%;
-  & ul{
-    width: 80%;
-    margin-left: 10%;
+.th-pagination { 
+  @include row();
+  margin-top: 2rem;
+
+  & ul {
+    width: 100%;
+    margin: 0;
     padding: 0;
     list-style: none;
     display: flex;
@@ -25,8 +26,8 @@
       }
     }
   }
-  &--lg {
-    & ul{
+  &.lg {
+    & ul {
       .page-link {
         min-width: 38px;
         height: 38px;

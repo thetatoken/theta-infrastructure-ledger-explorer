@@ -1,0 +1,29 @@
+table.data.txn-table {
+  tr .type {
+    white-space: nowrap;
+    &:before {
+      content: '';
+      display: inline-block;
+      top: 4px;
+      position: relative;
+      width: 18px;
+      height: 18px;
+      margin-right: .5rem;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+  }
+  tr.coinbase .type:before { background-image: url('/images/icons/icon_coinbase@2x.png'); }
+  tr.send .type:before { background-image: url('/images/icons/icon_send@2x.png'); }
+  tr.service-payment .type:before { background-image: url('/images/icons/icon_servicepayment@2x.png'); }
+  tr.split-contract .type:before { background-image: url('/images/icons/icon_splitcontract@2x.png'); }
+  tr.reserve .type:before { background-image: url('/images/icons/icon_reservefund@2x.png'); }
+  tr.release .type:before { background-image: url('/images/icons/icon_releasefund@2x.png'); }
+  tr.slash .type:before { background-image: url('/images/icons/icon_slash@2x.png'); }
+  tr.update-validators .type:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
+
+  td.age {
+    white-space: nowrap;
+  }
+}

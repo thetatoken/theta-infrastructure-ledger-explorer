@@ -1,40 +1,38 @@
 
-.theta-header{
-  height: 60px;
-  display: flex;
-  justify-content: space-between;
-  padding-left: 140px;
-  padding-right: 140px;
+.theta-header {
+  @include row($justify: space-between, $align: flex-start);
+  max-width: 1100px;
+  margin: 0 auto 0;
+  padding: 1.5rem 0 0;
 
   a{
     text-decoration: none;
   }
 
-  &__logo{
+  .theta-logo {
     height: 40px;
-    width: 120px;
-    margin: 0;
-    text-align: center;
-    line-height: 40px;
-    color: white;
-    font-size: 24px;
+    width: 116px;
+    margin: 0 3rem 0 0;
 
-    &:actice{
-      color: white;
-    }
+    background: url("/images/logo_theta-explorer@2x.png");
+    @include backgroundImage($url: "/images/logo_theta-explorer@2x.png");
+
   }
-  &__navigator{
-    height: 60px;
-    // margin: 0 0 0 120px;
+
+  .nav {
     display: flex;
 
-    &--button{
-      margin: 21px;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      line-height: 15px;
+    a {
+      font-family: $font-title;
+      font-weight: $weight-bold;
+      padding: .65rem;
+      margin-right: 1rem;
+      
+      color: $color-font-main;
+      font-size: 1rem;
+      line-height: 1rem;
+      letter-spacing: 3px;
+
       background: white;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -49,28 +47,18 @@
       }
     }
   }
-  &__blank{
-    flex: 1;
-  }
-  &__search{
-    height: 60px;
+
+  .nav-search {
     display: flex;
     align-items: center;
     color: $th-body;
 
-    &--input{
-      height: 20px;
-      font-size: 15px;
-      width: 150px;
-      line-height: 1.5;
-      border: 1px solid $th-blue;
-      border-radius: .25rem 0 0 .25rem;
-      padding: 5px 10px;
+    .search-input {
+      width: 16rem;
     }
 
-    &--select{
-      position: relative;
-      width: 125px;
+    .search-select {
+      width: 7rem;
       margin: 0 10px;
 
       &::after {
@@ -79,30 +67,21 @@
         height: 0;
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
-        border-top: 6px solid $th-blue;
+        border-top: 6px solid $color-input-text;
         position: absolute;
         right: 5px;
         top: 12px;
         pointer-events: none;
       }
 
-      & select{
+      select {
         height: 32px;
         width: 100%;
-        font-size: 15px;
-        font-family: "AlwynNew", sans-serif;
-        padding: 5px 10px;
         display: inline-block;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border: 1px solid $th-blue;
-        border-radius: 0 0.25rem 0.25rem 0;
-        color: $th-body;
       }
     }
 
-    &--button{
+    .search-button {
       height: 30px;
       width: 20px;
       border-radius: 0.25rem .25rem .25rem 0.25rem;
@@ -115,29 +94,25 @@
         @include linearVerticalGradient($th-blue, $th-green);
       }
     }
+
+    
+    .svg-icon {
+      width: 80%;
+      height: 80%;
+      display: block;
+      margin: auto;
+    }
+
+    .svg-icon path,
+    .svg-icon polygon,
+    .svg-icon rect {
+      fill: $th-white;
+    }
+
+    .svg-icon circle {
+      stroke: $th-white;
+      stroke-width: 1;
+    }
   }
 }
-.theta-logo{
-  height: 25px;
-  width: 90px;
-  background: url("/images/nav-logo.png");
-  background-size: 90px 25px;
-  margin-top: 17px;
-}
-.svg-icon {
-  width: 80%;
-  height: 80%;
-  display: block;
-  margin: auto;
-}
 
-.svg-icon path,
-.svg-icon polygon,
-.svg-icon rect {
-  fill: $th-white;
-}
-
-.svg-icon circle {
-  stroke: $th-white;
-  stroke-width: 1;
-}

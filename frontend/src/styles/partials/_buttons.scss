@@ -1,0 +1,70 @@
+#{$all-button-inputs},
+.btn,
+a.btn {
+  position: relative;
+  display: inline-block;
+
+  border: none;
+
+  color: $color-font-button;
+  font-family: $font-title;
+  font-weight: $weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  white-space: nowrap;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+
+  outline: none;
+  cursor: pointer;
+
+  transition: all .25s;
+
+  @include buttonGradient();
+
+  &:hover {
+    color: $color-font-button;
+  }
+
+  i {
+    top: 1px;
+    margin: 0;
+    margin-left: -2%;
+  }
+
+    // Default size
+  &,
+  &.m {
+    font-size: 1rem;
+    line-height: 1rem;
+    padding: .75rem 1.125rem;
+
+    i {
+      font-size: 1.125rem;
+      line-height: 1.125rem;
+      margin-right: .5rem;
+    }
+  }
+
+  &,
+  &.s {
+    font-size: .875rem;
+    line-height: 1rem;
+    padding: .375rem 1rem;
+
+    i {
+      font-size: 1.125rem;
+      line-height: 1.125rem;
+      margin-right: .5rem;
+    }
+  }
+}
+
+.button-list {
+  @include row($align: center);
+  &.split {
+    justify-content: space-between;
+  }
+}
