@@ -28,6 +28,9 @@ export function type(txn) {
 
 
 export function status(txn) {
+  if(!txn.status) {
+    return "Finalized";
+  }
   return _.capitalize(txn.status);
 }
 
