@@ -6,7 +6,6 @@ import BigNumber from 'bignumber.js';
 
 import { formatCoin } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
-import AccountExplorerTable from './account/components/account-explorer-table';
 import { accountService } from 'common/services/account';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';

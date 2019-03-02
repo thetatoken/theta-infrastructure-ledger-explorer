@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 import cx from 'classnames';
 
-import BlockExplorerTable from './blocks/components/block-explorer-table';
 import { blocksService } from 'common/services/block';
 import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist'; 
