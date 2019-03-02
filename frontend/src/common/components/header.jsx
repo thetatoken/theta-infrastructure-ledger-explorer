@@ -9,7 +9,6 @@ export default class Header extends Component {
     this.handleSearch = this.handleSearch.bind(this);
   }
   handleSearch() {
-    const type = this.searchType.value;
     const value = this.searchInput.value;
     switch (this.searchType.value) {
       case 'address':

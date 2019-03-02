@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Link, browserHistory } from 'react-router';
+import { Link } from 'react-router';
 import cx from 'classnames';
-import BigNumber from 'bignumber.js';
 
 
 import { formatCoin } from 'common/helpers/utils';
@@ -60,33 +59,32 @@ export default class AccountDetails extends Component {
     }
   }
   render() {
-    const { accountAddress } = this.props.params;
     const { account, errorType } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
-        { errorType === 'error_not_found' && 
-        <NotExist msg="Note: An account will not be created until the first time it receives some tokens."/>}
-        { account && !errorType && 
-        <React.Fragment>
-          <table className="details account-info">
-            <thead>
-              <tr>
-                <th>Address</th>
-                <th>{account.address}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <DetailsRow label="Balance" data={ <Balance balance={account.balance} /> } />
-              <DetailsRow label="Sequence" data={ account.sequence } />
-            </tbody>
-          </table>
-          <table className="details account-txns">
-            <tbody>
-              <DetailsRow label="Recent Transactions" data={ <HashList hashes={account.txs_hash_list} /> } />
-            </tbody>
-          </table>
-        </React.Fragment>}
+        {errorType === 'error_not_found' &&
+          <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />}
+        {account && !errorType &&
+          <React.Fragment>
+            <table className="details account-info">
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>{account.address}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DetailsRow label="Balance" data={<Balance balance={account.balance} />} />
+                <DetailsRow label="Sequence" data={account.sequence} />
+              </tbody>
+            </table>
+            <table className="details account-txns">
+              <tbody>
+                <DetailsRow label="Recent Transactions" data={<HashList hashes={account.txs_hash_list} />} />
+              </tbody>
+            </table>
+          </React.Fragment>}
       </div>
     );
   }
@@ -95,18 +93,18 @@ export default class AccountDetails extends Component {
 const Balance = ({ balance }) => {
   return (
     <React.Fragment>
-     { _.map(balance, (v,k) => <div key={k} className={cx("currency", k)}>{`${formatCoin(v)} ${CurrencyLabels[k] || k}` }</div>) }
+      {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>{`${formatCoin(v)} ${CurrencyLabels[k] || k}`}</div>)}
     </React.Fragment>)
 }
 
 const Address = ({ hash }) => {
-  return(<a href={`/account/${hash}`} target="_blank">{ hash }</a>)
+  return (<a href={`/account/${hash}`} target="_blank">{hash}</a>)
 }
 
-const HashList = ({hashes}) => {
+const HashList = ({ hashes }) => {
   return (
     <React.Fragment>
-      {_.map(_.compact(hashes), (hash,i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
+      {_.map(_.compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
     </React.Fragment>
   )
 }

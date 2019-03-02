@@ -139,7 +139,6 @@ export default class BlocksExplorer extends Component {
 const Transaction = props => {
   let { txn } = props;
   let { hash, type } = txn;
-  console.log(txn)
   return(
     <div className="block-txn">
       <span className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</span>
