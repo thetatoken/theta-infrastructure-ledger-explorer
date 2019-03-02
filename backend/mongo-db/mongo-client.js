@@ -132,3 +132,17 @@ exports.query = function (collectionName, queryObject, callback) {
     callback(err, res);
   });
 }
+exports.getTotal = function (collectionName, callback) {
+  var collection = _db.collection(collectionName);
+  collection.count(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
+exports.getTopRecords = function (collectionName, queryObject, limitNumber, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find().sort(queryObject).collation({ locale: "en_US", numericOrdering: true }).limit(limitNumber).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}

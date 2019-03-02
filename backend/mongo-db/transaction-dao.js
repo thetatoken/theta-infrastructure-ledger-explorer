@@ -22,7 +22,8 @@ module.exports = class TransactionDAO {
       'data': transactionInfo.data,
       'number': transactionInfo.number,
       'block_height': transactionInfo.block_height,
-      'timestamp': transactionInfo.timestamp
+      'timestamp': transactionInfo.timestamp,
+      'status': transactionInfo.status
     }
     const queryObject = { '_id': newObject.hash };
     this.client.upsert(this.transactionInfoCollection, queryObject, newObject, callback);
@@ -49,13 +50,13 @@ module.exports = class TransactionDAO {
         transactionInfo.data = recordList[i].data;
         transactionInfo.number = recordList[i].number;
         transactionInfo.block_height = recordList[i].block_height;
-        transactionInfo.timestamp = transactionInfo.timestamp;
+        transactionInfo.timestamp = recordList[i].timestamp;
+        transactionInfo.status = recordList[i].status;
         transactionInfoList.push(transactionInfo)
       }
       callback(error, transactionInfoList)
     })
   }
-
   getTransactionByPk(pk, callback) {
     const queryObject = { '_id': pk.toUpperCase() };
     this.client.findOne(this.transactionInfoCollection, queryObject, function (error, record) {
@@ -72,8 +73,19 @@ module.exports = class TransactionDAO {
         transactionInfo.number = record.number;
         transactionInfo.block_height = record.block_height;
         transactionInfo.timestamp = record.timestamp;
+        transactionInfo.status = record.status;
         callback(error, transactionInfo);
       }
     })
+  }
+  getTotalNumber(callback) {
+    this.client.getTotal(this.transactionInfoCollection, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error);
+      } else {
+        console.log('Calling get total number of txs')
+        callback(error, record);
+      }
+    });
   }
 }
