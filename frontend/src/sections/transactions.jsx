@@ -51,7 +51,6 @@ export default class Transactions extends Component {
     let { currentPageNumber, totalPageNumber } = this.state;
     currentPageNumber = Number(currentPageNumber);
     totalPageNumber = Number(totalPageNumber);
-
     return (
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>

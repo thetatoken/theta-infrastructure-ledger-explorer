@@ -79,7 +79,7 @@ export default class BlocksExplorer extends Component {
         <NotExist msg="This block information is coming soon." />}
         { block && !errorType &&
         <React.Fragment>
-          <table className="txn-info data">
+          <table className="txn-info details">
             <tbody>
               <tr>
                 <th>Height</th>
@@ -98,7 +98,7 @@ export default class BlocksExplorer extends Component {
                 <td>{ hash(block) }</td>
               </tr>
               <tr>
-                <th>Previous Block Hash</th>
+                <th>Previous Block</th>
                 <td>{ block.parent_hash }</td>
               </tr>
               <tr>
@@ -114,7 +114,7 @@ export default class BlocksExplorer extends Component {
                 <td>{ block.transactions_hash }</td>
               </tr>
               <tr>
-                <th>Number of Transactions</th>
+                <th># of Transactions</th>
                 <td>{ block.num_txs }</td>
               </tr>
               <tr className="transactions">

@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import moment from 'moment';
 
-import { WEI } from 'common/constants';
+import { TxnTypes, TxnStatus, WEI } from 'common/constants';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
 
@@ -18,6 +18,14 @@ export function from(txn, trunc = null) {
   }
   return a;
 }
+
+export function type(txn) {
+  if(txn.status === TxnStatus.PENDING) {
+    return status(txn);
+  }
+  return TxnTypes[txn.type];
+}
+
 
 export function status(txn) {
   return _.capitalize(txn.status);

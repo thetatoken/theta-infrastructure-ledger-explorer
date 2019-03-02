@@ -12,6 +12,11 @@ export const TxnTypes = {
   '7': 'Update Validators'
 }
 
+export const TxnStatus = {
+  FINALIZED: 'finalized',
+  PENDING: 'pending',
+}
+
 export const TxnClasses = {
   '0': 'coinbase',
   '1': 'slash',

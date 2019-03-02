@@ -6,7 +6,7 @@ import _ from 'lodash';
 import cx from 'classnames';
 
 import { truncateMiddle } from 'common/helpers/utils';
-import { from, to, fee, value, hash, age, date } from 'common/helpers/transactions';
+import { from, to, fee, value, hash, age, date, type } from 'common/helpers/transactions';
 import { TxnTypes, TxnClasses } from 'common/constants';
 
 
@@ -58,7 +58,6 @@ export default class TransactionTable extends Component {
   render() {
     const { className, includeDetails, truncate } = this.props;
     const { transactions } = this.state;
-    console.log(transactions)
     return (
       <table className={cx("data txn-table", className)}>
         <thead>
@@ -79,7 +78,7 @@ export default class TransactionTable extends Component {
           {_.map(transactions, txn => {
             return (
               <tr key={txn.hash} className={ TxnClasses[txn.type] }>
-                <td className="type">{ TxnTypes[txn.type] }</td>
+                <td className="type">{ type(txn) }</td>
                 <td className="overflow"><Link to={`/txs/${txn.hash}`}>{ hash(txn, truncate) }</Link></td>
                 { includeDetails &&
                 <React.Fragment>
