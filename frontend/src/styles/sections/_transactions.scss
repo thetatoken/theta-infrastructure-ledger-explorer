@@ -33,6 +33,12 @@
     }
 
   }
+
+  @include breakpoint('tablet', max) {
+    .txn-type {
+      margin-left: 1rem;
+    }
+  }
   
 }
 

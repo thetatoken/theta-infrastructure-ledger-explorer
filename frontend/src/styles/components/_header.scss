@@ -14,12 +14,13 @@
 
   .nav {
     display: flex;
+    flex: 1 0 auto;
 
     .theta-logo {
       flex: 0 0 116px;
       height: 40px;
       width: 116px;
-      margin: 0 3rem 0 0;
+      margin: 0 7% 0 0;
 
       background: url("/images/logo_theta-explorer@2x.png");
       @include backgroundImage($url: "/images/logo_theta-explorer@2x.png");
@@ -29,7 +30,8 @@
       font-family: $font-title;
       font-weight: $weight-bold;
       padding: .65rem;
-      margin-right: 1rem;
+      margin-right: 5%;
+      //margin-right: 1rem;
       
       color: $color-font-main;
       font-size: 1rem;

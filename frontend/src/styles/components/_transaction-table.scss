@@ -1,6 +1,10 @@
 table.data.txn-table {
   
-
+  thead tr .type {
+    &:before {
+      height: 1px;
+    }
+  }
   tr .type {
     white-space: nowrap;
     width: 170px;
@@ -29,8 +33,6 @@ table.data.txn-table {
   td.age {
     white-space: nowrap;
   }
-
-
 
   @include breakpoint('tablet-wide', max) {
     table-layout: fixed;

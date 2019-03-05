@@ -4,5 +4,20 @@
     tbody th {
       width: 200px;
     }
+    tbody tr td div {
+      white-space: nowrap;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
   }
+
+  @include breakpoint('tablet', max) {
+    table.details.account-txns {
+      tbody tr th {
+        content: 'Transactions';
+      }
+
+    }
+  }
+  
 }

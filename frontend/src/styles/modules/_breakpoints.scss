@@ -9,11 +9,7 @@ $breakpoints: (
         "desktop":      1248px,
         "desktop-wide": 1440px,
         //Custom
-        "1060px":       1060px,
-        "950px":       950px,
-        "920px":       920px,
-        "820px":       820px,
-        "600px":       600px,
+        "max-width":   1100px,
 );
 
 @mixin breakpoint($width, $type: min) {

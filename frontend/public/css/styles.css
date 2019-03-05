@@ -568,14 +568,17 @@ table.details {
   .theta-header .nav {
     display: -webkit-box;
     display: -ms-flexbox;
-    display: flex; }
+    display: flex;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto; }
     .theta-header .nav .theta-logo {
       -webkit-box-flex: 0;
       -ms-flex: 0 0 116px;
       flex: 0 0 116px;
       height: 40px;
       width: 116px;
-      margin: 0 3rem 0 0;
+      margin: 0 7% 0 0;
       background: url("/images/logo_theta-explorer@2x.png");
       background-image: url("/images/logo_theta-explorer@2x.png");
       background-position: center center;
@@ -585,7 +588,7 @@ table.details {
       font-family: "Rift", "Helvetica", sans-serif;
       font-weight: 700;
       padding: .65rem;
-      margin-right: 1rem;
+      margin-right: 5%;
       color: #ffffff;
       font-size: 1rem;
       line-height: 1rem;
@@ -802,6 +805,9 @@ table.details {
       border-color: transparent;
       cursor: pointer; }
 
+table.data.txn-table thead tr .type:before {
+  height: 1px; }
+
 table.data.txn-table tr .type {
   white-space: nowrap;
   width: 170px; }
@@ -954,9 +960,15 @@ table.data.block-table {
     -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
-    width: 50%; }
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 calc(50% - 2rem);
+    flex: 0 0 calc(50% - 2rem); }
+    .home .overview > * table {
+      table-layout: fixed; }
+      .home .overview > * table tr .hash {
+        width: auto; }
     .home .overview > *:first-child {
-      margin-right: 3rem; }
+      margin-right: 2rem; }
     .home .overview > * .btn {
       margin: 1rem 0 0; }
     .home .overview > * .block-table,
@@ -966,6 +978,18 @@ table.data.block-table {
     width: 14px;
     height: 14px;
     top: 2px; }
+
+@media only screen and (max-width: 767px) {
+  .home .overview {
+    margin-top: 0rem;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column;
+    flex-flow: column; }
+    .home .overview > *:first-child {
+      margin-right: 0rem; }
+    .home .overview .page-title {
+      margin-bottom: 1rem !important; } }
 
 .content.transaction-details .txn-type {
   margin: 3rem 0 .75rem;
@@ -999,6 +1023,10 @@ table.data.block-table {
     border-bottom: none; }
   .content.transaction-details .coinbase-output > *:first-child {
     margin-right: 1rem; }
+
+@media only screen and (max-width: 767px) {
+  .content.transaction-details .txn-type {
+    margin-left: 1rem; } }
 
 .txn-type:before {
   content: '';
@@ -1040,6 +1068,14 @@ table.data.block-table {
   margin-top: 2rem; }
   .content.account table.details.account-txns tbody th {
     width: 200px; }
+  .content.account table.details.account-txns tbody tr td div {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis; }
+
+@media only screen and (max-width: 767px) {
+  .content.account table.details.account-txns tbody tr th {
+    content: 'Transactions'; } }
 
 .content.block-details .button-list {
   margin-top: 2rem; }

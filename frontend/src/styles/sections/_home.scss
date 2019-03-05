@@ -5,9 +5,13 @@
 
     & > * {
       @include column($align: center);
-      width: 50%;
+      flex: 0 0 calc(50% - 2rem);
+      table {
+        table-layout: fixed;
+        tr .hash { width: auto; }
+      }
       &:first-child {
-        margin-right: 3rem;
+        margin-right: 2rem;
       }
       .btn {
         margin: 1rem 0 0;
@@ -17,11 +21,22 @@
         width: 100%;
       }
     }
-    
+
     .txn-table td.type:before {
       width: 14px;
       height: 14px;
       top: 2px;
+    }
+  }
+
+  @include breakpoint('tablet', max) {
+    .overview {
+      margin-top: 0rem;
+      flex-flow: column;
+      & > *:first-child { margin-right: 0rem; }
+      .page-title {
+        margin-bottom: 1rem !important;
+      }
     }
   }
 }
