@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { browserHistory } from 'react-router';
 
 import { blocksService } from 'common/services/block';
 import BlocksTable from "common/components/blocks-table";
@@ -56,15 +55,15 @@ export default class Blocks extends Component {
     return (
       <div className="content blocks">
         <div className="page-title blocks">Blocks</div>
-        <BlocksTable 
+        <BlocksTable
           blocks={blockInfoList}
-          truncate={ 70 } />
+          truncate={70} />
         <Pagination
           size={'lg'}
           totalPages={totalPageNumber}
           currentPage={currentPageNumber}
           callback={this.handleGetBlocksByPage}
-           />
+        />
       </div>
     );
   }

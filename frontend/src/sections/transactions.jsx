@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
-import { Link } from "react-router";
 
 import { transactionsService } from 'common/services/transaction';
 import Pagination from "common/components/pagination";
