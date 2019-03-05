@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 
+import { getQueryParam } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import Pagination from "common/components/pagination";
 import TransactionTable from "common/components/transactions-table";

@@ -1073,6 +1073,9 @@ table.data.block-table {
     overflow-x: hidden;
     text-overflow: ellipsis; }
 
+.content.account table.data.txn-table {
+  margin-top: 3rem; }
+
 @media only screen and (max-width: 767px) {
   .content.account table.details.account-txns tbody tr th {
     content: 'Transactions'; } }
