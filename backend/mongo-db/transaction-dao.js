@@ -17,7 +17,7 @@ module.exports = class TransactionDAO {
 
   upsertTransaction(transactionInfo, callback) {
     const newObject = {
-      'hash': transactionInfo.hash.toUpperCase(),
+      'hash': transactionInfo.hash,
       'type': transactionInfo.type,
       'data': transactionInfo.data,
       'number': transactionInfo.number,
@@ -58,7 +58,7 @@ module.exports = class TransactionDAO {
     })
   }
   getTransactionByPk(pk, callback) {
-    const queryObject = { '_id': pk.toUpperCase() };
+    const queryObject = { '_id': pk };
     this.client.findOne(this.transactionInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - ', error, pk);

@@ -51,7 +51,7 @@ exports.updateAccountByAddress = _updateAccountByAddress;
 function _updateAccountByAddress(address, accountDao, hash) {
   rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
-      address = address.toUpperCase();
+      address = address;
       let tmp = JSON.parse(data);
       if (tmp.result) {
         const isExist = await accountDao.checkAccountAsync(address);

@@ -6,7 +6,7 @@ var accountTxRouter = (app, accountTxDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/accountTx/:address", async (req, res) => {
-    const address = req.params.address.toUpperCase();
+    const address = req.params.address;
     let { type, isEqualType, pageNumber, limitNumber } = req.query;
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);

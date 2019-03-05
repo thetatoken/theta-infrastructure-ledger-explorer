@@ -13,8 +13,6 @@ module.exports = class AccountTxDAO {
 
   upsertInfo(info, callback) {
     const newObject = {
-      // 'account_address': info.address.toUpperCase(),
-      // 'tx_hash': info.tx_hash,
       'tx_type': info.tx_type,
       'timestamp': info.timestamp
     }

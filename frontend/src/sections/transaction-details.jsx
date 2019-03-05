@@ -29,11 +29,11 @@ export default class TransactionExplorer extends Component {
   }
   componentDidMount() {
     const { transactionHash } = this.props.params;
-    this.getOneTransactionByUuid(transactionHash.toUpperCase());
+    this.getOneTransactionByUuid(transactionHash.toLowerCase());
   }
   getOneTransactionByUuid(hash) {
     if (hash) {
-      transactionsService.getOneTransactionByUuid(hash.toUpperCase())
+      transactionsService.getOneTransactionByUuid(hash.toLowerCase())
         .then(res => {
           switch (res.data.type) {
             case 'transaction':
@@ -61,6 +61,7 @@ export default class TransactionExplorer extends Component {
   render() {
     const { transactionHash } = this.props.params;
     const { transaction, errorType } = this.state;
+    console.log(transaction);
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
