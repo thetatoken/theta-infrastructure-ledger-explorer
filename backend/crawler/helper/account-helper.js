@@ -1,34 +1,49 @@
 var rpc = require('../api/rpc.js');
 
-exports.updateAccount = function (accountDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, transactionList) {
   // console.log('transactionList', transactionList);
-  transactionList.forEach(async function (tx) {
+  // transactionList.forEach(async function (tx) {
+  for (let tx of transactionList) {
     switch (tx.type) { // TODO: Add other type cases
       case 0:
-        await _updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
+        for (let output of tx.data.outputs) {
+          await _updateAccountByAddress(output.address, accountDao, tx.hash);
+          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        }
         break;
       case 2:
         // Update inputs account
-        await _updateAccountByAddress(tx.data.inputs[0].address, accountDao, tx.hash);
+        for (let input of tx.data.intputs) {
+          await _updateAccountByAddress(input.address, accountDao, tx.hash);
+          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        }
         // Update outputs account
-        await _updateAccountByAddress(tx.data.outputs[0].address, accountDao, tx.hash);
+        for (let output of tx.data.outputs) {
+          await _updateAccountByAddress(output.address, accountDao, tx.hash);
+          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        }
         break;
       case 3:
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
+        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         break;
       case 5:
         // Update source account
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.hash);
+        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         // Update target account
         await _updateAccountByAddress(tx.data.target.address, accountDao, tx.hash);
+        await _updateAccountTxMap(tx.data.target.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         break;
       case 6:
         await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.hash);
+        await _updateAccountTxMap(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         break;
       default:
         break;
     }
-  });
+  }
+  // });
 };
 
 exports.updateAccountByAddress = _updateAccountByAddress;
@@ -50,7 +65,7 @@ function _updateAccountByAddress(address, accountDao, hash) {
           // 'last_updated_block_height': tmp.result.last_updated_block_height,
           'txs_hash_list': txs_hash_list
         });
-      }else{
+      } else {
         return;
       }
     })
@@ -62,4 +77,13 @@ function _updateAccountByAddress(address, accountDao, hash) {
         _updateAccountByAddress(address, accountDao, hash)
       }, 100);
     })
+}
+
+function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
+  accountTxDao.upsertInfoAsync({
+    address,
+    'tx_hash': hash,
+    'tx_type': type,
+    timestamp
+  });
 }

@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var accountHelper = require('../../crawler/helper/account-helper');
 
 var accountRouter = (app, accountDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));

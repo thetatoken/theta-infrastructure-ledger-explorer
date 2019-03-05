@@ -146,3 +146,11 @@ exports.getTopRecords = function (collectionName, queryObject, limitNumber, call
     callback(err, res);
   });
 }
+
+exports.getRecords = function (collectionName, queryObject, sortObject, pageNumebr, limitNumber, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find(queryObject).sort(sortObject).skip(pageNumebr).limit(limitNumber).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}

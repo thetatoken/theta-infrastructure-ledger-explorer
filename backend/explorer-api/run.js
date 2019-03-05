@@ -9,11 +9,13 @@ var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
+var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var vcpDaoLib = require('../mongo-db/vcp-dao.js');
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
+var accountTxRouter = require("./routes/accountTxRouter");
 var vcpRouter = require("./routes/vcpRouter");
 var supplyRouter = require("./routes/supplyRouter");
 var cors = require('cors')
@@ -64,6 +66,8 @@ function main() {
       bluebird.promisifyAll(transactionDao);
       accountDao = new accountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountDao);
+      accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(accountTxDao);
       vcpDao = new vcpDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(vcpDao);
       //
@@ -106,6 +110,8 @@ function main() {
       transactionsRouter(app, transactionDao, progressDao, config);
       // account router
       accountRouter(app, accountDao, rpc, config);
+      // account transaction mapping router
+      accountTxRouter(app, accountTxDao, rpc, config);
       // vcp router
       vcpRouter(app, vcpDao, config);
       // supply router
