@@ -46,7 +46,8 @@ table.data {
 
   tbody td.overflow {
     white-space: nowrap;
-    overflow-x: hidden; 
+    overflow-x: hidden;
+    text-overflow: ellipsis; 
   }
 
   th.left,
@@ -55,7 +56,12 @@ table.data {
   td.center { text-align: center; }
   th.right,
   td.right { text-align: right; }
+
+  
 }
+
+
+
 
 $th-width: 150px;
 table.details {

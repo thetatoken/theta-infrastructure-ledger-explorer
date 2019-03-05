@@ -2,6 +2,7 @@
 .theta-header {
   @include row($justify: space-between, $align: flex-start);
   max-width: 1100px;
+  width: 90%;
   margin: 0 auto 0;
   padding: 1.5rem 0 0;
 
@@ -9,20 +10,22 @@
     text-decoration: none;
   }
 
-  .theta-logo {
-    height: 40px;
-    width: 116px;
-    margin: 0 3rem 0 0;
-
-    background: url("/images/logo_theta-explorer@2x.png");
-    @include backgroundImage($url: "/images/logo_theta-explorer@2x.png");
-
-  }
+  
 
   .nav {
     display: flex;
 
-    a {
+    .theta-logo {
+      flex: 0 0 116px;
+      height: 40px;
+      width: 116px;
+      margin: 0 3rem 0 0;
+
+      background: url("/images/logo_theta-explorer@2x.png");
+      @include backgroundImage($url: "/images/logo_theta-explorer@2x.png");
+    }
+
+    a.nav-item {
       font-family: $font-title;
       font-weight: $weight-bold;
       padding: .65rem;
@@ -60,7 +63,7 @@
     .search-select {
       width: 7rem;
       margin: 0 10px;
-
+      
       &::after {
         content: "";
         width: 0;
@@ -114,5 +117,27 @@
       stroke-width: 1;
     }
   }
+
+  
+  @include breakpoint('tablet-wide', max) {
+    .nav-search .search-input { width: 10rem; }
+    .nav-search .search-select { width: 5rem; }
+  }
+  @include breakpoint('tablet', max) {
+    display: block;
+    .flex-spacer { display: none; }
+    .nav-search {
+      width: 80%;
+      margin: 3rem auto 0;
+      @include row($justify: center);
+      .search-input { width: 80%; }
+      .search-select { width: 7rem; }
+    }
+  }
+  @include breakpoint('phablet', max) {
+    width: 95%;
+    .nav .theta-logo { flex: 0 0 80px; }
+  }
+  
 }
 

@@ -28,3 +28,12 @@
   background-repeat: no-repeat;
   background-size: $size;
 }
+
+@mixin hideColumn() {
+  display:none;
+        width:0;
+        height:0;
+        opacity:0;
+        visibility: collapse;
+}
+

@@ -84,6 +84,8 @@ export function hash(txn, trunc = null) {
 }
 
 export function age(txn) {
+  if(!age || _.isNumber(parseInt(txn.timestamp)))
+    return null;
   return moment(parseInt(txn.timestamp) * 1000).fromNow(true);
 }
 

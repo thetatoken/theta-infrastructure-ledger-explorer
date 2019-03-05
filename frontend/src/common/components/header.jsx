@@ -38,12 +38,11 @@ export default class Header extends Component {
   render() {
     return (
       <div className="theta-header">
-        <Link to="/" className="theta-logo"></Link>
         <div className="nav">
-          <Link to="/blocks">Blocks</Link>
-          <Link to="/txs">Transactions</Link>
+          <Link to="/" className="theta-logo"></Link>
+          <Link to="/blocks" className="nav-item">Blocks</Link>
+          <Link to="/txs" className="nav-item">Transactions</Link>
         </div>
-        <div className="flex-spacer"></div>
         <div className="nav-search">
           <input type="text" className="search-input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
           <div className="search-select">

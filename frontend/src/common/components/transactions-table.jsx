@@ -22,7 +22,7 @@ export default class TransactionTable extends Component {
   }
   static defaultProps = {
     includeDetails: true,
-    truncate: 25,
+    truncate: 35,
   }
   static getDerivedStateFromProps(nextProps, prevState) {
     if(nextProps.transactions && nextProps.transactions.length && nextProps.transactions !== prevState.transactions) {
@@ -63,8 +63,8 @@ export default class TransactionTable extends Component {
       <table className={cx("data txn-table", className)}>
         <thead>
           <tr>
-            <th>Type</th>
-            <th>Transaction Hash</th>
+            <th className="type">Type</th>
+            <th className="hash">Txn Hash</th>
             { includeDetails &&
             <React.Fragment>
               <th className="block">Block</th>
@@ -80,13 +80,13 @@ export default class TransactionTable extends Component {
             return (
               <tr key={txn.hash} className={ TxnClasses[txn.type] }>
                 <td className="type">{ type(txn) }</td>
-                <td className="overflow"><Link to={`/txs/${txn.hash}`}>{ hash(txn, truncate) }</Link></td>
+                <td className="hash overflow"><Link to={`/txs/${txn.hash}`}>{ hash(txn, truncate) }</Link></td>
                 { includeDetails &&
                 <React.Fragment>
                   <td className="block">{ txn.block_height }</td>
                   <td className="age" title={ date(txn) }>{ age(txn) }</td>
-                  <td className="from"><a href={`/account/${from(txn)}`}>{ from(txn, 16) }</a></td>
-                  <td className="to"><a href={`/account/${to(txn)}`}>{ to(txn, 16) }</a></td>
+                  <td className="from overflow"><a href={`/account/${from(txn)}`}>{ from(txn, 16) }</a></td>
+                  <td className="to overflow"><a href={`/account/${to(txn)}`}>{ to(txn, 16) }</a></td>
                   { /* <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td> */ }
                 </React.Fragment>}
               </tr>);

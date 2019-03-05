@@ -1,5 +1,32 @@
-table.data.blocks-table {
-  table {
-    width: 100%; 
+table.data.block-table {
+  width: 100%; 
+
+  tr .height { width: 65px; }
+  tr .hash { width: 325px; }
+  tr .txns { width: 65px; }
+  
+  @include breakpoint('tablet-wide', max) {
+    table-layout: fixed;
+    thead th,
+    tbody td,
+    tbody th {
+      text-align: left;
+      padding: .5rem .5rem;
+      font-size: .875rem;
+    }
   }
+  @include breakpoint('tablet', max) {
+    tr .hash { width: 250px; }
+  }
+  @include breakpoint('tablet-small', max) {
+    tr .hash { width: 250px; }
+    tr .fee { @include hideColumn(); }
+  }
+  @include breakpoint('phablet', max) {
+    tr .hash { width: 200px; }
+  }
+  @include breakpoint('phone-wide', max) {
+    tr .age { @include hideColumn(); }
+  }
+  
 }

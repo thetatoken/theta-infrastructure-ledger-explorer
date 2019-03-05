@@ -1,6 +1,9 @@
 table.data.txn-table {
+  
+
   tr .type {
     white-space: nowrap;
+    width: 170px;
     &:before {
       content: '';
       display: inline-block;
@@ -25,5 +28,34 @@ table.data.txn-table {
 
   td.age {
     white-space: nowrap;
+  }
+
+
+
+  @include breakpoint('tablet-wide', max) {
+    table-layout: fixed;
+    tr .age { @include hideColumn(); }
+    tr .block { width: 75px; }
+    thead th,
+    tbody td,
+    tbody th {
+      text-align: left;
+      padding: .5rem .5rem;
+      font-size: .875rem;
+    }
+  }
+  @include breakpoint('tablet-wide', max) {
+    tr .to { @include hideColumn(); }
+    tr .type { width: 150px; }
+  }
+  @include breakpoint('phablet', max) {
+    tr .type:before { display: none; }
+    tr .type { 
+      white-space: normal; 
+      width: 110px; }
+    tr .from { @include hideColumn(); }
+  }
+  @include breakpoint('phone-wide', max) {
+    
   }
 }

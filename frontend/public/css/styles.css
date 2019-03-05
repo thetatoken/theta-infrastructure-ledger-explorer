@@ -280,6 +280,9 @@ body:before {
     width: 90%;
     max-width: 1100px;
     margin: 0 auto 10rem; }
+    @media only screen and (max-width: 767px) {
+      #app-content .content {
+        width: 100%; } }
     #app-content .content .page-title {
       font-family: "Rift", "Helvetica", sans-serif;
       font-size: 1.375rem;
@@ -287,7 +290,7 @@ body:before {
       text-align: center;
       letter-spacing: .375rem;
       width: 80%;
-      margin: 60px auto 40px; }
+      margin: 5rem auto 2.5rem; }
       #app-content .content .page-title.transactions:before, #app-content .content .page-title.account:before, #app-content .content .page-title.blocks:before {
         content: '';
         width: 28px;
@@ -311,6 +314,10 @@ body:before {
         background-position: center center;
         background-repeat: no-repeat;
         background-size: contain; }
+  @media only screen and (max-width: 559px) {
+    #app-content .content .page-title {
+      margin-top: 3rem;
+      margin-bottom: 1.5rem; } }
 
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"],
 textarea {
@@ -471,7 +478,8 @@ table.data {
     white-space: nowrap; }
   table.data tbody td.overflow {
     white-space: nowrap;
-    overflow-x: hidden; }
+    overflow-x: hidden;
+    text-overflow: ellipsis; }
   table.data th.left,
   table.data td.left {
     text-align: left; }
@@ -552,24 +560,28 @@ table.details {
   -ms-flex-align: start;
   align-items: flex-start;
   max-width: 1100px;
+  width: 90%;
   margin: 0 auto 0;
   padding: 1.5rem 0 0; }
   .theta-header a {
     text-decoration: none; }
-  .theta-header .theta-logo {
-    height: 40px;
-    width: 116px;
-    margin: 0 3rem 0 0;
-    background: url("/images/logo_theta-explorer@2x.png");
-    background-image: url("/images/logo_theta-explorer@2x.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: contain; }
   .theta-header .nav {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex; }
-    .theta-header .nav a {
+    .theta-header .nav .theta-logo {
+      -webkit-box-flex: 0;
+      -ms-flex: 0 0 116px;
+      flex: 0 0 116px;
+      height: 40px;
+      width: 116px;
+      margin: 0 3rem 0 0;
+      background: url("/images/logo_theta-explorer@2x.png");
+      background-image: url("/images/logo_theta-explorer@2x.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain; }
+    .theta-header .nav a.nav-item {
       font-family: "Rift", "Helvetica", sans-serif;
       font-weight: 700;
       padding: .65rem;
@@ -584,7 +596,7 @@ table.details {
       position: relative;
       white-space: nowrap;
       overflow: hidden; }
-      .theta-header .nav a:hover {
+      .theta-header .nav a.nav-item:hover {
         background: #29b3eb;
         /* Old browsers */
         /* FF3.6-15 */
@@ -656,6 +668,43 @@ table.details {
     .theta-header .nav-search .svg-icon circle {
       stroke: white;
       stroke-width: 1; }
+  @media only screen and (max-width: 1023px) {
+    .theta-header .nav-search .search-input {
+      width: 10rem; }
+    .theta-header .nav-search .search-select {
+      width: 5rem; } }
+  @media only screen and (max-width: 767px) {
+    .theta-header {
+      display: block; }
+      .theta-header .flex-spacer {
+        display: none; }
+      .theta-header .nav-search {
+        width: 80%;
+        margin: 3rem auto 0;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-flow: row nowrap;
+        flex-flow: row nowrap;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center; }
+        .theta-header .nav-search .search-input {
+          width: 80%; }
+        .theta-header .nav-search .search-select {
+          width: 7rem; } }
+  @media only screen and (max-width: 559px) {
+    .theta-header {
+      width: 95%; }
+      .theta-header .nav .theta-logo {
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 80px;
+        flex: 0 0 80px; } }
 
 .th-link-button {
   text-decoration: none;
@@ -754,7 +803,8 @@ table.details {
       cursor: pointer; }
 
 table.data.txn-table tr .type {
-  white-space: nowrap; }
+  white-space: nowrap;
+  width: 170px; }
   table.data.txn-table tr .type:before {
     content: '';
     display: inline-block;
@@ -794,8 +844,86 @@ table.data.txn-table tr.update-validators .type:before {
 table.data.txn-table td.age {
   white-space: nowrap; }
 
-table.data.blocks-table table {
+@media only screen and (max-width: 1023px) {
+  table.data.txn-table {
+    table-layout: fixed; }
+    table.data.txn-table tr .age {
+      display: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      visibility: collapse; }
+    table.data.txn-table tr .block {
+      width: 75px; }
+    table.data.txn-table thead th,
+    table.data.txn-table tbody td,
+    table.data.txn-table tbody th {
+      text-align: left;
+      padding: .5rem .5rem;
+      font-size: .875rem; } }
+
+@media only screen and (max-width: 1023px) {
+  table.data.txn-table tr .to {
+    display: none;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    visibility: collapse; }
+  table.data.txn-table tr .type {
+    width: 150px; } }
+
+@media only screen and (max-width: 559px) {
+  table.data.txn-table tr .type:before {
+    display: none; }
+  table.data.txn-table tr .type {
+    white-space: normal;
+    width: 110px; }
+  table.data.txn-table tr .from {
+    display: none;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    visibility: collapse; } }
+
+table.data.block-table {
   width: 100%; }
+  table.data.block-table tr .height {
+    width: 65px; }
+  table.data.block-table tr .hash {
+    width: 325px; }
+  table.data.block-table tr .txns {
+    width: 65px; }
+  @media only screen and (max-width: 1023px) {
+    table.data.block-table {
+      table-layout: fixed; }
+      table.data.block-table thead th,
+      table.data.block-table tbody td,
+      table.data.block-table tbody th {
+        text-align: left;
+        padding: .5rem .5rem;
+        font-size: .875rem; } }
+  @media only screen and (max-width: 767px) {
+    table.data.block-table tr .hash {
+      width: 250px; } }
+  @media only screen and (max-width: 639px) {
+    table.data.block-table tr .hash {
+      width: 250px; }
+    table.data.block-table tr .fee {
+      display: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      visibility: collapse; } }
+  @media only screen and (max-width: 559px) {
+    table.data.block-table tr .hash {
+      width: 200px; } }
+  @media only screen and (max-width: 479px) {
+    table.data.block-table tr .age {
+      display: none;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      visibility: collapse; } }
 
 .home .overview {
   margin-top: 5rem;

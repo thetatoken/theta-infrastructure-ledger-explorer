@@ -77,7 +77,7 @@ export default class BlockOverviewTable extends Component {
               return (
                 <tr key={b.height}>
                   <td className="height">{b.height}</td>
-                  <td className="hash"><Link to={`/blocks/${b.height}`}>{ hash(b, truncate ? truncate : undefined) }</Link></td>
+                  <td className="hash overflow"><Link to={`/blocks/${b.height}`}>{ hash(b, truncate ? truncate : undefined) }</Link></td>
                   {includeDetails && 
                   <React.Fragment>
                     <td className="age" title={date(b)}>{ age(b) }</td>
