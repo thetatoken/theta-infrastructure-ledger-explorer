@@ -22,7 +22,7 @@ export default class Dashboard extends Component {
           </div>
 
           <div>
-            <h2 className="page-title transactions">Transactions</h2>
+            <h2 className="page-title transactions"><a href="/txs">Transactions</a></h2>
             <TransactionsTable 
               updateLive={true} 
               backendAddress={ backendAddress }
