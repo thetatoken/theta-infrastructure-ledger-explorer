@@ -13,7 +13,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
         break;
       case 2:
         // Update inputs account
-        for (let input of tx.data.intputs) {
+        for (let input of tx.data.inputs) {
           await _updateAccountByAddress(input.address, accountDao, tx.hash);
           await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         }
