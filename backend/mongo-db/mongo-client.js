@@ -19,8 +19,9 @@ exports.init = function (execDir, hostIp, hostPort, dbName) {
 //  Implementations
 //------------------------------------------------------------------------------
 
-exports.connect = function (callback) {
+exports.connect = function (uri, callback) {
   if (_db) return callback();
+  url = uri ? uri : url;
   console.log(`url is: `, url);
   MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
     if (err) return callback(err)

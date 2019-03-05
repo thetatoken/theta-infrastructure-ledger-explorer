@@ -52,7 +52,7 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
-  mongoClient.connect(function (err) {
+  mongoClient.connect(config.mongo.uri, function (err) {
     if (err) {
       console.log('Mongo connection failed');
       process.exit(1);

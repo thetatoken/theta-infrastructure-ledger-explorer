@@ -58,7 +58,7 @@ function main() {
 
   // connect to mongoDB
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
-  mongoClient.connect(function (error) {
+  mongoClient.connect(config.mongo.uri, function (error) {
     if (error) {
       console.log('Mongo DB connection failed with err: ', error);
       process.exit();
