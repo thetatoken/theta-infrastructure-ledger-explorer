@@ -27,4 +27,11 @@ module.exports = class AccountTxDAO {
     const sortObject = { 'timestamp': -1 };
     this.client.getRecords(this.accountTxInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
+
+  getInfoTotal(address, type, isEqualType, callback) {
+    const pattern = `^${address}_`;
+    const typeObject = isEqualType === 'true' ? type : { $ne: type };
+    const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': typeObject };
+    this.client.getTotal(this.accountTxInfoCollection, queryObject, callback);
+  }
 }
