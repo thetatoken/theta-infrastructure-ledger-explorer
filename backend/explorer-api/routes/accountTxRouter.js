@@ -12,7 +12,6 @@ var accountTxRouter = (app, accountTxDao, transactionDao, rpc) => {
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
-    console.log(`typoe: ${type}, page: ${pageNumber}, limit: ${limitNumber}`)
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > -1 && limitNumber > 0 && limitNumber < 101) {
       accountTxDao.getInfoTotalAsync(address, type, isEqualType)
         .then(number => {
