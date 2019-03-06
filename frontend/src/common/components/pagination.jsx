@@ -32,7 +32,7 @@ export default class Pagination extends React.Component {
     this.props.onPageChange(pageNumber);
   }
 
-  renderPaginationItems() {
+  renderPaginationItems(disabled) {
     const { totalPages, currentPage, maxButtons } = this.props;
     const pageButtons = [];
     const items = totalPages;
@@ -60,29 +60,30 @@ export default class Pagination extends React.Component {
           key={page} 
           onClick={() => this.handleOnPage(page)} 
           active={ page === activePage }
-          className="number">
+          className="number"
+           disabled={disabled}>
           {page + 1}
         </PaginationLink>);
     }
     if (startPage >= 1) {
-      pageButtons.unshift(<Ellipse />);
+      pageButtons.unshift(<Ellipse key="e0" />);
     }
     if (endPage < items - 1) {
-      pageButtons.push(<Ellipse />);
+      pageButtons.push(<Ellipse key="e1" />);
     }
     
     return pageButtons;
   }
 
   render() {
-    let { size, totalPages, isDisabled } = this.props;
+    let { size, totalPages, disabled } = this.props;
     return (
-      <div className={cx('pagination', size, { disabled: isDisabled })}>
-        <PaginationFirst onClick={() => this.handleOnPage(0)} />
-        <PaginationPrev onClick={this.handlePrevious} />
-        {this.renderPaginationItems()}
-        <PaginationNext onClick={this.handleNext} />
-        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} />
+      <div className={cx('pagination', size, { disabled })}>
+        <PaginationFirst onClick={() => this.handleOnPage(0)} disabled={disabled} />
+        <PaginationPrev onClick={this.handlePrevious} disabled={disabled} />
+        {this.renderPaginationItems(disabled)}
+        <PaginationNext onClick={this.handleNext} disabled={disabled} />
+        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} disabled={disabled} />
       </div>);
   }
 }

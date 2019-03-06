@@ -55,6 +55,9 @@
   .ellipse {
     margin-right: 1rem;
     color: $color-font-light;
+    &[disabled] {
+      opacity: .50;
+    }
   }
 
   @include breakpoint('tablet', max) {

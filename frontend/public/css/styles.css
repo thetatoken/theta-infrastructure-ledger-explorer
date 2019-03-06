@@ -391,6 +391,10 @@ a.btn {
   .btn:hover,
   a.btn:hover {
     color: #1B1F2A; }
+  input[type="button"][disabled], input[type="reset"][disabled], input[type="submit"][disabled],
+  .btn[disabled],
+  a.btn[disabled] {
+    opacity: .50; }
   input[type="button"] i, input[type="reset"] i, input[type="submit"] i,
   .btn i,
   a.btn i {
@@ -852,6 +856,8 @@ table.details {
   .pagination .ellipse {
     margin-right: 1rem;
     color: #8A8FB5; }
+    .pagination .ellipse[disabled] {
+      opacity: .50; }
   @media only screen and (max-width: 767px) {
     .pagination .btn {
       margin-right: .25rem;
