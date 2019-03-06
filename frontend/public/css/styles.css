@@ -961,7 +961,8 @@ table.data.txn-table td.age {
 table.data.block-table {
   width: 100%; }
   table.data.block-table tr .height {
-    width: 65px; }
+    width: 65px;
+    white-space: nowrap; }
   table.data.block-table tr .hash {
     width: 325px; }
   table.data.block-table tr .txns {

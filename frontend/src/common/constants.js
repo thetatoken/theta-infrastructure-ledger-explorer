@@ -10,9 +10,10 @@ export const TxnTypes = {
   RELEASE_FUND: 4,
   SERVICE_PAYMENT: 5,
   SPLIT_CONTRACT: 6,
-  UPDATE_VALIDATOR: 7,
+  DEPOSIT_STAKE: 7,
+  WITHDRAW_STAKE: 8,
+  SMART_CONTRACT: 9,
 }
-
 
 export const TxnTypeText = {
   '0': 'Coinbase',
@@ -22,12 +23,9 @@ export const TxnTypeText = {
   '4': 'Release fund',
   '5': 'Service Payment',
   '6': 'Split Contract',
-  '7': 'Update Validators'
-}
-
-export const TxnStatus = {
-  FINALIZED: 'finalized',
-  PENDING: 'pending',
+  '7': 'Deposit Stake',
+  '8': 'Withdraw Stake',
+  '9': 'Smart Contract',
 }
 
 export const TxnClasses = {
@@ -38,9 +36,15 @@ export const TxnClasses = {
   '4': 'release',
   '5': 'service-payment',
   '6': 'split-contract',
-  '7': 'update-validators'
+  '7': 'deposit-stake',
+  '8': 'withdraw-stake',
+  '9': 'smart-contract',
 }
 
+export const TxnStatus = {
+  FINALIZED: 'finalized',
+  PENDING: 'pending',
+}
 
 export const BlockStatus = {
   0: 'Pending',
@@ -51,7 +55,6 @@ export const BlockStatus = {
   5: 'Finalized',
   6: 'Finalized'
 }
-
 
 export const CurrencyLabels = {
   thetawei: 'Theta',

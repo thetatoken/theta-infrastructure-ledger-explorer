@@ -50,6 +50,7 @@ export default class AccountDetails extends Component {
 
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS)
       .then(res => {
+        console.log(res)
         this.setState({ 
           transactions: _.get(res, 'data.body'),
           pageNumber: _.get(res, 'data.currentPageNumber'),
@@ -95,6 +96,7 @@ export default class AccountDetails extends Component {
 
   render() {
     const { account, transactions, currentPage, totalPages, errorType } = this.state;
+    console.log(transactions);
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
