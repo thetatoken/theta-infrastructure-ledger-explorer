@@ -68,7 +68,7 @@ export default class AccountDetails extends Component {
       return;
     }
 
-    accountService.getOneAccountByAddress(address.toUpperCase())
+    accountService.getOneAccountByAddress(address)
       .then(res => {
         switch (res.data.type) {
           case 'account':

@@ -1,7 +1,7 @@
 var path = require('path');
 
 //------------------------------------------------------------------------------
-//  DAO for transaction
+//  DAO for account
 //------------------------------------------------------------------------------
 
 module.exports = class AccountDAO {
@@ -15,7 +15,7 @@ module.exports = class AccountDAO {
   upsertAccount(accountInfo, callback) {
     // console.log('accountInfo in upsert:', accountInfo)
     const newObject = {
-      'address': accountInfo.address.toUpperCase(),
+      'address': accountInfo.address,
       'balance': accountInfo.balance,
       'sequence': accountInfo.sequence,
       'reserved_funds': accountInfo.reserved_funds === null ? 'null' : accountInfo.reserved_funds,

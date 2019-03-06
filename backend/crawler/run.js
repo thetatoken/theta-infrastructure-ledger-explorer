@@ -8,6 +8,7 @@ var progressDaoLib = require('../mongo-db/progress-dao.js');
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
+var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var vcpDaoLib = require('../mongo-db/vcp-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
@@ -57,7 +58,7 @@ function main() {
 
   // connect to mongoDB
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
-  mongoClient.connect(function (error) {
+  mongoClient.connect(config.mongo.uri, function (error) {
     if (error) {
       console.log('Mongo DB connection failed with err: ', error);
       process.exit();
@@ -109,10 +110,13 @@ function setupGetBlockCronJob(mongoClient) {
   accountDao = new accountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountDao);
 
+  accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(accountTxDao);
+
   vcpDao = new vcpDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(vcpDao);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, vcpDao);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, vcpDao);
   // readVcpCronJob.Initialize(progressDao);
   setTimeout(function run() {
     readBlockCronJob.Execute();

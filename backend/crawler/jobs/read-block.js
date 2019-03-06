@@ -11,7 +11,7 @@ var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 1;
+var max_block_per_crawl = 5;
 var target_crawl_height;
 var txs_count = 0;
 var crawled_block_height_progress = 0;
@@ -21,11 +21,12 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, vcpDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, vcpDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
+  accountTxDao = accountTxDaoInstance;
   vcpDao = vcpDaoInstance;
 }
 
@@ -46,7 +47,7 @@ exports.Execute = function () {
       let upsertTransactionAsyncList = [];
       for (let hash of pendingTxList) {
         const transaction = {
-          hash: hash.toUpperCase(),
+          hash: hash,
           status: 'pending'
         }
         const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
@@ -85,7 +86,7 @@ exports.Execute = function () {
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
@@ -130,7 +131,7 @@ exports.Execute = function () {
             if (txs !== undefined && txs.length > 0) {
               for (var j = 0; j < txs.length; j++) {
                 const transaction = {
-                  hash: txs[j].hash.toUpperCase(),
+                  hash: txs[j].hash,
                   type: txs[j].type,
                   data: txs[j].raw,
                   block_height: blockInfo.height,
@@ -157,7 +158,7 @@ exports.Execute = function () {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
     })
     .then(function () {
       validTransactionList = [];

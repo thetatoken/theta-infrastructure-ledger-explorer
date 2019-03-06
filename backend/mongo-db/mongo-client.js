@@ -19,8 +19,9 @@ exports.init = function (execDir, hostIp, hostPort, dbName) {
 //  Implementations
 //------------------------------------------------------------------------------
 
-exports.connect = function (callback) {
+exports.connect = function (uri, callback) {
   if (_db) return callback();
+  url = uri ? uri : url;
   console.log(`url is: `, url);
   MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
     if (err) return callback(err)
@@ -142,6 +143,14 @@ exports.getTotal = function (collectionName, callback) {
 exports.getTopRecords = function (collectionName, queryObject, limitNumber, callback) {
   var collection = _db.collection(collectionName);
   collection.find().sort(queryObject).collation({ locale: "en_US", numericOrdering: true }).limit(limitNumber).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
+
+exports.getRecords = function (collectionName, queryObject, sortObject, pageNumebr, limitNumber, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find(queryObject).sort(sortObject).skip(pageNumebr).limit(limitNumber).toArray(function (err, res) {
     if (err) callback(err);
     callback(err, res);
   });
