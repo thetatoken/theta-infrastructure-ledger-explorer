@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { browserHistory } from 'react-router';
 
+import { getQueryParam } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import Pagination from "common/components/pagination";
 import TransactionTable from "common/components/transactions-table";
@@ -58,7 +59,7 @@ export default class Transactions extends Component {
           size={'lg'}
           totalPages={totalPageNumber}
           currentPage={currentPageNumber}
-          callback={this.handleGetTransactionsByPage} />
+          onPageChange={this.handleGetTransactionsByPage} />
       </div>
     );
   }

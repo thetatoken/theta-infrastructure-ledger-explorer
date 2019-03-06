@@ -12,33 +12,40 @@ export function totalCoinValue(set, key = 'tfuelwei') {
 }
 
 export function from(txn, trunc = null) {
-  let a;
+  let path;
+
   if([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
-    a = _.get(txn, 'data.source.address');
+    path = 'data.source.address';
   } else if(txn.type === TxnTypes.SPLIT_CONTRACT) {
-    a = _.get(txn, 'data.initiator.address');
+    path = 'data.initiator.address';
+  } else if(txn.type === TxnTypes.COINBASE) {
+    path = 'data.proposer.address';
   } else {
-    a = _.get(txn, 'data.inputs[0].address');
+    path = 'data.inputs[0].address';
   }
-  
+
+  let addr = _.get(txn, path);
   if(trunc && trunc > 0) {
-    a = _.truncate(a, trunc);
+    addr = _.truncate(addr, trunc);
   }
-  return a;
+  return addr;
 }
 
 export function to(txn, trunc = null) {
-  let a;
+  let path;
   if(txn.type === TxnTypes.SERVICE_PAYMENT) {
-    a = _.get(txn, 'data.target.address');
+    path = 'data.target.address';
+  } else if(txn.type === TxnTypes.COINBASE) {
+    path = '';
   } else {
-    a = _.get(txn, 'data.outputs[0].address');
+    path = 'data.outputs[0].address';
   }
 
+  let addr = _.get(txn, path);
   if(trunc && trunc > 0) {
-    a = _.truncate(a, trunc);
+    addr = _.truncate(addr, trunc);
   }
-  return a;
+  return addr;
 }
 
 export function type(txn) {
@@ -84,11 +91,13 @@ export function hash(txn, trunc = null) {
 }
 
 export function age(txn) {
-  if(!age || _.isNumber(parseInt(txn.timestamp)))
+  if(!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
     return null;
   return moment(parseInt(txn.timestamp) * 1000).fromNow(true);
 }
 
 export function date(txn) {
+  if(!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
+    return null;
   return moment(parseInt(txn.timestamp) * 1000).format("MM/DD/YY hh:mma");
 }

@@ -20,3 +20,10 @@ export function formatCoin(weiAmount) {
     groupSize: 3,
   });
 }
+
+export function getQueryParam(search, name) {
+  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+  let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+  let results = regex.exec(search);
+  return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}

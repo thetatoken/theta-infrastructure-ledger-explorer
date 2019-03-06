@@ -62,7 +62,7 @@ export default class Blocks extends Component {
           size={'lg'}
           totalPages={totalPageNumber}
           currentPage={currentPageNumber}
-          callback={this.handleGetBlocksByPage}
+          onPageChange={this.handleGetBlocksByPage}
         />
       </div>
     );

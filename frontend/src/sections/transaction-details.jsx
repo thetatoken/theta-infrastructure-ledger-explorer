@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
-import { TxnTypeText, TxnClasses } from 'common/constants';
+import { TxnTypes, TxnTypeText, TxnClasses } from 'common/constants';
 import { date, age, fee, status, type } from 'common/helpers/transactions';
 import { formatCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
@@ -96,18 +96,36 @@ export default class TransactionExplorer extends Component {
           </table>
 
           <div className={cx("txn-type", TxnClasses[transaction.type])}>{ type(transaction) }</div>
-          { transaction.type === 0 && 
+          { transaction.type === TxnTypes.COINBASE && 
           <Coinbase transaction={transaction} /> }
-          { transaction.type === 1 && 
+          
+          { transaction.type === TxnTypes.SLASH && 
           <Slash transaction={transaction} /> }
-          { transaction.type === 2 && 
+          
+          { transaction.type === TxnTypes.SEND && 
           <Send transaction={transaction} /> }
-          { transaction.type === 3 && 
+          
+          { transaction.type === TxnTypes.RESERVE_FUND && 
           <ReserveFund transaction={transaction} /> }
-          { transaction.type === 5 && 
+
+          { transaction.type === TxnTypes.RELEASE_FUND && 
+          <ReleaseFund transaction={transaction} /> }
+
+          { transaction.type === TxnTypes.SERVICE_PAYMENT && 
           <ServicePayment transaction={transaction} /> }
-          { transaction.type === 6 && 
+          
+          { transaction.type === TxnTypes.SPLIT_CONTRACT && 
           <SplitContract transaction={transaction} /> }
+
+          { transaction.type === TxnTypes.WITHDRAW_STAKE && 
+          <WithdrawStake transaction={transaction} /> }
+
+          { transaction.type === TxnTypes.DEPOSIT_STAKE && 
+          <DepositStake transaction={transaction} /> }
+
+          { transaction.type === TxnTypes.SMART_CONTRACT && 
+          <SmartContract transaction={transaction} /> }
+
         </React.Fragment>}
       </div>);
   }
@@ -116,6 +134,14 @@ export default class TransactionExplorer extends Component {
 
 
 
+
+function _getAddressShortHash(address) {
+  return address.substring(12) + '...';
+}
+
+function _renderIds(ids) {
+  return _.map(ids, i => <div>{i}</div>)
+}
 
 
 const Amount = ({ coins }) => {
@@ -144,17 +170,7 @@ const CoinbaseOutput = ({ output }) => {
     </div>);
 }
 
-function _getAddressShortHash(address) {
-  return address.substring(12) + '...';
-}
-
-function _renderIds(ids) {
-  return _.map(ids, i => <div>{i}</div>)
-}
-
-
-const ServicePayment = props => {
-  let { transaction } = props;
+const ServicePayment = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -169,8 +185,7 @@ const ServicePayment = props => {
     </table>);
 }
 
-const ReserveFund = props => {
-  let { transaction } = props;
+const ReserveFund = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -185,8 +200,17 @@ const ReserveFund = props => {
     </table>);
 }
 
-const SplitContract = props => {
-  let { transaction } = props;
+const ReleaseFund = ({ transaction }) => {
+  let { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        
+      </tbody>
+    </table>);
+}
+
+const SplitContract = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -203,8 +227,7 @@ const SplitContract = props => {
     </table>);
 }
 
-const Send = props => {
-  let { transaction } = props;
+const Send = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -217,8 +240,7 @@ const Send = props => {
     </table>);
 }
 
-const Slash = props => {
-  let { transaction } = props;
+const Slash = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -231,13 +253,50 @@ const Slash = props => {
     </table>);
 }
 
-const Coinbase = props => {
-  let { transaction } = props;
+const Coinbase = ({ transaction }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Amount" data={ _.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} />) } />
+      </tbody>
+    </table>);
+}
+
+const WithdrawStake = ({ transaction }) => {
+  let { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        <DetailsRow label="Fee" data={ <Fee transaction={transaction} /> } />
+        <DetailsRow label="Stake Addr." data={ <Address hash={_.get(data, 'holder.address')} /> } />
+        <DetailsRow label="Withdrawn" data={ <Amount coins={ _.get(data, 'holder.coins') } /> } />
+        <DetailsRow label="Purpose" data={ _.get(data, 'purpose') } />
+        <DetailsRow label="Staker" data={ <Address hash={_.get(data, 'source.address')} /> } />
+      </tbody>
+    </table>);
+}
+
+const DepositStake = ({ transaction }) => {
+  let { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        <DetailsRow label="Fee" data={ <Fee transaction={transaction} /> } />
+        <DetailsRow label="Holder" data={ <Address hash={_.get(data, 'holder.address')} /> } />
+        <DetailsRow label="Withdrawn" data={ <Amount coins={ _.get(data, 'holder.coins') } /> } />
+        <DetailsRow label="Purpose" data={ _.get(data, 'purpose') } />
+        <DetailsRow label="Source" data={ <Address hash={_.get(data, 'source.address')} /> } />
+      </tbody>
+    </table>);
+}
+
+const SmartContract = ({ transaction }) => {
+  let { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        
       </tbody>
     </table>);
 }
