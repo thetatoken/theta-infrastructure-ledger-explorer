@@ -1,7 +1,10 @@
 table.data.block-table {
   width: 100%; 
 
-  tr .height { width: 65px; }
+  tr .height { 
+    width: 65px; 
+    white-space: nowrap;
+  }
   tr .hash { width: 325px; }
   tr .txns { width: 65px; }
   

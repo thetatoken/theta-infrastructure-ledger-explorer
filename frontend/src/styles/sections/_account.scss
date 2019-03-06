@@ -11,6 +11,10 @@
     }
   }
 
+  table.data.txn-table {
+    margin-top: 3rem;
+  }
+
   @include breakpoint('tablet', max) {
     table.details.account-txns {
       tbody tr th {

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Pagination as ReactstrapPagination, PaginationItem, PaginationLink } from 'reactstrap';
-import classnames from 'classnames';
+import cx from 'classnames';
 
+const ELLIPSE = '&#8230;'
 
-class Pagination extends React.Component {
+export default class Pagination extends React.Component {
   constructor(props) {
     super(props);
     this.handlePrevious = this.handlePrevious.bind(this);
@@ -12,6 +12,7 @@ class Pagination extends React.Component {
   }
   static defaultProps = {
     size: 'lg',
+    maxButtons: 5,
   }
   handlePrevious() {
     const previous = this.props.currentPage - 1;
@@ -28,13 +29,12 @@ class Pagination extends React.Component {
   }
 
   handleOnPage(pageNumber) {
-    this.props.callback(pageNumber);
+    this.props.onPageChange(pageNumber);
   }
 
   renderPaginationItems() {
-    const { totalPages, currentPage } = this.props;
+    const { totalPages, currentPage, maxButtons } = this.props;
     const pageButtons = [];
-    const maxButtons = 6;
     const items = totalPages;
     const activePage = currentPage;
     let startPage;
@@ -53,80 +53,50 @@ class Pagination extends React.Component {
       startPage = 0;
       endPage = items - 1;
     }
+
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
-        <PaginationItem disabled={this.props.isDisabled} key={page} active={page === activePage}>
-          <PaginationLink onClick={() => this.handleOnPage(page)} className={classnames({ 'active': page === activePage })}>
-            {page + 1}
-          </PaginationLink>
-        </PaginationItem>
-      );
+        <PaginationLink 
+          key={page} 
+          onClick={() => this.handleOnPage(page)} 
+          active={ page === activePage }
+          className="number">
+          {page + 1}
+        </PaginationLink>);
     }
-    if (startPage > 1) {
-      if (startPage > 2) {
-        pageButtons.unshift(
-          <PaginationItem
-            key="ellipsisFirst"
-            disabled
-          >
-            <PaginationLink>
-              &#8230;
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
-
-      pageButtons.unshift(
-        <PaginationItem disabled={this.props.isDisabled} key={0} active={false}>
-          <PaginationLink onClick={() => this.handleOnPage(0)}>1</PaginationLink>
-        </PaginationItem>
-      );
+    if (startPage >= 1) {
+      pageButtons.unshift(<Ellipse />);
     }
-    if (endPage < items) {
-      if (endPage < items - 1) {
-        pageButtons.push(
-          <PaginationItem
-            key="ellipsis"
-            disabled
-          >
-            <PaginationLink>
-              &#8230;
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
+    if (endPage < items - 1) {
+      pageButtons.push(<Ellipse />);
     }
+    
     return pageButtons;
   }
 
   render() {
-    let { size } = this.props;
+    let { size, totalPages, isDisabled } = this.props;
     return (
-      <ReactstrapPagination className={classnames('th-pagination', size)}>
-        <PaginationItem disabled={this.props.isDisabled}>
-          <PaginationLink onClick={() => this.handleOnPage(0)}>
-            First
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem disabled={this.props.isDisabled}>
-          <PaginationLink onClick={this.handlePrevious}>
-            Previous
-          </PaginationLink>
-        </PaginationItem>
+      <div className={cx('pagination', size, { disabled: isDisabled })}>
+        <PaginationFirst onClick={() => this.handleOnPage(0)} />
+        <PaginationPrev onClick={this.handlePrevious} />
         {this.renderPaginationItems()}
-        <PaginationItem disabled={this.props.isDisabled}>
-          <PaginationLink onClick={this.handleNext}>
-            Next
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem disabled={this.props.isDisabled}>
-          <PaginationLink onClick={() => this.handleOnPage(this.props.totalPages - 1)}>
-            Last
-          </PaginationLink>
-        </PaginationItem>
-      </ReactstrapPagination>
-    );
+        <PaginationNext onClick={this.handleNext} />
+        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} />
+      </div>);
   }
 }
 
-export default Pagination;
+const PaginationLink = props => {
+  let { active, onClick, children, className, ...params } = props;
+  return(
+    <button 
+      className={cx("btn t", {active: active}, className)} 
+      onClick={onClick}
+      {...params}>{ children }</button>);
+}
+const PaginationFirst = props => <PaginationLink active={false} className="first" {...props}><i/></PaginationLink>
+const PaginationPrev = props => <PaginationLink active={false} className="prev" {...props}><i/></PaginationLink>
+const PaginationNext = props => <PaginationLink active={false} className="next" {...props}><i/></PaginationLink>
+const PaginationLast = props => <PaginationLink active={false} className="last" {...props}><i/></PaginationLink>
+const Ellipse = props => <div className="ellipse" {...props}>&#8230;</div>
