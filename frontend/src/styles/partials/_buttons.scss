@@ -27,6 +27,10 @@ a.btn {
   &:hover {
     color: $color-font-button;
   }
+  &[disabled] {
+    opacity: .50;
+  }
+
 
   i {
     top: 1px;

@@ -14,32 +14,38 @@ export default class Transactions extends Component {
     this.state = {
       backendAddress: this.props.route.backendAddress,
       transactions: [],
-      currentPageNumber: 0,
-      totalPageNumber: 0
+      currentPage: 0,
+      totalPages: 0,
+      loading: false,
     };
   }
-
+  
   componentDidMount() {
-    const { currentPageNumber } = this.state;
-    transactionsService.getTransactionsByPage(currentPageNumber, NUM_TRANSACTIONS)
-      .then(res => this.receivedTransactionsEvent(res))
-      .catch(err => console.log(err))
+    const { currentPage } = this.state;
+    this.fetchData(currentPage);
   }
 
-  receivedTransactionsEvent = (data) => {
-    if (data.data.type == 'transaction_list') {
-      this.setState({
-        transactions: _.orderBy(data.data.body, 'number', 'desc'),
-        currentPageNumber: data.data.currentPageNumber,
-        totalPageNumber: data.data.totalPageNumber
+  fetchData(currentPage) {
+    this.setState({ loading: true });
+    transactionsService.getTransactionsByPage(currentPage, NUM_TRANSACTIONS)
+      .then(res => {
+        if (res.data.type == 'transaction_list') {
+          this.setState({
+            transactions: _.orderBy(res.data.body, 'number', 'desc'),
+            currentPage: _.toNumber(res.data.currentPageNumber),
+            totalPages: _.toNumber(res.data.totalPageNumber),
+            loading: false,
+          })
+        }
       })
-    }
+      .catch(err => {
+        this.setState({ loading: false });
+        console.log(err)
+      })
   }
 
-  handleGetTransactionsByPage = (pageNumber) => {
-    transactionsService.getTransactionsByPage(pageNumber, NUM_TRANSACTIONS)
-      .then(res => this.receivedTransactionsEvent(res))
-      .catch(err => console.log(err))
+  handlePageChange = (pageNumber) => {
+    this.fetchData(pageNumber);
   }
 
   handleRowClick = (hash) => {
@@ -47,19 +53,17 @@ export default class Transactions extends Component {
   }
 
   render() {
-    const { transactions } = this.state;
-    let { currentPageNumber, totalPageNumber } = this.state;
-    currentPageNumber = Number(currentPageNumber);
-    totalPageNumber = Number(totalPageNumber);
+    const { transactions, currentPage, totalPages, loading } = this.state;
     return (
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>
         <TransactionTable transactions={transactions} />
         <Pagination
           size={'lg'}
-          totalPages={totalPageNumber}
-          currentPage={currentPageNumber}
-          onPageChange={this.handleGetTransactionsByPage} />
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onPageChange={this.handlePageChange}
+          disabled={loading} />
       </div>
     );
   }

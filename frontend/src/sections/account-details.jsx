@@ -22,9 +22,11 @@ export default class AccountDetails extends Component {
     this.state = {
       account: null,
       transactions: null,
-      pageNumber: 0,
+      currentPage: 0,
       totalPages: null,
       errorType: null,
+      loading_acct: false,
+      loading_txns: false,
     };
   }
   componentWillUpdate(nextProps) {
@@ -48,16 +50,18 @@ export default class AccountDetails extends Component {
       return;
     }
 
+    this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS)
       .then(res => {
-        console.log(res)
         this.setState({ 
           transactions: _.get(res, 'data.body'),
-          pageNumber: _.get(res, 'data.currentPageNumber'),
+          currentPage: _.get(res, 'data.currentPageNumber'),
           totalPages: _.get(res, 'data.totalPageNumber'),
+          loading_txns: false,
         })
       })
       .catch(err => {
+        this.setState({ loading_txns: false });
         console.log(err);
       });
   }
@@ -68,6 +72,7 @@ export default class AccountDetails extends Component {
       return;
     }
 
+    this.setState({ loading_acct: true });
     accountService.getOneAccountByAddress(address)
       .then(res => {
         switch (res.data.type) {
@@ -85,18 +90,20 @@ export default class AccountDetails extends Component {
           default:
             break;
         }
+        this.setState({ loading_acct: false });
       }).catch(err => {
+        this.setState({ loading_acct: false });
         console.log(err);
       })
   }
 
   handlePageChange = pageNumber => {
-    this.getTransactionsByAddress(this.state.address, pageNumber);
+    let { accountAddress } = this.props.params;
+    this.getTransactionsByAddress(accountAddress, pageNumber);
   }
 
   render() {
-    const { account, transactions, currentPage, totalPages, errorType } = this.state;
-    console.log(transactions);
+    const { account, transactions, currentPage, totalPages, errorType, loading_txns } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -122,9 +129,10 @@ export default class AccountDetails extends Component {
           <TransactionTable transactions={transactions} />
           <Pagination
             size={'lg'}
-            totalPages={totalPages}
             currentPage={currentPage}
-            onPageChange={this.handlePageChange} />
+            totalPages={totalPages}
+            onPageChange={this.handlePageChange}
+            disabled={loading_txns} />
         </React.Fragment>}
       </div>
     );

@@ -79,11 +79,11 @@ module.exports = class TransactionDAO {
     })
   }
   getTotalNumber(callback) {
-    this.client.getTotal(this.transactionInfoCollection, function (error, record) {
+    this.client.getTotal(this.transactionInfoCollection, null, function (error, record) {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        console.log('Calling get total number of txs')
+        console.log('Calling get total number of txs, returns:', record)
         callback(error, record);
       }
     });
