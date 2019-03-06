@@ -1,6 +1,7 @@
 var rpc = require('../api/rpc.js');
-var accountHelper = require('../helper/account-helper');
-var vcpHelper = require('../helper/vcp-helper');
+var accountHelper = require('../helper/account');
+var vcpHelper = require('../helper/vcp');
+var txHelper = require('../helper/transactions');
 var fs = require('fs');
 
 //------------------------------------------------------------------------------
@@ -112,6 +113,7 @@ exports.Execute = function () {
               })
             })
           } else {  //handle block response
+            var txs = result.result.transactions;
             const blockInfo = {
               epoch: result.result.epoch,
               status: result.result.status,
@@ -123,11 +125,10 @@ exports.Execute = function () {
               state_hash: result.result.state_hash,
               transactions_hash: result.result.transactions_hash,
               num_txs: result.result.transactions.length,
-              txs: result.result.transactions
+              txs: txHelper.getBriefTxs(result.result.transactions)
             }
             upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
             // Store the transaction data
-            var txs = blockInfo.txs;
             if (txs !== undefined && txs.length > 0) {
               for (var j = 0; j < txs.length; j++) {
                 const transaction = {
