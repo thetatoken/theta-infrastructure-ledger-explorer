@@ -1,45 +1,87 @@
-.th-pagination { 
-  @include row();
-  margin-top: 2rem;
+.pagination { 
+  @include row($justify: center);
 
-  & ul {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    .page-link {
-      text-align: center;
-      color: $th-blue;
-      border-color: $th-grey;
-      background-color: transparent;
-      font-size: 16px;
-      outline: none;
-      &:hover {
-        color: $th-blue;
-        border-color: transparent;
-        cursor: pointer;
-      }  
-      &.active{
-        color: $th-green;
+  margin: 2rem auto 0;
+
+  .btn {
+    flex: 0 0 auto;
+    font-family: $font-body;
+    margin-right: .875rem;
+
+    &:last-child {
+      margin-right: 0rem;
+    }
+    &.active {
+      color: $color-font-main;
+    }
+    &.first,
+    &.last,
+    &.prev,
+    &.next, {
+      padding-left: 0;
+      padding-right: 0;
+      i {
+        display: block;
+        width: 32px;
+        height: 32px;
+        margin: 0;
+        top: -1px;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
       }
     }
-  }
-  &.lg {
-    & ul {
-      .page-link {
-        min-width: 38px;
-        height: 38px;
-        text-align: center;
-        color: $th-blue;
-        border-color: transparent;
-        &:hover {
-          color: $th-green;
-          border-color: transparent;
-          cursor: pointer;
-        }  
-      }
+    &.first {
+      margin-right: 1.5rem;
+      i { background-image: url('/images/icons/page_first_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_first_white@2x.png'); }
+    }
+    &.last {
+      margin-left: 1.5rem;
+      i { background-image: url('/images/icons/page_last_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_last_white@2x.png'); }
+    }
+    &.next {
+      margin-left: 2rem;
+      i { background-image: url('/images/icons/page_next_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_next_white@2x.png'); }
+    }
+    &.prev {
+      margin-right: 2rem;
+      i { background-image: url('/images/icons/page_prev_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_prev_white@2x.png'); }
     }
   }
+  .ellipse {
+    margin-right: 1rem;
+    color: $color-font-light;
+  }
+
+  @include breakpoint('tablet', max) {
+    .btn {
+      margin-right: .25rem;
+      font-size: .875rem;
+      &.first,
+      &.prev,
+      &.last,
+      &.next {
+        i {
+          width: 24px;
+          height: 24px;
+        }
+      }
+      &.first { margin-right: .25rem; }
+      &.prev { margin-right: .5rem; }
+      &.last { margin-left: .25rem; }
+      &.next { margin-left: .5rem; }
+    }
+
+  }
+  @include breakpoint('phone-wide', max) {
+    .btn.first,
+    .btn.last {
+      display: none;
+    }
+  }
+
 }

@@ -34,8 +34,38 @@ a.btn {
     margin-left: -2%;
   }
 
-    // Default size
-  &,
+
+  // COLORS
+  &.light {
+    background: $color-button-light;
+    color: $color-font-button-light;
+    border-radius: 2px;
+    padding: .5rem .75rem;
+  }
+
+  // transparent
+   &.t { 
+    @include column($justify: center, $align: center);
+    background: transparent;
+    color: $color-font-light;
+    font-weight: $weight-semi;
+    font-size: 1.125rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    line-height: 2.5rem;
+    border-radius: 1.5rem;
+    padding: 0 .875rem;
+
+    &:hover {
+      background: $color-button-light;
+      color: $color-font-main;
+    }
+   }
+
+
+  // SIZES
+  
+  &, // Default size
   &.m {
     font-size: 1rem;
     line-height: 1rem;
@@ -48,7 +78,6 @@ a.btn {
     }
   }
 
-  &,
   &.s {
     font-size: .875rem;
     line-height: 1rem;

@@ -59,7 +59,7 @@ export default class Transactions extends Component {
           size={'lg'}
           totalPages={totalPageNumber}
           currentPage={currentPageNumber}
-          callback={this.handleGetTransactionsByPage} />
+          onPageChange={this.handleGetTransactionsByPage} />
       </div>
     );
   }

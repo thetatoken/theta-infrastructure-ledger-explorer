@@ -122,7 +122,7 @@ export default class AccountDetails extends Component {
             size={'lg'}
             totalPages={totalPages}
             currentPage={currentPage}
-            callback={this.handlePageChange} />
+            onPageChange={this.handlePageChange} />
         </React.Fragment>}
       </div>
     );
