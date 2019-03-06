@@ -61,7 +61,6 @@ export default class TransactionExplorer extends Component {
   render() {
     const { transactionHash } = this.props.params;
     const { transaction, errorType } = this.state;
-    console.log(transaction);
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
