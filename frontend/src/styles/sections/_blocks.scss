@@ -5,8 +5,24 @@
   .button-list {
     margin-top: 2rem;
   }
-  table tr.transactions {
-    th { vertical-align: top; }
+  table.transactions {
+    table-layout: fixed;
+    max-width: 100%;
+    th.txn-type { 
+      width: 5rem;
+      vertical-align: top; 
+      white-space: nowrap;
+    }
+    td.hash {
+      width: 75%;
+      vertical-align: middle;
+      a {
+        display: block;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis; 
+      }
+    }
   }
   h3 {
     margin: 3rem 0 .75rem .75rem;
@@ -21,13 +37,15 @@
   .block-txn {
     
     .txn-type {
-      margin-right: .5rem;
-      width: 150px;
       white-space: nowrap;
-      
     }
   }
-  
+  @include breakpoint('tablet', max) {
+    .button-list {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+  }
 
 
 }

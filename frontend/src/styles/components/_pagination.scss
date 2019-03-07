@@ -33,23 +33,19 @@
     }
     &.first {
       margin-right: 1.5rem;
-      i { background-image: url('/images/icons/page_first_grey@2x.png'); }
-      &:hover i { background-image: url('/images/icons/page_first_white@2x.png'); }
+      
     }
     &.last {
       margin-left: 1.5rem;
-      i { background-image: url('/images/icons/page_last_grey@2x.png'); }
-      &:hover i { background-image: url('/images/icons/page_last_white@2x.png'); }
+      
     }
     &.next {
       margin-left: 2rem;
-      i { background-image: url('/images/icons/page_next_grey@2x.png'); }
-      &:hover i { background-image: url('/images/icons/page_next_white@2x.png'); }
+      
     }
     &.prev {
       margin-right: 2rem;
-      i { background-image: url('/images/icons/page_prev_grey@2x.png'); }
-      &:hover i { background-image: url('/images/icons/page_prev_white@2x.png'); }
+      
     }
   }
   .ellipse {

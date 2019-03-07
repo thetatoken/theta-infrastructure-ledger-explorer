@@ -79,11 +79,11 @@ export default class Pagination extends React.Component {
     let { size, totalPages, disabled } = this.props;
     return (
       <div className={cx('pagination', size, { disabled })}>
-        <PaginationFirst onClick={() => this.handleOnPage(0)} disabled={disabled} />
-        <PaginationPrev onClick={this.handlePrevious} disabled={disabled} />
+        <PaginationFirst onClick={() => this.handleOnPage(0)} disabled={disabled} className="icon first" />
+        <PaginationPrev onClick={this.handlePrevious} disabled={disabled} className="icon prev" />
         {this.renderPaginationItems(disabled)}
-        <PaginationNext onClick={this.handleNext} disabled={disabled} />
-        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} disabled={disabled} />
+        <PaginationNext onClick={this.handleNext} disabled={disabled} className="icon next" />
+        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} disabled={disabled} className="icon last" />
       </div>);
   }
 }

@@ -27,8 +27,10 @@ a.btn {
   &:hover {
     color: $color-font-button;
   }
-  &[disabled] {
+  &[disabled],
+  &.disabled {
     opacity: .50;
+    cursor: default;
   }
 
 
@@ -45,6 +47,44 @@ a.btn {
     color: $color-font-button-light;
     border-radius: 2px;
     padding: .5rem .75rem;
+
+  }
+
+  &.icon {
+    @include column($justify: center, $align: center);
+    background: $color-button-light;
+    color: $color-font-light;
+    font-weight: $weight-semi;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    border-radius: 1.5rem;
+    padding: 0 0rem;
+    i {
+        display: block;
+        width: 2rem;
+        height: 2rem;
+        margin: 0;
+        top: -1px;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+    &.next {
+      i { background-image: url('/images/icons/page_next_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_next_white@2x.png'); }
+    }
+    &.prev {
+      i { background-image: url('/images/icons/page_prev_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_prev_white@2x.png'); }
+    }
+    &.first {
+      i { background-image: url('/images/icons/page_first_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_first_white@2x.png'); }
+    }
+    &.last {
+      i { background-image: url('/images/icons/page_last_grey@2x.png'); }
+      &:hover i { background-image: url('/images/icons/page_last_white@2x.png'); }
+    }
   }
 
   // transparent

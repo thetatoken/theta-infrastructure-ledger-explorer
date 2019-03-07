@@ -395,10 +395,13 @@ a.btn {
   .btn:hover,
   a.btn:hover {
     color: #1B1F2A; }
-  input[type="button"][disabled], input[type="reset"][disabled], input[type="submit"][disabled],
+  input[type="button"][disabled], input[type="button"].disabled, input[type="reset"][disabled], input[type="reset"].disabled, input[type="submit"][disabled], input[type="submit"].disabled,
   .btn[disabled],
-  a.btn[disabled] {
-    opacity: .50; }
+  .btn.disabled,
+  a.btn[disabled],
+  a.btn.disabled {
+    opacity: .50;
+    cursor: default; }
   input[type="button"] i, input[type="reset"] i, input[type="submit"] i,
   .btn i,
   a.btn i {
@@ -412,6 +415,72 @@ a.btn {
     color: #ffffff;
     border-radius: 2px;
     padding: .5rem .75rem; }
+  input[type="button"].icon, input[type="reset"].icon, input[type="submit"].icon,
+  .btn.icon,
+  a.btn.icon {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: rgba(124, 129, 163, 0.45);
+    color: #8A8FB5;
+    font-weight: 600;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    border-radius: 1.5rem;
+    padding: 0 0rem; }
+    input[type="button"].icon i, input[type="reset"].icon i, input[type="submit"].icon i,
+    .btn.icon i,
+    a.btn.icon i {
+      display: block;
+      width: 2rem;
+      height: 2rem;
+      margin: 0;
+      top: -1px;
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat; }
+    input[type="button"].icon.next i, input[type="reset"].icon.next i, input[type="submit"].icon.next i,
+    .btn.icon.next i,
+    a.btn.icon.next i {
+      background-image: url("/images/icons/page_next_grey@2x.png"); }
+    input[type="button"].icon.next:hover i, input[type="reset"].icon.next:hover i, input[type="submit"].icon.next:hover i,
+    .btn.icon.next:hover i,
+    a.btn.icon.next:hover i {
+      background-image: url("/images/icons/page_next_white@2x.png"); }
+    input[type="button"].icon.prev i, input[type="reset"].icon.prev i, input[type="submit"].icon.prev i,
+    .btn.icon.prev i,
+    a.btn.icon.prev i {
+      background-image: url("/images/icons/page_prev_grey@2x.png"); }
+    input[type="button"].icon.prev:hover i, input[type="reset"].icon.prev:hover i, input[type="submit"].icon.prev:hover i,
+    .btn.icon.prev:hover i,
+    a.btn.icon.prev:hover i {
+      background-image: url("/images/icons/page_prev_white@2x.png"); }
+    input[type="button"].icon.first i, input[type="reset"].icon.first i, input[type="submit"].icon.first i,
+    .btn.icon.first i,
+    a.btn.icon.first i {
+      background-image: url("/images/icons/page_first_grey@2x.png"); }
+    input[type="button"].icon.first:hover i, input[type="reset"].icon.first:hover i, input[type="submit"].icon.first:hover i,
+    .btn.icon.first:hover i,
+    a.btn.icon.first:hover i {
+      background-image: url("/images/icons/page_first_white@2x.png"); }
+    input[type="button"].icon.last i, input[type="reset"].icon.last i, input[type="submit"].icon.last i,
+    .btn.icon.last i,
+    a.btn.icon.last i {
+      background-image: url("/images/icons/page_last_grey@2x.png"); }
+    input[type="button"].icon.last:hover i, input[type="reset"].icon.last:hover i, input[type="submit"].icon.last:hover i,
+    .btn.icon.last:hover i,
+    a.btn.icon.last:hover i {
+      background-image: url("/images/icons/page_last_white@2x.png"); }
   input[type="button"].t, input[type="reset"].t, input[type="submit"].t,
   .btn.t,
   a.btn.t {
@@ -838,28 +907,12 @@ table.details {
         background-repeat: no-repeat; }
     .pagination .btn.first {
       margin-right: 1.5rem; }
-      .pagination .btn.first i {
-        background-image: url("/images/icons/page_first_grey@2x.png"); }
-      .pagination .btn.first:hover i {
-        background-image: url("/images/icons/page_first_white@2x.png"); }
     .pagination .btn.last {
       margin-left: 1.5rem; }
-      .pagination .btn.last i {
-        background-image: url("/images/icons/page_last_grey@2x.png"); }
-      .pagination .btn.last:hover i {
-        background-image: url("/images/icons/page_last_white@2x.png"); }
     .pagination .btn.next {
       margin-left: 2rem; }
-      .pagination .btn.next i {
-        background-image: url("/images/icons/page_next_grey@2x.png"); }
-      .pagination .btn.next:hover i {
-        background-image: url("/images/icons/page_next_white@2x.png"); }
     .pagination .btn.prev {
       margin-right: 2rem; }
-      .pagination .btn.prev i {
-        background-image: url("/images/icons/page_prev_grey@2x.png"); }
-      .pagination .btn.prev:hover i {
-        background-image: url("/images/icons/page_prev_white@2x.png"); }
   .pagination .ellipse {
     margin-right: 1rem;
     color: #8A8FB5; }
@@ -1170,8 +1223,21 @@ table.data.block-table {
 .content.block-details .button-list {
   margin-top: 2rem; }
 
-.content.block-details table tr.transactions th {
-  vertical-align: top; }
+.content.block-details table.transactions {
+  table-layout: fixed;
+  max-width: 100%; }
+  .content.block-details table.transactions th.txn-type {
+    width: 5rem;
+    vertical-align: top;
+    white-space: nowrap; }
+  .content.block-details table.transactions td.hash {
+    width: 75%;
+    vertical-align: middle; }
+    .content.block-details table.transactions td.hash a {
+      display: block;
+      white-space: nowrap;
+      overflow-x: hidden;
+      text-overflow: ellipsis; }
 
 .content.block-details h3 {
   margin: 3rem 0 .75rem .75rem;
@@ -1183,6 +1249,9 @@ table.data.block-table {
   text-transform: uppercase; }
 
 .content.block-details .block-txn .txn-type {
-  margin-right: .5rem;
-  width: 150px;
   white-space: nowrap; }
+
+@media only screen and (max-width: 767px) {
+  .content.block-details .button-list {
+    margin-left: 1rem;
+    margin-right: 1rem; } }

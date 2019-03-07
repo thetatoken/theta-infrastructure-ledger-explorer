@@ -69,6 +69,8 @@ export default class BlocksExplorer extends Component {
   render() {
     const { block, totalBlocksNumber, errorType } = this.state;
     const height = Number(this.props.params.blockHeight);
+    const hasNext = totalBlocksNumber > height;
+    const hasPrev = height > 1;
     return (
       <div className="content block-details">
         <div className="page-title blocks">Block Details</div>
@@ -120,19 +122,17 @@ export default class BlocksExplorer extends Component {
           </table>
 
           <h3>Transactions</h3>
-          <table className="data">
+          <table className="data transactions">
             <tbody>
               { _.map(block.txs, (t,i) => <Transaction key={i} txn={t} />)  }
             </tbody>
           </table>
           
           <div className="button-list split">
-            { height > 1 
-              ? <a className="btn" href={`/blocks/${height - 1}`}><i>&#8678;</i> Prev</a>
-              : <div className="th-explorer__buttons--no-more">No More</div>}
-            { totalBlocksNumber > height 
-              ? <a className="btn" href={`/blocks/${height + 1}`}>Next <i>&#8680;</i></a>
-              : <div className="th-explorer__buttons--no-more">No More</div>}
+            { hasPrev &&
+            <a className="btn icon prev" href={ `/blocks/${height - 1}` }><i /></a>}
+            { hasNext && 
+            <a className="btn icon next" href={ `/blocks/${height + 1}` }><i /></a>}
           </div>
         </React.Fragment>}
       </div>);
@@ -144,7 +144,7 @@ const Transaction = ({ txn }) => {
   return(
     <tr className="block-txn">
       <td className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</td>
-      <td><a href={`/txs/${hash}`}>{ hash }</a></td>
+      <td className="hash overflow"><a href={`/txs/${hash}`}>{ hash }</a></td>
     </tr>)
 }
 
