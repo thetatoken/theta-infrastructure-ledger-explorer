@@ -3,7 +3,10 @@ exports.getBriefTxs = function (txs) {
     txs.forEach(tx => {
         tx = {
             hash: tx.hash,
-            type: tx.type
+            type: tx.type,
+            raw: tx.raw.fee ? {
+                fee: tx.raw.fee
+            } : null
         }
         res.push(tx);
     });
