@@ -124,7 +124,7 @@ export default class AccountDetails extends Component {
             </tbody>
           </table>
         </React.Fragment>}
-        { transactions && transactions.length && 
+        { transactions && Boolean(transactions.length) && 
         <React.Fragment>
           <TransactionTable transactions={transactions} />
           <Pagination
@@ -134,8 +134,7 @@ export default class AccountDetails extends Component {
             onPageChange={this.handlePageChange}
             disabled={loading_txns} />
         </React.Fragment>}
-      </div>
-    );
+      </div>);
   }
 }
 
