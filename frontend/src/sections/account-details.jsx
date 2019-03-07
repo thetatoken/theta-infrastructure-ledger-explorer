@@ -124,7 +124,7 @@ export default class AccountDetails extends Component {
             </tbody>
           </table>
         </React.Fragment>}
-        { transactions && Boolean(transactions.length) && 
+        { transactions && transactions.length > 0 && 
         <React.Fragment>
           <TransactionTable transactions={transactions} />
           <Pagination
