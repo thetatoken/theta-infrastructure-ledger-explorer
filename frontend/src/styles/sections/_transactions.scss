@@ -25,12 +25,22 @@
     @include row($align: flex-start);
     border-bottom: 1px solid $color-line;
     padding: .5rem 0;
+    &:first-child {
+      padding-top: 0;
+    }
     &:last-child {
       border-bottom: none;
     }
     & > *:first-child {
       margin-right: 1rem;
+      white-space: nowrap;
     }
+    & > a {
+      display: block;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+
 
   }
 

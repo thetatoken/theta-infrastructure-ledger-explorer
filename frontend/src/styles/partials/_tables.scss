@@ -71,6 +71,7 @@ table.details {
       width: 7rem;
       border-bottom: none;
       padding-left: 1rem;
+      vertical-align: top;
     }
     th {
       font-family: $font-body;
@@ -106,6 +107,11 @@ table.details {
     }
     &:last-child td {
       border-bottom: none;
+    }
+  }
+  @include breakpoint('phablet', max) {
+    tbody tr th {
+      width: 125px;
     }
   }
 }

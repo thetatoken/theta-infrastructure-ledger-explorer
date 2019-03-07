@@ -28,3 +28,7 @@ export function age(block) {
 export function date(block) {
   return moment(parseInt(block.timestamp) * 1000).format("MM/DD/YY hh:mma");
 }
+
+export function prevBlock(block) {
+  return block.parent_hash;
+}

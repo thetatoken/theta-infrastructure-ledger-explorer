@@ -63,7 +63,7 @@
   @include breakpoint('tablet', max) {
     .btn {
       margin-right: .25rem;
-      font-size: .875rem;
+      //font-size: .875rem;
       &.first,
       &.prev,
       &.last,

@@ -15,10 +15,6 @@ body {
   }
 }
 
-
-
-
-
 #app-root{
   &:before{
     content: '';
@@ -92,10 +88,16 @@ body {
   }
 
   @include breakpoint('phablet', max) {
-
     .content .page-title {
       margin-top: 3rem;
       margin-bottom: 1.5rem;
     }
   }
 }
+
+@include breakpoint('phablet', max) {
+  html {
+    font-size: 14px;
+  }
+}
+

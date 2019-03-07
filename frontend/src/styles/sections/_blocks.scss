@@ -8,20 +8,26 @@
   table tr.transactions {
     th { vertical-align: top; }
   }
-  .block-txn {
-    @include row();
-    border-bottom: 1px solid $color-line-light;
-    padding: .5rem 0;
-    &:last-child {
-      border: none;
-    }
-  }
-  .txn-type {
-    margin-right: .5rem;
-    width: 150px;
-    white-space: nowrap;
+  h3 {
+    margin: 3rem 0 .75rem .75rem;
+    font-family: $font-title;
+    font-weight: $weight-bold;
+    font-size: 1.125rem;
+    color: $color-font-main;
+    letter-spacing: 3px;
+    text-transform: uppercase;
     
   }
+  .block-txn {
+    
+    .txn-type {
+      margin-right: .5rem;
+      width: 150px;
+      white-space: nowrap;
+      
+    }
+  }
+  
 
 
 }

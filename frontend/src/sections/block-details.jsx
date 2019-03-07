@@ -6,7 +6,7 @@ import { blocksService } from 'common/services/block';
 import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist'; 
 import { BlockStatus, TxnTypeText, TxnClasses } from 'common/constants';
-import { date, hash } from 'common/helpers/blocks';
+import { date, hash, prevBlock } from 'common/helpers/blocks';
 
 
 export default class BlocksExplorer extends Component {
@@ -98,28 +98,31 @@ export default class BlocksExplorer extends Component {
               </tr>
               <tr>
                 <th>Previous Block</th>
-                <td>{ block.parent_hash }</td>
+                <td>{ <a href={`/blocks/${height}`}>{ prevBlock(block) }</a> }</td>
               </tr>
               <tr>
                 <th>Proposer</th>
-                <td>{ block.proposer }</td>
+                <td>{ <a href={`/account/${block.proposer}`}>{ block.proposer }</a> }</td>
               </tr>
               <tr>
                 <th>State Hash</th>
                 <td>{ block.state_hash }</td>
               </tr>
               <tr>
-                <th>Transactions Hash</th>
+                <th>Txns Hash</th>
                 <td>{ block.transactions_hash }</td>
               </tr>
               <tr>
-                <th># of Transactions</th>
+                <th># Transactions</th>
                 <td>{ block.num_txs }</td>
               </tr>
-              <tr className="transactions">
-                <th>Transactions</th>
-                <td>{ _.map(block.txs, (t,i) => <Transaction key={i} txn={t} />)  }</td>
-              </tr>
+            </tbody>
+          </table>
+
+          <h3>Transactions</h3>
+          <table className="data">
+            <tbody>
+              { _.map(block.txs, (t,i) => <Transaction key={i} txn={t} />)  }
             </tbody>
           </table>
           
@@ -136,80 +139,14 @@ export default class BlocksExplorer extends Component {
   }
 }
 
-const Transaction = props => {
-  let { txn } = props;
+const Transaction = ({ txn }) => {
   let { hash, type } = txn;
   return(
-    <div className="block-txn">
-      <span className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</span>
-      <a href={`/txs/${hash}`}>{ hash }</a>
-    </div>)
+    <tr className="block-txn">
+      <td className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</td>
+      <td><a href={`/txs/${hash}`}>{ hash }</a></td>
+    </tr>)
 }
 
 
 
-const nameMap = {
-  'status': 'Status',
-  'height': 'Height',
-  'timestamp': 'Timestamp',
-  'hash': 'Hash',
-  'parent_hash': 'Previous Block Hash',
-  'proposer': 'Proposer',
-  'state_hash': 'State Hash',
-  'transactions_hash': 'Transactions Hash',
-  'num_txs': 'Number of Transactions',
-  'txs': 'Transactions'
-}
-
-const nameOrder = ['height', 'status', 'timestamp', 'hash', 'parent_hash', 'proposer', 'state_hash', 'transactions_hash', 'num_txs', 'txs'];
-class BlockExplorerTable2 extends Component {
-  renderContent(key, content) {
-    if (key === 'parent_hash') {
-      return (
-        <Link to={`/blocks/${Number(this.props.blockInfo.height) - 1}`} >{content}</Link>
-      )
-    } else
-      return content;
-  }
-  getInfo(blockInfo, key) {
-    if (key === 'status') return BlockStatus[blockInfo[key]];
-    else if (key !== 'txs') return blockInfo[key];
-    else if (blockInfo[key]) {
-      return (
-        <div>
-          {blockInfo[key].map((tx, i) => {
-            return (
-              <div key={i}>
-                <Link to={`/txs/${tx.hash}`} >{tx.hash}</Link>
-                <br />
-              </div>
-            )
-          })}
-        </div>
-        // <Link to={`/txs/${blockInfo[key][blockInfo[key].length - 1].hash}`} >{blockInfo[key][blockInfo[key].length - 1].hash}</Link>
-      )
-    } else return 'Wrong Data';
-  }
-  render() {
-    const { blockInfo } = this.props;
-    return (
-      <div className="th-explorer-table">
-        {nameOrder.map(key => {
-          const content = this.getInfo(blockInfo, key);
-          return (
-            <div className="th-explorer-table__row" key={key}>
-              <div className="th-explorer-table__row--left">
-                <p className="th-explorer-table-text">{nameMap[key]}</p>
-              </div>
-              <div className="th-explorer-table__row--right">
-                <div className="th-explorer-table-text">
-                  {this.renderContent(key, content)}
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    );
-  }
-}

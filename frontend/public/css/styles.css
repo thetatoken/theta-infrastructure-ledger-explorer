@@ -319,6 +319,10 @@ body:before {
       margin-top: 3rem;
       margin-bottom: 1.5rem; } }
 
+@media only screen and (max-width: 559px) {
+  html {
+    font-size: 14px; } }
+
 input[type="email"], input[type="number"], input[type="password"], input[type="search"], input[type="tel"], input[type="text"], input[type="url"], input[type="color"], input[type="date"], input[type="datetime"], input[type="datetime-local"], input[type="month"], input[type="time"], input[type="week"],
 textarea {
   font-size: .875rem;
@@ -534,7 +538,8 @@ table.details {
   table.details thead tr th:first-child {
     width: 7rem;
     border-bottom: none;
-    padding-left: 1rem; }
+    padding-left: 1rem;
+    vertical-align: top; }
   table.details thead tr th {
     font-family: "Alwyn", "Helvetica", sans-serif;
     color: #8A8FB5;
@@ -563,6 +568,9 @@ table.details {
     border-bottom: 1px solid #42455e; }
   table.details tbody tr:last-child td {
     border-bottom: none; }
+  @media only screen and (max-width: 559px) {
+    table.details tbody tr th {
+      width: 125px; } }
 
 .currency:before {
   content: '';
@@ -611,10 +619,9 @@ table.details {
     flex: 1 0 auto; }
     .theta-header .nav .theta-logo {
       -webkit-box-flex: 0;
-      -ms-flex: 0 0 116px;
-      flex: 0 0 116px;
-      height: 40px;
-      width: 116px;
+      -ms-flex: 0 0 7.25rem;
+      flex: 0 0 7.25rem;
+      height: 2.5rem;
       margin: 0 7% 0 0;
       background: url("/images/logo_theta-explorer@2x.png");
       background-image: url("/images/logo_theta-explorer@2x.png");
@@ -743,8 +750,8 @@ table.details {
       width: 95%; }
       .theta-header .nav .theta-logo {
         -webkit-box-flex: 0;
-        -ms-flex: 0 0 80px;
-        flex: 0 0 80px; } }
+        -ms-flex: 0 0 6rem;
+        flex: 0 0 6rem; } }
 
 .th-link-button {
   text-decoration: none;
@@ -860,8 +867,7 @@ table.details {
       opacity: .50; }
   @media only screen and (max-width: 767px) {
     .pagination .btn {
-      margin-right: .25rem;
-      font-size: .875rem; }
+      margin-right: .25rem; }
       .pagination .btn.first i, .pagination .btn.prev i, .pagination .btn.last i, .pagination .btn.next i {
         width: 24px;
         height: 24px; }
@@ -1093,10 +1099,17 @@ table.data.block-table {
   align-items: flex-start;
   border-bottom: 1px solid #42455e;
   padding: .5rem 0; }
+  .content.transaction-details .coinbase-output:first-child {
+    padding-top: 0; }
   .content.transaction-details .coinbase-output:last-child {
     border-bottom: none; }
   .content.transaction-details .coinbase-output > *:first-child {
-    margin-right: 1rem; }
+    margin-right: 1rem;
+    white-space: nowrap; }
+  .content.transaction-details .coinbase-output > a {
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis; }
 
 @media only screen and (max-width: 767px) {
   .content.transaction-details .txn-type {
@@ -1160,26 +1173,16 @@ table.data.block-table {
 .content.block-details table tr.transactions th {
   vertical-align: top; }
 
-.content.block-details .block-txn {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-flow: row nowrap;
-  flex-flow: row nowrap;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  border-bottom: 1px solid #2d2f40;
-  padding: .5rem 0; }
-  .content.block-details .block-txn:last-child {
-    border: none; }
+.content.block-details h3 {
+  margin: 3rem 0 .75rem .75rem;
+  font-family: "Rift", "Helvetica", sans-serif;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #ffffff;
+  letter-spacing: 3px;
+  text-transform: uppercase; }
 
-.content.block-details .txn-type {
+.content.block-details .block-txn .txn-type {
   margin-right: .5rem;
   width: 150px;
   white-space: nowrap; }
