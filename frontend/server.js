@@ -4,12 +4,14 @@ var express = require('express');
 var webpack = require('webpack');
 var config = require('./webpack.config.js');
 var fs = require('fs');
+var compression = require('compression')
 let port = process.env.PORT || 443;
 
 
 var app = express();
 var compiler = webpack(config);
 
+app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
