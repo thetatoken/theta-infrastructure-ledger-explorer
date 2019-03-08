@@ -20,11 +20,15 @@ module.exports = class AccountTxDAO {
     this.client.upsert(this.accountTxInfoCollection, queryObject, newObject, callback);
   }
 
-  getInfoListByType(address, type, isEqualType, pageNumber, limitNumber, callback) {
+  getInfoListByType(address, type, isEqualType, pageNumber, limitNumber, diff, callback) {
+    console.log(diff);
+    console.log(typeof diff)
     const pattern = `^${address}_`;
     const typeObject = isEqualType === 'true' ? type : { $ne: type };
     const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': typeObject };
-    const sortObject = { 'timestamp': -1 };
+    const sortObject = { 'timestamp': diff === null ? -1 : 1 };
+    pageNumber = diff ? 0 : pageNumber;
+    limitNumber = diff ? diff : limitNumber;
     this.client.getRecords(this.accountTxInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
 

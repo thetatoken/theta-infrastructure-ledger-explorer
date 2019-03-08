@@ -9,6 +9,7 @@ var accountTxRouter = (app, accountTxDao, transactionDao, rpc) => {
     const address = req.params.address.toLowerCase();
     let { type = 5, isEqualType = 'false', pageNumber = 0, limitNumber = 10 } = req.query;
     let totalNumber = 0;
+    let diff = null;
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
@@ -16,7 +17,22 @@ var accountTxRouter = (app, accountTxDao, transactionDao, rpc) => {
       accountTxDao.getInfoTotalAsync(address, type, isEqualType)
         .then(number => {
           totalNumber = number;
-          return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber)
+          if (number < (pageNumber + 1) * limitNumber) {
+            if (number > pageNumber * limitNumber) {
+              diff = number - pageNumber * limitNumber;
+              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+            } else {
+              const data = ({
+                type: 'account_tx_list',
+                body: [],
+                totalPageNumber: Math.ceil(totalNumber / limitNumber),
+                currentPageNumber: pageNumber
+              });
+              res.status(200).send(data);
+            }
+          } else {
+            return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+          }
         })
         .then(async infoList => {
           let result = [];
@@ -29,6 +45,7 @@ var accountTxRouter = (app, accountTxDao, transactionDao, rpc) => {
               console.log('Error occurred while getting transaction:' + tmp[1]);
             }
           }
+          result = diff === null ? result : result.reverse();
           var data = ({
             type: 'account_tx_list',
             body: result,
