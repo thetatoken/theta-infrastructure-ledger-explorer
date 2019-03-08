@@ -31,8 +31,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   vcpDao = vcpDaoInstance;
 }
 
-exports.Execute = function () {
-  progressDao.getProgressAsync(network_id)
+exports.Execute = async function () {
+  await progressDao.getProgressAsync(network_id)
     .then(function (progressInfo) {
       txs_count = progressInfo.count;
       crawled_block_height_progress = progressInfo.height;
@@ -161,13 +161,13 @@ exports.Execute = function () {
     .then(() => {
       accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
     })
-    .then(function () {
+    .then(async function () {
       validTransactionList = [];
       console.log('target_crawl_height: ', target_crawl_height, '. txs_count: ', txs_count)
-      progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
+      await progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
       console.log('Crawl progress updated to ' + target_crawl_height.toString());
     })
-    .catch(function (error) {
+    .catch(async function (error) {
       if (error) {
         if (error.message === 'No progress record') {
           console.log('Initializng progress record..');
@@ -181,15 +181,18 @@ exports.Execute = function () {
             console.log(err);
             process.exit(1);
           }
-          // console.log(initialAccounts);
-          let getAccountAysncList = [];
+          // let counter = 1
+          // for (let address of Object.keys(initialAccounts)) {
+          //   console.log(counter++)
+          //   await accountHelper.updateAccountByAddress(address, accountDao)
+          // }
           Object.keys(initialAccounts).forEach(function (address, i) {
             setTimeout(function () {
               console.log(i)
               accountHelper.updateAccountByAddress(address, accountDao)
             }, i * 10);
           })
-          return Promise.all(getAccountAysncList)
+          // return Promise.all(getAccountAysncList)
         } else {
           console.log(error);
         }

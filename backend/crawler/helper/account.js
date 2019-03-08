@@ -48,8 +48,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
 
 exports.updateAccountByAddress = _updateAccountByAddress;
 
-function _updateAccountByAddress(address, accountDao, hash) {
-  rpc.getAccountAsync([{ 'address': address }])
+async function _updateAccountByAddress(address, accountDao, hash) {
+  await rpc.getAccountAsync([{ 'address': address }])
     .then(async function (data) {
       address = address;
       let tmp = JSON.parse(data);
