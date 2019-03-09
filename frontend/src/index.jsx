@@ -10,7 +10,7 @@ import Blocks from 'sections/blocks'
 import BlockDetails from 'sections/block-details'
 import AccountDetails from 'sections/account-details'
 
-import config from '../config';
+import config from '../config'; 
 
 const app = document.querySelector('#app-root');
 const backendSocketAddress = `${config.socketApi.host}:${config.socketApi.port}`;

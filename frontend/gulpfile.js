@@ -4,9 +4,15 @@ let gulp = require('gulp'),
     prefixer = require('gulp-autoprefixer'),
     webpack = require("webpack-stream"),
     compiler = require('webpack'),
-    gulpClean = require("gulp-clean")
+    gulpClean = require("gulp-clean");
+let uglify = require('gulp-uglify');
+const minify = require('gulp-minify');
 let browserSync = require('browser-sync').create()
 let webPackConfig = require('./webpack.config.js');
+
+let buildMode = 'development';
+const DEV = 'development';
+const PROD = 'production';
 
 let paths = {
       sass_start: './src/styles/styles.scss',
@@ -15,6 +21,7 @@ let paths = {
 
       js_start: './src/index.jsx',
       js_dest: './public/js/',
+      js_minify: ['./public/js/**/*.jsx', './public/js/**/*.js'],
       js_watch: ['./src/**/*.jsx', './src/**/*.js'],
 
       clean: ['./public/js/','./public/css/'],
@@ -40,6 +47,10 @@ let displayError = error => {
     return errorString;
 };
 
+const setBuildMode = mode => done => {
+  buildMode = mode;
+  done();
+}
 
 const buildSASS = done => {
   return stream = gulp.src(paths.sass_start)
@@ -56,16 +67,17 @@ const buildSASS = done => {
       displayError(err);
       done();
     })
+    .pipe(cssnano())
     .pipe(gulp.dest(paths.sass_dest))
     .pipe(browserSync.stream());
 }
 
 const buildJS = done => {
+  webPackConfig.mode = buildMode;
   return gulp.src(paths.js_start)
     .pipe(webpack(webPackConfig, compiler))
     .pipe(gulp.dest(paths.js_dest))
     .pipe(browserSync.stream());
-    
 }
 
 const clean = done => {
@@ -74,6 +86,12 @@ const clean = done => {
     .on("error", async (err) => {
       displayError(err);
     });
+}
+
+const compress = done => {
+   return gulp.src(paths.js_minify)
+    .pipe(minify())
+    .pipe(gulp.dest(paths.js_dest))
 }
 
 const sync = done => {
@@ -94,7 +112,9 @@ const watch = done => {
   done();
 };
 
-gulp.task('default', gulp.series(clean, sync, buildSASS, buildJS, watch));
+gulp.task('default', gulp.series(setBuildMode(DEV), clean, sync, buildSASS, buildJS, watch));
+gulp.task('build-dev', gulp.series(setBuildMode(DEV), clean, buildSASS, buildJS));
+gulp.task('build-prod', gulp.series(setBuildMode(PROD), clean, buildSASS, buildJS));
 gulp.task('nosync', gulp.series(clean, buildSASS, buildJS, watch));
 gulp.task('build-js', buildJS);
 gulp.task('build-sass', buildSASS);

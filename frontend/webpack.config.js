@@ -1,11 +1,12 @@
 var path = require("path");
 let webpack = require('webpack');
 
+
 let srcDir = path.join(__dirname, "src/");
 let distDir = path.join(__dirname, "public/js");
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: path.join(srcDir, 'index.jsx'),
   output: {
     path: distDir,
