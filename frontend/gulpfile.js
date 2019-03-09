@@ -5,8 +5,6 @@ let gulp = require('gulp'),
     webpack = require("webpack-stream"),
     compiler = require('webpack'),
     gulpClean = require("gulp-clean");
-let uglify = require('gulp-uglify');
-const minify = require('gulp-minify');
 let browserSync = require('browser-sync').create()
 let webPackConfig = require('./webpack.config.js');
 
@@ -21,7 +19,6 @@ let paths = {
 
       js_start: './src/index.jsx',
       js_dest: './public/js/',
-      js_minify: ['./public/js/**/*.jsx', './public/js/**/*.js'],
       js_watch: ['./src/**/*.jsx', './src/**/*.js'],
 
       clean: ['./public/js/','./public/css/'],
@@ -86,12 +83,6 @@ const clean = done => {
     .on("error", async (err) => {
       displayError(err);
     });
-}
-
-const compress = done => {
-   return gulp.src(paths.js_minify)
-    .pipe(minify())
-    .pipe(gulp.dest(paths.js_dest))
 }
 
 const sync = done => {
