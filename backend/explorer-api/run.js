@@ -111,7 +111,7 @@ function main() {
       // account router
       accountRouter(app, accountDao, rpc, config);
       // account transaction mapping router
-      accountTxRouter(app, accountTxDao, transactionDao, rpc, config);
+      accountTxRouter(app, accountDao, accountTxDao, transactionDao, rpc, config);
       // vcp router
       vcpRouter(app, vcpDao, config);
       // supply router

@@ -38,13 +38,13 @@ var accountRouter = (app, accountDao, rpc) => {
         if (tmp.result) {
           const isExist = await accountDao.checkAccountAsync(address);
           const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
-          const txs_hash_list = accountInfo ? accountInfo.txs_hash_list : [];
+          const txs_counter = accountInfo ? accountInfo.txs_counter : {};
           const newInfo = {
             address,
             'balance': tmp.result.coins,
             'sequence': tmp.result.sequence,
             'reserved_funds': tmp.result.reserved_funds,
-            'txs_hash_list': txs_hash_list
+            'txs_counter': txs_counter
           }
           await accountDao.upsertAccountAsync(newInfo);
           const data = ({

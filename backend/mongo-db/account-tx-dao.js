@@ -21,8 +21,6 @@ module.exports = class AccountTxDAO {
   }
 
   getInfoListByType(address, type, isEqualType, pageNumber, limitNumber, diff, callback) {
-    console.log(diff);
-    console.log(typeof diff)
     const pattern = `^${address}_`;
     const typeObject = isEqualType === 'true' ? type : { $ne: type };
     const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': typeObject };
