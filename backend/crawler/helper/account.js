@@ -57,7 +57,7 @@ async function _updateAccountByAddress(address, accountDao, type) {
         const isExist = await accountDao.checkAccountAsync(address);
         const accountInfo = isExist ? await accountDao.getAccountByPkAsync(address) : null;
         let txs_counter = {};
-        if (type !== null) {
+        if (type !== null && type !== undefined) {
           if (accountInfo) {
             accountInfo.txs_counter = accountInfo.txs_counter || {};
             accountInfo.txs_counter[`${type}`] = accountInfo.txs_counter[`${type}`] === undefined ? 1 : accountInfo.txs_counter[`${type}`] + 1;
