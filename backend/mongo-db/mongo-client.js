@@ -98,7 +98,7 @@ exports.tryQuery = (function (maxConcurrency) {
 // }
 exports.upsert = function (collectionName, queryObject, updateObject, callback) {
   var collection = _db.collection(collectionName);
-  collection.updateOne(queryObject, { $set: updateObject }, { upsert: true }, function (err, res) {
+  collection.updateOne(queryObject, { $set: updateObject }, { upsert: true, writeConcern: { w: "majority", wtimeout: 5000 } }, function (err, res) {
     if (err) callback(err);
     // console.log(res);
     callback(err, res);
