@@ -40,8 +40,6 @@ module.exports = class TransactionDAO {
     });
   }
   getTransactions(pageNumber, limitNumber, diff, callback) {
-    console.log(diff);
-    console.log(typeof diff)
     const queryObject = { 'status': 'finalized' };
     const sortObject = { 'number': diff === null ? -1 : 1 };
     pageNumber = pageNumber;
