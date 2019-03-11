@@ -50,24 +50,26 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
   });
 
   router.get("/transactions/range", (req, res) => {
-    numberOfTransactions = 10;
-    let totalPageNumber, pageNumber = 1;
+    let totalPageNumber = 0;
+    let { pageNumber = 0, limit = 10 } = req.query;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
-        latest_transaction_count = progressInfo.count;
-        console.log('Latest transaction count: ' + latest_transaction_count.toString());
-        var query_txs_count_max = latest_transaction_count;
-        var query_txs_count_min = Math.max(0, query_txs_count_max - numberOfTransactions + 1); // pushing 100 blocks initially
-        totalPageNumber = Math.ceil(latest_transaction_count / req.query.limit);
-        if (req.query.pageNumber !== undefined && req.query.limit !== undefined) {
-          const { limit } = req.query;
-          pageNumber = req.query.pageNumber;
-          query_txs_count_max = latest_transaction_count - pageNumber * limit;
-          query_txs_count_min = Math.max(1, query_txs_count_max - limit + 1);
+        totalNumber = progressInfo.count;
+        console.log('Latest transaction count: ' + totalNumber.toString());
+        let diff = null;
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+        totalPageNumber = Math.ceil(totalNumber / limit);
+        let searchPage = pageNumber;
+        if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > -1 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
+          if (pageNumber > totalPageNumber / 2) {
+            diff = limit;
+            searchPage = totalPageNumber - pageNumber - 1;
+          }
+          return transactionDao.getTransactionsAsync(searchPage, limit, diff)
+        } else {
+          res.status(400).send('Wrong parameter.');
         }
-        console.log('REST api querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
-        //return blockDao.getBlockAsync(123) 
-        return transactionDao.getTransactionsAsync(query_txs_count_min, query_txs_count_max)
       })
       .then(transactionInfoList => {
         var data = ({

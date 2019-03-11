@@ -39,23 +39,14 @@ module.exports = class TransactionDAO {
       callback(err, res);
     });
   }
-  getTransactions(min, max, callback) {
-    const queryObject = { 'number': { $gte: min, $lte: max } };
-    this.client.query(this.transactionInfoCollection, queryObject, function (error, recordList) {
-      var transactionInfoList = []
-      for (var i = 0; i < recordList.length; i++) {
-        var transactionInfo = {};
-        transactionInfo.hash = recordList[i].hash;
-        transactionInfo.type = recordList[i].type;
-        transactionInfo.data = recordList[i].data;
-        transactionInfo.number = recordList[i].number;
-        transactionInfo.block_height = recordList[i].block_height;
-        transactionInfo.timestamp = recordList[i].timestamp;
-        transactionInfo.status = recordList[i].status;
-        transactionInfoList.push(transactionInfo)
-      }
-      callback(error, transactionInfoList)
-    })
+  getTransactions(pageNumber, limitNumber, diff, callback) {
+    console.log(diff);
+    console.log(typeof diff)
+    const queryObject = { 'status': 'finalized' };
+    const sortObject = { 'number': diff === null ? -1 : 1 };
+    pageNumber = pageNumber;
+    limitNumber = limitNumber;
+    this.client.getRecords(this.transactionInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
   getTransactionByPk(pk, callback) {
     const queryObject = { '_id': pk };

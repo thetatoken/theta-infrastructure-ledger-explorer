@@ -154,17 +154,7 @@ function pushTopBlocks() {
 }
 function pushTopTransactions() {
   numberOfTransactions = 10;
-
-  progressDao.getProgressAsync(config.blockchain.network_id)
-    .then((progressInfo) => {
-      latest_transaction_count = progressInfo.count;
-      // console.log('Latest transaction count: ' + latest_transaction_count.toString());
-      var query_txs_count_max = latest_transaction_count;
-      var query_txs_count_min = Math.max(0, query_txs_count_max - numberOfTransactions + 1); // pushing 100 blocks initially
-      console.log('Querying transactions from ' + query_txs_count_min.toString() + ' to ' + query_txs_count_max.toString())
-      //return blockDao.getBlockAsync(123) 
-      return transactionDao.getTransactionsAsync(query_txs_count_min, query_txs_count_max)
-    })
+  transactionDao.getTransactionsAsync(0, numberOfTransactions, null)
     .then(function (transactionInfoList) {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });
