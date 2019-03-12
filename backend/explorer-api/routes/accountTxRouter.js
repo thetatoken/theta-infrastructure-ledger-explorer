@@ -2,12 +2,12 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 
-var accountTxRouter = (app, accountDao, accountTxDao, transactionDao, rpc) => {
+var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = req.params.address.toLowerCase();
-    let { type = 5, isEqualType = 'false', pageNumber = 0, limitNumber = 10 } = req.query;
+    let { type = 2, isEqualType = 'true', pageNumber = 0, limitNumber = 10 } = req.query;
     let totalNumber = 0;
     let diff = null;
     pageNumber = parseInt(pageNumber);
@@ -21,17 +21,21 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao, rpc) => {
           } else {
             if (accountInfo.txs_counter) {
               number = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
-                console.log(typeof key, typeof type)
                 return key === type ? total : total + accountInfo.txs_counter[key]
               }, number);
             }
           }
-          // totalNumber = number;
           type = parseInt(type);
+          // totalNumber = number;
           if (number < (pageNumber + 1) * limitNumber) {
             if (number > pageNumber * limitNumber) {
               diff = number - pageNumber * limitNumber;
-              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+              if ((isEqualType === 'true' && type === 2) || number === accountInfo.txs_counter[2]) {
+                console.log('Search Tx Send DB only!');
+                return accountTxSendDao.getInfoListAsync(address, pageNumber, limitNumber, diff);
+              } else {
+                return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+              }
             } else {
               const data = ({
                 type: 'account_tx_list',
@@ -42,7 +46,12 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao, rpc) => {
               res.status(200).send(data);
             }
           } else {
-            return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+            if ((isEqualType === 'true' && type === 2) || number === accountInfo.txs_counter[2]) {
+              console.log('Search Tx Send DB only!');
+              return accountTxSendDao.getInfoListAsync(address, pageNumber, limitNumber, diff);
+            } else {
+              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+            }
           }
         })
         .then(async infoList => {
