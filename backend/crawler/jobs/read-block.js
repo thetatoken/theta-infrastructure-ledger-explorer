@@ -22,12 +22,13 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, vcpDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, accountTxSendDaoInstance, vcpDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
+  accountTxSendDao = accountTxSendDaoInstance;
   vcpDao = vcpDaoInstance;
 }
 
@@ -159,7 +160,7 @@ exports.Execute = async function () {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, accountTxSendDao, validTransactionList);
     })
     .then(async function () {
       validTransactionList = [];

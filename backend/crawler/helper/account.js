@@ -1,6 +1,6 @@
 var rpc = require('../api/rpc.js');
 
-exports.updateAccount = async function (accountDao, accountTxDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendDao, transactionList) {
   // console.log('transactionList', transactionList);
   // transactionList.forEach(async function (tx) {
   for (let tx of transactionList) {
@@ -15,12 +15,12 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
         // Update inputs account
         for (let input of tx.data.inputs) {
           await _updateAccountByAddress(input.address, accountDao, tx.type);
-          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao, accountTxSendDao);
         }
         // Update outputs account
         for (let output of tx.data.outputs) {
           await _updateAccountByAddress(output.address, accountDao, tx.type);
-          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao, accountTxSendDao);
         }
         break;
       case 3:
@@ -87,11 +87,19 @@ async function _updateAccountByAddress(address, accountDao, type) {
     })
 }
 
-function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
+function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao, accountTxSendDao) {
   accountTxDao.upsertInfoAsync({
     address,
     'tx_hash': hash,
     'tx_type': type,
     timestamp
   });
+  if (type === 2) {
+    accountTxSendDao.upsertInfoAsync({
+      address,
+      'tx_hash': hash,
+      'tx_type': type,
+      timestamp
+    });
+  }
 }
