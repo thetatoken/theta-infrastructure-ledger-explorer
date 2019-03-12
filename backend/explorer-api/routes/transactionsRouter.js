@@ -51,22 +51,21 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
 
   router.get("/transactions/range", (req, res) => {
     let totalPageNumber = 0;
-    let { pageNumber = 0, limit = 10 } = req.query;
+    let { pageNumber = 1, limit = 10 } = req.query;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         totalNumber = progressInfo.count;
-        console.log('Latest transaction count: ' + totalNumber.toString());
         let diff = null;
         pageNumber = parseInt(pageNumber);
         limit = parseInt(limit);
         totalPageNumber = Math.ceil(totalNumber / limit);
         let searchPage = pageNumber;
-        if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > -1 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
+        if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > 0 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
           if (pageNumber > totalPageNumber / 2) {
             diff = limit;
-            searchPage = totalPageNumber - pageNumber - 1;
+            searchPage = totalPageNumber - pageNumber + 1;
           }
-          return transactionDao.getTransactionsAsync(searchPage, limit, diff)
+          return transactionDao.getTransactionsAsync(searchPage - 1, limit, diff)
         } else {
           res.status(400).send('Wrong parameter.');
         }

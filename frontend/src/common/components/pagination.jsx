@@ -16,14 +16,14 @@ export default class Pagination extends React.Component {
   }
   handlePrevious() {
     const previous = this.props.currentPage - 1;
-    if (previous >= 0) {
+    if (previous > 0) {
       this.handleOnPage(previous);
     }
   }
 
   handleNext() {
     const next = this.props.currentPage + 1;
-    if (next <= (this.props.totalPages - 1)) {
+    if (next <= this.props.totalPages) {
       this.handleOnPage(next);
     }
   }
@@ -44,34 +44,34 @@ export default class Pagination extends React.Component {
       startPage = Math.max(
         Math.min(
           activePage - Math.floor(maxButtons / 2, 10),
-          items - maxButtons,
+          items - maxButtons + 1,
         ),
-        0,
+        1,
       );
       endPage = startPage + maxButtons - 1;
     } else {
-      startPage = 0;
-      endPage = items - 1;
+      startPage = 1;
+      endPage = items;
     }
 
     for (let page = startPage; page <= endPage; ++page) {
       pageButtons.push(
-        <PaginationLink 
-          key={page} 
-          onClick={() => this.handleOnPage(page)} 
-          active={ page === activePage }
+        <PaginationLink
+          key={page}
+          onClick={() => this.handleOnPage(page)}
+          active={page === activePage}
           className="number"
-           disabled={disabled}>
-          {page + 1}
+          disabled={disabled}>
+          {page}
         </PaginationLink>);
     }
-    if (startPage >= 1) {
+    if (startPage > 1) {
       pageButtons.unshift(<Ellipse key="e0" />);
     }
-    if (endPage < items - 1) {
+    if (endPage < items) {
       pageButtons.push(<Ellipse key="e1" />);
     }
-    
+
     return pageButtons;
   }
 
@@ -79,25 +79,25 @@ export default class Pagination extends React.Component {
     let { size, totalPages, disabled } = this.props;
     return (
       <div className={cx('pagination', size, { disabled })}>
-        <PaginationFirst onClick={() => this.handleOnPage(0)} disabled={disabled} className="icon first" />
+        <PaginationFirst onClick={() => this.handleOnPage(1)} disabled={disabled} className="icon first" />
         <PaginationPrev onClick={this.handlePrevious} disabled={disabled} className="icon prev" />
         {this.renderPaginationItems(disabled)}
         <PaginationNext onClick={this.handleNext} disabled={disabled} className="icon next" />
-        <PaginationLast onClick={() => this.handleOnPage(totalPages - 1)} disabled={disabled} className="icon last" />
+        <PaginationLast onClick={() => this.handleOnPage(totalPages)} disabled={disabled} className="icon last" />
       </div>);
   }
 }
 
 const PaginationLink = props => {
   let { active, onClick, children, className, ...params } = props;
-  return(
-    <button 
-      className={cx("btn t", {active: active}, className)} 
+  return (
+    <button
+      className={cx("btn t", { active: active }, className)}
       onClick={onClick}
-      {...params}>{ children }</button>);
+      {...params}>{children}</button>);
 }
-const PaginationFirst = props => <PaginationLink active={false} className="first" {...props}><i/></PaginationLink>
-const PaginationPrev = props => <PaginationLink active={false} className="prev" {...props}><i/></PaginationLink>
-const PaginationNext = props => <PaginationLink active={false} className="next" {...props}><i/></PaginationLink>
-const PaginationLast = props => <PaginationLink active={false} className="last" {...props}><i/></PaginationLink>
+const PaginationFirst = props => <PaginationLink active={false} className="first" {...props}><i /></PaginationLink>
+const PaginationPrev = props => <PaginationLink active={false} className="prev" {...props}><i /></PaginationLink>
+const PaginationNext = props => <PaginationLink active={false} className="next" {...props}><i /></PaginationLink>
+const PaginationLast = props => <PaginationLink active={false} className="last" {...props}><i /></PaginationLink>
 const Ellipse = props => <div className="ellipse" {...props}>&#8230;</div>

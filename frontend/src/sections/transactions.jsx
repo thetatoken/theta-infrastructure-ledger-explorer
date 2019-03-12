@@ -14,7 +14,7 @@ export default class Transactions extends Component {
     this.state = {
       backendAddress: this.props.route.backendAddress,
       transactions: [],
-      currentPage: 0,
+      currentPage: 1,
       totalPages: 0,
       loading: false,
     };

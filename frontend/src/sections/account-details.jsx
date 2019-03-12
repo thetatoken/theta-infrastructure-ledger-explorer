@@ -22,7 +22,7 @@ export default class AccountDetails extends Component {
     this.state = {
       account: null,
       transactions: null,
-      currentPage: 0,
+      currentPage: 1,
       totalPages: null,
       errorType: null,
       loading_acct: false,
@@ -44,7 +44,7 @@ export default class AccountDetails extends Component {
     this.getTransactionsByAddress(address);
   }
 
-  getTransactionsByAddress(address, page = 0) {
+  getTransactionsByAddress(address, page = 1) {
     if(!address) {
       this.setState({ errorType: 'error_not_found' });
       return;

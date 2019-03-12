@@ -7,50 +7,48 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = req.params.address.toLowerCase();
-    let { type = 2, isEqualType = 'true', pageNumber = 0, limitNumber = 10 } = req.query;
+    let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
     let totalNumber = 0;
     let diff = null;
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
-    if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > -1 && limitNumber > 0 && limitNumber < 101) {
+    if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
-          let number = 0;
           if (isEqualType === 'true') {
-            number = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
           } else {
             if (accountInfo.txs_counter) {
-              number = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
+              totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
                 return key === type ? total : total + accountInfo.txs_counter[key]
-              }, number);
+              }, 0);
             }
           }
           type = parseInt(type);
-          // totalNumber = number;
-          if (number < (pageNumber + 1) * limitNumber) {
-            if (number > pageNumber * limitNumber) {
-              diff = number - pageNumber * limitNumber;
-              if ((isEqualType === 'true' && type === 2) || number === accountInfo.txs_counter[2]) {
+          if (totalNumber < pageNumber * limitNumber) {
+            if (totalNumber > (pageNumber - 1) * limitNumber) {
+              diff = totalNumber - (pageNumber - 1) * limitNumber;
+              if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
                 console.log('Search Tx Send DB only!');
-                return accountTxSendDao.getInfoListAsync(address, pageNumber, limitNumber, diff);
+                return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
               } else {
-                return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+                return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
               }
             } else {
               const data = ({
                 type: 'account_tx_list',
                 body: [],
-                totalPageNumber: Math.ceil(number / limitNumber),
+                totalPageNumber: Math.ceil(totalNumber / limitNumber),
                 currentPageNumber: pageNumber
               });
               res.status(200).send(data);
             }
           } else {
-            if ((isEqualType === 'true' && type === 2) || number === accountInfo.txs_counter[2]) {
+            if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
               console.log('Search Tx Send DB only!');
-              return accountTxSendDao.getInfoListAsync(address, pageNumber, limitNumber, diff);
+              return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
             } else {
-              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber, limitNumber, diff)
+              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
             }
           }
         })

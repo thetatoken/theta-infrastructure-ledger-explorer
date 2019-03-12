@@ -11,7 +11,7 @@ var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
-var network_id = 'test_chain_id';
+var network_id = 'main_net_chain';
 var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;

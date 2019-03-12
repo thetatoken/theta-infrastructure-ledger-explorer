@@ -13,7 +13,7 @@ export default class Blocks extends Component {
       backendAddress: this.props.route.backendAddress,
       blockHeight: 0,
       blockInfoList: [],
-      currentPageNumber: 0,
+      currentPageNumber: 1,
       totalPageNumber: 0
     };
     this.receivedBlocksEvent = this.receivedBlocksEvent.bind(this);
