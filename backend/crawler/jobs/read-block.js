@@ -7,12 +7,12 @@ var fs = require('fs');
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
-var initialAccounts = null;
+var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
 var network_id = 'test_chain_id';
-var max_block_per_crawl = 5;
+var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
 var crawled_block_height_progress = 0;
@@ -22,12 +22,13 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, vcpDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, accountTxSendDaoInstance, vcpDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
+  accountTxSendDao = accountTxSendDaoInstance;
   vcpDao = vcpDaoInstance;
 }
 
@@ -87,7 +88,7 @@ exports.Execute = async function () {
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
@@ -159,7 +160,7 @@ exports.Execute = async function () {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, accountTxSendDao, validTransactionList);
     })
     .then(async function () {
       validTransactionList = [];
