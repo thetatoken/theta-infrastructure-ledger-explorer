@@ -15,11 +15,12 @@
 
 // COMPONENTS
 @import 'components/header';
-@import 'components/link-button';
 @import 'components/not-exist';
 @import 'components/pagination';
 @import 'components/transaction-table';
 @import 'components/blocks-table';
+@import 'components/loading-panel';
+@import 'components/spinner';
 
 // SECTIONS 
 @import 'sections/home';

@@ -13,6 +13,7 @@ import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
+import LoadingPanel from 'common/components/loading-panel';
 
 const NUM_TRANSACTIONS = 50;
 
@@ -124,9 +125,15 @@ export default class AccountDetails extends Component {
             </tbody>
           </table>
         </React.Fragment>}
+        { !transactions && loading_txns && 
+        <LoadingPanel />}
         { transactions && transactions.length > 0 && 
         <React.Fragment>
-          <TransactionTable transactions={transactions} />
+          <div>
+            { loading_txns &&
+              <LoadingPanel className="fill" />}
+            <TransactionTable transactions={transactions} />
+          </div>
           <Pagination
             size={'lg'}
             currentPage={currentPage}
