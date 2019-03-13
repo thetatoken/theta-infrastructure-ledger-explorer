@@ -1,12 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
 
 var accountRouter = (app, accountDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/account/:address", async (req, res) => {
-    let address = req.params.address.toLowerCase();
+    let address = helper.normalize(req.params.address.toLowerCase());
+    console.log(address);
+    address = regex.test(address) ? adress : '0x' + address;
     // console.log('Querying one account by using Id: ' + address);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
@@ -30,7 +33,8 @@ var accountRouter = (app, accountDao, rpc) => {
   });
 
   router.get("/account/update/:address", async (req, res) => {
-    let address = req.params.address.toLowerCase();
+    let address = helper.normalize(req.params.address.toLowerCase());
+    console.log(address);
     // console.log('Updating one account by Id:', address);
     rpc.getAccountAsync([{ 'address': address }])
       .then(async function (data) {

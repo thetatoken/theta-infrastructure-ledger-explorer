@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
 
 var transactionRouter = (app, transactionDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/transaction/:hash", (req, res) => {
-    let hash = req.params.hash.toLowerCase();
+    let hash = helper.normalize(req.params.hash.toLowerCase());
     console.log('Querying one transaction by using uuid: ' + hash);
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {

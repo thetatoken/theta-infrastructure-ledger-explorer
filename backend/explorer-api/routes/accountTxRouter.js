@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
 
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/accountTx/:address", async (req, res) => {
-    const address = req.params.address.toLowerCase();
+    const address = helper.normalize(req.params.address.toLowerCase());
+    console.log(address);
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
     let totalNumber = 0;
     let diff = null;
