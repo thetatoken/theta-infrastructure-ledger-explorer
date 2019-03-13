@@ -8,7 +8,6 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
-    console.log(address);
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
     let totalNumber = 0;
     let diff = null;
