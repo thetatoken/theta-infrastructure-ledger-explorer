@@ -33,7 +33,6 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/update/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    console.log(address);
     // console.log('Updating one account by Id:', address);
     rpc.getAccountAsync([{ 'address': address }])
       .then(async function (data) {

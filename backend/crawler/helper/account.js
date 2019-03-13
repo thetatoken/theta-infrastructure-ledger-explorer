@@ -39,6 +39,16 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         break;
+      case 7:
+      case 8:
+        // Update source account
+        await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
+        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+
+        // Update holder account
+        await _updateAccountByAddress(tx.data.holder.address, accountDao, tx.type);
+        await _updateAccountTxMap(tx.data.holder.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        break
       default:
         break;
     }
