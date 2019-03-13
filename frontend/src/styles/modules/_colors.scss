@@ -1,12 +1,19 @@
-$color-white: #fff;
-$color-black: #1B1F2A;
+// brand colors
 $color-theta-green: #21EDBA;
 $color-theta-blue: #29B3EB;
+
+// basic colors
+$color-white: #fff;
+$color-black: #1B1F2A;
+$color-blue: $color-theta-blue;
+$color-green: $color-theta-green;
 $color-light: #7C81A3;
 
+// panels
 $color-page: #1b1f2a;
 $color-panel: rgba(#D6D8FF, .05);
 
+// Fonts
 $color-font-main: #ffffff;
 $color-font-light: #8A8FB5;
 $color-font-highlight: $color-theta-blue;
@@ -18,27 +25,31 @@ $color-font-link-hover: $color-font-highlight;
 $color-font-button: $color-black;
 $color-font-button-light: $color-font-main;
 
+// Lines
 $color-line: darken($color-light, 25%);
 $color-line-main: $color-line;
 $color-line-light: darken($color-light, 35%);
 
+// Text select
 $color-select-back: $color-font-highlight;
 $color-select-type: $color-font-main;
 
+// Forms
 $color-input-background: rgba($color-light, .35);
 $color-input-text: $color-font-main;
 $color-input-placeholder: rgba($color-font-main, .5);
 $color-input-border: $color-line-main;
 
+// Tables
 $color-table-row: rgba(#D6D8FF, .05);
 $color-table-row-alt: rgba(#D6D8FF, .02);
 
+// Buttons
 $color-button-light: rgba($color-light, .45);
 
 
 
 //Gradient helpers
-
 @mixin linearVerticalGradient($top, $bottom){
   background: $top; /* Old browsers */
   background: -moz-linear-gradient(top,  $top 0%, $bottom 100%); /* FF3.6+ */
@@ -58,53 +69,6 @@ $color-button-light: rgba($color-light, .45);
 
 @mixin buttonGradient() { @include linearHorizontalGradient($color-theta-blue, $color-theta-green); }
 
-
-
-
-// DEPRECATED
-$th-body: #1b1f2a;
-
-$th-white: white;
-
-$th-grey: rgba(255,255,255,0.5);
-$th-grey-dark: rgba(255,255,255,0.25);
-$th-grey-light: rgba(255,255,255,0.65);
-$th-grey-lighter: rgba(255,255,255,0.85);
-
-$th-blue: #29b3eb;
-$th-blue-transparent: rgba(41, 179, 235, 0.5);
-
-$th-light-blue: #33ccff;
-
-$th-green: #21edba;
-$th-green-transparent: rgba(33, 237, 186, 0.5);
-
-$th-yellow: #ccdf23;
-
-$th-pink: #e82768;
-
-$th-brand: $th-green;
-
-$th-bullet-blue: #25ced5;
-$th-bullet-red: #f42f56;
-$th-bullet-yellow: #f5c437;
-$th-bullet-purple: #9154d4;
-
-$th-red-gradient-start: #e82768;
-$th-red-gradient-end: #ff5e45;
-
-$th-gold-gradient-start: #c3922e;
-$th-gold-gradient-end: #fbc926;
-
-
-$th-input-background: #3A3A3A;
-$th-input-border: transparent;
-$th-input-hover-border: transparent;
-$th-input-placeholder-text: #777777;
-$th-input-text: white;
-
-$th-overlay: rgba(27, 31, 42, 0.95);
-$th-modal-background: rgba(27, 31, 42, 1.0);
 
 
 

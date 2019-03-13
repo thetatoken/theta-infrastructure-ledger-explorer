@@ -11,7 +11,9 @@
     }
   }
 
-  table.data.txn-table {
+
+  table.data.txn-table,
+  & > .loading-panel {
     margin-top: 3rem;
   }
 

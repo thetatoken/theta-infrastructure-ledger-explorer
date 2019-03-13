@@ -42,7 +42,7 @@
       overflow: hidden;
 
       &:hover{
-        @include linearHorizontalGradient($th-blue, $th-green);
+        @include linearHorizontalGradient($color-blue, $color-green);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
@@ -52,7 +52,7 @@
   .nav-search {
     display: flex;
     align-items: center;
-    color: $th-body;
+    color: $color-font-body;
 
     .search-input {
       width: 16rem;
@@ -92,7 +92,7 @@
       // @include linearVerticalGradient($th-blue, $th-green);
 
       &:hover{
-        @include linearVerticalGradient($th-blue, $th-green);
+        @include linearVerticalGradient($color-blue, $color-green);
       }
     }
 
@@ -107,11 +107,11 @@
     .svg-icon path,
     .svg-icon polygon,
     .svg-icon rect {
-      fill: $th-white;
+      fill: $color-white;
     }
 
     .svg-icon circle {
-      stroke: $th-white;
+      stroke: $color-white;
       stroke-width: 1;
     }
   }

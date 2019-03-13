@@ -1,0 +1,15 @@
+
+.loading-panel {
+  @include column($justify: center, $align: center);
+  background-color: $color-panel;
+  min-height: 10rem;
+  &.fill {
+  	background-color: rgba($color-page, .80);
+  	position: absolute;
+  	top: 0;
+  	bottom: 0;
+  	left: 0;
+  	right: 0;
+  	z-index: 10;
+  }
+}
