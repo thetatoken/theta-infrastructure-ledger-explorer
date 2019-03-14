@@ -8,7 +8,6 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    address = regex.test(address) ? adress : '0x' + address;
     // console.log('Querying one account by using Id: ' + address);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
