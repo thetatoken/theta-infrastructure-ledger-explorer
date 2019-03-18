@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router";
-import { browserHistory } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import socketClient from 'socket.io-client';
 import _ from 'lodash';
 import cx from 'classnames';
@@ -84,8 +83,8 @@ export default class TransactionTable extends Component {
                 <React.Fragment>
                   <td className="block">{ txn.block_height }</td>
                   <td className="age" title={ date(txn) }>{ age(txn) }</td>
-                  <td className="from overflow"><a href={`/account/${from(txn)}`}>{ from(txn, 16) }</a></td>
-                  <td className="to overflow"><a href={`/account/${to(txn)}`}>{ to(txn, 16) }</a></td>
+                  <td className="from overflow"><Link to={`/account/${from(txn)}`}>{ from(txn, 16) }</Link></td>
+                  <td className="to overflow"><Link to={`/account/${to(txn)}`}>{ to(txn, 16) }</Link></td>
                   { /* <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td> */ }
                 </React.Fragment>}
               </tr>);

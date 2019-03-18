@@ -153,7 +153,7 @@ const Amount = ({ coins }) => {
 }
 
 const Address = ({ hash }) => {
-  return(<a href={`/account/${hash}`}>{ hash }</a>)
+  return(<Link to={`/account/${hash}`}>{ hash }</Link>)
 }
 
 const Fee = ({ transaction }) => {

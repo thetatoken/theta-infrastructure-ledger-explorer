@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { browserHistory } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import cx from 'classnames';
 
 import { blocksService } from 'common/services/block';
@@ -99,12 +99,12 @@ export default class BlocksExplorer extends Component {
                 <td>{ hash(block) }</td>
               </tr>
               <tr>
-                <th>Previous Block</th>
-                <td>{ <a href={`/blocks/${height}`}>{ prevBlock(block) }</a> }</td>
+                <th># Transactions</th>
+                <td>{ block.num_txs }</td>
               </tr>
               <tr>
                 <th>Proposer</th>
-                <td>{ <a href={`/account/${block.proposer}`}>{ block.proposer }</a> }</td>
+                <td>{ <Link to={`/account/${block.proposer}`}>{ block.proposer }</Link> }</td>
               </tr>
               <tr>
                 <th>State Hash</th>
@@ -115,8 +115,8 @@ export default class BlocksExplorer extends Component {
                 <td>{ block.transactions_hash }</td>
               </tr>
               <tr>
-                <th># Transactions</th>
-                <td>{ block.num_txs }</td>
+                <th>Previous Block</th>
+                <td>{ <Link to={`/blocks/${height - 1}`}>{ prevBlock(block) }</Link> }</td>
               </tr>
             </tbody>
           </table>
@@ -130,9 +130,9 @@ export default class BlocksExplorer extends Component {
           
           <div className="button-list split">
             { hasPrev &&
-            <a className="btn icon prev" href={ `/blocks/${height - 1}` }><i /></a>}
+            <Link className="btn icon prev" to={ `/blocks/${height - 1}` }><i /></Link>}
             { hasNext && 
-            <a className="btn icon next" href={ `/blocks/${height + 1}` }><i /></a>}
+            <Link className="btn icon next" to={ `/blocks/${height + 1}` }><i /></Link>}
           </div>
         </React.Fragment>}
       </div>);
@@ -144,7 +144,7 @@ const Transaction = ({ txn }) => {
   return(
     <tr className="block-txn">
       <td className={cx("txn-type",TxnClasses[type])}>{ TxnTypeText[type] }</td>
-      <td className="hash overflow"><a href={`/txs/${hash}`}>{ hash }</a></td>
+      <td className="hash overflow"><Link to={`/txs/${hash}`}>{ hash }</Link></td>
     </tr>)
 }
 

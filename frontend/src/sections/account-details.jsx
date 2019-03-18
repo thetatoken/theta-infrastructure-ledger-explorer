@@ -153,7 +153,7 @@ const Balance = ({ balance }) => {
 }
 
 const Address = ({ hash }) => {
-  return (<a href={`/account/${hash}`} target="_blank">{hash}</a>)
+  return (<Link to={`/account/${hash}`} target="_blank">{hash}</Link>)
 }
 
 const HashList = ({ hashes }) => {

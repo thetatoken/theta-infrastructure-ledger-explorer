@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from 'react-router';
 
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
@@ -11,24 +12,24 @@ export default class Dashboard extends Component {
         <div className="overview">
 
           <div>
-            <h2 className="page-title blocks"><a href="/blocks">Blocks</a></h2>
+            <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
             <BlocksTable 
               updateLive={true} 
               backendAddress={ backendAddress } 
               truncateHash={true}
               includeDetails={false}
               truncate={50} />
-            <a href="/blocks" className="btn s">More</a>
+            <Link to="/blocks" className="btn s">More</Link>
           </div>
 
           <div>
-            <h2 className="page-title transactions"><a href="/txs">Transactions</a></h2>
+            <h2 className="page-title transactions"><Link to="/txs">Transactions</Link></h2>
             <TransactionsTable 
               updateLive={true} 
               backendAddress={ backendAddress }
               includeDetails={false}
               truncate={40} />
-            <a href="/txs" className="btn s">More</a>
+            <Link to="/txs" className="btn s">More</Link>
           </div>
           
         </div>
