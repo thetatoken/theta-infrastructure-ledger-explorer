@@ -28,6 +28,7 @@ export default class AccountDetails extends Component {
       errorType: null,
       loading_acct: false,
       loading_txns: false,
+      includeService: true,
     };
   }
   componentWillUpdate(nextProps) {
@@ -42,17 +43,17 @@ export default class AccountDetails extends Component {
 
   fetchData(address) {
     this.getOneAccountByAddress(address);
-    this.getTransactionsByAddress(address);
+    this.getTransactionsByAddress(address, this.state.includeService, 1);
   }
 
-  getTransactionsByAddress(address, page = 1) {
+  getTransactionsByAddress(address, includeService, page = 1, ) {
     if(!address) {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
 
     this.setState({ loading_txns: true });
-    transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS)
+    transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
         this.setState({ 
           transactions: _.get(res, 'data.body'),
@@ -100,11 +101,22 @@ export default class AccountDetails extends Component {
 
   handlePageChange = pageNumber => {
     let { accountAddress } = this.props.params;
-    this.getTransactionsByAddress(accountAddress, pageNumber);
+    let { includeService } = this.state;
+    this.getTransactionsByAddress(accountAddress, includeService, pageNumber);
+  }
+
+  handleToggleHideTxn = () => {
+    let { accountAddress } = this.props.params;
+    let includeService = !this.state.includeService;
+    this.setState({ 
+      includeService,
+      currentPage: 1,
+      totalPages: null, });
+    this.getTransactionsByAddress(accountAddress, includeService, 1);
   }
 
   render() {
-    const { account, transactions, currentPage, totalPages, errorType, loading_txns } = this.state;
+    const { account, transactions, currentPage, totalPages, errorType, loading_txns, includeService } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -129,6 +141,9 @@ export default class AccountDetails extends Component {
         <LoadingPanel />}
         { transactions && transactions.length > 0 && 
         <React.Fragment>
+          <div className="actions">
+            <button className="btn tx" onClick={this.handleToggleHideTxn}>{includeService ? 'Hide' : 'Show'} Service Payments</button>
+          </div>
           <div>
             { loading_txns &&
               <LoadingPanel className="fill" />}

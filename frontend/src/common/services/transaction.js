@@ -18,10 +18,12 @@ export const transactionsService = {
     return apiService.get('transactions/range', { params: { pageNumber, limit } });
   },
 
-  getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50) {
+  getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50, includeService = true) {
     let isEqualType = false;
-    // let type = TxnTypes.SERVICE_PAYMENT; //Exclude this
     let type = 10; //Return all types
+    if(!includeService) {
+      type = TxnTypes.SERVICE_PAYMENT; //Exclude this
+    }
     return apiService.get(`accounttx/${address}`, { params: { type, pageNumber, limitNumber, isEqualType } });
   }
 };

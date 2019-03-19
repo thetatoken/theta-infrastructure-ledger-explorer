@@ -11,10 +11,20 @@
     }
   }
 
+  .actions {
+    @include row($justify: flex-end);
+    margin-top: 3rem;
+    .btn.tx {
+      font-size: .875rem;
+      font-weight: $weight-semi;
+      color: $color-font-light;
+    }
+  }
+
 
   table.data.txn-table,
   & > .loading-panel {
-    margin-top: 3rem;
+    margin-top: 0rem;
   }
 
   @include breakpoint('tablet', max) {
@@ -22,7 +32,6 @@
       tbody tr th {
         content: 'Transactions';
       }
-
     }
   }
   
