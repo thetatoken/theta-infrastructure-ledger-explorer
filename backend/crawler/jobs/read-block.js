@@ -88,7 +88,7 @@ exports.Execute = async function () {
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
