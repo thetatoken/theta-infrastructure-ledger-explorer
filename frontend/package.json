@@ -26,6 +26,7 @@
     "raven-js": "^3.26.3",
     "react": "^16.4.1",
     "react-dom": "^16.4.2",
+    "react-json-view": "^1.19.1",
     "react-router": "^3.0.2",
     "reactstrap": "^6.2.0",
     "sass-loader": "^5.0.1",

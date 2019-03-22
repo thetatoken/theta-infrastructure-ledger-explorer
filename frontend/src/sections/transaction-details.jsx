@@ -9,6 +9,8 @@ import { formatCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
+import JsonView from 'common/components/json-view';
+import BodyTag from 'common/components/body-tag';
 
 
 
@@ -19,7 +21,8 @@ export default class TransactionExplorer extends Component {
       backendAddress: this.props.route.backendAddress,
       transaction: null,
       totalTransactionsNumber: undefined,
-      errorType: null
+      errorType: null,
+      showRaw: false
     };
   }
   componentWillUpdate(nextProps) {
@@ -58,12 +61,18 @@ export default class TransactionExplorer extends Component {
       console.log('Wrong Height')
     }
   }
+  handleToggleDetailsClick = e => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({ showRaw: !this.state.showRaw });
+  }
   render() {
     const { transactionHash } = this.props.params;
-    const { transaction, errorType } = this.state;
+    const { transaction, errorType, showRaw } = this.state;
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
+        <BodyTag className={cx({ 'show-modal': showRaw })} />
         {errorType && 
         <NotExist />}
         { transaction && errorType === null && 
@@ -95,7 +104,10 @@ export default class TransactionExplorer extends Component {
             </tbody>
           </table>
 
-          <div className={cx("txn-type", TxnClasses[transaction.type])}>{ type(transaction) }</div>
+          <div className="details-header">
+            <div className={cx("txn-type", TxnClasses[transaction.type])}>{ type(transaction) }</div>
+            <button className="btn tx raw" onClick={this.handleToggleDetailsClick}>view raw txn</button>
+          </div>
           { transaction.type === TxnTypes.COINBASE && 
           <Coinbase transaction={transaction} /> }
           
@@ -126,6 +138,11 @@ export default class TransactionExplorer extends Component {
           { transaction.type === TxnTypes.SMART_CONTRACT && 
           <SmartContract transaction={transaction} /> }
 
+          { showRaw && 
+          <JsonView 
+            json={transaction} 
+            onClose={this.handleToggleDetailsClick} 
+            className="tx-raw" />}
         </React.Fragment>}
       </div>);
   }

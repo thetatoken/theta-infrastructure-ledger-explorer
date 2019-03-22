@@ -5,6 +5,10 @@
   flex: 1;
 }
 
+.hide {
+  display: none;
+}
+
 
 @mixin flex($direction: row, $justify: flex-start, $align: center, $wrap: nowrap) {
   display: flex;

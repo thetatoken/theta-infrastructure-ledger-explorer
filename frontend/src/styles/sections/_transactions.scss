@@ -5,21 +5,28 @@
 }
 
 .content.transaction-details {
-  .txn-type {
-    margin: 3rem 0 .75rem;
-    font-family: $font-title;
-    font-weight: $weight-bold;
-    font-size: 1.125rem;
-    color: $color-font-main;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    &:before {
-      top: 3px;
-      margin-right: .75rem;
+  
+
+  .details-header {
+    @include row($justify: space-between, $align: flex-end);
+    padding: 3rem 1rem .75rem;
+    .txn-type {
+      font-family: $font-title;
+      font-weight: $weight-bold;
+      font-size: 1.125rem;
+      color: $color-font-main;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      &:before {
+        top: 3px;
+        margin-right: .75rem;
+      }
     }
-  }
-  .txn-details {
-    
+    .btn.raw {
+      margin-bottom: .125rem;
+      color: $color-font-light;
+      font-weight: $weight-regular;
+    }
   }
   .coinbase-output {
     @include row($align: flex-start);
@@ -44,11 +51,6 @@
 
   }
 
-  @include breakpoint('tablet', max) {
-    .txn-type {
-      margin-left: 1rem;
-    }
-  }
   
 }
 
