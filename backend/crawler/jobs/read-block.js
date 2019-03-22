@@ -88,7 +88,7 @@ exports.Execute = async function () {
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // console.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
@@ -107,50 +107,52 @@ exports.Execute = async function () {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
           // console.log(blockDataList[i]);
-          if (result.result.BlockHashVcpPairs) {  // handle vcp response
-            result.result.BlockHashVcpPairs.forEach(vcpPair => {
-              vcpPair.Vcp.SortedCandidates.forEach(candidate => {
-                upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
+          if (result.result !== undefined) {
+            if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              result.result.BlockHashVcpPairs.forEach(vcpPair => {
+                vcpPair.Vcp.SortedCandidates.forEach(candidate => {
+                  upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
+                })
               })
-            })
-          } else {  //handle block response
-            var txs = result.result.transactions;
-            const blockInfo = {
-              epoch: result.result.epoch,
-              status: result.result.status,
-              height: result.result.height,
-              timestamp: result.result.timestamp,
-              hash: result.result.hash,
-              parent_hash: result.result.parent,
-              proposer: result.result.proposer,
-              state_hash: result.result.state_hash,
-              transactions_hash: result.result.transactions_hash,
-              num_txs: result.result.transactions.length,
-              txs: txHelper.getBriefTxs(result.result.transactions)
-            }
-            upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
-            // Store the transaction data
-            if (txs !== undefined && txs.length > 0) {
-              for (var j = 0; j < txs.length; j++) {
-                const transaction = {
-                  hash: txs[j].hash,
-                  type: txs[j].type,
-                  data: txs[j].raw,
-                  block_height: blockInfo.height,
-                  timestamp: blockInfo.timestamp,
-                  status: 'finalized'
-                }
-                const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
-                if (!isExisted) {
-                  transaction.number = ++txs_count;
-                  validTransactionList.push(transaction);
-                  upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
-                } else {
-                  // TODO: get transaction's number
-                  const tx = await transactionDao.getTransactionByPkAsync(transaction.hash);
-                  transaction.number = tx.number;
-                  validTransactionList.push(transaction);
-                  upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+            } else {  //handle block response
+              var txs = result.result.transactions;
+              const blockInfo = {
+                epoch: result.result.epoch,
+                status: result.result.status,
+                height: result.result.height,
+                timestamp: result.result.timestamp,
+                hash: result.result.hash,
+                parent_hash: result.result.parent,
+                proposer: result.result.proposer,
+                state_hash: result.result.state_hash,
+                transactions_hash: result.result.transactions_hash,
+                num_txs: result.result.transactions.length,
+                txs: txHelper.getBriefTxs(result.result.transactions)
+              }
+              upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
+              // Store the transaction data
+              if (txs !== undefined && txs.length > 0) {
+                for (var j = 0; j < txs.length; j++) {
+                  const transaction = {
+                    hash: txs[j].hash,
+                    type: txs[j].type,
+                    data: txs[j].raw,
+                    block_height: blockInfo.height,
+                    timestamp: blockInfo.timestamp,
+                    status: 'finalized'
+                  }
+                  const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
+                  if (!isExisted) {
+                    transaction.number = ++txs_count;
+                    validTransactionList.push(transaction);
+                    upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+                  } else {
+                    // TODO: get transaction's number
+                    const tx = await transactionDao.getTransactionByPkAsync(transaction.hash);
+                    transaction.number = tx.number;
+                    validTransactionList.push(transaction);
+                    upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
+                  }
                 }
               }
             }

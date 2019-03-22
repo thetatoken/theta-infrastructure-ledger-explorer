@@ -34,7 +34,7 @@ var blockRouter = (app, blockDao, progressDao, config) => {
       });
   });
   router.get("/blocks/top_blocks", (req, res) => {
-    numberOfBlocks = 10;
+    numberOfBlocks = 1;
     let totalPageNumber, pageNumber = 1;
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {

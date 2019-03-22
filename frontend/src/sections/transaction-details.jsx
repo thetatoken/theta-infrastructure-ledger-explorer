@@ -198,6 +198,7 @@ const ServicePayment = ({ transaction }) => {
         <DetailsRow label="Amount" data={ <Amount coins={data.source.coins} /> } />
         <DetailsRow label="Payment Sequence" data={data.payment_sequence} />
         <DetailsRow label="Reserve Sequence" data={data.reserve_sequence} />
+        <DetailsRow label="Resource ID" data={data.resource_id} />
       </tbody>
     </table>);
 }
