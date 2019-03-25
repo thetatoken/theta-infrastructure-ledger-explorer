@@ -9,7 +9,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         counter += tx.data.outputs.length;
         break;
       case 2:
-        counter += tx.data.inputs.length + tx.data.inputs.outputs.length;
+        counter += tx.data.inputs.length + tx.data.outputs.length;
         break;
       case 3:
         counter++;
