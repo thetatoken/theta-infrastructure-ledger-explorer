@@ -158,8 +158,8 @@ exports.Execute = async function () {
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
-                  Logger.log('validTransactionList length', validTransactionList.length);
-                  Logger.log('upsertTransactionAsyncList length', upsertTransactionAsyncList.length);
+                  // Logger.log('validTransactionList length', validTransactionList.length);
+                  // Logger.log('upsertTransactionAsyncList length', upsertTransactionAsyncList.length);
                 }
               }
             }
