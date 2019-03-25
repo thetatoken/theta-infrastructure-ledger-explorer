@@ -4,7 +4,7 @@
   "description": "theta explorer",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "export PORT=4000 && node server.js",
+    "dev": "export PORT=3030 && node server.js",
     "start": "node server.js"
   },
   "main": "server.js",
