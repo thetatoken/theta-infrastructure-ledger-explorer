@@ -4,7 +4,7 @@
   "description": "blockchain explorer for theta token",
   "main": "run.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --max-old-space-size=4096 run.js | tee -a /home/ubuntu/logs/crawler.log"
   },
   "author": "",
   "license": "ISC",

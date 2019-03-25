@@ -1,8 +1,34 @@
 var rpc = require('../api/rpc.js');
+var Logger = require('./logger');
 
 exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendDao, transactionList) {
-  // console.log('transactionList', transactionList);
-  // transactionList.forEach(async function (tx) {
+  var counter = 0;
+  transactionList.forEach(tx => {
+    switch (tx.type) { // TODO: Add other type cases
+      case 0:
+        counter += tx.data.outputs.length;
+        break;
+      case 2:
+        counter += tx.data.inputs.length + tx.data.inputs.outputs.length;
+        break;
+      case 3:
+        counter++;
+        break;
+      case 5:
+        counter = counter + 2
+        break;
+      case 6:
+        counter++;
+        break;
+      case 7:
+      case 8:
+        counter = counter + 2
+        break
+      default:
+        break;
+    }
+  })
+  Logger.log(`Number of upsert ACCOUNTS: ${counter}`);
   for (let tx of transactionList) {
     switch (tx.type) { // TODO: Add other type cases
       case 0:
@@ -53,7 +79,6 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         break;
     }
   }
-  // });
 };
 
 exports.updateAccountByAddress = _updateAccountByAddress;
@@ -88,10 +113,10 @@ async function _updateAccountByAddress(address, accountDao, type) {
       }
     })
     .catch(err => {
-      console.log(`Getting ${address} with:`, err);
-      console.log('Start retry in 100ms.');
+      Logger.error(`Getting ${address} with:`, err);
+      Logger.debug('Start retry in 100ms.');
       setTimeout(function retry() {
-        console.log('Retry of getting address:', address);
+        Logger.debug('Retry of getting address:', address);
         _updateAccountByAddress(address, accountDao, type)
       }, 100);
     })

@@ -3,6 +3,7 @@ var accountHelper = require('../helper/account');
 var vcpHelper = require('../helper/vcp');
 var txHelper = require('../helper/transactions');
 var fs = require('fs');
+var Logger = require('../helper/logger');
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -35,16 +36,18 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
 exports.Execute = async function () {
   await progressDao.getProgressAsync(network_id)
     .then(function (progressInfo) {
+      Logger.log('Start a new crawler progress');
       txs_count = progressInfo.count;
       crawled_block_height_progress = progressInfo.height;
-      console.log('DB transaction count progress: ' + txs_count.toString());
-      console.log('crawled_block_height_progress: ', crawled_block_height_progress);
+      Logger.log('DB transaction count progress: ' + txs_count.toString());
+      Logger.log('crawled_block_height_progress: ', crawled_block_height_progress);
       return rpc.getPendingTxsAsync([])
     })
     .then(async function (data) {
       const result = JSON.parse(data);
-      // console.log(result)
+      // Logger.log(result)
       const pendingTxList = result.result.tx_hashes;
+      // Logger.log(`Number of PENDING transactions: ${pendingTxList.length}`);
       // const pendingTxList = ["12311", "23411", "34511", "45611", "56711", "67811", "78911", "89011", "90111", "12211", "12411", "12511"];
       let upsertTransactionAsyncList = [];
       for (let hash of pendingTxList) {
@@ -59,22 +62,23 @@ exports.Execute = async function () {
           upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
         }
       }
+      Logger.log(`Number of upsert PENDING transactions: ${upsertTransactionAsyncList.length}`);
       return Promise.all(upsertTransactionAsyncList)
     })
     .then(() => {
       return rpc.getStatusAsync([]) // read block height from chain
     })
     // .catch(err => {
-    //   console.log(err)
-    //   console.log('Met error after get status.')
+    //   Logger.log(err)
+    //   Logger.log('Met error after get status.')
     // })
     .then(function (data) {
-      // console.log(data);
+      // Logger.log(data);
       var result = JSON.parse(data);
       latest_block_height = +result.result.latest_finalized_block_height;
-      console.log('Latest block height: ' + latest_block_height);
+      Logger.log('Latest block height: ' + latest_block_height);
 
-      console.log('DB block height progress: ' + crawled_block_height_progress.toString());
+      Logger.log('DB block height progress: ' + crawled_block_height_progress.toString());
 
       if (latest_block_height >= crawled_block_height_progress) {
         // get target crawl height
@@ -86,27 +90,28 @@ exports.Execute = async function () {
         var getBlockAsyncList = [];
         var getVcpAsyncList = [];
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
-          // console.log('Crawling new block: ' + i.toString());
+          // Logger.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
           // getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
         }
         return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
       } else {
-        console.log('Block crawling is up to date.');
+        Logger.error('Block crawling is up to date.');
       }
     })
     // .catch(err => {
-    //   console.log(err)
-    //   console.log('Met error after get blocks.')
+    //   Logger.log(err)
+    //   Logger.log('Met error after get blocks.')
     // })
     .then(async function (blockDataList) {
       if (blockDataList) {
         var upsertBlockAsyncList = [];
         var upsertVcpAsyncList = [];
+        var upsertTransactionAsyncList = [];
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
-          // console.log(blockDataList[i]);
+          // Logger.log(blockDataList[i]);
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
@@ -153,11 +158,16 @@ exports.Execute = async function () {
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
+                  Logger.log('validTransactionList length', validTransactionList.length);
+                  Logger.log('upsertTransactionAsyncList length', upsertTransactionAsyncList.length);
                 }
               }
             }
           }
         }
+        Logger.log(`Number of upsert BLOCKS: ${upsertBlockAsyncList.length}`);
+        Logger.log(`Number of upsert VCP: ${upsertVcpAsyncList.length}`);
+        Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertTransactionAsyncList)
       }
     })
@@ -166,38 +176,39 @@ exports.Execute = async function () {
     })
     .then(async function () {
       validTransactionList = [];
-      console.log('target_crawl_height: ', target_crawl_height, '. txs_count: ', txs_count)
+      Logger.log('target_crawl_height: ', target_crawl_height, '. txs_count: ', txs_count)
       await progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
-      console.log('Crawl progress updated to ' + target_crawl_height.toString());
+      Logger.log('Crawl progress updated to ' + target_crawl_height.toString());
+      Logger.log('The end of a new crawler progress');
     })
     .catch(async function (error) {
       if (error) {
         if (error.message === 'No progress record') {
-          console.log('Initializng progress record..');
+          Logger.log('Initializng progress record..');
           progressDao.upsertProgressAsync(network_id, 0, 0);
 
-          console.log('Loading initial accounts file: ' + accountFileName)
+          Logger.log('Loading initial accounts file: ' + accountFileName)
           try {
             initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
           } catch (err) {
-            console.log('Error: unable to load ' + accountFileName);
-            console.log(err);
+            Logger.error('Error: unable to load ' + accountFileName);
+            Logger.error(err);
             process.exit(1);
           }
           // let counter = 1
           // for (let address of Object.keys(initialAccounts)) {
-          //   console.log(counter++)
+          //   Logger.log(counter++)
           //   await accountHelper.updateAccountByAddress(address, accountDao)
           // }
           Object.keys(initialAccounts).forEach(function (address, i) {
             setTimeout(function () {
-              console.log(i)
+              Logger.log(i)
               accountHelper.updateAccountByAddress(address, accountDao)
             }, i * 10);
           })
           // return Promise.all(getAccountAysncList)
         } else {
-          console.log(error);
+          Logger.error(error);
         }
       }
     })
