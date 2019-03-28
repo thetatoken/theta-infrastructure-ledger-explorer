@@ -28,7 +28,7 @@ export default class AccountDetails extends Component {
       errorType: null,
       loading_acct: false,
       loading_txns: false,
-      includeService: true,
+      includeService: false,
     };
   }
   componentWillUpdate(nextProps) {
