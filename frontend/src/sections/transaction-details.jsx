@@ -239,7 +239,7 @@ const SplitContract = ({ transaction }) => {
         <DetailsRow label="Resource Id" data={ data.resource_id } />
         <DetailsRow label="Splits" data={
           (<div className="th-tx-text__split">
-            {splits.map(split => <span key={split.address}>{'Address: ' + split.address + '  ' + split.percentage + '%'}</span>)}
+            {data.splits.map(split => <span key={split.Address}>{'Address: ' + split.Address + '  ' + split.Percentage + '%'}</span>)}
           </div>)} />
       </tbody>
     </table>);
