@@ -14,6 +14,7 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
 	- [Account APIs](#account-apis)
 		- [GetAccount](#getaccount)
       - [GetAccountTxHistory](#getaccounttxhistory)
+      - [GetTopTokenHolders](#gettoptokenholders)
    - [Supply APIs](#supply-apis)
 		- [GetThetaAmount](#getthetaamount)
       - [GetTFuelAmount](#gettfuelamount)
@@ -526,6 +527,39 @@ curl "https://explorer.thetatoken.org:9000/api/accounttx/0x3c6D5ED0353c22c31c5F9
   "currentPageNumber": 1
 }
 ```
+### GetTopTokenHolders
+This API returns the list of top token holders.
+
+**REST Uri**: /account/top/:tokenType/:limit
+
+**Query Parameters**
+
+- tokenType: type of the token(theta/tfuel)
+- limit: the size of returns
+
+**Returns**
+
+- For each acount it is similar to the returns of the GetAccount API. Please [see above](#getaccount).
+
+**Example**
+
+// Request
+curl "https://explorer.thetatoken.org:9000/api/account/top/theta/5"
+
+// Result
+```
+{
+"type": "account_list",
+"body": [
+   {...},
+   {...},
+   {...},
+   {...},
+   {...}
+   ]
+}
+```
+ 
 ## Supply APIs
 
 ### GetThetaAmount
