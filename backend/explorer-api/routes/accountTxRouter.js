@@ -5,6 +5,17 @@ var helper = require('../helper/utils');
 
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
+  router.get("/accountTx/counter/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    let { type = 5, isEqualType = 'true', startTime = 0, endTime = 0 } = req.query;
+    accountTxDao.getInfoTotalAsync(address, type, isEqualType, startTime, endTime)
+      .then(resp => {
+        const data = ({
+          total: resp
+        });
+        res.status(200).send(data);
+      })
+  })
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());

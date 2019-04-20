@@ -40,3 +40,13 @@
     }
   }
 }
+
+.content.check {
+  display: flex;
+  flex-direction: column;
+
+  &.search{
+    display: flex;
+    justify-content: space-around;
+  }
+}
