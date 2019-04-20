@@ -35,6 +35,7 @@ export default class Check extends Component {
         const rest = total - time * 100;
         console.log(`total: ${total}, time: ${time}, rest: ${rest}`);
         if (total !== 0) {
+          this.setState({ result: 'processing' })
           for (counter; counter < time + 1; counter++) {
             await apiService.get(`accounttx/${address}`, { params: { type: 5, pageNumber: counter, limitNumber: 100, isEqualType: true } })
               .then(res => {
@@ -59,7 +60,6 @@ export default class Check extends Component {
   }
 
   render() {
-    // this.count();
     return (
       <div className="content check">
         <div className="search">
