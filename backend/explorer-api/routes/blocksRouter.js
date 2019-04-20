@@ -4,6 +4,40 @@ var bodyParser = require('body-parser');
 
 var blockRouter = (app, blockDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
+  router.get("/blocks/tmp", (req, res) => {
+    let { type = 5, startTime = 0, endTime = 0 } = req.query;
+    type = parseInt(type);
+    blockDao.getInfoListByTimeAsync(startTime, endTime)
+      .then(async infoList => {
+        if (infoList && infoList.length < 15000) {
+          let total = 0;
+          let txs = [];
+          infoList.forEach(info => {
+            info.txs.forEach(tx => {
+              if (tx.type === 5) txs.push(tx.hash);
+            })
+          })
+          for (let hash of txs) {
+            try {
+              const tx = await transactionDao.getTransactionByPkAsync(hash);
+              total += (tx.data.source.coins.tfuelwei - '0') / 1000000000000000000;
+            } catch (e) {
+              console.log('Error occurred while getting transaction in block tmp:' + hash);
+            }
+          }
+          var data = ({
+            total: total
+          });
+          res.status(200).send(data);
+        } else {
+          const err = ({
+            type: 'error_bad_request',
+            error
+          });
+          res.status(400).send(err);
+        }
+      })
+  })
   router.get("/block/:id", (req, res) => {
     let blockId = req.params.id;
     let latest_block_height;

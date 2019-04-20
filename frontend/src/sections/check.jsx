@@ -27,15 +27,25 @@ export default class Check extends Component {
     const endTime = new Date(this.searchEndTime.value).getTime() / 1000;
     console.log(`[test] endTime: ${endTime}`);
     console.log(address === '');
-    apiService.get(`/accountTx/tmp/${address}`, { params: { type: 5, startTime, endTime } })
-      .then(res => {
-        console.log('res is:', res);
-        this.setState({ result: res.data.total })
-      })
-      .catch(err => {
-        console.log('Error in check function:', err);
-      })
-
+    if (address !== '') {
+      apiService.get(`/accountTx/tmp/${address}`, { params: { type: 5, startTime, endTime } })
+        .then(res => {
+          console.log('res is:', res);
+          this.setState({ result: res.data.total })
+        })
+        .catch(err => {
+          console.log('Error in check function:', err);
+        })
+    } else {
+      apiService.get(`/blocks/tmp`, { params: { type: 5, startTime, endTime } })
+        .then(res => {
+          console.log('res is:', res);
+          this.setState({ result: res.data.total })
+        })
+        .catch(err => {
+          console.log('Error in check function:', err);
+        })
+    }
     // apiService.get(`/accountTx/counter/${address}`, { params: { type: 5, startTime, endTime, isEqualType: true } })
     //   .then(async res => {
     //     console.log('[test] res in get counter:', res);

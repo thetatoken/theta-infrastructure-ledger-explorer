@@ -79,4 +79,9 @@ module.exports = class BlockDAO {
       callback(error, blockInfoList)
     })
   }
+
+  getInfoListByTime(start, end, callback) {
+    const queryObject = { timestamp: { $gte: start, $lte: end } };
+    this.client.getRecords(this.blockInfoCollection, queryObject, {}, 0, 0, callback);
+  }
 }
