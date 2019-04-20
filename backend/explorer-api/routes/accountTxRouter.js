@@ -5,16 +5,47 @@ var helper = require('../helper/utils');
 
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
-  router.get("/accountTx/counter/:address", async (req, res) => {
+  // router.get("/accountTx/counter/:address", async (req, res) => {
+  //   const address = helper.normalize(req.params.address.toLowerCase());
+  //   let { type = 5, isEqualType = 'true', startTime = 0, endTime = 0 } = req.query;
+  //   type = parseInt(type);
+  //   accountTxDao.getInfoTotalAsync(address, type, isEqualType, startTime, endTime)
+  //     .then(resp => {
+  //       const data = ({
+  //         total: resp
+  //       });
+  //       res.status(200).send(data);
+  //     })
+  // })
+
+  router.get("/accountTx/tmp/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
-    let { type = 5, isEqualType = 'true', startTime = 0, endTime = 0 } = req.query;
+    let { type = 5, startTime = 0, endTime = 0 } = req.query;
     type = parseInt(type);
-    accountTxDao.getInfoTotalAsync(address, type, isEqualType, startTime, endTime)
-      .then(resp => {
-        const data = ({
-          total: resp
-        });
-        res.status(200).send(data);
+    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime)
+      .then(async infoList => {
+        if (infoList && infoList.length < 2500) {
+          let total = 0;
+          for (let info of infoList) {
+            const tmp = info._id.split('_');
+            try {
+              const tx = await transactionDao.getTransactionByPkAsync(tmp[1]);
+              total += (tx.data.source.coins.tfuelwei - '0') / 1000000000000000000;
+            } catch (e) {
+              console.log('Error occurred while getting transaction in tmp:' + tmp[1]);
+            }
+          }
+          var data = ({
+            total: total
+          });
+          res.status(200).send(data);
+        } else {
+          const err = ({
+            type: 'error_bad_request',
+            error
+          });
+          res.status(400).send(err);
+        }
       })
   })
 

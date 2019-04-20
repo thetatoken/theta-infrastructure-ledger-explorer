@@ -36,4 +36,10 @@ module.exports = class AccountTxDAO {
     const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': typeObject, timestamp: { $gte: startTime, $lte: endTime } };
     this.client.getTotal(this.accountTxInfoCollection, queryObject, callback);
   }
+
+  getInfoListByTime(address, startTime, endTime, callback){
+    const pattern = `^${address}_`;
+    const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': 5, timestamp: { $gte: startTime, $lte: endTime } };
+    this.client.getRecords(this.accountTxInfoCollection, queryObject, {}, 0, 0, callback);
+  }
 }
