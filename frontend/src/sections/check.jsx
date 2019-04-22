@@ -27,24 +27,29 @@ export default class Check extends Component {
     const endTime = new Date(this.searchEndTime.value).getTime() / 1000;
     console.log(`[test] endTime: ${endTime}`);
     console.log(address === '');
-    if (address !== '') {
-      apiService.get(`/accountTx/tmp/${address}`, { params: { type: 5, startTime, endTime } })
-        .then(res => {
-          console.log('res is:', res);
-          this.setState({ result: res.data.total })
-        })
-        .catch(err => {
-          console.log('Error in check function:', err);
-        })
+    if (!isNaN(startTime) && !isNaN(endTime)) {
+      if (address !== '') {
+        apiService.get(`/accountTx/tmp/${address}`, { params: { type: 5, startTime, endTime } })
+          .then(res => {
+            console.log('res is:', res);
+            this.setState({ result: res.data.total })
+          })
+          .catch(err => {
+            console.log('Error in check function:', err);
+          })
+      } else {
+        apiService.get(`/blocks/tmp`, { params: { type: 5, startTime, endTime } })
+          .then(res => {
+            console.log('res is:', res);
+            this.setState({ result: res.data.total })
+          })
+          .catch(err => {
+            console.log('Error in check function:', err);
+          })
+      }
     } else {
-      apiService.get(`/blocks/tmp`, { params: { type: 5, startTime, endTime } })
-        .then(res => {
-          console.log('res is:', res);
-          this.setState({ result: res.data.total })
-        })
-        .catch(err => {
-          console.log('Error in check function:', err);
-        })
+      this.setState({ result: 'Error' })
+      console.log(`Wrong time input. StartTime: ${startTime}, endTime: ${endTime}`);
     }
     // apiService.get(`/accountTx/counter/${address}`, { params: { type: 5, startTime, endTime, isEqualType: true } })
     //   .then(async res => {
@@ -79,17 +84,15 @@ export default class Check extends Component {
     //     }
     //   })
   }
-
   render() {
     return (
       <div className="content check">
         <div className="search">
           <input type="text" className="search-input" placeholder="Address" ref={input => this.searchAddress = input} onKeyPress={e => this.handleEnterKey(e)} />
-          <input type="date" id="start" name="trip-start"
-            min="2018-01-01" ref={input => this.searchStartTime = input} onKeyPress={e => this.handleEnterKey(e)}></input>
-          <input type="date" id="end" name="trip-start"
-            min="2018-01-01" ref={input => this.searchEndTime = input} onKeyPress={e => this.handleEnterKey(e)}></input>
+          <input type="text" className="search-input" placeholder="YYYY-MM-DDTHH:MM:SS" ref={input => this.searchStartTime = input} onKeyPress={e => this.handleEnterKey(e)} />
+          <input type="text" className="search-input" placeholder="YYYY-MM-DDTHH:MM:SS" ref={input => this.searchEndTime = input} onKeyPress={e => this.handleEnterKey(e)} />
         </div>
+        <div>Date input example: 2019-04-20T00:00:00</div>
         <div>Total earned tfuel: {this.state.result}</div>
       </div>
     );
