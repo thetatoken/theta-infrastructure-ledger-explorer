@@ -22,7 +22,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 5, startTime = 0, endTime = 0 } = req.query;
     type = parseInt(type);
-    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime)
+    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, type)
       .then(async infoList => {
         if (infoList && infoList.length < 2500) {
           let total = 0;
@@ -132,6 +132,48 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     } else {
       res.status(400).send('Wrong parameter.');
     }
+  });
+  router.get("/accountTx/latest/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    let { startTime = 0 } = req.query;
+    const endTime = Date.now();
+    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, null)
+      .then(async infoList => {
+        if (infoList) {
+          let result = [];
+          for (let info of infoList) {
+            const tmp = info._id.split('_');
+            try {
+              const tx = await transactionDao.getTransactionByPkAsync(tmp[1]);
+              result.push(tx);
+            } catch (e) {
+              console.log('Error occurred while getting transaction:' + tmp[1]);
+            }
+          }
+          var data = ({
+            type: 'account_tx_list',
+            body: result,
+          });
+          res.status(200).send(data);
+        } else {
+          const err = ({
+            type: 'error_bad_request',
+            error
+          });
+          res.status(400).send(err);
+        }
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
   });
   //the / route of router will get mapped to /api
   app.use('/api', router);
