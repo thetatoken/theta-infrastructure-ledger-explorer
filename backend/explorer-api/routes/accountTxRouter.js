@@ -136,7 +136,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
-    const endTime = Date.now();
+    const endTime = Math.ceil(Date.now() / 1000).toString();
     accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, null)
       .then(async infoList => {
         if (infoList) {
