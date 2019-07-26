@@ -29,10 +29,12 @@ export default class AccountDetails extends Component {
       loading_acct: false,
       loading_txns: false,
       includeService: false,
+      hasOtherTxs: true
     };
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
+      this.setState({ hasOtherTxs: true, includeService: false })
       this.fetchData(nextProps.params.accountAddress);
     }
   }
@@ -43,11 +45,11 @@ export default class AccountDetails extends Component {
 
   fetchData(address) {
     this.getOneAccountByAddress(address);
-    this.getTransactionsByAddress(address, this.state.includeService, 1);
+    this.getTransactionsByAddress(address, false, 1);
   }
 
   getTransactionsByAddress(address, includeService, page = 1, ) {
-    if(!address) {
+    if (!address) {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
@@ -55,12 +57,19 @@ export default class AccountDetails extends Component {
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
-        this.setState({ 
-          transactions: _.get(res, 'data.body'),
-          currentPage: _.get(res, 'data.currentPageNumber'),
-          totalPages: _.get(res, 'data.totalPageNumber'),
-          loading_txns: false,
-        })
+        const txs = _.get(res, 'data.body');
+        if (txs.length !== 0) {
+          this.setState({
+            transactions: _.get(res, 'data.body'),
+            currentPage: _.get(res, 'data.currentPageNumber'),
+            totalPages: _.get(res, 'data.totalPageNumber'),
+            loading_txns: false,
+          })
+        } else {
+          this.setState({ hasOtherTxs: false })
+          this.handleToggleHideTxn();
+        }
+
       })
       .catch(err => {
         this.setState({ loading_txns: false });
@@ -69,7 +78,7 @@ export default class AccountDetails extends Component {
   }
 
   getOneAccountByAddress(address) {
-    if(!address) {
+    if (!address) {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
@@ -108,54 +117,57 @@ export default class AccountDetails extends Component {
   handleToggleHideTxn = () => {
     let { accountAddress } = this.props.params;
     let includeService = !this.state.includeService;
-    this.setState({ 
+    this.setState({
       includeService,
       currentPage: 1,
-      totalPages: null, });
+      totalPages: null,
+    });
     this.getTransactionsByAddress(accountAddress, includeService, 1);
   }
 
   render() {
-    const { account, transactions, currentPage, totalPages, errorType, loading_txns, includeService } = this.state;
+    const { account, transactions, currentPage, totalPages, errorType, loading_txns, includeService, hasOtherTxs } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
         {errorType === 'error_not_found' &&
           <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />}
         {account && !errorType &&
-        <React.Fragment>
-          <table className="details account-info">
-            <thead>
-              <tr>
-                <th>Address</th>
-                <th>{account.address}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <DetailsRow label="Balance" data={<Balance balance={account.balance} />} />
-              <DetailsRow label="Sequence" data={account.sequence} />
-            </tbody>
-          </table>
-        </React.Fragment>}
-        { !transactions && loading_txns && 
-        <LoadingPanel />}
-        { transactions && transactions.length > 0 && 
-        <React.Fragment>
-          <div className="actions">
-            <button className="btn tx" onClick={this.handleToggleHideTxn}>{includeService ? 'Hide' : 'Show'} Service Payments</button>
-          </div>
-          <div>
-            { loading_txns &&
-              <LoadingPanel className="fill" />}
-            <TransactionTable transactions={transactions} />
-          </div>
-          <Pagination
-            size={'lg'}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={this.handlePageChange}
-            disabled={loading_txns} />
-        </React.Fragment>}
+          <React.Fragment>
+            <table className="details account-info">
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>{account.address}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <DetailsRow label="Balance" data={<Balance balance={account.balance} />} />
+                <DetailsRow label="Sequence" data={account.sequence} />
+              </tbody>
+            </table>
+          </React.Fragment>}
+        {!transactions && loading_txns &&
+          <LoadingPanel />}
+        {transactions && transactions.length > 0 &&
+          <React.Fragment>
+            <div className="actions">
+              {hasOtherTxs &&
+                <button className="btn tx" onClick={this.handleToggleHideTxn}>{includeService ? 'Hide' : 'Show'} Service Payments</button>
+              }
+            </div>
+            <div>
+              {loading_txns &&
+                <LoadingPanel className="fill" />}
+              <TransactionTable transactions={transactions} />
+            </div>
+            <Pagination
+              size={'lg'}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={this.handlePageChange}
+              disabled={loading_txns} />
+          </React.Fragment>}
       </div>);
   }
 }
