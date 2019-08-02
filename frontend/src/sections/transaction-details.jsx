@@ -114,7 +114,7 @@ export default class TransactionExplorer extends Component {
           { transaction.type === TxnTypes.SLASH && 
           <Slash transaction={transaction} /> }
           
-          { transaction.type === TxnTypes.SEND && 
+          { transaction.type === TxnTypes.TRANSFER && 
           <Send transaction={transaction} /> }
           
           { transaction.type === TxnTypes.RESERVE_FUND && 

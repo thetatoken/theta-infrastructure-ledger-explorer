@@ -22,7 +22,7 @@ table.data.txn-table {
     }
   }
   tr.coinbase .type:before { background-image: url('/images/icons/icon_coinbase@2x.png'); }
-  tr.send .type:before { background-image: url('/images/icons/icon_send@2x.png'); }
+  tr.transfer .type:before { background-image: url('/images/icons/icon_send@2x.png'); }
   tr.service-payment .type:before { background-image: url('/images/icons/icon_servicepayment@2x.png'); }
   tr.split-contract .type:before { background-image: url('/images/icons/icon_splitcontract@2x.png'); }
   tr.reserve .type:before { background-image: url('/images/icons/icon_reservefund@2x.png'); }
