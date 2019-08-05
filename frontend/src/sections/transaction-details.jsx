@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
-import { TxnTypes, TxnTypeText, TxnClasses } from 'common/constants';
+import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
 import { date, age, fee, status, type } from 'common/helpers/transactions';
 import { formatCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
@@ -288,8 +288,8 @@ const WithdrawStake = ({ transaction }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Withdrawn" data={<Amount coins={_.get(data, 'source.coins')} />} />
-        <DetailsRow label="Purpose" data={_.get(data, 'purpose')} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
     </table>);
@@ -302,8 +302,8 @@ const DepositStake = ({ transaction }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Holder" data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Withdrawn" data={<Amount coins={_.get(data, 'source.coins')} />} />
-        <DetailsRow label="Purpose" data={_.get(data, 'purpose')} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Source" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
     </table>);

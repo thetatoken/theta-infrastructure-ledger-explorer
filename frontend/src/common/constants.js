@@ -61,3 +61,7 @@ export const CurrencyLabels = {
   tfuelwei: 'TFuel',
 }
 
+export const TxnPurpose = {
+  0: 'Validator Staking',
+  1: 'Guardian Staking',
+}
