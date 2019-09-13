@@ -148,9 +148,10 @@ exports.getTopRecords = function (collectionName, queryObject, limitNumber, call
   });
 }
 
-exports.getRecords = function (collectionName, queryObject, sortObject, pageNumebr, limitNumber, callback) {
+exports.getRecords = function (collectionName, queryObject, sortObject, pageNumebr, limitNumber, callback, diff) {
   var collection = _db.collection(collectionName);
-  collection.find(queryObject).sort(sortObject).skip(pageNumebr * limitNumber).limit(limitNumber).toArray(function (err, res) {
+  var newLimit = diff ? diff : limitNumber;
+  collection.find(queryObject).sort(sortObject).skip(pageNumebr * limitNumber).limit(newLimit).toArray(function (err, res) {
     if (err) callback(err);
     callback(err, res);
   });

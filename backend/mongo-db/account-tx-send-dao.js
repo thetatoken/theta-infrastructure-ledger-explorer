@@ -23,10 +23,11 @@ module.exports = class AccountTxDAO {
   getInfoList(address, pageNumber, limitNumber, diff, callback) {
     const pattern = `^${address}_`;
     const queryObject = { '_id': { '$regex': pattern, $options: 'i' } };
-    const sortObject = { 'timestamp': diff === null ? -1 : 1 };
-    pageNumber = diff ? 0 : pageNumber;
-    limitNumber = diff ? diff : limitNumber;
-    this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback);
+    const sortObject = { 'timestamp': -1 };
+    // const sortObject = { 'timestamp': diff === null ? -1 : 1 };
+    // pageNumber = diff ? 0 : pageNumber;
+    // limitNumber = diff ? diff : limitNumber;
+    this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback, diff);
   }
 
 }
