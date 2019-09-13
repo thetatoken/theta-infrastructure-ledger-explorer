@@ -24,10 +24,11 @@ module.exports = class AccountTxDAO {
     const pattern = `^${address}_`;
     const typeObject = isEqualType === 'true' ? type : { $ne: type };
     const queryObject = { '_id': { '$regex': pattern, $options: 'i' }, 'tx_type': typeObject };
-    const sortObject = { 'timestamp': diff === null ? -1 : 1 };
-    pageNumber = diff ? 0 : pageNumber;
-    limitNumber = diff ? diff : limitNumber;
-    this.client.getRecords(this.accountTxInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
+    const sortObject = { 'timestamp': -1 };
+    // const sortObject = { 'timestamp': diff === null ? -1 : 1 };
+    // pageNumber = diff ? 0 : pageNumber;
+    // limitNumber = diff ? diff : limitNumber;
+    this.client.getRecords(this.accountTxInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback, diff);
   }
 
   getInfoTotal(address, type, isEqualType, startTime, endTime, callback) {
