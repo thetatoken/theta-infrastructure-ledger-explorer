@@ -108,7 +108,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
                 console.log('Error occurred while getting transaction:' + tmp[1]);
               }
             }
-            result = diff === null ? result : result.reverse();
+            // result = diff === null ? result : result.reverse();
             var data = ({
               type: 'account_tx_list',
               body: result,
