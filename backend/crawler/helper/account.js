@@ -129,6 +129,12 @@ function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao, accou
     'tx_type': type,
     timestamp
   });
+  accountTxDao.insertAsync({
+    'acct': address,
+    hash,
+    type,
+    'ts': timestamp
+  });
   if (type === 2) {
     accountTxSendDao.upsertInfoAsync({
       address,

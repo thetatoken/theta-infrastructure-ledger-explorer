@@ -88,14 +88,14 @@ exports.tryQuery = (function (maxConcurrency) {
   };
 })(MAX_CONCURRENCY);
 
-// exports.insertOne = function (collectionName, object, callback) {
-//   var collection = _db.collection(collectionName);
-//   collection.insertOne(object, function (err, res) {
-//     if (err) callback(err);
-//     console.log("1 document inserted");
-//     callback(err, res);
-//   });
-// }
+exports.insert = function (collectionName, object, callback) {
+  var collection = _db.collection(collectionName);
+  collection.insertOne(object, function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
+
 exports.upsert = function (collectionName, queryObject, updateObject, callback) {
   var collection = _db.collection(collectionName);
   collection.updateOne(queryObject, { $set: updateObject }, { upsert: true, writeConcern: { w: "majority", wtimeout: 5000 } }, function (err, res) {
