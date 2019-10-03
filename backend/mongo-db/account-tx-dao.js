@@ -9,6 +9,11 @@ module.exports = class AccountTxDAO {
   constructor(execDir, client) {
     this.client = client;
     this.accountTxInfoCollection = 'accountTx';
+    this.collection = 'acctTx';
+  }
+
+  insert(tx, callback) {
+    this.client.insert(this.collection, tx, callback);
   }
 
   upsertInfo(info, callback) {
