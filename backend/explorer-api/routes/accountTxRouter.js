@@ -52,67 +52,28 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
-    let totalNumber = 0;
-    let diff = null;
-    pageNumber = parseInt(pageNumber);
-    limitNumber = parseInt(limitNumber);
+    type = parseInt(type);
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
-          if (isEqualType === 'true') {
-            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
-          } else {
-            if (accountInfo.txs_counter) {
-              totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
-                return key === type ? total : total + accountInfo.txs_counter[key]
-              }, 0);
-            }
-          }
-          type = parseInt(type);
-          if (totalNumber < pageNumber * limitNumber) {
-            if (totalNumber > (pageNumber - 1) * limitNumber) {
-              diff = totalNumber - (pageNumber - 1) * limitNumber;
-              if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
-                console.log('Search Tx Send DB only!');
-                return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
-              } else {
-                return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
-              }
-            } else {
-              const data = ({
-                type: 'account_tx_list',
-                body: [],
-                totalPageNumber: Math.ceil(totalNumber / limitNumber),
-                currentPageNumber: pageNumber
-              });
-              res.status(200).send(data);
-            }
-          } else {
-            if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
-              console.log('Search Tx Send DB only!');
-              return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
-            } else {
-              return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
-            }
-          }
+          return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
         })
-        .then(async infoList => {
-          if (infoList) {
+        .then(async txList => {
+          if (txList) {
             let result = [];
-            for (let info of infoList) {
-              const tmp = info._id.split('_');
+            for (let tx of txList) {
               try {
-                const tx = await transactionDao.getTransactionByPkAsync(tmp[1]);
+                const tx = await transactionDao.getTransactionByPkAsync(tx.hash);
                 result.push(tx);
               } catch (e) {
-                console.log('Error occurred while getting transaction:' + tmp[1]);
+                console.log('Error occurred while getting transaction:' + tx.hash);
               }
             }
-            // result = diff === null ? result : result.reverse();
+
             var data = ({
               type: 'account_tx_list',
               body: result,
-              totalPageNumber: Math.ceil(totalNumber / limitNumber),
+              // totalPageNumber: Math.ceil(totalNumber / limitNumber),
               currentPageNumber: pageNumber
             });
             res.status(200).send(data);
@@ -133,6 +94,94 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       res.status(400).send('Wrong parameter.');
     }
   });
+
+
+
+  // router.get("/accountTx/:address", async (req, res) => {
+  //   const address = helper.normalize(req.params.address.toLowerCase());
+  //   let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
+  //   let totalNumber = 0;
+  //   let diff = null;
+  //   pageNumber = parseInt(pageNumber);
+  //   limitNumber = parseInt(limitNumber);
+  //   if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
+  //     accountDao.getAccountByPkAsync(address)
+  //       .then(accountInfo => {
+  //         if (isEqualType === 'true') {
+  //           totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+  //         } else {
+  //           if (accountInfo.txs_counter) {
+  //             totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
+  //               return key === type ? total : total + accountInfo.txs_counter[key]
+  //             }, 0);
+  //           }
+  //         }
+  //         type = parseInt(type);
+  //         if (totalNumber < pageNumber * limitNumber) {
+  //           if (totalNumber > (pageNumber - 1) * limitNumber) {
+  //             diff = totalNumber - (pageNumber - 1) * limitNumber;
+  //             if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
+  //               console.log('Search Tx Send DB only!');
+  //               return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
+  //             } else {
+  //               return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
+  //             }
+  //           } else {
+  //             const data = ({
+  //               type: 'account_tx_list',
+  //               body: [],
+  //               totalPageNumber: Math.ceil(totalNumber / limitNumber),
+  //               currentPageNumber: pageNumber
+  //             });
+  //             res.status(200).send(data);
+  //           }
+  //         } else {
+  //           if ((isEqualType === 'true' && type === 2) || totalNumber === accountInfo.txs_counter[2]) {
+  //             console.log('Search Tx Send DB only!');
+  //             return accountTxSendDao.getInfoListAsync(address, pageNumber - 1, limitNumber, diff);
+  //           } else {
+  //             return accountTxDao.getInfoListByTypeAsync(address, type, isEqualType, pageNumber - 1, limitNumber, diff)
+  //           }
+  //         }
+  //       })
+  //       .then(async infoList => {
+  //         if (infoList) {
+  //           let result = [];
+  //           for (let info of infoList) {
+  //             const tmp = info._id.split('_');
+  //             try {
+  //               const tx = await transactionDao.getTransactionByPkAsync(tmp[1]);
+  //               result.push(tx);
+  //             } catch (e) {
+  //               console.log('Error occurred while getting transaction:' + tmp[1]);
+  //             }
+  //           }
+  //           // result = diff === null ? result : result.reverse();
+  //           var data = ({
+  //             type: 'account_tx_list',
+  //             body: result,
+  //             totalPageNumber: Math.ceil(totalNumber / limitNumber),
+  //             currentPageNumber: pageNumber
+  //           });
+  //           res.status(200).send(data);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         if (error.message.includes('NOT_FOUND')) {
+  //           const err = ({
+  //             type: 'error_not_found',
+  //             error
+  //           });
+  //           res.status(404).send(err);
+  //         } else {
+  //           console.log('ERR - ', error)
+  //         }
+  //       });
+  //   } else {
+  //     res.status(400).send('Wrong parameter.');
+  //   }
+  // });
+  
   router.get("/accountTx/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
