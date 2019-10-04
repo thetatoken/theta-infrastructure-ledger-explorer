@@ -55,6 +55,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
+    console.log("type: " + type)
+    console.log("isEqualType: " + isEqualType)
+    console.log("pageNumber: " + pageNumber)
+    console.log("limitNumber: " + limitNumber)
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
