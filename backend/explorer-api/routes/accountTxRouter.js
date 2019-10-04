@@ -67,12 +67,12 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         .then(async txList => {
           if (txList) {
             let result = [];
-            for (let tx of txList) {
+            for (let acctTx of txList) {
               try {
-                const tx = await transactionDao.getTransactionByPkAsync(tx.hash);
+                const tx = await transactionDao.getTransactionByPkAsync(acctTx.hash);
                 result.push(tx);
               } catch (e) {
-                console.log('Error occurred while getting transaction:' + tx.hash + ". error: " + e);
+                console.log('Error occurred while getting transaction:' + acctTx.hash + ". error: " + e);
               }
             }
 
