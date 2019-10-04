@@ -72,7 +72,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
                 const tx = await transactionDao.getTransactionByPkAsync(tx.hash);
                 result.push(tx);
               } catch (e) {
-                console.log('Error occurred while getting transaction:' + tx.hash);
+                console.log('Error occurred while getting transaction:' + tx.hash + ". error: " + e);
               }
             }
 
