@@ -52,6 +52,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
+    console.log("limitNumber = " + limitNumber)
     type = parseInt(type);
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
@@ -181,7 +182,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   //     res.status(400).send('Wrong parameter.');
   //   }
   // });
-  
+
   router.get("/accountTx/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
