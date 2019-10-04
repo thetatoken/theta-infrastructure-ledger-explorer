@@ -52,8 +52,9 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
-    console.log("limitNumber = " + limitNumber)
     type = parseInt(type);
+    pageNumber = parseInt(pageNumber);
+    limitNumber = parseInt(limitNumber);
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
