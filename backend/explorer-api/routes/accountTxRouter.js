@@ -66,19 +66,20 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         })
         .then(async txList => {
           if (txList) {
-            let result = [];
+            let txHashes = [];
+            let txs = [];
             for (let acctTx of txList) {
-              try {
-                const tx = await transactionDao.getTransactionByPkAsync(acctTx.hash);
-                result.push(tx);
-              } catch (e) {
-                console.log('Error occurred while getting transaction:' + acctTx.hash + ". error: " + e);
-              }
+              txHashes.push(acctTx.hash);
+            }
+            try {
+              txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+            } catch (e) {
+              console.log('Error occurred while getting transactions, ' + e);
             }
 
             var data = ({
               type: 'account_tx_list',
-              body: result,
+              body: txs,
               // totalPageNumber: Math.ceil(totalNumber / limitNumber),
               currentPageNumber: pageNumber
             });
