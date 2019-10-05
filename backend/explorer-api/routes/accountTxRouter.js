@@ -3,6 +3,15 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
+function orderTxs(txs, ids) {
+  var hashOfResults = txs.reduce(function (prev, curr) {
+      prev[curr._id] = curr;
+      return prev;
+  }, {});
+
+  return ids.map( function(id) { return hashOfResults[id] } );
+}
+
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   // router.get("/accountTx/counter/:address", async (req, res) => {
@@ -76,6 +85,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             } catch (e) {
               console.log('Error occurred while getting transactions, ' + e);
             }
+
+            txs = orderTxs(txs, txHashes);
 
             var data = ({
               type: 'account_tx_list',
