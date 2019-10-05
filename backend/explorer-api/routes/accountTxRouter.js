@@ -64,13 +64,21 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
-    console.log("type: " + type)
-    console.log("isEqualType: " + isEqualType)
-    console.log("pageNumber: " + pageNumber)
-    console.log("limitNumber: " + limitNumber)
+    let totalNumber = 0;
+
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
+          if (isEqualType === 'true') {
+            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+          } else {
+            if (accountInfo.txs_counter) {
+              totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
+                return key === type ? total : total + accountInfo.txs_counter[key]
+              }, 0);
+            }
+          }
+
           return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
         })
         .then(async txList => {
@@ -91,7 +99,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             var data = ({
               type: 'account_tx_list',
               body: txs,
-              // totalPageNumber: Math.ceil(totalNumber / limitNumber),
+              totalPageNumber: Math.ceil(totalNumber / limitNumber),
               currentPageNumber: pageNumber
             });
             res.status(200).send(data);
