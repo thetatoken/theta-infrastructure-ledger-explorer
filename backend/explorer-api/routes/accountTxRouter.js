@@ -126,7 +126,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
           for (let acctTx of txList) {
             txHashes.push(acctTx.hash);
           }
-
+console.log("=============== " + txHashes)
           txs = await transactionDao.getTransactionsByPkAsync(txHashes);
           txs = orderTxs(txs, txHashes);
 
