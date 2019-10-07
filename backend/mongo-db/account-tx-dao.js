@@ -39,7 +39,7 @@ module.exports = class AccountTxDAO {
     } else {
       queryObject = { acct: address, type: type, ts: { $gte: startTime, $lte: endTime } };
     }
-    this.client.getRecords(this.collection, queryObject, {}, 0, 10, callback);
+    this.client.getRecords(this.collection, queryObject, {}, 0, 1000, callback);
   }
 
   getCount(address, type, isEqualType, startTime, endTime, callback) {
