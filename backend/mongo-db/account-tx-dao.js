@@ -32,12 +32,6 @@ module.exports = class AccountTxDAO {
     this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
 
-  getCount(address, type, isEqualType, startTime, endTime, callback) {
-    const typeObject = isEqualType === 'true' ? type : { $ne: type };
-    const queryObject = { acct: address, type: typeObject, ts: { $gte: startTime, $lte: endTime } };
-    this.client.getTotal(this.collection, queryObject, callback);
-  }
-
   getListByTime(address, startTime, endTime, type, callback) {
     let queryObject;
     if (type === null) {
@@ -45,8 +39,15 @@ module.exports = class AccountTxDAO {
     } else {
       queryObject = { acct: address, type: type, ts: { $gte: startTime, $lte: endTime } };
     }
-    this.client.getRecords(this.collection, queryObject, {}, 0, 0, callback);
+    this.client.getRecords(this.collection, queryObject, {}, 0, 10, callback);
   }
+
+  getCount(address, type, isEqualType, startTime, endTime, callback) {
+    const typeObject = isEqualType === 'true' ? type : { $ne: type };
+    const queryObject = { acct: address, type: typeObject, ts: { $gte: startTime, $lte: endTime } };
+    this.client.getTotal(this.collection, queryObject, callback);
+  }
+
 
   getInfoListByType(address, type, isEqualType, pageNumber, limitNumber, diff, callback) {
     const pattern = `^${address}_`;
