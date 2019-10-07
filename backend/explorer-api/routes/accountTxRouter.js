@@ -70,7 +70,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
           if (isEqualType === 'true') {
-            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+            totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
           } else {
             if (accountInfo.txs_counter) {
               totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
@@ -81,19 +81,14 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
           return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
         })
-        .then(async txList => {
-          if (txList) {
+        .then(txList => {
             let txHashes = [];
             let txs = [];
             for (let acctTx of txList) {
               txHashes.push(acctTx.hash);
             }
-            try {
-              txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-            } catch (e) {
-              console.log('Error occurred while getting transactions, ' + e);
-            }
-
+            
+            txs = transactionDao.getTransactionsByPkAsync(txHashes);
             txs = orderTxs(txs, txHashes);
 
             var data = ({
@@ -103,7 +98,6 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
               currentPageNumber: pageNumber
             });
             res.status(200).send(data);
-          }
         })
         .catch(error => {
           if (error.message.includes('NOT_FOUND')) {
@@ -113,14 +107,47 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             });
             res.status(404).send(err);
           } else {
-            console.log('ERR - ', error)
+            res.status(500).send(err);
           }
         });
     } else {
-      res.status(400).send('Wrong parameter.');
+      res.status(400).send('Invalid parameter');
     }
   });
 
+  router.get("/accountTx/latest/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    let { startTime = 0 } = req.query;
+    const endTime = Math.ceil(Date.now() / 1000).toString();
+    accountTxDao.getListByTimeAsync(address, startTime, endTime, null)
+      .then(infoList => {
+          let txHashes = [];
+          let txs = [];
+          for (let acctTx of txList) {
+            txHashes.push(acctTx.hash);
+          }
+
+          txs = transactionDao.getTransactionsByPkAsync(txHashes);
+          txs = orderTxs(txs, txHashes);
+
+          var data = ({
+            type: 'account_tx_list',
+            body: txs,
+          });
+          res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          res.status(500).send(err);
+        }
+      });
+  });
 
 
   router.get("/accountTxOld/:address", async (req, res) => {
@@ -134,7 +161,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
           if (isEqualType === 'true') {
-            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+            totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
           } else {
             if (accountInfo.txs_counter) {
               totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
@@ -208,7 +235,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     }
   });
 
-  router.get("/accountTx/latest/:address", async (req, res) => {
+  router.get("/accountTxOld/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
@@ -250,6 +277,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         }
       });
   });
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
