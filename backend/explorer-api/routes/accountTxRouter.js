@@ -81,14 +81,14 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
           return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
         })
-        .then(txList => {
+        .then(async txList => {
             let txHashes = [];
             let txs = [];
             for (let acctTx of txList) {
               txHashes.push(acctTx.hash);
             }
             
-            txs = transactionDao.getTransactionsByPkAsync(txHashes);
+            txs = await transactionDao.getTransactionsByPkAsync(txHashes);
             txs = orderTxs(txs, txHashes);
 
             var data = ({
@@ -120,14 +120,14 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
     accountTxDao.getListByTimeAsync(address, startTime, endTime, null)
-      .then(infoList => {
+      .then(async txList => {
           let txHashes = [];
           let txs = [];
           for (let acctTx of txList) {
             txHashes.push(acctTx.hash);
           }
 
-          txs = transactionDao.getTransactionsByPkAsync(txHashes);
+          txs = await transactionDao.getTransactionsByPkAsync(txHashes);
           txs = orderTxs(txs, txHashes);
 
           var data = ({
