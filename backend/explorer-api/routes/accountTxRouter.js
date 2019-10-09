@@ -3,6 +3,15 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
+function orderTxs(txs, ids) {
+  var hashOfResults = txs.reduce(function (prev, curr) {
+      prev[curr._id] = curr;
+      return prev;
+  }, {});
+
+  return ids.map( function(id) { return hashOfResults[id] } );
+}
+
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   // router.get("/accountTx/counter/:address", async (req, res) => {
@@ -52,6 +61,98 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
+    type = parseInt(type);
+    pageNumber = parseInt(pageNumber);
+    limitNumber = parseInt(limitNumber);
+    let totalNumber = 0;
+
+    if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
+      accountDao.getAccountByPkAsync(address)
+        .then(accountInfo => {
+          if (isEqualType === 'true') {
+            totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
+          } else {
+            if (accountInfo.txs_counter) {
+              totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
+                return key === type ? total : total + accountInfo.txs_counter[key]
+              }, 0);
+            }
+          }
+
+          return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
+        })
+        .then(async txList => {
+            let txHashes = [];
+            let txs = [];
+            for (let acctTx of txList) {
+              txHashes.push(acctTx.hash);
+            }
+            
+            txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+            txs = orderTxs(txs, txHashes);
+
+            var data = ({
+              type: 'account_tx_list',
+              body: txs,
+              totalPageNumber: Math.ceil(totalNumber / limitNumber),
+              currentPageNumber: pageNumber
+            });
+            res.status(200).send(data);
+        })
+        .catch(error => {
+          if (error.message.includes('NOT_FOUND')) {
+            const err = ({
+              type: 'error_not_found',
+              error
+            });
+            res.status(404).send(err);
+          } else {
+            res.status(500).send(err);
+          }
+        });
+    } else {
+      res.status(400).send('Invalid parameter');
+    }
+  });
+
+  router.get("/accountTx/latest/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    let { startTime = 0 } = req.query;
+    const endTime = Math.ceil(Date.now() / 1000).toString();
+    accountTxDao.getListByTimeAsync(address, startTime, endTime, null)
+      .then(async txList => {
+          let txHashes = [];
+          let txs = [];
+          for (let acctTx of txList) {
+            txHashes.push(acctTx.hash);
+          }
+
+          txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+          txs = orderTxs(txs, txHashes);
+
+          var data = ({
+            type: 'account_tx_list',
+            body: txs,
+          });
+          res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          res.status(500).send(err);
+        }
+      });
+  });
+
+
+  router.get("/accountTxOld/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
     let totalNumber = 0;
     let diff = null;
     pageNumber = parseInt(pageNumber);
@@ -60,7 +161,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
           if (isEqualType === 'true') {
-            totalNumber = accountInfo.txs_counter[[type]] ? accountInfo.txs_counter[[type]] : 0;
+            totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
           } else {
             if (accountInfo.txs_counter) {
               totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
@@ -133,7 +234,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       res.status(400).send('Wrong parameter.');
     }
   });
-  router.get("/accountTx/latest/:address", async (req, res) => {
+
+  router.get("/accountTxOld/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
@@ -175,6 +277,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         }
       });
   });
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

@@ -77,4 +77,17 @@ module.exports = class TransactionDAO {
       }
     });
   }
+
+  getTransactionsByPk(pks, callback) {
+    const queryObject = { _id: {$in: pks} };
+    this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
+      if (error) {
+        console.log('ERR - ', error, pk);
+      } else if (!transactions) {
+        callback(Error('NOT_FOUND - ' + pk));
+      } else {
+        callback(error, transactions);
+      }
+    })
+  }
 }
