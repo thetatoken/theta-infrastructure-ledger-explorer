@@ -74,7 +74,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
           } else {
             if (accountInfo.txs_counter) {
               totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
-                return key === type ? total : total + accountInfo.txs_counter[key]
+                return key == type ? total : total + accountInfo.txs_counter[key]
               }, 0);
             }
           }
