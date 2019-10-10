@@ -25,10 +25,10 @@ module.exports = class AccountTxDAO {
     this.client.upsert(this.accountTxInfoCollection, queryObject, newObject, callback);
   }
 
-  getList(address, type, isEqualType, pageNumber, limitNumber, callback) {
+  getList(address, type, isEqualType, pageNumber, limitNumber, reverse, callback) {
     const typeObject = isEqualType === 'true' ? type : { $ne: type };
     const queryObject = { acct: address, type: typeObject };
-    const sortObject = { ts: -1 };
+    const sortObject = { ts: reverse ? 1 : -1 };
     this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
 
