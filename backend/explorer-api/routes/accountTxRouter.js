@@ -65,6 +65,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
     let totalNumber = 0;
+    let numPages = 0;
+    let reverse = false;
 
     if (!isNaN(pageNumber) && !isNaN(limitNumber) && pageNumber > 0 && limitNumber > 0 && limitNumber < 101) {
       accountDao.getAccountByPkAsync(address)
@@ -78,14 +80,24 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
               }, 0);
             }
           }
+          numPages = Math.ceil(totalNumber / limitNumber);
+          let page = pageNumber - 1;
+          if (numPages > 200 && pageNumber > numPages / 2) {
+            reverse = true;
+            page = numPages - pageNumber;
+          }
 
-          return accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber);
+          return accountTxDao.getListAsync(address, type, isEqualType, page, limitNumber, reverse);
         })
         .then(async txList => {
             let txHashes = [];
             let txs = [];
             for (let acctTx of txList) {
-              txHashes.push(acctTx.hash);
+              if (reverse) {
+                txHashes.unshift(acctTx.hash);
+              } else {
+                txHashes.push(acctTx.hash);
+              }
             }
             
             txs = await transactionDao.getTransactionsByPkAsync(txHashes);
@@ -94,7 +106,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             var data = ({
               type: 'account_tx_list',
               body: txs,
-              totalPageNumber: Math.ceil(totalNumber / limitNumber),
+              totalPageNumber: numPages,
               currentPageNumber: pageNumber
             });
             res.status(200).send(data);
