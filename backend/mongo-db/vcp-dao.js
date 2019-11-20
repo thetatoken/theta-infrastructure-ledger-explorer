@@ -65,4 +65,13 @@ module.exports = class VcpDAO {
       callback(err, res);
     });
   }
+
+  removeAll(callback) {
+    this.client.removeAll(this.vcpInfoCollection, function (error) {
+      if (error) {
+        console.log('ERR - ', error, height);
+        // callback(error);
+      }
+    })
+  }
 }
