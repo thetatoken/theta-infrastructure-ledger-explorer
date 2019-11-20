@@ -11,12 +11,8 @@ module.exports = class VcpDAO {
     this.vcpInfoCollection = 'vcp';
   }
 
-  upsertVcp(vcpInfo, callback) {
-    const queryObject = { '_id': vcpInfo.source };
-    const newObject = {
-      'stakes': vcpInfo.stakes
-    };
-    this.client.upsert(this.vcpInfoCollection, queryObject, newObject, callback);
+  insert(vcpInfo, callback) {
+    this.client.insert(this.vcpInfoCollection, vcpInfo, callback);
   }
 
   getVcp(source, callback) {

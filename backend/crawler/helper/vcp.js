@@ -1,23 +1,17 @@
 exports.updateVcp = async function (candidate, vcpDao) {
+  await vcpDao.removeAllAsync();
   const holder = candidate.Holder;
   const stakes = candidate.Stakes;
-  const isExist = await vcpDao.checkVcpAsync(holder);
-  const vpc = isExist ? await vcpDao.getVcpAsync(holder) : null;
-  let stakeList = {};
+  let insertList = [];
   stakes.forEach(stake => {
-    if (!stakeList[stake.source]) {
-      stakeList[stake.source] = stake.amount;
-    } else {
-      if (!stake.withdrawn) {
-        stakeList[stake.source] = stake.amount;
-      } else {
-        stakeList[stake.source] = null;
+    if (!stake.withdrawn) {
+      const vcpInfo = {
+        'holder': holder,
+        'source': stake.source,
+        'amount': stake.amount
       }
+      insertList.push(vcpDao.insertAsync(vcpInfo));
     }
   });
-  const vcpInfo = {
-    'source': holder,
-    'stakes': stakeList
-  }
-  await vcpDao.upsertVcpAsync(vcpInfo);
+  await Promise.all(insertList);
 }
