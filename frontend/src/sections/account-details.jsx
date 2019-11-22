@@ -153,8 +153,12 @@ export default class AccountDetails extends Component {
           <React.Fragment>
             <div className="actions">
               {hasOtherTxs &&
-                <button className="btn tx" onClick={this.handleToggleHideTxn}>{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
               }
+              <label className="switch">
+                <input type="checkbox" checked={!includeService} onChange={this.handleToggleHideTxn}></input>
+                <span className="slider"></span>
+              </label>
             </div>
             <div>
               {loading_txns &&
