@@ -160,7 +160,7 @@ exports.getRecords = function (collectionName, queryObject, sortObject, pageNume
 exports.removeAll = function (collectionName, callback) {
   if (collectionName === 'vcp') {
     var collection = _db.collection(collectionName);
-    collection.remove({}, function (err, res) {
+    collection.deleteMany({}, function (err, res) {
       if (err) callback(err);
       callback(err, res);
     });

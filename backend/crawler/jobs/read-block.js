@@ -114,6 +114,7 @@ exports.Execute = async function () {
           // Logger.log(blockDataList[i]);
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              await vcpDao.removeAllAsync();
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
                 vcpPair.Vcp.SortedCandidates.forEach(candidate => {
                   upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
