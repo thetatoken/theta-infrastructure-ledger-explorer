@@ -54,7 +54,6 @@ module.exports = class BlockDAO {
         callback(error, blockInfo);
       }
     })
-
   }
 
   getBlocksByRange(min, max, callback) {

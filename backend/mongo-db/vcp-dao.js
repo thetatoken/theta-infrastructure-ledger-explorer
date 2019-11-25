@@ -51,6 +51,30 @@ module.exports = class VcpDAO {
     })
   }
 
+  getVcpByAddress(address, callback) {
+    const queryHolder = { 'holder': address };
+    const querySource = { 'source': address };
+    let holderRecords = [];
+    let sourceRecords = [];
+    const self = this;
+    this.client.query(this.vcpInfoCollection, queryHolder, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error, height);
+      } else if (record) {
+        holderRecords = record;
+      }
+      self.client.query(self.vcpInfoCollection, querySource, function (error, record) {
+        if (error) {
+          console.log('ERR - ', error, height);
+        } else if (record) {
+          sourceRecords = record;
+        }
+        const res = { holderRecords, sourceRecords }
+        callback(error, res);
+      })
+    })
+  }
+
   checkVcp(source, callback) {
     const queryObject = { '_id': source };
     return this.client.exist(this.vcpInfoCollection, queryObject, function (err, res) {
