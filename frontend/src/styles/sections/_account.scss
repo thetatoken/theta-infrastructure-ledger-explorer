@@ -13,7 +13,12 @@
 
   .actions {
     @include row($justify: flex-end);
-    margin-top: 3rem;
+    border-top: 1px solid $color-font-light;
+    padding-top: 2rem;
+    .title{
+      position: absolute;
+      left: calc(50% - 44px)
+    }
     .btn.tx {
       font-size: .875rem;
       font-weight: $weight-semi;

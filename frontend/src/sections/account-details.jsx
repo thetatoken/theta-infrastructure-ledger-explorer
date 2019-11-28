@@ -152,6 +152,7 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
+              <div className="title">Transactions</div>
               {hasOtherTxs &&
                 <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
               }
