@@ -15,7 +15,7 @@ import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 
-const NUM_TRANSACTIONS = 50;
+const NUM_TRANSACTIONS = 5;
 
 export default class AccountDetails extends Component {
   constructor(props) {
