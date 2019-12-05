@@ -16,6 +16,7 @@ export default class TransactionTable extends Component {
     this.state = {
       backendAddress: this.props.backendAddress,
       transactions: [],
+      account: null
     };
     this.onSocketEvent = this.onSocketEvent.bind(this);
   }
@@ -25,7 +26,7 @@ export default class TransactionTable extends Component {
   }
   static getDerivedStateFromProps(nextProps, prevState) {
     if(nextProps.transactions && nextProps.transactions.length && nextProps.transactions !== prevState.transactions) {
-      return { transactions: nextProps.transactions};
+      return { transactions: nextProps.transactions, account: nextProps.account};
     }
     return prevState;
   }
@@ -55,7 +56,7 @@ export default class TransactionTable extends Component {
   }
 
   render() {
-    const { className, includeDetails, truncate } = this.props;
+    const { className, includeDetails, truncate, account } = this.props;
     const { transactions } = this.state;
     return (
       <table className={cx("data txn-table", className)}>
@@ -68,6 +69,7 @@ export default class TransactionTable extends Component {
               <th className="block">Block</th>
               <th className="age">Age</th>
               <th className="from">From</th>
+              <th className="icon"></th>
               <th className="to">To</th>
               { /* <th className="value">value</th> */ }
             </React.Fragment>}
@@ -75,6 +77,9 @@ export default class TransactionTable extends Component {
         </thead>
         <tbody>
           {_.map(transactions, txn => {
+            let source = null;
+            source = !account && !txn.type ? 'none' : account.address === from(txn) ? 'from' : 'to';
+            console.log('source:',source);
             return (
               <tr key={txn.hash} className={ TxnClasses[txn.type] }>
                 <td className="type">{ type(txn) }</td>
@@ -84,6 +89,7 @@ export default class TransactionTable extends Component {
                   <td className="block">{ txn.block_height }</td>
                   <td className="age" title={ date(txn) }>{ age(txn) }</td>
                   <td className="from overflow"><Link to={`/account/${from(txn)}`}>{ from(txn, 16) }</Link></td>
+                  <td className={cx(source, "icon")}></td>
                   <td className="to overflow"><Link to={`/account/${to(txn)}`}>{ to(txn, 16) }</Link></td>
                   { /* <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td> */ }
                 </React.Fragment>}

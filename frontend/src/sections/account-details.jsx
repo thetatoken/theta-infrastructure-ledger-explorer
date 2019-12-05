@@ -192,7 +192,7 @@ export default class AccountDetails extends Component {
             <div>
               {loading_txns &&
                 <LoadingPanel className="fill" />}
-              <TransactionTable transactions={transactions} />
+              <TransactionTable transactions={transactions} account={account} />
             </div>
             <Pagination
               size={'lg'}

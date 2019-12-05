@@ -6,6 +6,7 @@ table.data.txn-table {
     }
   }
   tr .type {
+    color: $color-font-light;
     white-space: nowrap;
     width: 170px;
     &:before {
@@ -31,7 +32,34 @@ table.data.txn-table {
   tr.update-validators .type:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
 
   td.age {
+    color: $color-font-light;
     white-space: nowrap;
+  }
+
+  td.block {
+    color: $color-font-light;
+  }
+
+  tr .icon {
+    &:before {
+      content: '';
+      display: inline-block;
+      position: relative;
+      top: 2px;
+      width: 32px;
+      height: 20px;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+  }
+  tr .to.icon:before { background-image: url('/images/icons/stake-in@2x.png'); }
+
+  tr .from.icon:before { background-image: url('/images/icons/stake-out@2x.png'); }
+
+  tr .none.icon:before { 
+    width: 0;
+    height: 0;
   }
 
   @include breakpoint('tablet-wide', max) {
