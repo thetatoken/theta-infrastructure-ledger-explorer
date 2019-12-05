@@ -3,7 +3,7 @@ import { browserHistory, Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-import { formatCoin } from 'common/helpers/utils';
+import { formatCoin, sumCoin } from 'common/helpers/utils';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
 
@@ -25,6 +25,7 @@ export default class StakeTxsTable extends Component {
 
   render() {
     const { txs, type, className, truncate } = this.props;
+    let sum = 0;
     return (
       <div className="stakes">
         <div className="title">{type === 'holder' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
@@ -38,6 +39,7 @@ export default class StakeTxsTable extends Component {
           </thead>
           <tbody className="stake-tb">
             {_.map(txs, record => {
+              sum = sumCoin(record.amount, sum);
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
@@ -46,8 +48,14 @@ export default class StakeTxsTable extends Component {
                   <td className="token">{formatCoin(record.amount)}</td>
                 </tr>);
             })}
+            <tr>
+              <td></td>
+              <td></td>
+              <td className="token">{formatCoin(sum)}</td>
+            </tr>
           </tbody>
         </table>
+        <div className="total"></div>
       </div>);
   }
 }

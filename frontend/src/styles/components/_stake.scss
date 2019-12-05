@@ -17,9 +17,11 @@
         letter-spacing: 1.5px;
     }
 }
-.stake-tb{
+.stake-tb tr:last-child{
     // display:block;
     // max-height:60px;
     // overflow:auto;
     // table-layout:fixed;
+    background-color: transparent !important;
+    border-top: 3px solid $color-table-row-line;
 }

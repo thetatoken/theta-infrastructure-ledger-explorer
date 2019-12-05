@@ -21,6 +21,10 @@ export function formatCoin(weiAmount) {
   });
 }
 
+export function sumCoin(weiAmountA, weiAmountB){
+  return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB));
+}
+
 export function getQueryParam(search, name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
   let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
