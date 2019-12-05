@@ -9,11 +9,13 @@ import { formatCoin } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
+import { vcpService } from 'common/services/vcp';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
+import StakeTxsTable from "../common/components/stake-txs";
 
 const NUM_TRANSACTIONS = 5;
 
@@ -29,7 +31,8 @@ export default class AccountDetails extends Component {
       loading_acct: false,
       loading_txns: false,
       includeService: false,
-      hasOtherTxs: true
+      hasOtherTxs: true,
+      hasStakes: false
     };
   }
   componentWillUpdate(nextProps) {
@@ -46,8 +49,26 @@ export default class AccountDetails extends Component {
   fetchData(address) {
     this.getOneAccountByAddress(address);
     this.getTransactionsByAddress(address, false, 1);
+    this.getStakeTransactions(address);
   }
-
+  getStakeTransactions(address) {
+    if (!address) {
+      this.setState({ errorType: 'error_not_found' });
+      return;
+    }
+    vcpService.getVcpByAddress(address)
+      .then(res => {
+        const stakes = _.get(res, 'data.body');
+        this.setState({
+          holderTxs: stakes.holderRecords,
+          sourceTxs: stakes.sourceRecords,
+          hasStakes: stakes.holderRecords.length + stakes.sourceRecords.length > 0
+        })
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   getTransactionsByAddress(address, includeService, page = 1, ) {
     if (!address) {
       this.setState({ errorType: 'error_not_found' });
@@ -126,7 +147,8 @@ export default class AccountDetails extends Component {
   }
 
   render() {
-    const { account, transactions, currentPage, totalPages, errorType, loading_txns, includeService, hasOtherTxs } = this.state;
+    const { account, transactions, currentPage, totalPages, errorType, loading_txns,
+      includeService, hasOtherTxs, hasStakes, holderTxs, sourceTxs } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -147,6 +169,12 @@ export default class AccountDetails extends Component {
               </tbody>
             </table>
           </React.Fragment>}
+        {hasStakes &&
+          <div className="stake-container">
+            <StakeTxsTable type='holder' txs={holderTxs} />
+            <StakeTxsTable type='source' txs={sourceTxs} />
+          </div>
+        }
         {!transactions && loading_txns &&
           <LoadingPanel />}
         {transactions && transactions.length > 0 &&
