@@ -65,6 +65,7 @@ $th-width: 150px;
 table.details {
   width: 100%;
   table-layout: fixed;
+  margin-bottom: 48px;
   background-color: $color-panel;
   thead tr {
     th:first-child {

@@ -6,6 +6,5 @@ export const accountService = {
       throw Error('Missing argument');
     }
     return apiService.get(`account/update/${address}`, {});
-    
   }
 };

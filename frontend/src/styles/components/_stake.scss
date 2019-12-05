@@ -1,0 +1,25 @@
+.stake-container{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 48px;
+}
+
+.stakes{
+    width: 45%;
+    text-align: center;
+    .title{
+        display: inline-block;
+        margin-bottom: 38px;
+        font-family: $font-title;
+        font-weight: $weight-bold;
+        font-size: 1.0rem;
+        color: $color-font-light;
+        letter-spacing: 1.5px;
+    }
+}
+.stake-tb{
+    // display:block;
+    // max-height:60px;
+    // overflow:auto;
+    // table-layout:fixed;
+}
