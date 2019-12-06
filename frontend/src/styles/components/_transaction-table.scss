@@ -39,7 +39,9 @@ table.data.txn-table {
   td.block {
     color: $color-font-light;
   }
-
+  td.dim a, td.token{
+    color: $color-font-light;
+  }
   tr .icon {
     &:before {
       content: '';

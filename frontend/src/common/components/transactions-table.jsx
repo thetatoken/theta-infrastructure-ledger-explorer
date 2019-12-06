@@ -88,9 +88,9 @@ export default class TransactionTable extends Component {
                 <React.Fragment>
                   <td className="block">{ txn.block_height }</td>
                   <td className="age" title={ date(txn) }>{ age(txn) }</td>
-                  <td className="from overflow"><Link to={`/account/${from(txn)}`}>{ from(txn, 16) }</Link></td>
+                  <td className={cx({'dim': source === 'to'}, "from overflow")}><Link to={`/account/${from(txn)}`}>{ from(txn, 16) }</Link></td>
                   <td className={cx(source, "icon")}></td>
-                  <td className="to overflow"><Link to={`/account/${to(txn)}`}>{ to(txn, 16) }</Link></td>
+                  <td className={cx({'dim': source === 'from'}, "to overflow")}><Link to={`/account/${to(txn)}`}>{ to(txn, 16) }</Link></td>
                   { /* <td className="value">{ _.map(value(txn), v => <span>{v}</span>) }</td> */ }
                 </React.Fragment>}
               </tr>);
