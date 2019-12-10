@@ -42,7 +42,7 @@ table.data.txn-table {
     color: $color-font-light;
   }
   td.token, th.token{
-    float: right;
+    text-align: right;
   }
   td.dim a, td.token{
     color: $color-font-light;
