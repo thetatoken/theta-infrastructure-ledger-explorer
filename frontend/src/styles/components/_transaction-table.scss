@@ -1,5 +1,7 @@
 table.data.txn-table {
-  
+  .none{
+    display: none;
+  }
   thead tr .type {
     &:before {
       height: 1px;
