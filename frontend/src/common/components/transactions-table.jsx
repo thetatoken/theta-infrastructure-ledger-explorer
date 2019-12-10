@@ -78,7 +78,7 @@ export default class TransactionTable extends Component {
         <tbody>
           {_.map(transactions, txn => {
             let source = null;
-            source = !account && !txn.type ? 'none' : account.address === from(txn) ? 'from' : 'to';
+            source = !account || !txn.type ? 'none' : account.address === from(txn) ? 'from' : 'to';
             return (
               <tr key={txn.hash} className={ TxnClasses[txn.type] }>
                 <td className="type">{ type(txn) }</td>
