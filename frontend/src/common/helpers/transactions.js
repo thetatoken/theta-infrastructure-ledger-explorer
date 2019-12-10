@@ -8,48 +8,49 @@ BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
 export function totalCoinValue(set, key = 'tfuelwei') {
   //_.forEach(set, v => console.log(_.get(v, `coins.${key}`, 0)))
-  return _.reduce(set, (acc,v) => acc + parseInt(_.get(v, `coins.${key}`, 0)), 0)
+  return _.reduce(set, (acc, v) => acc + parseInt(_.get(v, `coins.${key}`, 0)), 0)
 }
 
 export function from(txn, trunc = null) {
   let path;
 
-  if([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
+  if ([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
     path = 'data.source.address';
-  } else if(txn.type === TxnTypes.SPLIT_CONTRACT) {
+  } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
     path = 'data.initiator.address';
-  } else if(txn.type === TxnTypes.COINBASE) {
+  } else if (txn.type === TxnTypes.COINBASE) {
     path = 'data.proposer.address';
   } else {
     path = 'data.inputs[0].address';
   }
 
   let addr = _.get(txn, path);
-  if(trunc && trunc > 0) {
-    addr = _.truncate(addr, trunc);
+  if (trunc && trunc > 0) {
+    addr = _.truncate(addr, { length: trunc });
   }
+
   return addr;
 }
 
 export function to(txn, trunc = null) {
   let path;
-  if(txn.type === TxnTypes.SERVICE_PAYMENT) {
+  if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
-  } else if(txn.type === TxnTypes.COINBASE) {
+  } else if (txn.type === TxnTypes.COINBASE) {
     path = '';
   } else {
     path = 'data.outputs[0].address';
   }
 
   let addr = _.get(txn, path);
-  if(trunc && trunc > 0) {
-    addr = _.truncate(addr, trunc);
+  if (trunc && trunc > 0) {
+    addr = _.truncate(addr, { length: trunc });
   }
   return addr;
 }
 
 export function type(txn) {
-  if(txn.status === TxnStatus.PENDING) {
+  if (txn.status === TxnStatus.PENDING) {
     return status(txn);
   }
   return TxnTypeText[txn.type];
@@ -57,7 +58,7 @@ export function type(txn) {
 
 
 export function status(txn) {
-  if(!txn.status) {
+  if (!txn.status) {
     return "Finalized";
   }
   return _.capitalize(txn.status);
@@ -84,20 +85,20 @@ export function value(txn) {
 
 export function hash(txn, trunc = null) {
   let a = _.get(txn, 'hash')
-  if(trunc && trunc > 0) {
+  if (trunc && trunc > 0) {
     a = _.truncate(a, { length: trunc });
   }
   return a;
 }
 
 export function age(txn) {
-  if(!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
+  if (!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
     return null;
   return moment(parseInt(txn.timestamp) * 1000).fromNow(true);
 }
 
 export function date(txn) {
-  if(!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
+  if (!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
     return null;
   return moment(parseInt(txn.timestamp) * 1000).format("MM/DD/YY hh:mma");
 }
