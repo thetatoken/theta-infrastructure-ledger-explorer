@@ -61,20 +61,10 @@ export default class AccountDetails extends Component {
         prices.forEach(info => {
           switch (info._id) {
             case 'THETA':
-              this.setState({
-                price: {
-                  ...this.state.price,
-                  'Theta': info.price
-                }
-              })
+              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
               return;
             case 'TFUEL':
-              this.setState({
-                price: {
-                  ...this.state.price,
-                  'TFuel': info.price
-                }
-              })
+              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
               return;
             default:
               return;
@@ -226,7 +216,7 @@ export default class AccountDetails extends Component {
             <div>
               {loading_txns &&
                 <LoadingPanel className="fill" />}
-              <TransactionTable transactions={transactions} account={account} />
+              <TransactionTable transactions={transactions} account={account} price={price} />
             </div>
             <Pagination
               size={'lg'}
@@ -240,8 +230,6 @@ export default class AccountDetails extends Component {
 }
 
 const Balance = ({ balance, price }) => {
-  // const { price } = this.state;
-  console.log(price);
   return (
     <div className="act balance">
       {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>

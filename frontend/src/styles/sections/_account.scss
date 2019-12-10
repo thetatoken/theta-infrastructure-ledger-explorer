@@ -101,9 +101,9 @@
   .currency{
     width: 50%;
     display: flex;
-    .price{
-      margin-left: 5px;
-      color: $color-light;
-    }
   }
+}
+.price{
+  margin-left: 5px;
+  color: $color-light;
 }

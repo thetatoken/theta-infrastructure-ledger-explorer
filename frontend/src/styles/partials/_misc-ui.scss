@@ -2,6 +2,7 @@
 
 
 .currency {
+  display: flex;
   &:before {
     content: '';
     display: inline-block;

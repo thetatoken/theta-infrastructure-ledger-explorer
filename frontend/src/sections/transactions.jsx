@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 
 import { getQueryParam } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
+import { priceService } from 'common/services/price';
 import Pagination from "common/components/pagination";
 import TransactionTable from "common/components/transactions-table";
 
@@ -17,9 +18,10 @@ export default class Transactions extends Component {
       currentPage: 1,
       totalPages: 0,
       loading: false,
+      price: 0
     };
   }
-  
+
   componentDidMount() {
     const { currentPage } = this.state;
     this.fetchData(currentPage);
@@ -27,6 +29,7 @@ export default class Transactions extends Component {
 
   fetchData(currentPage) {
     this.setState({ loading: true });
+    this.getPrices();
     transactionsService.getTransactionsByPage(currentPage, NUM_TRANSACTIONS)
       .then(res => {
         if (res.data.type == 'transaction_list') {
@@ -43,7 +46,27 @@ export default class Transactions extends Component {
         console.log(err)
       })
   }
-
+  getPrices() {
+    priceService.getAllprices()
+      .then(res => {
+        const prices = _.get(res, 'data.body');
+        prices.forEach(info => {
+          switch (info._id) {
+            case 'THETA':
+              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
+              return;
+            case 'TFUEL':
+              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
+              return;
+            default:
+              return;
+          }
+        })
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   handlePageChange = (pageNumber) => {
     this.fetchData(pageNumber);
   }
@@ -53,11 +76,11 @@ export default class Transactions extends Component {
   }
 
   render() {
-    const { transactions, currentPage, totalPages, loading } = this.state;
+    const { transactions, currentPage, totalPages, loading, price } = this.state;
     return (
       <div className="content transactions">
         <div className="page-title transactions">Transactions</div>
-        <TransactionTable transactions={transactions} />
+        <TransactionTable transactions={transactions} price={price} />
         <Pagination
           size={'lg'}
           totalPages={totalPages}
