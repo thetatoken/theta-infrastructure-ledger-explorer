@@ -5,11 +5,12 @@ import cx from 'classnames';
 
 
 
-import { formatCoin } from 'common/helpers/utils';
+import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { vcpService } from 'common/services/vcp';
+import { priceService } from 'common/services/price';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
 import NotExist from 'common/components/not-exist';
@@ -32,7 +33,8 @@ export default class AccountDetails extends Component {
       loading_txns: false,
       includeService: false,
       hasOtherTxs: true,
-      hasStakes: false
+      hasStakes: false,
+      price: {}
     };
   }
   componentWillUpdate(nextProps) {
@@ -50,6 +52,38 @@ export default class AccountDetails extends Component {
     this.getOneAccountByAddress(address);
     this.getTransactionsByAddress(address, false, 1);
     this.getStakeTransactions(address);
+    this.getPrices();
+  }
+  getPrices() {
+    priceService.getAllprices()
+      .then(res => {
+        const prices = _.get(res, 'data.body');
+        prices.forEach(info => {
+          switch (info._id) {
+            case 'THETA':
+              this.setState({
+                price: {
+                  ...this.state.price,
+                  'Theta': info.price
+                }
+              })
+              return;
+            case 'TFUEL':
+              this.setState({
+                price: {
+                  ...this.state.price,
+                  'TFuel': info.price
+                }
+              })
+              return;
+            default:
+              return;
+          }
+        })
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   getStakeTransactions(address) {
     if (!address) {
@@ -148,7 +182,7 @@ export default class AccountDetails extends Component {
 
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, sourceTxs } = this.state;
+      includeService, hasOtherTxs, hasStakes, holderTxs, sourceTxs, price } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -164,7 +198,7 @@ export default class AccountDetails extends Component {
                 </tr>
               </thead>
               <tbody>
-                <DetailsRow label="Balance" data={<Balance balance={account.balance} />} />
+                <DetailsRow label="Balance" data={<Balance balance={account.balance} price={price} />} />
                 <DetailsRow label="Sequence" data={account.sequence} />
               </tbody>
             </table>
@@ -205,11 +239,16 @@ export default class AccountDetails extends Component {
   }
 }
 
-const Balance = ({ balance }) => {
+const Balance = ({ balance, price }) => {
+  // const { price } = this.state;
+  console.log(price);
   return (
-    <React.Fragment>
-      {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>{`${formatCoin(v)} ${CurrencyLabels[k] || k}`}</div>)}
-    </React.Fragment>)
+    <div className="act balance">
+      {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
+        {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
+        <div className='price'>{`[\$${priceCoin(v, price[CurrencyLabels[k]])} USD]`}</div>
+      </div>)}
+    </div>)
 }
 
 const Address = ({ hash }) => {

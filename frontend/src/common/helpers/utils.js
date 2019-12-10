@@ -21,6 +21,15 @@ export function formatCoin(weiAmount) {
   });
 }
 
+export function priceCoin(weiAmount, price){
+  console.log(price);
+  return new BigNumber(weiAmount).dividedBy(WEI).multipliedBy(price).decimalPlaces(2).toFormat({
+    decimalSeparator: '.',
+    groupSeparator: ',',
+    groupSize: 3,
+  });
+}
+
 export function sumCoin(weiAmountA, weiAmountB){
   return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB));
 }
