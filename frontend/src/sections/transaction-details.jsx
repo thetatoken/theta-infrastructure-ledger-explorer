@@ -5,7 +5,8 @@ import { BigNumber } from 'bignumber.js';
 
 import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
 import { date, age, fee, status, type } from 'common/helpers/transactions';
-import { formatCoin } from 'common/helpers/utils';
+import { formatCoin, priceCoin } from 'common/helpers/utils';
+import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
@@ -22,17 +23,41 @@ export default class TransactionExplorer extends Component {
       transaction: null,
       totalTransactionsNumber: undefined,
       errorType: null,
-      showRaw: false
+      showRaw: false,
+      price: {}
     };
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
       this.getOneTransactionByUuid(nextProps.params.transactionHash);
+      this.getPrices();
     }
   }
   componentDidMount() {
     const { transactionHash } = this.props.params;
     this.getOneTransactionByUuid(transactionHash.toLowerCase());
+    this.getPrices();
+  }
+  getPrices() {
+    priceService.getAllprices()
+      .then(res => {
+        const prices = _.get(res, 'data.body');
+        prices.forEach(info => {
+          switch (info._id) {
+            case 'THETA':
+              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
+              return;
+            case 'TFUEL':
+              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
+              return;
+            default:
+              return;
+          }
+        })
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   getOneTransactionByUuid(hash) {
     if (hash) {
@@ -68,7 +93,7 @@ export default class TransactionExplorer extends Component {
   }
   render() {
     const { transactionHash } = this.props.params;
-    const { transaction, errorType, showRaw } = this.state;
+    const { transaction, errorType, showRaw, price } = this.state;
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
@@ -109,34 +134,34 @@ export default class TransactionExplorer extends Component {
               <button className="btn tx raw" onClick={this.handleToggleDetailsClick}>view raw txn</button>
             </div>
             {transaction.type === TxnTypes.COINBASE &&
-              <Coinbase transaction={transaction} />}
+              <Coinbase transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SLASH &&
               <Slash transaction={transaction} />}
 
             {transaction.type === TxnTypes.TRANSFER &&
-              <Send transaction={transaction} />}
+              <Send transaction={transaction} price={price}/>}
 
             {transaction.type === TxnTypes.RESERVE_FUND &&
-              <ReserveFund transaction={transaction} />}
+              <ReserveFund transaction={transaction} price={price}/>}
 
             {transaction.type === TxnTypes.RELEASE_FUND &&
-              <ReleaseFund transaction={transaction} />}
+              <ReleaseFund transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SERVICE_PAYMENT &&
-              <ServicePayment transaction={transaction} />}
+              <ServicePayment transaction={transaction} price={price}/>}
 
             {transaction.type === TxnTypes.SPLIT_CONTRACT &&
-              <SplitContract transaction={transaction} />}
+              <SplitContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
-              <SmartContract transaction={transaction} />}
+              <SmartContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
-              <WithdrawStake transaction={transaction} />}
+              <WithdrawStake transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.DEPOSIT_STAKE &&
-              <DepositStake transaction={transaction} />}
+              <DepositStake transaction={transaction} price={price} />}
 
             {showRaw &&
               <JsonView
@@ -161,11 +186,18 @@ function _renderIds(ids) {
 }
 
 
-const Amount = ({ coins }) => {
+const Amount = ({ coins, price }) => {
   return (
     <React.Fragment>
-      <div className="currency theta">{formatCoin(coins.thetawei)} Theta</div>
-      <div className="currency tfuel">{formatCoin(coins.tfuelwei)} TFuel</div>
+      <div className="currency theta">
+        {formatCoin(coins.thetawei)} Theta
+        <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>
+        <div></div>
+      </div>
+      <div className="currency tfuel">
+        {formatCoin(coins.tfuelwei)} TFuel
+        <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>
+      </div>
     </React.Fragment>)
 }
 
@@ -177,17 +209,17 @@ const Fee = ({ transaction }) => {
   return (<span className="currency tfuel">{fee(transaction) + " TFuel"}</span>);
 }
 
-const CoinbaseOutput = ({ output }) => {
+const CoinbaseOutput = ({ output, price }) => {
   return (
     <div className="coinbase-output">
       <div>
-        <Amount coins={output.coins} />
+        <Amount coins={output.coins} price={price} />
       </div>
       <Address hash={output.address} />
     </div>);
 }
 
-const ServicePayment = ({ transaction }) => {
+const ServicePayment = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
@@ -195,7 +227,7 @@ const ServicePayment = ({ transaction }) => {
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="From Address" data={<Address hash={data.source.address} />} />
         <DetailsRow label="To Address" data={<Address hash={data.target.address} />} />
-        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} />} />
+        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
         <DetailsRow label="Payment Sequence" data={data.payment_sequence} />
         <DetailsRow label="Reserve Sequence" data={data.reserve_sequence} />
         <DetailsRow label="Resource ID" data={data.resource_id} />
@@ -203,15 +235,15 @@ const ServicePayment = ({ transaction }) => {
     </table>);
 }
 
-const ReserveFund = ({ transaction }) => {
+const ReserveFund = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Collateral" data={<Amount coins={data.collateral} />} />
+        <DetailsRow label="Collateral" data={<Amount coins={data.collateral} price={price}/>} />
         <DetailsRow label="Duration" data={data.duration} />
-        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} />} />
+        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price}/>} />
         <DetailsRow label="Source Address" data={<Address hash={data.source.address} />} />
         <DetailsRow label="Resource Ids" data={_renderIds(data.resource_ids)} />
       </tbody>
@@ -245,13 +277,13 @@ const SplitContract = ({ transaction }) => {
     </table>);
 }
 
-const Send = ({ transaction }) => {
+const Send = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Amount" data={<Amount coins={data.outputs[0].coins} />} />
+        <DetailsRow label="Amount" data={<Amount coins={data.outputs[0].coins} price={price}/>} />
         <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />
         <DetailsRow label="To Address" data={<Address hash={data.outputs[0].address} />} />
       </tbody>
@@ -271,38 +303,38 @@ const Slash = ({ transaction }) => {
     </table>);
 }
 
-const Coinbase = ({ transaction }) => {
+const Coinbase = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} />)} />
+        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
 
-const WithdrawStake = ({ transaction }) => {
+const WithdrawStake = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price}/>} />
         <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
 
-const DepositStake = ({ transaction }) => {
+const DepositStake = ({ transaction, price }) => {
   let { data } = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Holder" data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price}/>} />
         <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Source" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
