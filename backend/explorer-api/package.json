@@ -9,6 +9,8 @@
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "mongodb": "^3.1.11",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
     "socketio": "^1.0.0"
   },
   "devDependencies": {},
