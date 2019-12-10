@@ -39,6 +39,9 @@ table.data.txn-table {
   td.block {
     color: $color-font-light;
   }
+  td.token, th.token{
+    float: right;
+  }
   td.dim a, td.token{
     color: $color-font-light;
   }
