@@ -5,6 +5,7 @@
   "main": "run.js",
   "dependencies": {
     "bluebird": "^3.5.1",
+    "bignumber.js": "^8.0.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",

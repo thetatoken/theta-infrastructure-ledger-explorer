@@ -39,14 +39,7 @@ module.exports = class VcpDAO {
       } else if (!recordList) {
         callback(Error('NOT_FOUND - ' + height));
       } else {
-        var vcpInfoList = []
-        for (var i = 0; i < recordList.length; i++) {
-          var vcpInfo = {};
-          vcpInfo.source = recordList[i]._id;
-          vcpInfo.stakes = recordList[i].stakes;
-          vcpInfoList.push(vcpInfo)
-        }
-        callback(error, vcpInfoList)
+        callback(error, recordList)
       }
     })
   }
