@@ -34,7 +34,7 @@ export default class AccountDetails extends Component {
       includeService: false,
       hasOtherTxs: true,
       hasStakes: false,
-      price: {}
+      price: { 'Theta': 0, 'TFuel': 0}
     };
   }
   componentWillUpdate(nextProps) {

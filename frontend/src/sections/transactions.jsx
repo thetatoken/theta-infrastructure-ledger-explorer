@@ -18,7 +18,7 @@ export default class Transactions extends Component {
       currentPage: 1,
       totalPages: 0,
       loading: false,
-      price: {}
+      price: { 'Theta': 0, 'TFuel': 0}
     };
   }
 

@@ -24,7 +24,7 @@ export default class TransactionExplorer extends Component {
       totalTransactionsNumber: undefined,
       errorType: null,
       showRaw: false,
-      price: {}
+      price: { 'Theta': 0, 'TFuel': 0}
     };
   }
   componentWillUpdate(nextProps) {
