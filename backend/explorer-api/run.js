@@ -143,7 +143,7 @@ function onClientConnect(client) {
 }
 
 function pushTopBlocks() {
-  const numberOfBlocks = 10;
+  const numberOfBlocks = 5;
 
   progressDao.getProgressAsync(config.blockchain.network_id)
     .then(function (progressInfo) {
@@ -151,7 +151,7 @@ function pushTopBlocks() {
       // console.log('Latest block height: ' + latest_block_height.toString());
 
       var query_block_height_max = latest_block_height;
-      var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 100 blocks initially
+      var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 50 blocks initially
       console.log('Querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
       //return blockDao.getBlockAsync(123) 
       return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
@@ -163,7 +163,7 @@ function pushTopBlocks() {
   if (isPushingData) setTimeout(pushTopBlocks, 1000);
 }
 function pushTopTransactions() {
-  numberOfTransactions = 10;
+  const numberOfTransactions = 5;
   transactionDao.getTransactionsAsync(0, numberOfTransactions, null)
     .then(function (transactionInfoList) {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });

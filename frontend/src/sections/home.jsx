@@ -10,7 +10,6 @@ export default class Dashboard extends Component {
     return (
       <div className="content home">
         <div className="overview">
-
           <div>
             <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
             <BlocksTable 
@@ -19,7 +18,7 @@ export default class Dashboard extends Component {
               truncateHash={true}
               includeDetails={false}
               truncate={50} />
-            <Link to="/blocks" className="btn s">More</Link>
+            <Link to="/blocks" className="more">View More</Link>
           </div>
 
           <div>
@@ -29,7 +28,7 @@ export default class Dashboard extends Component {
               backendAddress={ backendAddress }
               includeDetails={false}
               truncate={40} />
-            <Link to="/txs" className="btn s">More</Link>
+            <Link to="/txs" className="more">View More</Link>
           </div>
           
         </div>

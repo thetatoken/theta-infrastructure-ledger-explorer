@@ -27,6 +27,12 @@
       height: 14px;
       top: 2px;
     }
+    .more{
+      margin-top: 27px;
+      font-size: 14px;
+      letter-spacing: 1.4px;
+      color: $color-theta-blue-light;
+    }
   }
 
   @include breakpoint('tablet', max) {
