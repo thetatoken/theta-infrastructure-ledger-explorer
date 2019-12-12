@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import _ from 'lodash';
 import cx from 'classnames';
 
-import { formatNumber, formatCurrency } from 'common/helpers/utils';
+import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
+import { vcpService } from 'common/services/vcp';
 
+import BigNumber from 'bignumber.js';
+import { WEI } from 'common/constants';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
 
@@ -12,12 +15,14 @@ export default class TokenDashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      txnNum: 0
+      txnNum: 0,
+      totalStaked: 0
     };
   }
   componentDidMount() {
     if (this.props.type === 'theta') {
       this.getTransactionNumber();
+      this.getTotalStaked();
     }
   }
   getTransactionNumber() {
@@ -30,12 +35,22 @@ export default class TokenDashboard extends Component {
         console.log(err);
       });
   }
+  getTotalStaked() {
+    vcpService.getAllVcp()
+      .then(res => {
+        const vcpList = _.get(res, 'data.body')
+        let sum = vcpList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        this.setState({ totalStaked: sum });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   render() {
-    const { txnNum } = this.state;
+    const { txnNum, totalStaked } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
-    console.log(txnNum)
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("token dashboard", type)}>
@@ -53,7 +68,7 @@ export default class TokenDashboard extends Component {
           <div className="column">
             {type === 'theta' && <Detail title={'TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
             {/* {type === 'theta' && <Detail title={'TRANSACTIONS'} value={txnNum} />} */}
-            {type === 'theta' && <Detail title={'total STAKED (%)'} value={`N/A`} />}
+            {type === 'theta' && <Detail title={'total STAKED (%)'} value={<StakedPercent supply={tokenInfo.circulating_supply} staked={totalStaked} />} />}
           </div>
           <div className="column">
             {type === 'theta' ?
@@ -90,6 +105,14 @@ const TxnNumber = ({ num }) => {
     <React.Fragment>
       {`${formatNumber(num / 1000000) + ' M'}`}
       <div className="tps">[{tps.toFixed()} TPS]</div>
+    </React.Fragment>
+  );
+}
+
+const StakedPercent = ({ supply, staked }) => {
+  return (
+    <React.Fragment>
+      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply).toFixed(4) * 100}%`}
     </React.Fragment>
   );
 }
