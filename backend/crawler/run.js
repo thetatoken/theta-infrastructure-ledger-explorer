@@ -41,7 +41,7 @@ function main() {
     process.exit(1);
   }
   console.log(config);
-
+  const network_id = config.blockchain.network_id;
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
@@ -74,7 +74,7 @@ function main() {
       // }
       // mongoClient.upsert('progress', queryObject, newObject, function () { });
       // mongoClient.find('progress', function () { });
-      setupGetBlockCronJob(mongoClient);
+      setupGetBlockCronJob(mongoClient, network_id);
     }
   });
 }
@@ -97,7 +97,7 @@ function main() {
 //   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
 // }
 
-function setupGetBlockCronJob(mongoClient) {
+function setupGetBlockCronJob(mongoClient, network_id) {
   // initialize DAOs
   progressDao = new progressDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(progressDao);
@@ -123,7 +123,7 @@ function setupGetBlockCronJob(mongoClient) {
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, accountTxSendDao, vcpDao);
   // readVcpCronJob.Initialize(progressDao);
   setTimeout(async function run() {
-    await readBlockCronJob.Execute();
+    await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
   }, 1000);
   // schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
