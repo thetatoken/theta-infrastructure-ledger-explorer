@@ -7,7 +7,9 @@ exports.updateVcp = async function (candidate, vcpDao) {
       const vcpInfo = {
         'holder': holder,
         'source': stake.source,
-        'amount': stake.amount
+        'amount': stake.amount,
+        'withdrawn': stake.withdrawn,
+        'return_height': stake.return_height
       }
       insertList.push(vcpDao.insertAsync(vcpInfo));
     }
