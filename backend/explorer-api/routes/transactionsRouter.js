@@ -81,6 +81,20 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
         res.status(200).send(data);
       });
   })
+
+  router.get("/transactions/number", (req, res) => {
+    transactionDao.getTotalNumberAsync()
+      .then(number => {
+        var data = ({
+          type: 'transaction_number',
+          body: { total_num_tx: number }
+        });
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        console.log('Error - Push total number of transaction', err);
+      });
+  });
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
