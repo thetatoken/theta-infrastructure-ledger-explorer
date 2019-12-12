@@ -20,8 +20,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
       case 6:
         counter++;
         break;
-      case 7:
       case 8:
+      case 9:
         counter = counter + 2
         break
       default:
@@ -65,8 +65,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         break;
-      case 7:
       case 8:
+      case 9:
         // Update source account
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
