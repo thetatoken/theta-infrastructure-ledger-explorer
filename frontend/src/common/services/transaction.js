@@ -17,7 +17,9 @@ export const transactionsService = {
   getTransactionsByPage(pageNumber, limit = 10) {
     return apiService.get('transactions/range', { params: { pageNumber, limit } });
   },
-
+  getTotalTransactionNumber(){
+    return apiService.get('transactions/number');
+  },
   getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50, includeService = true) {
     let isEqualType = false;
     let type = 10; //Return all types

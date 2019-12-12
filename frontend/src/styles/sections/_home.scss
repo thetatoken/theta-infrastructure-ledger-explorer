@@ -1,6 +1,9 @@
 .content.home {
+  > :first-child{
+    margin-top: 5rem;
+  }
   .overview {
-  	margin-top: 5rem;
+  	// margin-top: 5rem;
     @include row($justify: space-between, $align: flex-start);
 
     & > * {

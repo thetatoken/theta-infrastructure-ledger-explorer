@@ -13,6 +13,14 @@ export function truncateMiddle(str, maxLength = 20, separator = '...') {
   return str.substr(0, front) + separator + str.substr(str.length - back);
 }
 
+export function formatNumber(num, length = 0) {
+  return num.toFixed(length).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+export function formatCurrency(num, length = 2) {
+  return '$' + num.toFixed(length).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
 export function formatCoin(weiAmount) {
   return new BigNumber(weiAmount).dividedBy(WEI).decimalPlaces(4).toFormat({
     decimalSeparator: '.',
