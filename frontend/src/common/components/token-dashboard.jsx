@@ -99,11 +99,9 @@ const Detail = ({ title, value }) => {
 const TxnNumber = ({ num }) => {
   const duration = (new Date() - new Date('2019-03-15T20:00:00').getTime()) / 1000;
   const tps = num / duration.toFixed();
-  console.log(tps)
-  // return formatNumber(num / 1000000) + ' M';
   return (
     <React.Fragment>
-      {`${formatNumber(num / 1000000) + ' M'}`}
+      {`${formatNumber(num / 1000000, 2) + ' M'}`}
       <div className="tps">[{tps.toFixed()} TPS]</div>
     </React.Fragment>
   );
