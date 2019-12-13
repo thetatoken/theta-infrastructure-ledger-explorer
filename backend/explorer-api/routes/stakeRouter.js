@@ -64,10 +64,10 @@ var stakeRouter = (app, stakeDao, accountDao) => {
     stakeDao.getStakeByAddressAsync(address)
       .then(async stakeListInfo => {
         if (hasBalance === 'true') {
-          for (let i = 0; i < stakeListInfo.sourceRecords.length; i++) {
-            if (stakeListInfo.sourceRecords[i].type === 'gcp') {
-              const accInfo = await accountDao.getAccountByPkAsync(stakeListInfo.sourceRecords[i].holder);
-              stakeListInfo.sourceRecords[i].holder_tfuelwei_balance = accInfo.balance.tfuelwei;
+          for (let i = 0; i < stakeListInfo.holderRecords.length; i++) {
+            if (stakeListInfo.holderRecords[i].type === 'gcp') {
+              const accInfo = await accountDao.getAccountByPkAsync(stakeListInfo.holderRecords[i].source);
+              stakeListInfo.holderRecords[i].source_tfuelwei_balance = accInfo.balance.tfuelwei;
             }
           }
         }
