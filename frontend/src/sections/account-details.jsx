@@ -34,8 +34,17 @@ export default class AccountDetails extends Component {
       includeService: false,
       hasOtherTxs: true,
       hasStakes: false,
-      price: { 'Theta': 0, 'TFuel': 0}
+      price: { 'Theta': 0, 'TFuel': 0 }
     };
+  }
+  getEmptyAccount(address){
+    return {
+      address,
+      balance: {thetawei:0, tfuelwei:0},
+      sequence: 0,
+      reserved_funds: [],
+      txs_counter: {}
+    }
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
@@ -88,6 +97,13 @@ export default class AccountDetails extends Component {
           sourceTxs: stakes.sourceRecords,
           hasStakes: stakes.holderRecords.length + stakes.sourceRecords.length > 0
         })
+        let { errorType, holderTxs, sourceTxs } = this.state
+        if (errorType === 'error_not_found' && (holderTxs.length || sourceTxs.length)) {
+          this.setState({
+            account: this.getEmptyAccount(address),
+            errorType: null
+          })
+        }
       })
       .catch(err => {
         console.log(err);
@@ -98,7 +114,7 @@ export default class AccountDetails extends Component {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
-    if(this.state.account && !Object.keys(this.state.account.txs_counter).length){
+    if (this.state.account && !Object.keys(this.state.account.txs_counter).length) {
       this.setState({ loading_txns: false });
       return;
     }
@@ -142,6 +158,14 @@ export default class AccountDetails extends Component {
             })
             break;
           case 'error_not_found':
+            let {holderTxs, sourceTxs} = this.state;
+            if(holderTxs && sourceTxs && (holderTxs.length || sourceTxs.length)){
+              this.setState({
+                account: this.getEmptyAccount(address),
+                errorType: null
+              })
+              break;
+            }
             this.setState({
               errorType: 'error_not_found'
             });
