@@ -98,7 +98,10 @@ export default class AccountDetails extends Component {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
-
+    if(this.state.account && !Object.keys(this.state.account.txs_counter).length){
+      this.setState({ loading_txns: false });
+      return;
+    }
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
