@@ -60,7 +60,7 @@ var stakeRouter = (app, stakeDao) => {
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
     const address = req.params.id.toLowerCase();
-    stakeDao.getstakeByAddressAsync(address)
+    stakeDao.getStakeByAddressAsync(address)
       .then(stakeListInfo => {
         const data = ({
           type: 'stake',
