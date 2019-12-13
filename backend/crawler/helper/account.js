@@ -1,7 +1,7 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
 
-exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, transactionList) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -22,6 +22,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         break;
       case 8:
       case 9:
+      case 10:
         counter = counter + 2
         break
       default:
@@ -41,12 +42,12 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         // Update inputs account
         for (let input of tx.data.inputs) {
           await _updateAccountByAddress(input.address, accountDao, tx.type);
-          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao, accountTxSendDao);
+          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         }
         // Update outputs account
         for (let output of tx.data.outputs) {
           await _updateAccountByAddress(output.address, accountDao, tx.type);
-          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao, accountTxSendDao);
+          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         }
         break;
       case 3:
@@ -67,6 +68,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, accountTxSendD
         break;
       case 8:
       case 9:
+      case 10:
         // Update source account
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
@@ -122,25 +124,11 @@ async function _updateAccountByAddress(address, accountDao, type) {
     })
 }
 
-function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao, accountTxSendDao) {
-  accountTxDao.upsertInfoAsync({
-    address,
-    'tx_hash': hash,
-    'tx_type': type,
-    timestamp
-  });
+function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
   accountTxDao.insertAsync({
     'acct': address,
     hash,
     type,
     'ts': timestamp
   });
-  if (type === 2) {
-    accountTxSendDao.upsertInfoAsync({
-      address,
-      'tx_hash': hash,
-      'tx_type': type,
-      timestamp
-    });
-  }
 }

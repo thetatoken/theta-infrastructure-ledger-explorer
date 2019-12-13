@@ -183,7 +183,7 @@ exports.Execute = async function (network_id) {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, accountTxDao, accountTxSendDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
     })
     .then(async function () {
       validTransactionList = [];
