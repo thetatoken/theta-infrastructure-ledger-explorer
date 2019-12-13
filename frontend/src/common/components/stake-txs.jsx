@@ -6,7 +6,7 @@ import cx from 'classnames';
 import { formatCoin, sumCoin } from 'common/helpers/utils';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
-
+const TRUNC = 2;
 
 
 export default class StakeTxsTable extends Component {
@@ -15,7 +15,8 @@ export default class StakeTxsTable extends Component {
     this.state = {
       backendAddress: this.props.backendAddress,
       type: this.props.type,
-      txs: this.props.txs
+      transaction: this.props.txs.slice(0, TRUNC),
+      isSliced: true
     };
   }
   static defaultProps = {
@@ -23,9 +24,18 @@ export default class StakeTxsTable extends Component {
     truncate: 35,
   }
 
+  toggleList() {
+    if (this.state.isSliced) {
+      this.setState({ transaction: this.props.txs, isSliced: false })
+    } else {
+      this.setState({ transaction: this.props.txs.slice(0, TRUNC), isSliced: true })
+    }
+  }
+
   render() {
     const { txs, type, className, truncate } = this.props;
-    let sum = 0;
+    const { transaction, isSliced } = this.state;
+    let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.amount) }, 0);
     return (
       <div className="stakes">
         <div className="title">{type === 'source' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
@@ -38,8 +48,8 @@ export default class StakeTxsTable extends Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(txs, record => {
-              sum = sumCoin(record.amount, sum);
+            {_.map(transaction, record => {
+              // sum = sumCoin(record.amount, sum);
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
@@ -48,6 +58,17 @@ export default class StakeTxsTable extends Component {
                   <td className="token">{formatCoin(record.amount)}</td>
                 </tr>);
             })}
+            {txs.length > TRUNC &&
+              <tr>
+                <td className="arrow-container" colSpan="3" onClick={this.toggleList.bind(this)}>
+                  {
+                    isSliced ? <p><i className="arrow down" /><i className="arrow down" /><i className="arrow down" /></p> :
+                      <p><i className="arrow up" /><i className="arrow up" /><i className="arrow up" /></p>
+                  }
+                </td>
+              </tr>
+            }
+            <tr><td className="empty"></td></tr>
             <tr>
               <td></td>
               <td></td>
@@ -55,7 +76,13 @@ export default class StakeTxsTable extends Component {
             </tr>
           </tbody>
         </table>
-        <div className="total"></div>
+        {/* <div className="arrow-container" onClick={this.toggleList.bind(this)}>
+          {
+            isSliced ? <p><i className="arrow down" /><i className="arrow down" /><i className="arrow down" /></p> :
+              <p><i className="arrow up" /><i className="arrow up" /><i className="arrow up" /></p>
+          }
+        </div>
+        <div className="total">{formatCoin(sum)}</div> */}
       </div>);
   }
 }
