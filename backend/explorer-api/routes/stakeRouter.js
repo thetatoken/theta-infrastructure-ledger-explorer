@@ -32,7 +32,7 @@ var stakeRouter = (app, stakeDao, accountDao) => {
 
   router.get("/stake/totalAmount", (req, res) => {
     console.log('Querying total staked tokens.');
-    stakeDao.getAllstakeAsync()
+    stakeDao.getAllStakesAsync()
       .then(stakeListInfo => {
         let total = 0;
         stakeListInfo.forEach(info => {
