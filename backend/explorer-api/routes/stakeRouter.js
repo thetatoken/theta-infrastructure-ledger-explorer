@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var BigNumber = require('bignumber.js');
 
-var stakeRouter = (app, stakeDao) => {
+var stakeRouter = (app, stakeDao, accountDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -59,9 +59,18 @@ var stakeRouter = (app, stakeDao) => {
 
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
+    let { hasBalance = false } = req.query;
     const address = req.params.id.toLowerCase();
     stakeDao.getStakeByAddressAsync(address)
-      .then(stakeListInfo => {
+      .then(async stakeListInfo => {
+        if (hasBalance === 'true') {
+          for (let i = 0; i < stakeListInfo.sourceRecords.length; i++) {
+            if (stakeListInfo.sourceRecords[i].type === 'gcp') {
+              const accInfo = await accountDao.getAccountByPkAsync(stakeListInfo.sourceRecords[i].holder);
+              stakeListInfo.sourceRecords[i].holder_tfuelwei_balance = accInfo.balance.tfuelwei;
+            }
+          }
+        }
         const data = ({
           type: 'stake',
           body: stakeListInfo,

@@ -121,7 +121,7 @@ function main() {
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc, config);
       // stake router
-      stakeRouter(app, stakeDao, config);
+      stakeRouter(app, stakeDao, accountDao, config);
       // supply router
       supplyRouter(app, config);
       // price router

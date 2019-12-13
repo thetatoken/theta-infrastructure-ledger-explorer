@@ -22,7 +22,7 @@ export const transactionsService = {
   },
   getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50, includeService = true) {
     let isEqualType = false;
-    let type = 10; //Return all types
+    let type = -1; //Return all types
     if(!includeService) {
       type = TxnTypes.SERVICE_PAYMENT; //Exclude this
     }
