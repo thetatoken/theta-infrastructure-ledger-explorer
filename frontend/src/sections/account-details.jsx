@@ -39,7 +39,7 @@ export default class AccountDetails extends Component {
   }
   getEmptyAccount(address){
     return {
-      address,
+      address: address.toLowerCase(),
       balance: {thetawei:0, tfuelwei:0},
       sequence: 0,
       reserved_funds: [],
