@@ -164,7 +164,19 @@ exports.removeAll = function (collectionName, callback) {
       if (err) callback(err);
       callback(err, res);
     });
-  }else{
+  } else {
+    callback();
+  }
+}
+
+exports.remove = function (collectionName, queryObject, callback) {
+  if (collectionName === 'stake') {
+    var collection = _db.collection(collectionName);
+    collection.deleteMany(queryObject, function (err, res) {
+      if (err) callback(err);
+      callback(err, res);
+    });
+  } else {
     callback();
   }
 }

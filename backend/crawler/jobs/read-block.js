@@ -1,6 +1,6 @@
 var rpc = require('../api/rpc.js');
 var accountHelper = require('../helper/account');
-var vcpHelper = require('../helper/vcp');
+var stakeHelper = require('../helper/stake');
 var txHelper = require('../helper/transactions');
 var fs = require('fs');
 var Logger = require('../helper/logger');
@@ -12,8 +12,7 @@ var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
-var network_id = 'main_net_chain';
-var max_block_per_crawl = 2;
+var max_block_per_crawl = 5;
 var target_crawl_height;
 var txs_count = 0;
 var crawled_block_height_progress = 0;
@@ -23,17 +22,17 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, accountTxSendDaoInstance, vcpDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, accountTxSendDaoInstance, stakeDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
   accountTxSendDao = accountTxSendDaoInstance;
-  vcpDao = vcpDaoInstance;
+  stakeDao = stakeDaoInstance;
 }
 
-exports.Execute = async function () {
+exports.Execute = async function (network_id) {
   await progressDao.getProgressAsync(network_id)
     .then(function (progressInfo) {
       Logger.log('Start a new crawler progress');
@@ -89,12 +88,14 @@ exports.Execute = async function () {
 
         var getBlockAsyncList = [];
         var getVcpAsyncList = [];
+        var getGcpAsyncList = [];
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           // Logger.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
           getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          getGcpAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
         }
-        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList))
+        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList).concat(getGcpAsyncList))
       } else {
         Logger.error('Block crawling is up to date.');
       }
@@ -107,6 +108,7 @@ exports.Execute = async function () {
       if (blockDataList) {
         var upsertBlockAsyncList = [];
         var upsertVcpAsyncList = [];
+        var upsertGcpAsyncList = [];
         var upsertTransactionAsyncList = [];
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
@@ -114,10 +116,17 @@ exports.Execute = async function () {
           // Logger.log(blockDataList[i]);
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
-              await vcpDao.removeAllAsync();
+              await stakeDao.removeRecordsAsync('vcp');
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
                 vcpPair.Vcp.SortedCandidates.forEach(candidate => {
-                  upsertVcpAsyncList.push(vcpHelper.updateVcp(candidate, vcpDao));
+                  upsertVcpAsyncList.push(stakeHelper.updateStake(candidate, 'vcp', stakeDao));
+                })
+              })
+            } else if (result.result.BlockHashGcpPairs) {
+              await stakeDao.removeRecordsAsync('gcp');
+              result.result.BlockHashGcpPairs.forEach(gcpPair => {
+                gcpPair.Gcp.SortedGuardians.forEach(candidate => {
+                  upsertGcpAsyncList.push(stakeHelper.updateStake(candidate, 'gcp', stakeDao));
                 })
               })
             } else {  //handle block response
@@ -168,8 +177,9 @@ exports.Execute = async function () {
         }
         Logger.log(`Number of upsert BLOCKS: ${upsertBlockAsyncList.length}`);
         Logger.log(`Number of upsert VCP: ${upsertVcpAsyncList.length}`);
+        Logger.log(`Number of upsert GCP: ${upsertGcpAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
-        return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertTransactionAsyncList)
+        return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList, upsertTransactionAsyncList)
       }
     })
     .then(() => {

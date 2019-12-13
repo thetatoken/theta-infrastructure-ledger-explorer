@@ -1,22 +1,22 @@
 var path = require('path');
 //------------------------------------------------------------------------------
-//  DAO for vcp
+//  DAO for stake
 //------------------------------------------------------------------------------
 
-module.exports = class VcpDAO {
+module.exports = class stakeDAO {
 
   constructor(execDir, client) {
     // this.aerospike = require(path.join(execDir, 'node_modules', 'mongodb'));
     this.client = client;
-    this.vcpInfoCollection = 'vcp';
+    this.stakeInfoCollection = 'stake';
   }
 
-  insert(vcpInfo, callback) {
-    this.client.insert(this.vcpInfoCollection, vcpInfo, callback);
+  insert(stakeInfo, callback) {
+    this.client.insert(this.stakeInfoCollection, stakeInfo, callback);
   }
 
-  getAllVcp(callback) {
-    this.client.findAll(this.vcpInfoCollection, function (error, recordList) {
+  getAllStakes(callback) {
+    this.client.findAll(this.stakeInfoCollection, function (error, recordList) {
       if (error) {
         console.log('ERR - ', error, height);
         // callback(error);
@@ -28,19 +28,19 @@ module.exports = class VcpDAO {
     })
   }
 
-  getVcpByAddress(address, callback) {
+  getStakeByAddress(address, callback) {
     const queryHolder = { 'holder': address };
     const querySource = { 'source': address };
     let holderRecords = [];
     let sourceRecords = [];
     const self = this;
-    this.client.query(this.vcpInfoCollection, queryHolder, function (error, record) {
+    this.client.query(this.stakeInfoCollection, queryHolder, function (error, record) {
       if (error) {
         console.log('ERR - ', error, height);
       } else if (record) {
         holderRecords = record;
       }
-      self.client.query(self.vcpInfoCollection, querySource, function (error, record) {
+      self.client.query(self.stakeInfoCollection, querySource, function (error, record) {
         if (error) {
           console.log('ERR - ', error, height);
         } else if (record) {
@@ -52,8 +52,9 @@ module.exports = class VcpDAO {
     })
   }
 
-  removeAll(callback) {
-    this.client.removeAll(this.vcpInfoCollection, function (err, res) {
+  removeRecords(type, callback) {
+    const queryObject = { 'type': type };
+    this.client.remove(this.stakeInfoCollection, queryObject, function (err, res) {
       if (err) {
         console.log('ERR - ', err, height);
         callback(err);
