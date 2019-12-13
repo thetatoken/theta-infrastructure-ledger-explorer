@@ -16,6 +16,8 @@
         letter-spacing: 1.5px;
     }
     .arrow-container{
+        cursor: pointer;
+        color: $color-font-light;
         padding: 0;
         text-align: center;
         i {

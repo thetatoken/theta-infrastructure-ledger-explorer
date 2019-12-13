@@ -21,7 +21,7 @@ export default class StakeTxsTable extends Component {
   }
   static defaultProps = {
     includeDetails: true,
-    truncate: 35,
+    truncate: 30,
   }
 
   toggleList() {
@@ -55,16 +55,13 @@ export default class StakeTxsTable extends Component {
                 <tr key={record._id}>
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td>
-                  <td className="token">{formatCoin(record.amount)}</td>
+                  <td className="token">{formatCoin(record.amount)} Theta</td>
                 </tr>);
             })}
             {txs.length > TRUNC &&
               <tr>
                 <td className="arrow-container" colSpan="3" onClick={this.toggleList.bind(this)}>
-                  {
-                    isSliced ? <p><i className="arrow down" /><i className="arrow down" /><i className="arrow down" /></p> :
-                      <p><i className="arrow up" /><i className="arrow up" /><i className="arrow up" /></p>
-                  }
+                  View {isSliced ? 'More' : 'Less'}
                 </td>
               </tr>
             }
@@ -72,7 +69,7 @@ export default class StakeTxsTable extends Component {
             <tr>
               <td></td>
               <td></td>
-              <td className="token">{formatCoin(sum)}</td>
+              <td className="token">{formatCoin(sum)} Theta</td>
             </tr>
           </tbody>
         </table>
