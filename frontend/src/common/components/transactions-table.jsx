@@ -80,6 +80,7 @@ export default class TransactionTable extends Component {
           {_.map(transactions, txn => {
             let source = null;
             source = !account ? 'none' : account.address === from(txn) ? 'from' : 'to';
+            const coins = txn.data.outputs && txn.data.outputs.length ? txn.data.outputs[0].coins : { 'thetawei': 0, 'tfuelwei': 0 };
             return (
               <tr key={txn.hash} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
@@ -91,7 +92,7 @@ export default class TransactionTable extends Component {
                     <td className={cx({ 'dim': source === 'to' }, "from overflow")}><Link to={`/account/${from(txn)}`}>{from(txn, 20)}</Link></td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}><Link to={`/account/${to(txn)}`}>{to(txn, 20)}</Link></td>
-                    <td className="value"><Value coins={txn.data.outputs[0].coins} price={price} /></td>
+                    <td className="value"><Value coins={coins} price={price} /></td>
                   </React.Fragment>}
               </tr>);
           })}
