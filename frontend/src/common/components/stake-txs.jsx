@@ -28,11 +28,11 @@ export default class StakeTxsTable extends Component {
     let sum = 0;
     return (
       <div className="stakes">
-        <div className="title">{type === 'holder' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
+        <div className="title">{type === 'source' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
         <table className={cx("data txn-table", className)}>
           <thead>
             <tr>
-              <th className="address">{type === 'holder' ? 'TO NODE' : 'FROM ADDRESS'}</th>
+              <th className="address">{type === 'source' ? 'TO NODE' : 'FROM ADDRESS'}</th>
               <th className="txn">STAKING TX</th>
               <th className="token">TOKENS STAKED</th>
             </tr>

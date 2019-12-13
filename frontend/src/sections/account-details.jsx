@@ -222,8 +222,8 @@ export default class AccountDetails extends Component {
           </React.Fragment>}
         {hasStakes &&
           <div className="stake-container">
-            <StakeTxsTable type='holder' txs={holderTxs} />
             <StakeTxsTable type='source' txs={sourceTxs} />
+            <StakeTxsTable type='holder' txs={holderTxs} />
           </div>
         }
         {!transactions && loading_txns &&
