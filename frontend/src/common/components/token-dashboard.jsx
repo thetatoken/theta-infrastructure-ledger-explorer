@@ -66,8 +66,7 @@ export default class TokenDashboard extends Component {
             <Detail title={'SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
           <div className="column">
-            {type === 'theta' && <Detail title={'TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
-            {/* {type === 'theta' && <Detail title={'TRANSACTIONS'} value={txnNum} />} */}
+            {type === 'theta' && <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
             {type === 'theta' && <Detail title={'total STAKED (%)'} value={<StakedPercent supply={tokenInfo.circulating_supply} staked={totalStaked} />} />}
           </div>
           <div className="column">
