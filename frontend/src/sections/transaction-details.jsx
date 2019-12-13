@@ -24,7 +24,7 @@ export default class TransactionExplorer extends Component {
       totalTransactionsNumber: undefined,
       errorType: null,
       showRaw: false,
-      price: { 'Theta': 0, 'TFuel': 0}
+      price: { 'Theta': 0, 'TFuel': 0 }
     };
   }
   componentWillUpdate(nextProps) {
@@ -140,16 +140,16 @@ export default class TransactionExplorer extends Component {
               <Slash transaction={transaction} />}
 
             {transaction.type === TxnTypes.TRANSFER &&
-              <Send transaction={transaction} price={price}/>}
+              <Send transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.RESERVE_FUND &&
-              <ReserveFund transaction={transaction} price={price}/>}
+              <ReserveFund transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.RELEASE_FUND &&
               <ReleaseFund transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SERVICE_PAYMENT &&
-              <ServicePayment transaction={transaction} price={price}/>}
+              <ServicePayment transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SPLIT_CONTRACT &&
               <SplitContract transaction={transaction} price={price} />}
@@ -241,9 +241,9 @@ const ReserveFund = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Collateral" data={<Amount coins={data.collateral} price={price}/>} />
+        <DetailsRow label="Collateral" data={<Amount coins={data.collateral} price={price} />} />
         <DetailsRow label="Duration" data={data.duration} />
-        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price}/>} />
+        <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
         <DetailsRow label="Source Address" data={<Address hash={data.source.address} />} />
         <DetailsRow label="Resource Ids" data={_renderIds(data.resource_ids)} />
       </tbody>
@@ -283,7 +283,7 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Amount" data={<Amount coins={data.outputs[0].coins} price={price}/>} />
+        <DetailsRow label="Amount" data={<Amount coins={data.outputs[0].coins} price={price} />} />
         <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />
         <DetailsRow label="To Address" data={<Address hash={data.outputs[0].address} />} />
       </tbody>
@@ -308,6 +308,7 @@ const Coinbase = ({ transaction, price }) => {
   return (
     <table className="details txn-details">
       <tbody>
+        <DetailsRow label="Proposer" data={<Address hash={_.get(data, 'proposer.address')} />}></DetailsRow>
         <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
@@ -320,7 +321,7 @@ const WithdrawStake = ({ transaction, price }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price}/>} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
@@ -334,7 +335,7 @@ const DepositStake = ({ transaction, price }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Holder" data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price}/>} />
+        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
         <DetailsRow label="Source" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
