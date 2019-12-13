@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
-import { vcpService } from 'common/services/vcp';
+import { stakeService } from 'common/services/stake';
 
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
@@ -36,10 +36,10 @@ export default class TokenDashboard extends Component {
       });
   }
   getTotalStaked() {
-    vcpService.getAllVcp()
+    stakeService.getAllStake()
       .then(res => {
-        const vcpList = _.get(res, 'data.body')
-        let sum = vcpList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        const stakeList = _.get(res, 'data.body')
+        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
         this.setState({ totalStaked: sum });
       })
       .catch(err => {
@@ -110,7 +110,7 @@ const TxnNumber = ({ num }) => {
 const StakedPercent = ({ supply, staked }) => {
   return (
     <React.Fragment>
-      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply).toFixed(4) * 100}%`}
+      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply/100).toFixed(4)}%`}
     </React.Fragment>
   );
 }

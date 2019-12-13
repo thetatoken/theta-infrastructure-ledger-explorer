@@ -9,7 +9,7 @@ import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
-import { vcpService } from 'common/services/vcp';
+import { stakeService } from 'common/services/stake';
 import { priceService } from 'common/services/price';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
@@ -80,7 +80,7 @@ export default class AccountDetails extends Component {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
-    vcpService.getVcpByAddress(address)
+    stakeService.getStakeByAddress(address)
       .then(res => {
         const stakes = _.get(res, 'data.body');
         this.setState({
