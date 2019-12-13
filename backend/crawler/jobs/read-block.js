@@ -12,7 +12,7 @@ var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
-var max_block_per_crawl = 5;
+var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
 var crawled_block_height_progress = 0;
