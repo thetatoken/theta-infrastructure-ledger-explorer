@@ -19,12 +19,11 @@ export function from(txn, trunc = null, account = null) {
     path = 'data.initiator.address';
   } else if (txn.type === TxnTypes.COINBASE) {
     path = 'data.proposer.address';
-  } if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+  } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
     path = 'data.holder.address'
   } else {
     path = 'data.inputs[0].address';
   }
-
   let addr = _.get(txn, path);
   if (trunc && trunc > 0) {
     addr = _.truncate(addr, { length: trunc });
@@ -35,7 +34,6 @@ export function from(txn, trunc = null, account = null) {
 
 export function to(txn, trunc = null, address = null) {
   let path, isSelf;
-  console.log(txn);
   if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
   } if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
