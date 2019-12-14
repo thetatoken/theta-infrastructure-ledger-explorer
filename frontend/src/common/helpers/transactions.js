@@ -11,7 +11,7 @@ export function totalCoinValue(set, key = 'tfuelwei') {
   return _.reduce(set, (acc, v) => acc + parseInt(_.get(v, `coins.${key}`, 0)), 0)
 }
 
-export function from(txn, trunc = null) {
+export function from(txn, trunc = null, account = null) {
   let path;
 
   if ([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
@@ -32,17 +32,18 @@ export function from(txn, trunc = null) {
   return addr;
 }
 
-export function to(txn, trunc = null) {
-  let path;
+export function to(txn, trunc = null, address = null) {
+  let path, isSelf;
   if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
-  } else if (txn.type === TxnTypes.COINBASE) {
-    path = '';
   } else {
+    const outputs = _.get(txn, 'data.outputs');
+    isSelf = outputs.some(output => {
+      return output.address === address;
+    })
     path = 'data.outputs[0].address';
   }
-
-  let addr = _.get(txn, path);
+  let addr = isSelf ? address : _.get(txn, path);
   if (trunc && trunc > 0) {
     addr = _.truncate(addr, { length: trunc });
   }
