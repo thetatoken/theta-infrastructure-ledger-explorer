@@ -26,7 +26,7 @@ export default class TokenDashboard extends Component {
     }
   }
   getTransactionNumber() {
-    transactionsService.getTotalTransactionNumber()
+    transactionsService.getTotalTransactionNumber(24)
       .then(res => {
         const txnNum = _.get(res, 'data.body.total_num_tx');
         this.setState({ txnNum })
@@ -96,12 +96,12 @@ const Detail = ({ title, value }) => {
 }
 
 const TxnNumber = ({ num }) => {
-  const duration = (new Date() - new Date('2019-03-15T20:00:00').getTime()) / 1000;
-  const tps = num / duration.toFixed();
+  const duration = 24 * 60 * 60;
+  const tps = num / duration;
   return (
     <React.Fragment>
-      {`${formatNumber(num / 1000000, 2) + ' M'}`}
-      <div className="tps">[{tps.toFixed()} TPS]</div>
+      {`${formatNumber(num)}`}
+      <div className="tps">[{tps.toFixed(2)} TPS]</div>
     </React.Fragment>
   );
 }
