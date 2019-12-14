@@ -12,7 +12,8 @@ export const TxnTypes = {
   SPLIT_CONTRACT: 6,
   SMART_CONTRACT: 7,
   DEPOSIT_STAKE: 8,
-  WITHDRAW_STAKE: 9
+  WITHDRAW_STAKE: 9,
+  DEPOSIT_STAKE_TX_V2: 10,
 }
 
 export const TxnTypeText = {
@@ -25,7 +26,8 @@ export const TxnTypeText = {
   '6': 'Split Contract',
   '7': 'Smart Contract',
   '8': 'Deposit Stake',
-  '9': 'Withdraw Stake'
+  '9': 'Withdraw Stake',
+  '10':'Deposit Stake Tx V2'
 }
 
 export const TxnClasses = {
@@ -39,6 +41,7 @@ export const TxnClasses = {
   '7': 'smart-contract',
   '8': 'deposit-stake',
   '9': 'withdraw-stake',
+  '10': 'deposit-stake-tx-v2'
 }
 
 export const TxnStatus = {

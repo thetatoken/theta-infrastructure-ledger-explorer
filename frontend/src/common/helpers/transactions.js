@@ -13,13 +13,14 @@ export function totalCoinValue(set, key = 'tfuelwei') {
 
 export function from(txn, trunc = null, account = null) {
   let path;
-
   if ([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
     path = 'data.source.address';
   } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
     path = 'data.initiator.address';
   } else if (txn.type === TxnTypes.COINBASE) {
     path = 'data.proposer.address';
+  } if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+    path = 'data.holder.address'
   } else {
     path = 'data.inputs[0].address';
   }
@@ -34,8 +35,11 @@ export function from(txn, trunc = null, account = null) {
 
 export function to(txn, trunc = null, address = null) {
   let path, isSelf;
+  console.log(txn);
   if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
+  } if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+    path = 'data.source.address'
   } else {
     const outputs = _.get(txn, 'data.outputs');
     isSelf = outputs.some(output => {
