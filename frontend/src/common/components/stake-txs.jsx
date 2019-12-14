@@ -21,7 +21,7 @@ export default class StakeTxsTable extends Component {
   }
   static defaultProps = {
     includeDetails: true,
-    truncate: 20,
+    truncate: 35,
   }
 
   toggleList() {
@@ -50,14 +50,13 @@ export default class StakeTxsTable extends Component {
           </thead>
           <tbody className="stake-tb">
             {_.map(transaction, record => {
-              // sum = sumCoin(record.amount, sum);
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td>
-                  <td className="status">{record.withdrawn ? 'Pending' : 'Staked'}</td>
-                  <td className="token">{formatCoin(record.amount)} Theta</td>
+                  <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
+                  <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} Theta</div></td>
                 </tr>);
             })}
             {txs.length > TRUNC &&
@@ -72,17 +71,10 @@ export default class StakeTxsTable extends Component {
               <td></td>
               <td></td>
               <td></td>
-              <td className="token">{formatCoin(sum)} Theta</td>
+              <td className="token"><div className="currency thetawei">{formatCoin(sum)} Theta</div></td>
             </tr>
           </tbody>
         </table>
-        {/* <div className="arrow-container" onClick={this.toggleList.bind(this)}>
-          {
-            isSliced ? <p><i className="arrow down" /><i className="arrow down" /><i className="arrow down" /></p> :
-              <p><i className="arrow up" /><i className="arrow up" /><i className="arrow up" /></p>
-          }
-        </div>
-        <div className="total">{formatCoin(sum)}</div> */}
       </div>);
   }
 }

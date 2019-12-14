@@ -1,11 +1,11 @@
 .stake-container{
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     margin-bottom: 48px;
 }
 
 .stakes{
-    width: 45%;
+    width: 100%;
     text-align: center;
     .title{
         display: inline-block;
@@ -51,7 +51,13 @@
         padding: 0;
     }
 }
+.stake-tb .token .currency{
+    float: right;
+}
 .stake-tb tr:last-child{
     background-color: transparent !important;
     border-top: 3px solid $color-table-row-line;
+    td.token{
+        color: $color-white;
+    }
 }
