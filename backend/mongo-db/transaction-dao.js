@@ -67,8 +67,14 @@ module.exports = class TransactionDAO {
       }
     })
   }
-  getTotalNumber(callback) {
-    this.client.getTotal(this.transactionInfoCollection, null, function (error, record) {
+  getTotalNumberByHour(hour, callback) {
+    let queryObject = null;
+    if (hour !== null) {
+      const now = Math.floor(new Date().getTime() / 1000);
+      const startTime = now - hour * 60 * 60;
+      queryObject = { timestamp: { $gte: startTime.toString(), $lte: now.toString()} }
+    }
+    this.client.getTotal(this.transactionInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - ', error);
       } else {
@@ -77,9 +83,8 @@ module.exports = class TransactionDAO {
       }
     });
   }
-
   getTransactionsByPk(pks, callback) {
-    const queryObject = { _id: {$in: pks} };
+    const queryObject = { _id: { $in: pks } };
     this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
       if (error) {
         console.log('ERR - ', error, pk);

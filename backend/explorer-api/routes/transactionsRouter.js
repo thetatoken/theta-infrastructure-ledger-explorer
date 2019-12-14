@@ -83,10 +83,30 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
   })
 
   router.get("/transactions/number", (req, res) => {
-    transactionDao.getTotalNumberAsync()
+    transactionDao.getTotalNumberByHourAsync(null)
       .then(number => {
         var data = ({
           type: 'transaction_number',
+          body: { total_num_tx: number }
+        });
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        console.log('Error - Push total number of transaction', err);
+      });
+  });
+
+  router.get("/transactions/number/:h", (req, res) => {
+    const { h } = req.params;
+    const hour = Number.parseInt(h);
+    if(hour > 720){
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    transactionDao.getTotalNumberByHourAsync(hour)
+      .then(number => {
+        var data = ({
+          type: 'transaction_number_by_hour',
           body: { total_num_tx: number }
         });
         res.status(200).send(data);

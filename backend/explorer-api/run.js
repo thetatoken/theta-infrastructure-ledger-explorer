@@ -173,7 +173,7 @@ function pushTopTransactions() {
 }
 
 function pushTotalTxsNum() {
-  transactionDao.getTotalNumberAsync()
+  transactionDao.getTotalNumberByHourAsync(null)
     .then(number => {
       io.sockets.emit('PUSH_TOTAL_NUM_TXS', { type: 'total_number_transaction', body: { total_num_tx: number } });
     })
