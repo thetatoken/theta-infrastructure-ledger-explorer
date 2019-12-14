@@ -24,10 +24,10 @@ export default class Dashboard extends Component {
         prices.forEach(info => {
           switch (info._id) {
             case 'THETA':
-              this.setState({ thetaInfo: info })
+                this.setState({ thetaInfo: info })
               return;
             case 'TFUEL':
-              this.setState({ tfuelInfo: info })
+                this.setState({ tfuelInfo: info })
               return;
             default:
               return;
@@ -37,6 +37,12 @@ export default class Dashboard extends Component {
       .catch(err => {
         console.log(err);
       });
+    setTimeout(() => {
+      let { thetaInfo, tfuelInfo } = this.state;
+      if (!thetaInfo || !tfuelInfo) {
+        this.getPrices();
+      }
+    }, 2000);
   }
   render() {
     const { thetaInfo, tfuelInfo } = this.state;

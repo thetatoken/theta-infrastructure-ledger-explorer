@@ -37,10 +37,10 @@ export default class AccountDetails extends Component {
       price: { 'Theta': 0, 'TFuel': 0 }
     };
   }
-  getEmptyAccount(address){
+  getEmptyAccount(address) {
     return {
       address: address.toLowerCase(),
-      balance: {thetawei:0, tfuelwei:0},
+      balance: { thetawei: 0, tfuelwei: 0 },
       sequence: 0,
       reserved_funds: [],
       txs_counter: {}
@@ -83,7 +83,16 @@ export default class AccountDetails extends Component {
       .catch(err => {
         console.log(err);
       });
+    setTimeout(() => {
+      let { price } = this.state;
+      if (!price.Theta || !price.TFuel) {
+        console.log('In get price again');
+        console.log(price);
+        this.getPrices();
+      }
+    }, 2000);
   }
+
   getStakeTransactions(address) {
     if (!address) {
       this.setState({ errorType: 'error_not_found' });
@@ -158,8 +167,8 @@ export default class AccountDetails extends Component {
             })
             break;
           case 'error_not_found':
-            let {holderTxs, sourceTxs} = this.state;
-            if(holderTxs && sourceTxs && (holderTxs.length || sourceTxs.length)){
+            let { holderTxs, sourceTxs } = this.state;
+            if (holderTxs && sourceTxs && (holderTxs.length || sourceTxs.length)) {
               this.setState({
                 account: this.getEmptyAccount(address),
                 errorType: null

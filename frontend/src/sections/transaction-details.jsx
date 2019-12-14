@@ -58,6 +58,12 @@ export default class TransactionExplorer extends Component {
       .catch(err => {
         console.log(err);
       });
+    setTimeout(() => {
+      let { price } = this.state;
+      if (!price.Theta || !price.TFuel) {
+        this.getPrices();
+      }
+    }, 2000);
   }
   getOneTransactionByUuid(hash) {
     if (hash) {

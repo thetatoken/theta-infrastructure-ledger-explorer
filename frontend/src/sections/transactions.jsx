@@ -66,6 +66,12 @@ export default class Transactions extends Component {
       .catch(err => {
         console.log(err);
       });
+    setTimeout(() => {
+      let { price } = this.state;
+      if (!price.Theta || !price.TFuel) {
+        this.getPrices();
+      }
+    }, 2000);
   }
   handlePageChange = (pageNumber) => {
     this.fetchData(pageNumber);
