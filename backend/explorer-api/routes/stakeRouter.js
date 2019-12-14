@@ -35,12 +35,14 @@ var stakeRouter = (app, stakeDao, accountDao) => {
     stakeDao.getAllStakesAsync()
       .then(stakeListInfo => {
         let total = 0;
+        let holders = new Set();
         stakeListInfo.forEach(info => {
           total = helper.sumCoin(total, info.amount)
+          holders.add(info.holder)
         });
         const data = ({
           type: 'stakeTotalAmout',
-          body: { totalAmount: total.toFixed() },
+          body: { totalAmount: total.toFixed(), totalNodes: holders.size },
         });
         res.status(200).send(data);
       })
