@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
+import ThetaChart from 'common/components/chart';
 
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
@@ -16,7 +17,9 @@ export default class TokenDashboard extends Component {
     super(props);
     this.state = {
       txnNum: 0,
-      totalStaked: 0
+      totalStaked: 0,
+      holders: [],
+      percentage: []
     };
   }
   componentDidMount() {
@@ -24,6 +27,35 @@ export default class TokenDashboard extends Component {
       this.getTransactionNumber();
       this.getTotalStaked();
     }
+    if (this.props.type === 'tfuel') {
+      this.getAllStakes();
+    }
+  }
+  getAllStakes() {
+    stakeService.getAllStake()
+      .then(res => {
+        const stakeList = _.get(res, 'data.body')
+        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        let topStakes = stakeList.sort((a, b) => {
+          return b.amount - a.amount
+        }).slice(0, 7)
+        let sumPercent = 0;
+        let objList = topStakes.map(stake => {
+          let obj = {};
+          obj.holder = stake.holder;
+          obj.percentage = new BigNumber(stake.amount).dividedBy(sum).toFixed(4);
+          sumPercent += obj.percentage - '0';
+          return obj;
+        }).concat({ holder: 'Rest Nodes', 'percentage': (1 - sumPercent).toFixed(4) })
+        this.setState({
+          totalStaked: sum,
+          holders: objList.map(obj => { return obj.holder }),
+          percentage: objList.map(obj => { return (obj.percentage - '0') * 100 })
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   getTransactionNumber() {
     transactionsService.getTotalTransactionNumber(24)
@@ -47,7 +79,7 @@ export default class TokenDashboard extends Component {
       });
   }
   render() {
-    const { txnNum, totalStaked } = this.state;
+    const { txnNum, totalStaked, holders, percentage } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -77,7 +109,7 @@ export default class TokenDashboard extends Component {
               </div> :
               <div className="chart-container">
                 <div className="title">THETA NODES</div>
-                <div className="chart"></div>
+                <ThetaChart holders={holders} percentage={percentage} />
               </div>}
           </div>
         </div>}
@@ -109,7 +141,7 @@ const TxnNumber = ({ num }) => {
 const StakedPercent = ({ supply, staked }) => {
   return (
     <React.Fragment>
-      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply/100).toFixed(4)}%`}
+      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply / 100).toFixed(4)}%`}
     </React.Fragment>
   );
 }

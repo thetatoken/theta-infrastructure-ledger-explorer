@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "bignumber.js": "^8.0.1",
     "body-parser": "^1.18.3",
+    "chart.js": "^2.9.3",
     "classnames": "^2.2.6",
     "css-loader": "^0.26.1",
     "express": "^4.14.1",
