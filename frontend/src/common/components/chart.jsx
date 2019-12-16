@@ -27,6 +27,7 @@ const getInitialOptions = (type, data, labels) => {
     },
     options: {
       responsive: true,
+      cutoutPercentage: 75,
       legend: {
         position: 'top',
       },
@@ -51,7 +52,6 @@ const getInitialOptions = (type, data, labels) => {
             if (label) {
               label += '% ' + data.labels[index];
             }
-
             return label;
           }
         }
