@@ -4,9 +4,6 @@ import { browserHistory, Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-const randomScalingFactor = function () {
-  return Math.round(Math.random() * 100);
-};
 let chart;
 const getInitialOptions = (type, data, labels) => {
   return {
@@ -44,7 +41,7 @@ const getInitialOptions = (type, data, labels) => {
         animateRotate: true
       },
       onClick: (e) => {
-        browserHistory.push(`/blocks`);
+        browserHistory.push(`/stakes`);
       },
       tooltips: {
         callbacks: {

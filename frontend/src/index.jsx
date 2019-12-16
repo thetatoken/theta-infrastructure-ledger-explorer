@@ -10,6 +10,7 @@ import Blocks from 'sections/blocks'
 import BlockDetails from 'sections/block-details'
 import AccountDetails from 'sections/account-details'
 import Check from 'sections/check'
+import Stakes from 'sections/stakes'
 
 import config from '../config'; 
 
@@ -26,6 +27,7 @@ ReactDom.render(
       <Route path='/txs' component={Transactions} />
       <Route path='/txs/:transactionHash' component={TransactionDetails} />
       <Route path='/account/:accountAddress' component={AccountDetails} />
+      <Route path='/stakes' component={Stakes} />
       <Route path='/tmp-internal-check' component={Check} />
     </Route>
   </Router>,
