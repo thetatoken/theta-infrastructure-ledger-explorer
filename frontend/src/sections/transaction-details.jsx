@@ -169,6 +169,9 @@ export default class TransactionExplorer extends Component {
             {transaction.type === TxnTypes.DEPOSIT_STAKE &&
               <DepositStake transaction={transaction} price={price} />}
 
+            {transaction.type === TxnTypes.DEPOSIT_STAKE_TX_V2 &&
+              <DepositStake transaction={transaction} price={price} />}
+
             {showRaw &&
               <JsonView
                 json={transaction}
