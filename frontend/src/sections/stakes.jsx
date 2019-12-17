@@ -64,15 +64,15 @@ export default class Blocks extends Component {
         let topList = sortedStakesByHolder.slice(0, 8).map(stake => {
           let obj = {};
           obj.holder = stake.holder;
-          obj.percentage = new BigNumber(stake.amount).dividedBy(sum).toFixed(4);
+          obj.percentage = new BigNumber(stake.amount).dividedBy(sum / 100).toFixed(2);
           sumPercent += obj.percentage - '0';
           return obj;
-        }).concat({ holder: 'Rest Nodes', 'percentage': (1 - sumPercent).toFixed(4) })
+        }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
         this.setState({
           stakes: stakeList,
           totalStaked: sum,
           holders: topList.map(obj => { return obj.holder }),
-          percentage: topList.map(obj => { return (obj.percentage - '0') * 100 }),
+          percentage: topList.map(obj => { return (obj.percentage - '0') }),
           sortedStakesByHolder: sortedStakesByHolder,
           sortedStakesBySource: sortedStakesBySource
         });
@@ -84,7 +84,6 @@ export default class Blocks extends Component {
 
   render() {
     const { holders, percentage, sortedStakesByHolder, sortedStakesBySource, totalStaked } = this.state;
-    console.log(sortedStakesBySource);
     return (
       <div className="content stakes">
         <div className="page-title stakes">TOTAL STAKED</div>
@@ -93,7 +92,6 @@ export default class Blocks extends Component {
         </div>
         <div className="legend">THETA NODES</div>
         <div className="table-container">
-          {/* <StakesTable type='wallet' /> */}
           <StakesTable type='wallet' stakes={sortedStakesBySource} totalStaked={totalStaked} truncate={20} />
           <StakesTable type='node' stakes={sortedStakesByHolder} totalStaked={totalStaked} truncate={20} />
         </div>

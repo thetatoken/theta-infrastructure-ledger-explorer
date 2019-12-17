@@ -15,7 +15,7 @@ export default class StakeTxsTable extends Component {
     this.state = {
       backendAddress: this.props.backendAddress,
       type: this.props.type,
-      transaction: this.props.txs.slice(0, TRUNC),
+      transactions: this.props.txs.slice(0, TRUNC),
       isSliced: true
     };
   }
@@ -26,15 +26,15 @@ export default class StakeTxsTable extends Component {
 
   toggleList() {
     if (this.state.isSliced) {
-      this.setState({ transaction: this.props.txs, isSliced: false })
+      this.setState({ transactions: this.props.txs, isSliced: false })
     } else {
-      this.setState({ transaction: this.props.txs.slice(0, TRUNC), isSliced: true })
+      this.setState({ transactions: this.props.txs.slice(0, TRUNC), isSliced: true })
     }
   }
 
   render() {
     const { txs, type, className, truncate } = this.props;
-    const { transaction, isSliced } = this.state;
+    const { transactions, isSliced } = this.state;
     let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.amount) }, 0);
     return (
       <div className="stakes">
@@ -49,7 +49,7 @@ export default class StakeTxsTable extends Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(transaction, record => {
+            {_.map(transactions, record => {
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
