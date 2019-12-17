@@ -142,7 +142,7 @@ const TxnNumber = ({ num }) => {
   return (
     <React.Fragment>
       {`${formatNumber(num)}`}
-      <div className="tps">[{tps.toFixed(2)} TPS]</div>
+      {/* <div className="tps">[{tps.toFixed(2)} TPS]</div> */}
     </React.Fragment>
   );
 }
