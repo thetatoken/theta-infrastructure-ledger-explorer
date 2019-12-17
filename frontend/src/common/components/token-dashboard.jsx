@@ -36,7 +36,16 @@ export default class TokenDashboard extends Component {
       .then(res => {
         const stakeList = _.get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
-        let topStakes = stakeList.sort((a, b) => {
+        let newObj = stakeList.reduce((map, obj) => {
+          if (!map[obj.holder]) {
+            map[obj.holder] = 0;
+          }
+          map[obj.holder] = sumCoin(map[obj.holder], obj.amount).toFixed()
+          return map;
+        }, {});
+        let topStakes = Array.from(Object.keys(newObj), key => {
+          return { 'holder': key, 'amount': newObj[key] }
+        }).sort((a, b) => {
           return b.amount - a.amount
         }).slice(0, 8)
         let sumPercent = 0;

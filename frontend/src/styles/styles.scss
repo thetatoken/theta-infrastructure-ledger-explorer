@@ -23,7 +23,7 @@
 @import 'components/loading-panel';
 @import 'components/spinner';
 @import 'components/json-view';
-@import 'components/stake';
+@import 'components/stakes-table';
 @import 'components/chart';
 
 // SECTIONS 
@@ -31,4 +31,4 @@
 @import 'sections/transactions';
 @import 'sections/account';
 @import 'sections/blocks';
-@import 'sections/stakes.scss';
+@import 'sections/stakes';

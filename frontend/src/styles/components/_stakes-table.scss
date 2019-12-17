@@ -7,6 +7,9 @@
 .stakes{
     width: 100%;
     text-align: center;
+    &.half{
+        width: 45%;
+    }
     .title{
         display: inline-block;
         margin-bottom: 38px;
