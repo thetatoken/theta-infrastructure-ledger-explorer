@@ -5,7 +5,7 @@ import _ from 'lodash';
 import cx from 'classnames';
 
 let chart;
-const getInitialOptions = (type, data, labels) => {
+const getInitialOptions = (type, data, labels, clickType) => {
   return {
     type: type,
     data: {
@@ -42,7 +42,17 @@ const getInitialOptions = (type, data, labels) => {
         animateRotate: true
       },
       onClick: (e) => {
-        browserHistory.push(`/stakes`);
+        if (clickType === 'account') {
+          var activeElement = chart.getElementAtEvent(e);
+          if (activeElement.length > 0) {
+            const address = chart.config.data.labels[activeElement[0]._index];
+            browserHistory.push(`/account/${address}`);
+            return;
+          }
+        }
+        if (clickType === 'stake') {
+          browserHistory.push(`/stakes`);
+        }
       },
       tooltips: {
         callbacks: {
@@ -73,10 +83,10 @@ export default class ThetaChart extends Component {
     truncate: 35,
   }
   componentDidMount() {
-    const { holders, percentage } = this.props;
+    const { holders, percentage, clickType } = this.props;
     const chartRef = this.thetaChart.current.getContext("2d");
 
-    chart = new Chart(chartRef, getInitialOptions('doughnut', holders, percentage));
+    chart = new Chart(chartRef, getInitialOptions('doughnut', holders, percentage, clickType));
   }
   componentWillUpdate(nextProps) {
     if (nextProps.holders !== this.props.holders) {

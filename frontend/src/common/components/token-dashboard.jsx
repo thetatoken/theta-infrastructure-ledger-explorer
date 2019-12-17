@@ -118,7 +118,7 @@ export default class TokenDashboard extends Component {
               </div> :
               <div className="chart-container">
                 <div className="title">THETA NODES</div>
-                <ThetaChart holders={holders} percentage={percentage} />
+                <ThetaChart holders={holders} percentage={percentage} clickType={'stake'} />
               </div>}
           </div>
         </div>}

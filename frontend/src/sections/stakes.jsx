@@ -87,7 +87,7 @@ export default class Blocks extends Component {
       <div className="content stakes">
         <div className="page-title stakes">TOTAL STAKED</div>
         <div className="chart-container">
-          <ThetaChart holders={holders} percentage={percentage} />
+          <ThetaChart holders={holders} percentage={percentage} clickType={'account'}/>
         </div>
         <div className="legend">THETA NODES</div>
         <div className="table-container">
