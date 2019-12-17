@@ -104,7 +104,7 @@ export default class TokenDashboard extends Component {
           </div>
           <div className="column">
             <Detail title={'24 HR VOLUME (USD)'} value={formatCurrency(tokenInfo.volume_24h)} />
-            <Detail title={'SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
+            <Detail title={'CIRCULATING SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
           <div className="column">
             {type === 'theta' && <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}

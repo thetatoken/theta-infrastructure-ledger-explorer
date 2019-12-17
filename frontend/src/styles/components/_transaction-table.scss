@@ -44,6 +44,10 @@ table.data.txn-table {
   }
   td.token, th.token{
     text-align: right;
+    &.left{
+      text-align: left;
+      padding-left: 0;
+    }
   }
   td.dim a, td.token{
     color: $color-font-light;

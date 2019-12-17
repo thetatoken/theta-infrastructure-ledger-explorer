@@ -44,7 +44,7 @@ export default class StakesTable extends Component {
               <th className="address">ADDRESS</th>
               {type === 'node' && <th className="type">TYPE</th>}
               <th className="staked">TOKENS STAKED</th>
-              <th className="staked%">%STAKED</th>
+              <th className="staked-prct">%STAKED</th>
             </tr>
           </thead>
           <tbody className="stake-tb">
@@ -55,7 +55,7 @@ export default class StakesTable extends Component {
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className="type">{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
                   <td className="staked"><div className="currency thetawei">{formatCoin(record.amount)}</div></td>
-                  <td className="staked%">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
+                  <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
             })}
             {stakes.length > TRUNC &&

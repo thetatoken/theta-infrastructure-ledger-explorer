@@ -7,6 +7,10 @@
 .stakes{
     width: 100%;
     text-align: center;
+    .node-type{
+        color: $color-font-light;
+        width: 112px;
+    }
     &.half{
         width: 45%;
     }
@@ -17,6 +21,9 @@
         font-weight: $weight-bold;
         font-size: 1.0rem;
         letter-spacing: 1.5px;
+    }
+    .staked-prct{
+        float: right;
     }
     .arrow-container{
         cursor: pointer;
@@ -56,11 +63,33 @@
 }
 .stake-tb .token .currency{
     float: right;
+    &.left{
+        float: left;
+    }
 }
 .stake-tb tr:last-child{
     background-color: transparent !important;
     border-top: 3px solid $color-table-row-line;
     td.token{
         color: $color-white;
+        font-size: 16px;
     }
 }
+
+td.node-type {
+    &:before {
+      content: '';
+      display: inline-block;
+      top: 4px;
+      position: relative;
+      width: 18px;
+      height: 18px;
+      margin-right: .2rem;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-size: contain;
+    }  
+  }
+    
+  .node-type.vcp:before { background-image: url('/images/icons/icon_validator-node@2x.png'); }
+  .node-type.gcp:before { background-image: url('/images/icons/icon_guardian-node@2x.png'); }

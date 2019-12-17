@@ -71,7 +71,7 @@ export default class Transactions extends Component {
       if (!price.Theta || !price.TFuel) {
         this.getPrices();
       }
-    }, 2000);
+    }, 1000);
   }
   handlePageChange = (pageNumber) => {
     this.fetchData(pageNumber);

@@ -42,7 +42,7 @@ export default class Dashboard extends Component {
       if (!thetaInfo || !tfuelInfo) {
         this.getPrices();
       }
-    }, 2000);
+    }, 1000);
   }
   render() {
     const { thetaInfo, tfuelInfo } = this.state;

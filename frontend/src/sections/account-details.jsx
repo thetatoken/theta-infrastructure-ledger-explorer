@@ -88,7 +88,7 @@ export default class AccountDetails extends Component {
       if (!price.Theta || !price.TFuel) {
         this.getPrices();
       }
-    }, 2000);
+    }, 1000);
   }
 
   getStakeTransactions(address) {
@@ -229,8 +229,8 @@ export default class AccountDetails extends Component {
           </React.Fragment>}
         {hasStakes &&
           <div className="stake-container">
-            {sourceTxs.length > 0 && <StakeTxsTable type='source' txs={sourceTxs} />}
-            {holderTxs.length > 0 && <StakeTxsTable type='holder' txs={holderTxs} />}
+            {sourceTxs.length > 0 && <StakeTxsTable type='source' txs={sourceTxs} price={price}/>}
+            {holderTxs.length > 0 && <StakeTxsTable type='holder' txs={holderTxs} price={price}/>}
           </div>
         }
         {!transactions && loading_txns &&

@@ -63,7 +63,7 @@ export default class TransactionExplorer extends Component {
       if (!price.Theta || !price.TFuel) {
         this.getPrices();
       }
-    }, 2000);
+    }, 1000);
   }
   getOneTransactionByUuid(hash) {
     if (hash) {

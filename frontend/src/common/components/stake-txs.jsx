@@ -3,7 +3,7 @@ import { browserHistory, Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-import { formatCoin, sumCoin } from 'common/helpers/utils';
+import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
 const TRUNC = 2;
@@ -33,7 +33,7 @@ export default class StakeTxsTable extends Component {
   }
 
   render() {
-    const { txs, type, className, truncate } = this.props;
+    const { txs, type, className, truncate, price } = this.props;
     const { transactions, isSliced } = this.state;
     let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.amount) }, 0);
     return (
@@ -42,10 +42,12 @@ export default class StakeTxsTable extends Component {
         <table className={cx("data txn-table", className)}>
           <thead>
             <tr>
+              {type === 'source' && <th className="node-type">NODE TYPE</th>}
+              {type === 'source' && <th className="token left">TOKENS STAKED</th>}
               <th className="address">{type === 'source' ? 'TO NODE' : 'FROM ADDRESS'}</th>
               <th className="txn">STAKING TX</th>
               <th className="status">STATUS</th>
-              <th className="token">TOKENS STAKED</th>
+              {type !== 'source' && <th className="token">TOKENS STAKED</th>}
             </tr>
           </thead>
           <tbody className="stake-tb">
@@ -53,25 +55,28 @@ export default class StakeTxsTable extends Component {
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
+                  {type === 'source' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
+                  {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td>
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
-                  <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} Theta</div></td>
+                  {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} Theta</div></td>}
                 </tr>);
             })}
             {txs.length > TRUNC &&
               <tr>
-                <td className="arrow-container" colSpan="4" onClick={this.toggleList.bind(this)}>
+                <td className="arrow-container" colSpan={type === 'source' ? 5 : 4} onClick={this.toggleList.bind(this)}>
                   View {isSliced ? 'More' : 'Less'}
                 </td>
               </tr>
             }
-            <tr><td className="empty"></td></tr>
+            <tr><td className="empty" colSpan={type === 'source' ? 1 : 4}></td></tr>
             <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td className="token"><div className="currency thetawei">{formatCoin(sum)} Theta</div></td>
+              {type === 'source' && <td></td>}
+              <td className={cx("token", { 'left': type === 'source' })} colSpan='4'>
+                <div className={cx("currency thetawei", { 'left': type === 'source' })}>{formatCoin(sum)} Theta </div>
+                {type === 'source' && <div className='price'>&nbsp;{`[\$${priceCoin(sum, price['Theta'])} USD]`}</div>}
+              </td>
             </tr>
           </tbody>
         </table>
