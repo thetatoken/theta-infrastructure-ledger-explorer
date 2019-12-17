@@ -53,7 +53,7 @@ export default class StakesTable extends Component {
               return (
                 <tr key={address}>
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
-                  {type === 'node' && <td className="type">{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
+                  {type === 'node' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
                   <td className="staked"><div className="currency thetawei">{formatCoin(record.amount)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
@@ -70,7 +70,7 @@ export default class StakesTable extends Component {
               <td></td>
               {type === 'node' && <td></td>}
               <td className="staked"><div className="currency thetawei">{formatCoin(totalStaked)}</div></td>
-              <td className="staked%">100%</td>
+              <td className="staked-prct">100%</td>
             </tr>
           </tbody>
         </table>

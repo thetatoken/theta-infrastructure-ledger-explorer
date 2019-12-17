@@ -46,7 +46,7 @@ const getInitialOptions = (type, data, labels, clickType) => {
           var activeElement = chart.getElementAtEvent(e);
           if (activeElement.length > 0) {
             const address = chart.config.data.labels[activeElement[0]._index];
-            browserHistory.push(`/account/${address}`);
+            if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
             return;
           }
         }

@@ -121,14 +121,19 @@ export default class AccountDetails extends Component {
       this.setState({ errorType: 'error_not_found' });
       return;
     }
-    if (this.state.account && !Object.keys(this.state.account.txs_counter).length) {
-      this.setState({ loading_txns: false });
-      return;
-    }
+    // if (this.state.account && !Object.keys(this.state.account.txs_counter).length) {
+    //   this.setState({ loading_txns: false });
+    //   console.log('return 2');
+    //   return;
+    // }
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
         const txs = _.get(res, 'data.body');
+        if (!txs) {
+          this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
+          return
+        }
         if (txs.length !== 0) {
           this.setState({
             transactions: _.get(res, 'data.body'),
@@ -229,8 +234,8 @@ export default class AccountDetails extends Component {
           </React.Fragment>}
         {hasStakes &&
           <div className="stake-container">
-            {sourceTxs.length > 0 && <StakeTxsTable type='source' txs={sourceTxs} price={price}/>}
-            {holderTxs.length > 0 && <StakeTxsTable type='holder' txs={holderTxs} price={price}/>}
+            {sourceTxs.length > 0 && <StakeTxsTable type='source' txs={sourceTxs} price={price} />}
+            {holderTxs.length > 0 && <StakeTxsTable type='holder' txs={holderTxs} price={price} />}
           </div>
         }
         {!transactions && loading_txns &&
