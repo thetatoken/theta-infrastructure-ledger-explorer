@@ -59,7 +59,6 @@ export default class Blocks extends Component {
         }).sort((a, b) => {
           return b.amount - a.amount
         })
-        console.log(sourceObj, sortedStakesBySource);
         let sumPercent = 0;
         let topList = sortedStakesByHolder.slice(0, 8).map(stake => {
           let obj = {};

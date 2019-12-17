@@ -52,14 +52,14 @@ export default class TokenDashboard extends Component {
         let objList = topStakes.map(stake => {
           let obj = {};
           obj.holder = stake.holder;
-          obj.percentage = new BigNumber(stake.amount).dividedBy(sum).toFixed(4);
+          obj.percentage = new BigNumber(stake.amount).dividedBy(sum / 100).toFixed(2);
           sumPercent += obj.percentage - '0';
           return obj;
-        }).concat({ holder: 'Rest Nodes', 'percentage': (1 - sumPercent).toFixed(4) })
+        }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
         this.setState({
           totalStaked: sum,
           holders: objList.map(obj => { return obj.holder }),
-          percentage: objList.map(obj => { return (obj.percentage - '0') * 100 })
+          percentage: objList.map(obj => { return (obj.percentage - '0') })
         });
       })
       .catch(err => {

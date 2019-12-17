@@ -86,8 +86,6 @@ export default class AccountDetails extends Component {
     setTimeout(() => {
       let { price } = this.state;
       if (!price.Theta || !price.TFuel) {
-        console.log('In get price again');
-        console.log(price);
         this.getPrices();
       }
     }, 2000);
