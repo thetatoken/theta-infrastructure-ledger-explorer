@@ -18,7 +18,7 @@ import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 
-const NUM_TRANSACTIONS = 5;
+const NUM_TRANSACTIONS = 20;
 
 export default class AccountDetails extends Component {
   constructor(props) {
