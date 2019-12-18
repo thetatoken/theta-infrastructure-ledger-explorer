@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
-var transactionRouter = (app, transactionDao, progressDao, config) => {
+var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/transaction/:hash", (req, res) => {
@@ -99,7 +99,7 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
   router.get("/transactions/number/:h", (req, res) => {
     const { h } = req.params;
     const hour = Number.parseInt(h);
-    if(hour > 720){
+    if (hour > 720) {
       res.status(400).send('Wrong parameter.');
       return;
     }
@@ -115,6 +115,20 @@ var transactionRouter = (app, transactionDao, progressDao, config) => {
         console.log('Error - Push total number of transaction', err);
       });
   });
+
+  router.get("/transactions/history", (req, res) => {
+    txHistoryDao.getAllTxHistoryAsync()
+      .then(infoList => {
+        var data = ({
+          type: 'transaction_number_by_hour',
+          body: { data: infoList }
+        });
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        console.log('Error - Push total number of transaction', err);
+      });
+  })
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

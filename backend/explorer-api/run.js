@@ -13,6 +13,7 @@ var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var priceDaoLib = require('../mongo-db/price-dao.js');
+var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -78,6 +79,8 @@ function main() {
       bluebird.promisifyAll(stakeDao);
       priceDao = new priceDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(priceDao);
+      txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(txHistoryDao);
       //
       var privateKey = fs.readFileSync(config.cert.key, 'utf8');
       var certificate = fs.readFileSync(config.cert.crt, 'utf8');
@@ -115,7 +118,7 @@ function main() {
       // blocks router
       blocksRouter(app, blockDao, progressDao, config);
       // transactions router       
-      transactionsRouter(app, transactionDao, progressDao, config);
+      transactionsRouter(app, transactionDao, progressDao, txHistoryDao, config);
       // account router
       accountRouter(app, accountDao, rpc, config);
       // account transaction mapping router
