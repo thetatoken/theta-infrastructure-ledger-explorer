@@ -4,7 +4,6 @@ import { browserHistory, Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-let chart;
 const getInitialOptions = (type, data, labels, clickType) => {
   return {
     type: type,
@@ -58,13 +57,103 @@ const getInitialOptions = (type, data, labels, clickType) => {
         callbacks: {
           label: function (tooltipItem, data) {
             const { index, datasetIndex } = tooltipItem;
-            var label = data.datasets[datasetIndex].data[index] || '';
-            if (label) {
-              label += '% ' + data.labels[index];
+            if (type !== 'line') {
+              var label = data.datasets[datasetIndex].data[index] || '';
+              if (label) {
+                label += '% ' + data.labels[index];
+              }
+              return label;
+            } else {
+              var label = data.datasets[datasetIndex].data[index] || '';
+              if (label) {
+                label += ': ' + data.labels[index];
+              }
+              return label;
             }
-            return label;
           }
         }
+      }
+    }
+  }
+}
+
+const getTimes = () => {
+  let res = [];
+  let now = new Date().getTime();
+  for (let i = 0; i < 14; i++) {
+    res.push(now - 1000 * 60 * 60 * 24 * i);
+  }
+  return res;
+}
+const getLineOptions = (type, data, labels, clickType) => {
+  return {
+    type: type,
+    data: {
+      datasets: [{
+        data: [13547, 13921, 13741, 13948, 13008, 13748, 13110, 13547, 13921, 13741, 13948, 13008, 13748, 13110],
+        backgroundColor: "transparent",
+        borderColor: '#29B3EB'
+      }],
+      labels: getTimes()
+    },
+    options: {
+      responsive: true,
+      cutoutPercentage: 75,
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: false,
+      },
+      legend: {
+        display: false,
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true
+      },
+      onClick: (e) => {
+        if (clickType === 'account') {
+          var activeElement = chart.getElementAtEvent(e);
+          if (activeElement.length > 0) {
+            const address = chart.config.data.labels[activeElement[0]._index];
+            if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
+            return;
+          }
+        }
+        if (clickType === 'stake') {
+          browserHistory.push(`/stakes`);
+        }
+      },
+      tooltips: {
+        callbacks: {
+          label: function (tooltipItem, data) {
+            const { index, datasetIndex } = tooltipItem;
+            if (type !== 'line') {
+              var label = data.datasets[datasetIndex].data[index] || '';
+              if (label) {
+                label += '% ' + data.labels[index];
+              }
+              return label;
+            }
+            else {
+              // console.log(data.datasets[0].data[index]);
+              var label = data.datasets[datasetIndex].data[index] || '';
+              // if (label) {
+              //   label += ': ' + data.labels[index];
+              // }
+              return label;
+            }
+          }
+        }
+      },
+      scales: {
+        xAxes: [{
+          type: 'time',
+          time: {
+            unit: 'week'
+          }
+        }]
       }
     }
   }
@@ -73,7 +162,9 @@ const getInitialOptions = (type, data, labels, clickType) => {
 export default class ThetaChart extends Component {
   constructor(props) {
     super(props);
-    this.thetaChart = React.createRef();
+    this.chart = null;
+    this.doughnut = React.createRef();
+    this.line = React.createRef();
     this.state = {
 
     };
@@ -83,25 +174,27 @@ export default class ThetaChart extends Component {
     truncate: 35,
   }
   componentDidMount() {
-    const { holders, percentage, clickType } = this.props;
-    const chartRef = this.thetaChart.current.getContext("2d");
-
-    chart = new Chart(chartRef, getInitialOptions('doughnut', holders, percentage, clickType));
+    const { chartType, labels, data, clickType } = this.props;
+    const chartRef = chartType === 'line' ? this.line.current.getContext("2d") : this.doughnut.current.getContext("2d");
+    const options = chartType === 'line' ? getLineOptions(chartType, labels, data, clickType) : getInitialOptions(chartType, labels, data, clickType);
+    this.chart = new Chart(chartRef, options);
   }
   componentWillUpdate(nextProps) {
-    if (nextProps.holders !== this.props.holders) {
-      this.updateChart(chart, nextProps.holders, nextProps.percentage);
+    if (nextProps.labels !== this.props.labels) {
+      this.updateChart(this.chart, nextProps.labels, nextProps.data);
     }
   }
-  updateChart(chart, holders, percentage) {
-    chart.data.labels = holders;
-    chart.data.datasets[0].data = percentage;
+  updateChart(chart, labels, data) {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data;
     chart.update();
   }
   render() {
+    const { chartType } = this.props;
     return (
-      <div className="chart">
-        <canvas ref={this.thetaChart} className="canvas" />
+      <div className={cx("chart", chartType)}>
+        {chartType === 'doughnut' && <canvas ref={this.doughnut} className="canvas doughnut" />}
+        {chartType === 'line' && <canvas ref={this.line} className="canvas line" />}
       </div>);
   }
 }

@@ -114,11 +114,11 @@ export default class TokenDashboard extends Component {
             {type === 'theta' ?
               <div className="chart-container">
                 <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
-                <div className="chart"></div>
+                <ThetaChart chartType={'line'} clickType={'stake'} />
               </div> :
               <div className="chart-container">
                 <div className="title">THETA NODES</div>
-                <ThetaChart holders={holders} percentage={percentage} clickType={'stake'} />
+                <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'stake'} />
               </div>}
           </div>
         </div>}
