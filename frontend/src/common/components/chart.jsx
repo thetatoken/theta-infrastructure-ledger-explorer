@@ -167,7 +167,6 @@ export default class ThetaChart extends Component {
   updateChart(chart, labels, data) {
     chart.data.labels = labels;
     chart.data.datasets[0].data = data;
-    console.log(lables, data);
     chart.update();
   }
   render() {
