@@ -33,6 +33,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
   for (let tx of transactionList) {
     switch (tx.type) { // TODO: Add other type cases
       case 0:
+        await _updateAccountByAddress(tx.data.proposer.address, accountDao, tx.type);
+        await _updateAccountTxMap(tx.data.proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
         for (let output of tx.data.outputs) {
           await _updateAccountByAddress(output.address, accountDao, tx.type);
           await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
