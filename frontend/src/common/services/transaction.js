@@ -27,5 +27,8 @@ export const transactionsService = {
       type = TxnTypes.SERVICE_PAYMENT; //Exclude this
     }
     return apiService.get(`accounttx/${address}`, { params: { type, pageNumber, limitNumber, isEqualType } });
+  },
+  getTransactionHistory(){
+    return apiService.get(`transactions/history`);
   }
 };

@@ -90,11 +90,11 @@ const getLineOptions = (type, data, labels, clickType) => {
     type: type,
     data: {
       datasets: [{
-        data: [13547, 13921, 13741, 13948, 13008, 13748, 13110, 13547, 13921, 13741, 13948, 13008, 13748, 13110],
+        data: data,
         backgroundColor: "transparent",
         borderColor: '#29B3EB'
       }],
-      labels: getTimes()
+      labels: labels
     },
     options: {
       responsive: true,
@@ -113,37 +113,17 @@ const getLineOptions = (type, data, labels, clickType) => {
         animateRotate: true
       },
       onClick: (e) => {
-        if (clickType === 'account') {
-          var activeElement = chart.getElementAtEvent(e);
-          if (activeElement.length > 0) {
-            const address = chart.config.data.labels[activeElement[0]._index];
-            if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
-            return;
-          }
-        }
-        if (clickType === 'stake') {
-          browserHistory.push(`/stakes`);
-        }
+        
       },
       tooltips: {
         callbacks: {
           label: function (tooltipItem, data) {
             const { index, datasetIndex } = tooltipItem;
-            if (type !== 'line') {
-              var label = data.datasets[datasetIndex].data[index] || '';
-              if (label) {
-                label += '% ' + data.labels[index];
-              }
-              return label;
-            }
-            else {
-              // console.log(data.datasets[0].data[index]);
-              var label = data.datasets[datasetIndex].data[index] || '';
-              // if (label) {
-              //   label += ': ' + data.labels[index];
-              // }
-              return label;
-            }
+            var label = data.datasets[datasetIndex].data[index] || '';
+            // if (label) {
+            //   label += ': ' + data.labels[index];
+            // }
+            return label;
           }
         }
       },
@@ -176,7 +156,7 @@ export default class ThetaChart extends Component {
   componentDidMount() {
     const { chartType, labels, data, clickType } = this.props;
     const chartRef = chartType === 'line' ? this.line.current.getContext("2d") : this.doughnut.current.getContext("2d");
-    const options = chartType === 'line' ? getLineOptions(chartType, labels, data, clickType) : getInitialOptions(chartType, labels, data, clickType);
+    const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
   }
   componentWillUpdate(nextProps) {
@@ -187,6 +167,7 @@ export default class ThetaChart extends Component {
   updateChart(chart, labels, data) {
     chart.data.labels = labels;
     chart.data.datasets[0].data = data;
+    console.log(lables, data);
     chart.update();
   }
   render() {

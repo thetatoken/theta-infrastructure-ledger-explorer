@@ -19,17 +19,36 @@ export default class TokenDashboard extends Component {
       txnNum: 0,
       totalStaked: 0,
       holders: [],
-      percentage: []
+      percentage: [],
+      txTs: [],
+      txNumber: []
     };
   }
   componentDidMount() {
     if (this.props.type === 'theta') {
       this.getTransactionNumber();
       this.getTotalStaked();
+      this.getTransactionHistory();
     }
     if (this.props.type === 'tfuel') {
       this.getAllStakes();
     }
+  }
+  getTransactionHistory() {
+    transactionsService.getTransactionHistory()
+      .then(res => {
+        const txHistory = _.get(res, 'data.body.data');
+        let txTs = [];
+        let txNumber = []
+        txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach(info => {
+          txTs.push(new Date(info.timestamp * 1000));
+          txNumber.push(info.number);
+        })
+        this.setState({ txTs, txNumber })
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   getAllStakes() {
     stakeService.getAllStake()
@@ -88,7 +107,7 @@ export default class TokenDashboard extends Component {
       });
   }
   render() {
-    const { txnNum, totalStaked, holders, percentage } = this.state;
+    const { txnNum, totalStaked, holders, percentage, txTs, txNumber } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -114,7 +133,7 @@ export default class TokenDashboard extends Component {
             {type === 'theta' ?
               <div className="chart-container">
                 <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
-                <ThetaChart chartType={'line'} clickType={'stake'} />
+                <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
               </div> :
               <div className="chart-container">
                 <div className="title">THETA NODES</div>
