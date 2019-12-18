@@ -77,14 +77,6 @@ const getInitialOptions = (type, data, labels, clickType) => {
   }
 }
 
-const getTimes = () => {
-  let res = [];
-  let now = new Date().getTime();
-  for (let i = 0; i < 14; i++) {
-    res.push(now - 1000 * 60 * 60 * 24 * i);
-  }
-  return res;
-}
 const getLineOptions = (type, data, labels, clickType) => {
   return {
     type: type,
@@ -97,6 +89,7 @@ const getLineOptions = (type, data, labels, clickType) => {
       labels: labels
     },
     options: {
+      maintainAspectRatio: false,
       responsive: true,
       cutoutPercentage: 75,
       legend: {
