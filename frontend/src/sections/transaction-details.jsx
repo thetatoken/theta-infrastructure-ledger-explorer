@@ -292,7 +292,8 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />
+        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={_.map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
+          : <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />}
         <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
