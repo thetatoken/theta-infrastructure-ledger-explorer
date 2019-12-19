@@ -6,7 +6,7 @@ import cx from 'classnames';
 
 import { truncateMiddle } from 'common/helpers/utils';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
-import { from, to, fee, value, hash, age, date, type } from 'common/helpers/transactions';
+import { from, to, fee, value, hash, age, date, type, coins } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
 
 
@@ -81,7 +81,6 @@ export default class TransactionTable extends Component {
           {_.map(transactions, txn => {
             let source = null;
             source = !account ? 'none' : account.address === from(txn,null,account) ? 'from' : 'to';
-            const coins = txn.data.outputs && txn.data.outputs.length ? txn.data.outputs[0].coins : { 'thetawei': 0, 'tfuelwei': 0 };
             return (
               <tr key={txn.hash} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
@@ -95,7 +94,7 @@ export default class TransactionTable extends Component {
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
                       <Link to={`/account/${to(txn,null,address)}`}>{to(txn, 20, address)}</Link>
                     </td>
-                    <td className="value"><Value coins={coins} price={price} /></td>
+                    <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
               </tr>);
           })}

@@ -105,3 +105,55 @@ export function date(txn) {
     return null;
   return moment(parseInt(txn.timestamp) * 1000).format("MM/DD/YY hh:mma");
 }
+
+export function coins(txn, account = null) {
+  console.log(txn)
+  let coins = { 'thetawei': 0, 'tfuelwei': 0 };
+  let outputs = null, inputs = null, index = 0;
+  switch (txn.type) {
+    case TxnTypes.COINBASE:
+      outputs = _.get(txn, 'data.outputs');
+      if (!account || txn.data.proposer.address === account.address) {
+        coins = {
+          'thetawei': totalCoinValue(_.get(txn, 'data.outputs'), 'thetawei').toFixed(),
+          'tfuelwei': totalCoinValue(_.get(txn, 'data.outputs'), 'tfuelwei').toFixed()
+        }
+      } else if (outputs.some(output => { return output.address === account.address; })) {
+        index = outputs.findIndex(e => e.address === account.address);
+        coins = outputs[index].coins;
+      }
+      break;
+    case TxnTypes.TRANSFER:
+      outputs = _.get(txn, 'data.outputs');
+      inputs = _.get(txn, 'data.inputs')
+      if (!account) {
+        coins = {
+          'thetawei': totalCoinValue(_.get(txn, 'data.inputs'), 'thetawei').toFixed(),
+          'tfuelwei': totalCoinValue(_.get(txn, 'data.inputs'), 'tfuelwei').toFixed()
+        }
+      } else if (inputs.some(input => { return input.address === account.address; })) {
+        index = inputs.findIndex(e => e.address === account.address);
+        coins = inputs[index].coins;
+      } else if (outputs.some(output => { return output.address === account.address; })) {
+        index = outputs.findIndex(e => e.address === account.address);
+        coins = outputs[index].coins;
+      }
+      break
+    case TxnTypes.SLASH:
+    case TxnTypes.RELEASE_FUND:
+    case TxnTypes.SPLIT_CONTRACT:
+    case TxnTypes.SMART_CONTRACT:
+      break
+    case TxnTypes.RESERVE_FUND:
+    case TxnTypes.SERVICE_PAYMENT:
+    case TxnTypes.DEPOSIT_STAKE:
+    case TxnTypes.WITHDRAW_STAKE:
+    case TxnTypes.DEPOSIT_STAKE_TX_V2:
+      coins = txn.data.source.coins;
+      break
+    default:
+      break;
+  }
+  console.log(coins);
+  return coins;
+}
