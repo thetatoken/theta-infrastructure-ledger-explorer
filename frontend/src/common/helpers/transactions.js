@@ -107,7 +107,6 @@ export function date(txn) {
 }
 
 export function coins(txn, account = null) {
-  console.log(txn)
   let coins = { 'thetawei': 0, 'tfuelwei': 0 };
   let outputs = null, inputs = null, index = 0;
   switch (txn.type) {
@@ -154,6 +153,5 @@ export function coins(txn, account = null) {
     default:
       break;
   }
-  console.log(coins);
   return coins;
 }
