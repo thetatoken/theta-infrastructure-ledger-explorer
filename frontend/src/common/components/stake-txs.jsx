@@ -45,7 +45,7 @@ export default class StakeTxsTable extends Component {
               <th className="node-type">NODE TYPE</th>
               {type === 'source' && <th className="token left">TOKENS STAKED</th>}
               <th className="address">{type === 'source' ? 'TO NODE' : 'FROM ADDRESS'}</th>
-              <th className="txn">STAKING TX</th>
+              {/* <th className="txn">STAKING TX</th> */}
               <th className="status">STATUS</th>
               {type !== 'source' && <th className="token">TOKENS STAKED</th>}
             </tr>
@@ -58,14 +58,14 @@ export default class StakeTxsTable extends Component {
                   <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>
                   {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
-                  <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td>
+                  {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
                   {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} Theta</div></td>}
                 </tr>);
             })}
             {txs.length > TRUNC &&
               <tr>
-                <td className="arrow-container" colSpan='5' onClick={this.toggleList.bind(this)}>
+                <td className="arrow-container" colSpan='4' onClick={this.toggleList.bind(this)}>
                   View {isSliced ? 'More' : 'Less'}
                 </td>
               </tr>
@@ -73,7 +73,7 @@ export default class StakeTxsTable extends Component {
             <tr><td className="empty"></td></tr>
             <tr>
               <td></td>
-              <td className={cx("token", { 'left': type === 'source' })} colSpan='4'>
+              <td className={cx("token", { 'left': type === 'source' })} colSpan='3'>
                 <div className={cx("currency thetawei", { 'left': type === 'source' })}>{formatCoin(sum)} Theta </div>
                 {type === 'source' && <div className='price'>&nbsp;{`[\$${priceCoin(sum, price['Theta'])} USD]`}</div>}
               </td>
