@@ -19,7 +19,9 @@ export function from(txn, trunc = null, account = null) {
     path = 'data.initiator.address';
   } else if (txn.type === TxnTypes.COINBASE) {
     path = 'data.proposer.address';
-  } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+  } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+    path = 'data.source.address'
+  } else if (txn.type === TxnTypes.WITHDRAW_STAKE) {
     path = 'data.holder.address'
   } else {
     path = 'data.inputs[0].address';
@@ -36,8 +38,10 @@ export function to(txn, trunc = null, address = null) {
   let path, isSelf;
   if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
-  } if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.WITHDRAW_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
-    path = 'data.source.address'
+  } if (txn.type === TxnTypes.WITHDRAW_STAKE) {
+    path = 'data.source.address';
+  } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+    path = 'data.holder.address';
   } else {
     const outputs = _.get(txn, 'data.outputs');
     isSelf = outputs.some(output => {

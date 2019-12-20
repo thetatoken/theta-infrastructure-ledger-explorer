@@ -343,10 +343,10 @@ const DepositStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Holder" data={<Address hash={_.get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
         <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
-        <DetailsRow label="Source" data={<Address hash={_.get(data, 'source.address')} />} />
+        <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
