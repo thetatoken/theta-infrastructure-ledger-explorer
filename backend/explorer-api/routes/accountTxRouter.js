@@ -5,11 +5,11 @@ var helper = require('../helper/utils');
 
 function orderTxs(txs, ids) {
   var hashOfResults = txs.reduce(function (prev, curr) {
-      prev[curr._id] = curr;
-      return prev;
+    prev[curr._id] = curr;
+    return prev;
   }, {});
 
-  return ids.map( function(id) { return hashOfResults[id] } );
+  return ids.map(function (id) { return hashOfResults[id] });
 }
 
 var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
@@ -90,34 +90,64 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
           return accountTxDao.getListAsync(address, type, isEqualType, page, limitNumber, reverse);
         })
         .then(async txList => {
-            let txHashes = [];
-            let txs = [];
-            for (let acctTx of txList) {
-              if (reverse) {
-                txHashes.unshift(acctTx.hash);
-              } else {
-                txHashes.push(acctTx.hash);
-              }
+          let txHashes = [];
+          let txs = [];
+          for (let acctTx of txList) {
+            if (reverse) {
+              txHashes.unshift(acctTx.hash);
+            } else {
+              txHashes.push(acctTx.hash);
             }
-            
-            txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-            txs = orderTxs(txs, txHashes);
+          }
 
-            var data = ({
-              type: 'account_tx_list',
-              body: txs,
-              totalPageNumber: numPages,
-              currentPageNumber: pageNumber
-            });
-            res.status(200).send(data);
+          txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+          txs = orderTxs(txs, txHashes);
+
+          var data = ({
+            type: 'account_tx_list',
+            body: txs,
+            totalPageNumber: numPages,
+            currentPageNumber: pageNumber
+          });
+          res.status(200).send(data);
         })
         .catch(error => {
           if (error.message.includes('NOT_FOUND')) {
-            const err = ({
-              type: 'error_not_found',
-              error
-            });
-            res.status(404).send(err);
+            accountTxDao.getListAsync(address, type, isEqualType, pageNumber, limitNumber, reverse)
+              .then(async txList => {
+                let txHashes = [];
+                let txs = [];
+                for (let acctTx of txList) {
+                  if (reverse) {
+                    txHashes.unshift(acctTx.hash);
+                  } else {
+                    txHashes.push(acctTx.hash);
+                  }
+                }
+
+                txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+                txs = orderTxs(txs, txHashes);
+                if (txs.length > 0) {
+                  var data = ({
+                    type: 'account_tx_list',
+                    body: txs,
+                    totalPageNumber: numPages,
+                    currentPageNumber: pageNumber
+                  });
+                  res.status(200).send(data);
+                } else {
+                  const err = ({
+                    type: 'error_not_found',
+                  });
+                  res.status(404).send(err);
+                }
+              }).catch(error => {
+                const err = ({
+                  type: 'error_not_found',
+                  error
+                });
+                res.status(404).send(err);
+              })
           } else {
             res.status(500).send(err);
           }
@@ -133,20 +163,20 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     const endTime = Math.ceil(Date.now() / 1000).toString();
     accountTxDao.getListByTimeAsync(address, startTime, endTime, null)
       .then(async txList => {
-          let txHashes = [];
-          let txs = [];
-          for (let acctTx of txList) {
-            txHashes.push(acctTx.hash);
-          }
+        let txHashes = [];
+        let txs = [];
+        for (let acctTx of txList) {
+          txHashes.push(acctTx.hash);
+        }
 
-          txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-          txs = orderTxs(txs, txHashes);
+        txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+        txs = orderTxs(txs, txHashes);
 
-          var data = ({
-            type: 'account_tx_list',
-            body: txs,
-          });
-          res.status(200).send(data);
+        var data = ({
+          type: 'account_tx_list',
+          body: txs,
+        });
+        res.status(200).send(data);
       })
       .catch(error => {
         if (error.message.includes('NOT_FOUND')) {
