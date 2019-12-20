@@ -113,7 +113,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         })
         .catch(error => {
           if (error.message.includes('NOT_FOUND')) {
-            accountTxDao.getListAsync(address, type, isEqualType, pageNumber, limitNumber, reverse)
+            accountTxDao.getListAsync(address, type, isEqualType, pageNumber - 1, limitNumber, reverse)
               .then(async txList => {
                 let txHashes = [];
                 let txs = [];
