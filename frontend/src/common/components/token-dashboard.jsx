@@ -127,7 +127,7 @@ export default class TokenDashboard extends Component {
           </div>
           <div className="column">
             {type === 'theta' && <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
-            {type === 'theta' && <Detail title={'total STAKED (%)'} value={<StakedPercent supply={tokenInfo.circulating_supply} staked={totalStaked} />} />}
+            {type === 'theta' && <Detail title={'total STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />}
           </div>
           <div className="column">
             {type === 'theta' ?
@@ -166,10 +166,10 @@ const TxnNumber = ({ num }) => {
   );
 }
 
-const StakedPercent = ({ supply, staked }) => {
+const StakedPercent = ({ staked }) => {
   return (
     <React.Fragment>
-      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(supply / 100).toFixed(4)}%`}
+      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(1000000000 / 100).toFixed(4)}%`}
     </React.Fragment>
   );
 }
