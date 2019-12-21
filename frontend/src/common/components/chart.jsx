@@ -4,78 +4,6 @@ import { browserHistory, Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-const getInitialOptions = (type, data, labels, clickType) => {
-  return {
-    type: type,
-    data: {
-      datasets: [{
-        data: data,
-        backgroundColor: [
-          '#FF5CEA',
-          '#8652C9',
-          '#017CF8',
-          '#0EC1E6',
-          '#BAD930',
-          '#FFE643',
-          '#F7921E',
-          '#F1424D',
-          '#A5ACB9'
-        ],
-      }],
-      labels: labels
-    },
-    options: {
-      responsive: true,
-      cutoutPercentage: 75,
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: false,
-      },
-      legend: {
-        display: false,
-      },
-      animation: {
-        animateScale: true,
-        animateRotate: true
-      },
-      onClick: (e) => {
-        if (clickType === 'account') {
-          var activeElement = chart.getElementAtEvent(e);
-          if (activeElement.length > 0) {
-            const address = chart.config.data.labels[activeElement[0]._index];
-            if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
-            return;
-          }
-        }
-        if (clickType === 'stake') {
-          browserHistory.push(`/stakes`);
-        }
-      },
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            const { index, datasetIndex } = tooltipItem;
-            if (type !== 'line') {
-              var label = data.datasets[datasetIndex].data[index] || '';
-              if (label) {
-                label += '% ' + data.labels[index];
-              }
-              return label;
-            } else {
-              var label = data.datasets[datasetIndex].data[index] || '';
-              if (label) {
-                label += ': ' + data.labels[index];
-              }
-              return label;
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 const getLineOptions = (type, data, labels, clickType) => {
   return {
@@ -149,12 +77,84 @@ export default class ThetaChart extends Component {
   componentDidMount() {
     const { chartType, labels, data, clickType } = this.props;
     const chartRef = chartType === 'line' ? this.line.current.getContext("2d") : this.doughnut.current.getContext("2d");
-    const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : getInitialOptions(chartType, data, labels, clickType);
+    const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : this.getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
   }
   componentWillUpdate(nextProps) {
     if (nextProps.labels !== this.props.labels) {
       this.updateChart(this.chart, nextProps.labels, nextProps.data);
+    }
+  }
+  getInitialOptions = (type, data, labels, clickType) => {
+    return {
+      type: type,
+      data: {
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#FF5CEA',
+            '#8652C9',
+            '#017CF8',
+            '#0EC1E6',
+            '#BAD930',
+            '#FFE643',
+            '#F7921E',
+            '#F1424D',
+            '#A5ACB9'
+          ],
+        }],
+        labels: labels
+      },
+      options: {
+        responsive: true,
+        cutoutPercentage: 75,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: false,
+        },
+        legend: {
+          display: false,
+        },
+        animation: {
+          animateScale: true,
+          animateRotate: true
+        },
+        onClick: (e) => {
+          if (clickType === 'account') {
+            var activeElement = this.chart.getElementAtEvent(e);
+            if (activeElement.length > 0) {
+              const address = this.chart.config.data.labels[activeElement[0]._index];
+              if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
+              return;
+            }
+          }
+          if (clickType === 'stake') {
+            browserHistory.push(`/stakes`);
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: function (tooltipItem, data) {
+              const { index, datasetIndex } = tooltipItem;
+              if (type !== 'line') {
+                var label = data.datasets[datasetIndex].data[index] || '';
+                if (label) {
+                  label += '% ' + data.labels[index];
+                }
+                return label;
+              } else {
+                var label = data.datasets[datasetIndex].data[index] || '';
+                if (label) {
+                  label += ': ' + data.labels[index];
+                }
+                return label;
+              }
+            }
+          }
+        }
+      }
     }
   }
   updateChart(chart, labels, data) {
