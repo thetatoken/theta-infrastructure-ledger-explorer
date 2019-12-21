@@ -1,10 +1,18 @@
 table.data.block-table {
   width: 100%; 
-
+  thead tr .height:before{
+    height: 1px;
+  }
   tr .height { 
     width: 65px; 
     white-space: nowrap;
+    &:before{
+      content: '';
+      height: 14px;
+      display: inline-block;
+    }
   }
+
   tr .hash { width: 325px; }
   tr .txns { width: 65px; }
   

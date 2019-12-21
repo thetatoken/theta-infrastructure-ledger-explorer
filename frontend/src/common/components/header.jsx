@@ -41,6 +41,7 @@ export default class Header extends Component {
           <Link to="/" className="theta-logo"></Link>
           <Link to="/blocks" className="nav-item">Blocks</Link>
           <Link to="/txs" className="nav-item">Transactions</Link>
+          <Link to="/stakes" className="nav-item">Stakes</Link>
         </div>
         <div className="nav-search">
           <input type="text" className="search-input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
