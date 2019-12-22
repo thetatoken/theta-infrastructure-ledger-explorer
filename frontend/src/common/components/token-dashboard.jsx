@@ -118,7 +118,7 @@ export default class TokenDashboard extends Component {
             <div className={cx("currency", icon)}></div>
           </div>
           <div className="column">
-            <Detail title={`${token} Price (USD)`} value={`\$${tokenInfo.price.toFixed(6)}`} />
+            <Detail title={`${token} PRICE (USD)`} value={`\$${tokenInfo.price.toFixed(6)}`} />
             <Detail title={'MARKET CAP (USD)'} value={formatCurrency(tokenInfo.market_cap)} />
           </div>
           <div className="column">
@@ -127,7 +127,7 @@ export default class TokenDashboard extends Component {
           </div>
           <div className="column">
             {type === 'theta' && <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
-            {type === 'theta' && <Detail title={'total STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />}
+            {type === 'theta' && <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />}
           </div>
           <div className="column">
             {type === 'theta' ?

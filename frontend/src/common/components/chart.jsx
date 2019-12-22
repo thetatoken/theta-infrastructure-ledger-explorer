@@ -20,9 +20,6 @@ const getLineOptions = (type, data, labels, clickType) => {
       maintainAspectRatio: false,
       responsive: true,
       cutoutPercentage: 75,
-      legend: {
-        position: 'top',
-      },
       title: {
         display: false,
       },
@@ -79,6 +76,8 @@ export default class ThetaChart extends Component {
     const chartRef = chartType === 'line' ? this.line.current.getContext("2d") : this.doughnut.current.getContext("2d");
     const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : this.getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
+    Chart.defaults.global.defaultFontColor = '#8A8FB5';
+    Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
   componentWillUpdate(nextProps) {
     if (nextProps.labels !== this.props.labels) {
@@ -102,15 +101,13 @@ export default class ThetaChart extends Component {
             '#F1424D',
             '#A5ACB9'
           ],
+          borderWidth: 0
         }],
         labels: labels
       },
       options: {
         responsive: true,
         cutoutPercentage: 75,
-        legend: {
-          position: 'top',
-        },
         title: {
           display: false,
         },
