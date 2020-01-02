@@ -97,6 +97,25 @@ var blockRouter = (app, blockDao, progressDao, config) => {
         res.status(200).send(data);
       });
   })
+  router.get("/blocks/number/:h", (req, res) => {
+    const { h } = req.params;
+    const hour = Number.parseInt(h);
+    if (hour > 720) {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    blockDao.getTotalNumberByHourAsync(hour)
+      .then(number => {
+        var data = ({
+          type: 'block_number_by_hour',
+          body: { total_num_block: number }
+        });
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        console.log('Error - Push total number of block', err);
+      });
+  });
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

@@ -83,4 +83,21 @@ module.exports = class BlockDAO {
     const queryObject = { timestamp: { $gte: start, $lte: end } };
     this.client.getRecords(this.blockInfoCollection, queryObject, {}, 0, 0, callback);
   }
+  getTotalNumberByHour(hour, callback) {
+    let queryObject = null;
+    if (hour !== null) {
+      const now = Math.floor(new Date().getTime() / 1000);
+      const startTime = now - hour * 60 * 60;
+      queryObject = { timestamp: { $gte: startTime.toString(), $lte: now.toString()} }
+    }
+    console.log(queryObject);
+    this.client.getTotal(this.blockInfoCollection, queryObject, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error);
+      } else {
+        console.log('Calling get total number of blocks, returns:', record)
+        callback(error, record);
+      }
+    });
+  }
 }

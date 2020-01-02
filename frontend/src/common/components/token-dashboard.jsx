@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
+import { blocksService } from 'common/services/block';
 import ThetaChart from 'common/components/chart';
 
 import BigNumber from 'bignumber.js';
@@ -16,6 +17,7 @@ export default class TokenDashboard extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      blockNum: 0,
       txnNum: 0,
       totalStaked: 0,
       holders: [],
@@ -26,12 +28,13 @@ export default class TokenDashboard extends Component {
   }
   componentDidMount() {
     if (this.props.type === 'theta') {
-      this.getTransactionNumber();
       this.getTotalStaked();
       this.getTransactionHistory();
     }
     if (this.props.type === 'tfuel') {
+      this.getTransactionNumber();
       this.getAllStakes();
+      this.getBlockNumber();
     }
   }
   getTransactionHistory() {
@@ -95,6 +98,16 @@ export default class TokenDashboard extends Component {
         console.log(err);
       });
   }
+  getBlockNumber() {
+    blocksService.getTotalBlockNumber(24)
+      .then(res => {
+        const blockNum = _.get(res, 'data.body.total_num_block');
+        this.setState({ blockNum })
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
   getTotalStaked() {
     stakeService.getAllStake()
       .then(res => {
@@ -107,7 +120,7 @@ export default class TokenDashboard extends Component {
       });
   }
   render() {
-    const { txnNum, totalStaked, holders, percentage, txTs, txNumber } = this.state;
+    const { blockNum, txnNum, totalStaked, holders, percentage, txTs, txNumber } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -125,10 +138,15 @@ export default class TokenDashboard extends Component {
             <Detail title={'24 HR VOLUME (USD)'} value={formatCurrency(tokenInfo.volume_24h)} />
             <Detail title={'CIRCULATING SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
-          <div className="column">
-            {type === 'theta' && <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />}
-            {type === 'theta' && <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />}
-          </div>
+          {type === 'theta' &&
+            <div className="column">
+              <Detail title={'TOTAL NODES'} />
+              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />
+            </div>}
+          {type === 'tfuel' && <div className="column">
+            <Detail title={'24 HR BLOCKS'} value={formatNumber(blockNum)} />
+            <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />
+          </div>}
           <div className="column">
             {type === 'theta' ?
               <div className="chart-container">

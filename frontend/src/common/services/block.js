@@ -12,5 +12,8 @@ export const blocksService = {
   },
   getBlocksByPage(pageNumber, limit = 10) {
     return apiService.get('blocks/top_blocks', { params: { pageNumber, limit } });
-  }
+  },
+  getTotalBlockNumber(hour){
+    return apiService.get(`blocks/number/${hour}`);
+  },
 };
