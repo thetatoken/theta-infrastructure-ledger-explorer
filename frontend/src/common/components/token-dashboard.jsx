@@ -30,12 +30,12 @@ export default class TokenDashboard extends Component {
   componentDidMount() {
     if (this.props.type === 'theta') {
       this.getTotalStaked();
-      this.getTransactionHistory();
+      this.getAllStakes();
     }
     if (this.props.type === 'tfuel') {
       this.getTransactionNumber();
-      this.getAllStakes();
       this.getBlockNumber();
+      this.getTransactionHistory();
     }
   }
   getTransactionHistory() {
@@ -142,7 +142,7 @@ export default class TokenDashboard extends Component {
           </div>
           {type === 'theta' &&
             <div className="column">
-              <Detail title={'TOTAL NODES'} value={nodeNum} />
+              <Detail title={'TOTAL STAKED NODES'} value={nodeNum} />
               <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />
             </div>}
           {type === 'tfuel' && <div className="column">
@@ -150,7 +150,7 @@ export default class TokenDashboard extends Component {
             <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />
           </div>}
           <div className="column">
-            {type === 'theta' ?
+            {type === 'tfuel' ?
               <div className="chart-container">
                 <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
                 <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
