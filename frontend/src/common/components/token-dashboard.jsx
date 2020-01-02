@@ -23,7 +23,8 @@ export default class TokenDashboard extends Component {
       holders: [],
       percentage: [],
       txTs: [],
-      txNumber: []
+      txNumber: [],
+      nodeNum: 0
     };
   }
   componentDidMount() {
@@ -109,18 +110,19 @@ export default class TokenDashboard extends Component {
       });
   }
   getTotalStaked() {
+    const { type } = this.props;
     stakeService.getAllStake()
       .then(res => {
         const stakeList = _.get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
-        this.setState({ totalStaked: sum });
+        this.setState({ totalStaked: sum, nodeNum: stakeList.length });
       })
       .catch(err => {
         console.log(err);
       });
   }
   render() {
-    const { blockNum, txnNum, totalStaked, holders, percentage, txTs, txNumber } = this.state;
+    const { blockNum, txnNum, totalStaked, holders, percentage, txTs, txNumber, nodeNum } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -140,7 +142,7 @@ export default class TokenDashboard extends Component {
           </div>
           {type === 'theta' &&
             <div className="column">
-              <Detail title={'TOTAL NODES'} />
+              <Detail title={'TOTAL NODES'} value={nodeNum} />
               <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />
             </div>}
           {type === 'tfuel' && <div className="column">
