@@ -191,7 +191,7 @@ function _getAddressShortHash(address) {
 }
 
 function _renderIds(ids) {
-  return _.map(ids, i => <div>{i}</div>)
+  return _.map(ids, i => <div key={i}>{i}</div>)
 }
 
 
