@@ -38,7 +38,9 @@ export function to(txn, trunc = null, address = null) {
   let path, isSelf;
   if (txn.type === TxnTypes.SERVICE_PAYMENT) {
     path = 'data.target.address';
-  } if (txn.type === TxnTypes.WITHDRAW_STAKE) {
+  } else if (txn.type === TxnTypes.RESERVE_FUND) {
+    return '';
+  } else if (txn.type === TxnTypes.WITHDRAW_STAKE) {
     path = 'data.source.address';
   } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
     path = 'data.holder.address';
