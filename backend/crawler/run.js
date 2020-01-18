@@ -12,9 +12,11 @@ var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
+var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
+var accountingJob = require('./jobs/accounting.js');
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -126,6 +128,9 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(txHistoryDao);
 
+  accountingDao = new accountingDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(accountingDao);
+
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, accountTxSendDao, stakeDao);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
@@ -133,6 +138,9 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   }, 1000);
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
   schedule.scheduleJob('0 0 0 * * *', readTxHistoryJob.Execute);
+
+  accountingJob.Initialize(transactionDao, accountTxDao, accountingDao);
+  schedule.scheduleJob('0 0 0 * * *', accountingJob.Execute);
 }
 
 

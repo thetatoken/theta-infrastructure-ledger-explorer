@@ -133,6 +133,13 @@ exports.query = function (collectionName, queryObject, callback) {
     callback(err, res);
   });
 }
+exports.queryWithProjection = function (collectionName, queryObj, projectionObj, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find(queryObj, projectionObj).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
 exports.getTotal = function (collectionName, queryObject, callback) {
   var collection = _db.collection(collectionName);
   collection.find(queryObject).count(function (err, res) {

@@ -8,7 +8,7 @@ module.exports = class AccountTxDAO {
 
   constructor(execDir, client) {
     this.client = client;
-    this.accountTxInfoCollection = 'accountTx';
+    this.accountTxInfoCollection = 'accountTx'; // deprecated
     this.collection = 'acctTx';
   }
 
@@ -16,6 +16,7 @@ module.exports = class AccountTxDAO {
     this.client.insert(this.collection, tx, callback);
   }
 
+  // deprecated
   upsertInfo(info, callback) {
     const newObject = {
       'tx_type': info.tx_type,
@@ -40,6 +41,17 @@ module.exports = class AccountTxDAO {
       queryObject = { acct: address, type: type, ts: { $gte: startTime, $lte: endTime } };
     }
     this.client.getRecords(this.collection, queryObject, {}, 0, 1000, callback);
+  }
+
+  getTxHashes(address, startTime, endTime, type, callback) {
+    let queryObj;
+    if (type === null) {
+      queryObj = { acct: address, ts: { $gte: startTime, $lt: endTime } };
+    } else {
+      queryObj = { acct: address, type: type, ts: { $gte: startTime, $lt: endTime } };
+    }
+    let projectionObj = { hash: 1, _id: 0 };
+    this.client.queryWithProjection(this.collection, queryObj, projectionObj, callback);
   }
 
   getCount(address, type, isEqualType, startTime, endTime, callback) {
