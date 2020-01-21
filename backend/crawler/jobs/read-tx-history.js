@@ -1,3 +1,4 @@
+let transactionDao = null;
 let txHistoryDao = null;
 
 exports.Initialize = function (transactionDaoInstance, txHistoryDaoInstance) {

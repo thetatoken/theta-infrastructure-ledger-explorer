@@ -139,7 +139,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
   schedule.scheduleJob('0 0 0 * * *', readTxHistoryJob.Execute);
 
-  accountingJob.Initialize(transactionDao, accountTxDao, accountingDao);
+  accountingJob.Initialize(transactionDao, accountTxDao, accountingDao, config.coinbase.api_key);
   schedule.scheduleJob('0 0 0 * * *', accountingJob.Execute);
 }
 
