@@ -41,7 +41,8 @@
     & > *:first-child {
       margin-right: 1rem;
       white-space: nowrap;
-      width: 30%;
+      min-width: 30%;
+      max-width: 50%;
     }
     & > a {
       display: block;
