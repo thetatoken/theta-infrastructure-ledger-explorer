@@ -14,6 +14,7 @@ var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var priceDaoLib = require('../mongo-db/price-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
+var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
