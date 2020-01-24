@@ -81,6 +81,8 @@ function main() {
       bluebird.promisifyAll(priceDao);
       txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(txHistoryDao);
+      accountingDao = new accountingDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(accountingDao);
       //
       var privateKey = fs.readFileSync(config.cert.key, 'utf8');
       var certificate = fs.readFileSync(config.cert.crt, 'utf8');
@@ -129,6 +131,8 @@ function main() {
       supplyRouter(app, config);
       // price router
       priceRouter(app, priceDao, config)
+      // accounting router
+      accountingRouter(app, accountingDao)
       // keep push block data
       // pushTopBlocks();
     }

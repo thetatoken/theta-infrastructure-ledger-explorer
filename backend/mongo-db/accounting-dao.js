@@ -15,4 +15,7 @@ module.exports = class AccountTxDAO {
     this.client.insert(this.collection, rec, callback);
   }
 
+  get(wallet, startDate, endDate) {
+    this.client.find({addr: wallet, date: {$gte: startDate, $lt: endDate}}, {_id: 0}).toArray();
+  }
 }
