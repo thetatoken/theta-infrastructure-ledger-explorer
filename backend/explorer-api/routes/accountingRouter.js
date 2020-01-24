@@ -11,8 +11,10 @@ var accountingRouter = (app, accountingDao) => {
         let startDate = (Date.parse(req.query.start) / 1000).toString();
         let endDate = (Date.parse(req.query.end) / 1000).toString();
 
-        let data = await accountingDao.getStats(wallet, startDate, endDate);
-        res.status(200).send(data);
+        (async ()=>{
+            let data = await accountingDao.getAsync(wallet, startDate, endDate);
+            res.status(200).send(data);
+        })();
     });
 
     //the / route of router will get mapped to /api
