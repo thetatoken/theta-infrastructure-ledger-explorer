@@ -22,6 +22,7 @@ var accountRouter = require("./routes/accountRouter");
 var accountTxRouter = require("./routes/accountTxRouter");
 var stakeRouter = require("./routes/stakeRouter");
 var priceRouter = require("./routes/priceRouter");
+var accountingRouter = require("./routes/accountingRouter");
 
 var supplyRouter = require("./routes/supplyRouter");
 var cors = require('cors')
