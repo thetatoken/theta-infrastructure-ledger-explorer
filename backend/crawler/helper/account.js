@@ -67,6 +67,10 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
       case 6:
         await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        for (let split of tx.data.splits) {
+          await _updateAccountByAddress(split.Address, accountDao, tx.type);
+          await _updateAccountTxMap(split.Address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        }
         break;
       case 8:
       case 9:
