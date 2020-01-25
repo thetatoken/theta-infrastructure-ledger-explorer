@@ -7,8 +7,8 @@ var accountingRouter = (app, accountingDao) => {
 
     router.get("/accounting", (req, res) => {
         let wallet = req.query.wallet;
-        let startDate = (Date.parse(req.query.start) / 1000).toString();
-        let endDate = (Date.parse(req.query.end) / 1000).toString();
+        let startDate = Date.parse(req.query.start);
+        let endDate = Date.parse(req.query.end);
 
         accountingDao.getAsync(wallet, startDate, endDate).then(data => {
             // const data = ({
