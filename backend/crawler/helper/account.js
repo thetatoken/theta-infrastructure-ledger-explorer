@@ -6,7 +6,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
       case 0:
-        counter += tx.data.outputs ? tx.data.outputs.length : 0;
+        counter += tx.data.outputs ? tx.data.outputs.length + 1 : 1;
         break;
       case 2:
         counter += tx.data.inputs.length + tx.data.outputs.length;
@@ -18,7 +18,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
         counter = counter + 2
         break;
       case 6:
-        counter++;
+        counter += tx.data.splits ? tx.data.splits.length + 1 : 1;
         break;
       case 8:
       case 9:
