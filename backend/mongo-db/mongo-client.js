@@ -135,7 +135,7 @@ exports.query = function (collectionName, queryObject, callback) {
 }
 exports.queryWithProjection = function (collectionName, queryObj, projectionObj, callback) {
   var collection = _db.collection(collectionName);
-  collection.find(queryObj, projectionObj).toArray(function (err, res) {
+  collection.find(queryObj).project(projectionObj).toArray(function (err, res) {
     if (err) callback(err);
     callback(err, res);
   });
