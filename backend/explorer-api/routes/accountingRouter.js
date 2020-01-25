@@ -11,10 +11,6 @@ var accountingRouter = (app, accountingDao) => {
         let endDate = Date.parse(req.query.end);
 
         accountingDao.getAsync(wallet, startDate, endDate).then(data => {
-            // const data = ({
-            //   type: 'account',
-            //   body: accountInfo,
-            // });
             res.status(200).send(data);
         })
         .catch(error => {
