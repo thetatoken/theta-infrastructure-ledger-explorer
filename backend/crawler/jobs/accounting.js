@@ -23,13 +23,11 @@ exports.Initialize = function (transactionDaoInstance, accountTransactionDaoInst
     coinbaseApiKey = coinbaseApiKeyStr;
 }
 
-exports.Execute = function () {
-    (async ()=>{
-        let tfuelPrice = await getCoinbasePrice();
-        for (let addr of walletAddrs) {
-            process(addr, tfuelPrice);
-        }
-    })();
+exports.Execute = async function () {
+    let tfuelPrice = await getCoinbasePrice();
+    for (let addr of walletAddrs) {
+        process(addr, tfuelPrice);
+    }
 }
 
 async function process(address, tfuelPrice) {
@@ -61,7 +59,7 @@ async function process(address, tfuelPrice) {
     accountingDao.insertAsync(data);
 }
 
-async function getCoinbasePrice() {
+function getCoinbasePrice() {
     const requestOptions = {
         method: 'GET',
         uri: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest',
