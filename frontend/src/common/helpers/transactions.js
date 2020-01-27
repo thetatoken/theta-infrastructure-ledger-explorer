@@ -44,6 +44,12 @@ export function to(txn, trunc = null, address = null) {
     path = 'data.source.address';
   } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
     path = 'data.holder.address';
+  } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
+    const splits = _.get(txn, 'data.splits');
+    isSelf = splits.some(split => {
+      return split.Address === address;
+    })
+    path = 'data.splits[0].Address';
   } else {
     const outputs = _.get(txn, 'data.outputs');
     isSelf = outputs.some(output => {

@@ -24,7 +24,7 @@ export default class AccountDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: null,
+      account: this.getEmptyAccount(this.props.params.accountAddress),
       transactions: null,
       currentPage: 1,
       totalPages: null,
@@ -93,7 +93,6 @@ export default class AccountDetails extends Component {
 
   getStakeTransactions(address) {
     if (!address) {
-      this.setState({ errorType: 'error_not_found' });
       return;
     }
     stakeService.getStakeByAddress(address)
@@ -104,13 +103,6 @@ export default class AccountDetails extends Component {
           sourceTxs: stakes.sourceRecords,
           hasStakes: stakes.holderRecords.length + stakes.sourceRecords.length > 0
         })
-        let { errorType, holderTxs, sourceTxs } = this.state
-        if (errorType === 'error_not_found' && (holderTxs.length || sourceTxs.length)) {
-          this.setState({
-            account: this.getEmptyAccount(address),
-            errorType: null
-          })
-        }
       })
       .catch(err => {
         console.log(err);
@@ -118,14 +110,8 @@ export default class AccountDetails extends Component {
   }
   getTransactionsByAddress(address, includeService, page = 1, ) {
     if (!address) {
-      this.setState({ errorType: 'error_not_found' });
       return;
     }
-    // if (this.state.account && !Object.keys(this.state.account.txs_counter).length) {
-    //   this.setState({ loading_txns: false });
-    //   console.log('return 2');
-    //   return;
-    // }
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
@@ -155,7 +141,6 @@ export default class AccountDetails extends Component {
 
   getOneAccountByAddress(address) {
     if (!address) {
-      this.setState({ errorType: 'error_not_found' });
       return;
     }
 
@@ -170,17 +155,6 @@ export default class AccountDetails extends Component {
             })
             break;
           case 'error_not_found':
-            let { holderTxs, sourceTxs } = this.state;
-            if (holderTxs && sourceTxs && (holderTxs.length || sourceTxs.length)) {
-              this.setState({
-                account: this.getEmptyAccount(address),
-                errorType: null
-              })
-              break;
-            }
-            this.setState({
-              errorType: 'error_not_found'
-            });
             break;
           default:
             break;

@@ -183,9 +183,6 @@ export default class TransactionExplorer extends Component {
 }
 
 
-
-
-
 function _getAddressShortHash(address) {
   return address.substring(12) + '...';
 }
