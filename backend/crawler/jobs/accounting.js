@@ -29,8 +29,7 @@ exports.Execute = async function () {
 
 async function process(address, tfuelPrice) {
     var date = new Date();
-    let now = date.getTime();
-    date.setUTCHours(0,0,0,0)
+    date.setUTCHours(0,0,0,0);
     var endTime = date.getTime() / 1000;
     date.setDate(date.getDate() - 1);
     var startTime = date.getTime() / 1000;
@@ -52,7 +51,11 @@ async function process(address, tfuelPrice) {
         }
     }
 
-    const data = { date: now, addr: address, qty: Number(totalTFuel.dividedBy(WEI).toFixed(2)), price: tfuelPrice };
+    var now = new Date();
+    now.setUTCHours(0,0,0,0);
+    now.setMilliseconds(now.getMilliseconds() - 1);
+
+    const data = { date: now.getTime(), addr: address, qty: Number(totalTFuel.dividedBy(WEI).toFixed(2)), price: tfuelPrice };
     accountingDao.insertAsync(data);
 }
 
