@@ -10,17 +10,14 @@ let txDao = null;
 let acctTxDao = null;
 let accountingDao = null;
 let coinbaseApiKey = null;
-let walletAddrs = [
-    '0xfa7393eb179fdb4202229ef00607b41c1ccedc7f', 
-    '0x3de1b09087d18667cee078e02353d39a855bd79d', 
-    '0x3d38a88684b5489ab05084d24e7a164263332eaa'
-];
+let walletAddrs = null;
 
-exports.Initialize = function (transactionDaoInstance, accountTransactionDaoInstance, accountingDaoInstance, coinbaseApiKeyStr) {
+exports.Initialize = function (transactionDaoInstance, accountTransactionDaoInstance, accountingDaoInstance, coinbaseApiKeyStr, walletAddresses) {
     txDao = transactionDaoInstance;
     acctTxDao = accountTransactionDaoInstance;
     accountingDao = accountingDaoInstance;
     coinbaseApiKey = coinbaseApiKeyStr;
+    walletAddrs = walletAddresses;
 }
 
 exports.Execute = async function () {
