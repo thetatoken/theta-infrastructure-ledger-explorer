@@ -49,13 +49,13 @@ async function process(address, tfuelPrice) {
     for (let tx of txs) {
         for (let output of tx.data.outputs) {
             if (output.address === address) {
-                BigNumber.sum(totalTFuel, BigNumber(output.coins.tfuelwei).dividedBy(WEI));
+                totalTFuel = BigNumber.sum(totalTFuel, new BigNumber(output.coins.tfuelwei));
                 break;
             }
         }
     }
 
-    const data = { date: now, addr: address, qty: totalTFuel, price: tfuelPrice };
+    const data = { date: now, addr: address, qty: Number(totalTFuel.dividedBy(WEI).toFixed(2)), price: tfuelPrice };
     accountingDao.insertAsync(data);
 }
 
