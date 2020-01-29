@@ -16,6 +16,10 @@ module.exports = class AccountTxDAO {
     this.client.insert(this.collection, rec, callback);
   }
 
+  upsert(queryObj, updateObj, callback) {
+    this.client.upsert(this.collection, queryObj, updateObj, callback);
+  }
+
   get(wallet, startDate, endDate, callback) {
     let queryObj = { addr: wallet, date: { $gte: startDate, $lt: endDate } };
     let projectionObj = { _id: 0 };

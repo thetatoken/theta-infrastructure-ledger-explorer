@@ -12,28 +12,46 @@ let accountingDao = null;
 let coinbaseApiKey = null;
 let walletAddrs = null;
 
-exports.Initialize = function (transactionDaoInstance, accountTransactionDaoInstance, accountingDaoInstance, coinbaseApiKeyStr, walletAddresses) {
-    txDao = transactionDaoInstance;
-    acctTxDao = accountTransactionDaoInstance;
+exports.InitializeForTFuelPrice = function (accountingDaoInstance, coinbaseApiKeyStr, walletAddresses) {
     accountingDao = accountingDaoInstance;
     coinbaseApiKey = coinbaseApiKeyStr;
     walletAddrs = walletAddresses;
 }
 
-exports.Execute = async function () {
+exports.RecordTFuelPrice = async function () {
     let tfuelPrice = await getCoinbasePrice();
+    let [startTime] = getDayTimes();
+
     for (let addr of walletAddrs) {
-        process(addr, tfuelPrice);
+        const data = { date: startTime, addr: addr, price: tfuelPrice };
+        accountingDao.insertAsync(data);
     }
 }
 
-async function process(address, tfuelPrice) {
+exports.InitializeForTFuelEarning = function (transactionDaoInstance, accountTransactionDaoInstance, accountingDaoInstance, walletAddresses) {
+    txDao = transactionDaoInstance;
+    acctTxDao = accountTransactionDaoInstance;
+    accountingDao = accountingDaoInstance;
+    walletAddrs = walletAddresses;
+}
+
+exports.RecordTFuelEarning = async function () {
+    let [startTime, endTime] = getDayTimes();
+    for (let addr of walletAddrs) {
+        processEarning(addr, startTime, endTime);
+    }
+}
+
+function getDayTimes() {
     var date = new Date();
     date.setUTCHours(0,0,0,0);
     var endTime = date.getTime() / 1000;
     date.setDate(date.getDate() - 1);
     var startTime = date.getTime() / 1000;
+    return [startTime, endTime];
+}
 
+async function processEarning(address, startTime, endTime) {
     let txHashes = await acctTxDao.getTxHashesAsync(address, startTime.toString(), endTime.toString(), COINBASE);
     let hashes = [];
     txHashes.forEach(function(txHash){
@@ -51,12 +69,9 @@ async function process(address, tfuelPrice) {
         }
     }
 
-    var now = new Date();
-    now.setUTCHours(0,0,0,0);
-    now.setMilliseconds(now.getMilliseconds() - 1);
-
-    const data = { date: now.getTime(), addr: address, qty: Number(totalTFuel.dividedBy(WEI).toFixed(2)), price: tfuelPrice };
-    accountingDao.insertAsync(data);
+    const queryObj = { addr: address, date: startTime };
+    const updateObj = { qty: Number(totalTFuel.dividedBy(WEI).toFixed(2)) };
+    accountingDao.upsertAsync(queryObj, updateObj);
 }
 
 function getCoinbasePrice() {

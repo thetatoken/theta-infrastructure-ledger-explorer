@@ -139,8 +139,11 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
   schedule.scheduleJob('0 0 0 * * *', readTxHistoryJob.Execute);
 
-  accountingJob.Initialize(transactionDao, accountTxDao, accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 0 * * *', accountingJob.Execute);
+  accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
+  schedule.scheduleJob('0 0 0 * * *', accountingJob.RecordTFuelPrice); // GMT mid-night
+
+  accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
+  schedule.scheduleJob('0 0 8 * * *', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 }
 
 
