@@ -59,11 +59,11 @@ async function processEarning(address, startTime, endTime) {
     });
 
     let txs = await txDao.getTransactionsByPkAsync(hashes);
-    let totalTFuel = 0;
+    let totalTFuel = new BigNumber(0);
     for (let tx of txs) {
         for (let output of tx.data.outputs) {
             if (output.address === address) {
-                totalTFuel = BigNumber.sum(totalTFuel, new BigNumber(output.coins.tfuelwei));
+                totalTFuel = new BigNumber.sum(totalTFuel, new BigNumber(output.coins.tfuelwei));
                 break;
             }
         }
