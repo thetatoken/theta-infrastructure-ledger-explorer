@@ -23,7 +23,11 @@ export default class StakeTxsTable extends Component {
     includeDetails: true,
     truncate: 35,
   }
-
+  componentWillUpdate(nextProps){
+    if(nextProps.txs !== this.props.txs){
+        this.setState({ transactions: nextProps.txs.slice(0, TRUNC), isSliced: true })
+    }
+  }
   toggleList() {
     if (this.state.isSliced) {
       this.setState({ transactions: this.props.txs, isSliced: false })
