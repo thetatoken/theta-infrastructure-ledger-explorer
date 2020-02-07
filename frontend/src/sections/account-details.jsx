@@ -222,7 +222,7 @@ export default class AccountDetails extends Component {
                 <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
               }
               <label className="theta-switch">
-                <input type="checkbox" checked={!includeService} onChange={this.handleToggleHideTxn}></input>
+                <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
                 <span className="theta-slider"></span>
               </label>
             </div>
