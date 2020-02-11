@@ -58,6 +58,68 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
       })
   })
 
+  router.get("/accountTx/history/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    const type = 2;
+    const isEqualType = 'true';
+
+    accountDao.getAccountByPkAsync(address)
+      .then(accountInfo => {
+        totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
+        let page = 0;
+        return accountTxDao.getListAsync(address, type, isEqualType, page, totalNumber, false);
+      })
+      .then(async txList => {
+        console.log(txList);
+        let txHashes = [];
+        let txs = [];
+        for (let acctTx of txList) {
+          txHashes.push(acctTx.hash);
+        }
+
+        txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+        txs = orderTxs(txs, txHashes);
+        let records = txs.map(tx => {
+          const data = tx.data;
+          let obj = {
+            'tx_hash': tx.hash,
+            'timestamp': new Date(tx.timestamp * 1000).toUTCString()
+          }
+          if (data.inputs[0].address === address) {
+            obj.tx_type = 'Send';
+            obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
+            obj.tfuelwei_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
+            obj.from = address;
+            let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
+            obj.to = to.substring(0, to.length - 2)
+          } else {
+            data.outputs.forEach(output => {
+              if (output.address === address) {
+                obj.tx_type = 'Receive';
+                obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                obj.tfuelwei_amount = helper.formatCoin(output.coins.tfuelwei);
+                obj.from = data.inputs[0].address;
+                obj.to = address;
+              }
+            })
+          }
+          return obj;
+        })
+        var data = ({
+          type: 'account_tx_list',
+          body: records
+        });
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        const err = ({
+          type: 'error_not_found',
+          error
+        });
+        res.status(404).send(err);
+      });
+  });
+
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
