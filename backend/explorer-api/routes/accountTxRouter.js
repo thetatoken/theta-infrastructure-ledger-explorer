@@ -70,7 +70,6 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
         return accountTxDao.getListAsync(address, type, isEqualType, page, totalNumber, false);
       })
       .then(async txList => {
-        console.log(txList);
         let txHashes = [];
         let txs = [];
         for (let acctTx of txList) {
@@ -83,12 +82,12 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
           const data = tx.data;
           let obj = {
             'tx_hash': tx.hash,
-            'timestamp': new Date(tx.timestamp * 1000).toUTCString()
+            'timestamp': `"${new Date(tx.timestamp * 1000).toUTCString()}"`
           }
           if (data.inputs[0].address === address) {
             obj.tx_type = 'Send';
             obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
-            obj.tfuelwei_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
+            obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
             obj.from = address;
             let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
             obj.to = to.substring(0, to.length - 2)
@@ -97,7 +96,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
               if (output.address === address) {
                 obj.tx_type = 'Receive';
                 obj.theta_amount = helper.formatCoin(output.coins.thetawei);
-                obj.tfuelwei_amount = helper.formatCoin(output.coins.tfuelwei);
+                obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
                 obj.from = data.inputs[0].address;
                 obj.to = address;
               }
@@ -385,5 +384,24 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
+/**
+ * @param {string[]} strs
+ * @return {string[][]}
+ */
+var groupAnagrams = function (strs) {
+  if (strs.length === 0) return [];
+  var map = new Map();
+  strs.forEach(s => {
+    var c = s.split('').sort().join('');
+    if (map.has(c)) {
+      var v = map.get(c);
+      v.push(s);
+      map.set(c, v)
+    } else {
+      map.set(c, [s])
+    }
+  })
+  return Array.from(map.values())
+};
 
 module.exports = accountTxRouter;

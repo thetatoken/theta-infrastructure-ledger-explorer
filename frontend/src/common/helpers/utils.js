@@ -47,3 +47,7 @@ export function getQueryParam(search, name) {
   let results = regex.exec(search);
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
+
+export function getTheta(weiAmount){
+  return new BigNumber(weiAmount).dividedBy(WEI).toFixed();
+}

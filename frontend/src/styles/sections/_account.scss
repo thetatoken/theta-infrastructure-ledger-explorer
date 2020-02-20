@@ -15,6 +15,13 @@
     @include row($justify: flex-end);
     border-top: 1px solid $color-font-light;
     padding-top: 2rem;
+
+    .download{
+      position: absolute;
+      left: 0;
+      color: $color-font-light;
+      cursor: pointer;
+    }
     .title{
       position: absolute;
       left: calc(50% - 44px)

@@ -5,7 +5,7 @@ import cx from 'classnames';
 
 
 
-import { formatCoin, priceCoin } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getTheta } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -36,6 +36,8 @@ export default class AccountDetails extends Component {
       hasStakes: false,
       price: { 'Theta': 0, 'TFuel': 0 }
     };
+    this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
+    this.download = React.createRef();
   }
   getEmptyAccount(address) {
     return {
@@ -56,7 +58,6 @@ export default class AccountDetails extends Component {
     const { accountAddress } = this.props.params;
     this.fetchData(accountAddress);
   }
-
   fetchData(address) {
     this.getOneAccountByAddress(address);
     this.getTransactionsByAddress(address, false, 1);
@@ -108,7 +109,7 @@ export default class AccountDetails extends Component {
         console.log(err);
       });
   }
-  getTransactionsByAddress(address, includeService, page = 1, ) {
+  getTransactionsByAddress(address, includeService, page = 1) {
     if (!address) {
       return;
     }
@@ -183,6 +184,43 @@ export default class AccountDetails extends Component {
     this.getTransactionsByAddress(accountAddress, includeService, 1);
   }
 
+  downloadTrasanctionHistory() {
+    const { accountAddress } = this.props.params;
+    accountService.getTransactionHistory(accountAddress)
+      .then(res => {
+        if (res.status === 200) {
+          function convertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+            var line = '';
+            for (var index in array[0]) {
+              if (line != '') line += ','
+              line += index;
+            }
+            str += line + '\r\n';
+            for (var i = 0; i < array.length; i++) {
+              var line = '';
+              for (var index in array[i]) {
+                if (line != '') line += ','
+
+                line += array[i][index];
+              }
+
+              str += line + '\r\n';
+            }
+            return str;
+          }
+          var json = JSON.stringify(res.data.body);
+          var csv = convertToCSV(json);
+          var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          // var blob = new Blob([json], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+          this.download.current.download = 'transactions.csv';
+          this.download.current.href = url;
+          this.download.current.click();
+        }
+      });
+  }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasStakes, holderTxs, sourceTxs, price } = this.state;
@@ -217,6 +255,8 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
+              <div className="download" onClick={this.downloadTrasanctionHistory}>Download Transactions History</div>
+              <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
                 <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
