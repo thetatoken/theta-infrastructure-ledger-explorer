@@ -30,6 +30,21 @@
       font-size: .875rem;
       font-weight: $weight-semi;
       color: $color-font-light;
+      &.export{
+        display: flex;
+        &:before {
+          content: '';
+          display: inline-block;
+          position: relative;
+          width: 16px;
+          height: 16px;
+          margin-right: .375rem;
+          background-position: center center;
+          background-size: contain;
+          background-repeat: no-repeat;
+          background-image: url('/images/icons/icon-export@2x.png')
+        }
+      }
     }
   }
 

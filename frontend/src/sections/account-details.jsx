@@ -34,6 +34,7 @@ export default class AccountDetails extends Component {
       includeService: false,
       hasOtherTxs: true,
       hasStakes: false,
+      hasTransferTx: false,
       price: { 'Theta': 0, 'TFuel': 0 }
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
@@ -160,7 +161,7 @@ export default class AccountDetails extends Component {
           default:
             break;
         }
-        this.setState({ loading_acct: false });
+        this.setState({ loading_acct: false, hasTransferTx: res.data.body.txs_counter[2] !== undefined });
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -223,7 +224,7 @@ export default class AccountDetails extends Component {
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, sourceTxs, price } = this.state;
+      includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs, price } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -255,7 +256,7 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
-              <div className="download" onClick={this.downloadTrasanctionHistory}>Download Transactions History</div>
+              {hasTransferTx && <div className="download btn tx export" onClick={this.downloadTrasanctionHistory}>Export Transaction History (CSV)</div>}
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
