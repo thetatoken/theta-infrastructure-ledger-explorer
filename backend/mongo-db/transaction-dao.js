@@ -87,9 +87,9 @@ module.exports = class TransactionDAO {
     const queryObject = { _id: { $in: pks } };
     this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
       if (error) {
-        console.log('ERR - ', error, pk);
+        console.log('ERR - ', error, pks);
       } else if (!transactions) {
-        callback(Error('NOT_FOUND - ' + pk));
+        callback(Error('NOT_FOUND - ' + pks));
       } else {
         callback(error, transactions);
       }
