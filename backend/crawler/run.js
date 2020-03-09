@@ -143,7 +143,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   schedule.scheduleJob('0 0 0 * * *', accountingJob.RecordTFuelPrice); // GMT mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 8 * * *', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
+  schedule.scheduleJob('0 0 7 * * *', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 }
 
 
