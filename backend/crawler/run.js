@@ -2,7 +2,7 @@ var schedule = require('node-schedule');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
-// var aerospikeClient = require('../db/aerospike-client.js');
+var Logger = require('./helper/logger');
 var mongoClient = require('../mongo-db/mongo-client.js')
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var blockDaoLib = require('../mongo-db/block-dao.js');
@@ -35,50 +35,29 @@ main();
 //------------------------------------------------------------------------------
 
 function main() {
-
+  Logger.initialize()
   // load config
-  console.log('Loading config file: ' + configFileName)
+  Logger.log('Loading config file: ' + configFileName)
   try {
     config = JSON.parse(fs.readFileSync(configFileName));
   } catch (err) {
-    console.log('Error: unable to load ' + configFileName);
-    console.log(err);
+    Logger.log('Error: unable to load ' + configFileName);
+    Logger.log(err);
     process.exit(1);
   }
-  console.log(config);
+  Logger.log(config);
   const network_id = config.blockchain.network_id;
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
-
-  // connect to db
-  // aerospikeClient.init(__dirname, config.aerospike.address, config.aerospike.port, config.aerospike.namespace);
-  // aerospikeClient.connect(function (error) {
-  //   if (error) {
-  //     console.log('DB connection failed');
-  //     process.exit();
-  //   } else {
-  //     console.log('DB connection succeeded');
-  //     setupGetBlockCronJob(aerospikeClient);
-  //   }
-  // });
 
   // connect to mongoDB
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(config.mongo.uri, function (error) {
     if (error) {
-      console.log('Mongo DB connection failed with err: ', error);
+      Logger.log('Mongo DB connection failed with err: ', error);
       process.exit();
     } else {
-      console.log('Mongo DB connection succeeded');
-      // const mongoDB = mongoClient.getDB();
-      // const queryObject = { 'network': 'testnet_chain_id' };
-      // const newObject = {
-      //   'network': 'testnet_chain_id',
-      //   'lst_blk_height': 1213,
-      //   'txs_count': 451
-      // }
-      // mongoClient.upsert('progress', queryObject, newObject, function () { });
-      // mongoClient.find('progress', function () { });
+      Logger.log('Mongo DB connection succeeded');
       setupGetBlockCronJob(mongoClient, network_id);
     }
   });
