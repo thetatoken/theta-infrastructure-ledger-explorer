@@ -15,6 +15,10 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
 		- [GetAccount](#getaccount)
       - [GetAccountTxHistory](#getaccounttxhistory)
       - [GetTopTokenHolders](#gettoptokenholders)
+   - [Stake APIs](#stake-apis)
+      - [GetAllStakes](#getallstakes)
+      - [GetTotalStakedAmount](#gettotalstakedamount)
+      - [GetStakeByAddress](#getstakebyaddress)
    - [Supply APIs](#supply-apis)
 		- [GetThetaAmount](#getthetaamount)
       - [GetTFuelAmount](#gettfuelamount)
@@ -511,12 +515,11 @@ This API returns the details of the account being queried with address.
 - For each transaction it is similar to the returns of the GetTransaction API. Please [see above](#gettransaction).
 
 **Example**
-
+```
 // Request
 curl "https://explorer.thetatoken.org:9000/api/accounttx/0x3c6D5ED0353c22c31c5F91688A9D10E7Af2DF636?type=2&pageNumber=1&limitNumber=50&isEqualType=true"
 
 // Result
-```
 {
   "type": "account_tx_list",
   "body": [
@@ -542,12 +545,11 @@ This API returns the list of top token holders.
 - For each acount it is similar to the returns of the GetAccount API. Please [see above](#getaccount).
 
 **Example**
-
+```
 // Request
 curl "https://explorer.thetatoken.org:9000/api/account/top/theta/5"
 
 // Result
-```
 {
 "type": "account_list",
 "body": [
@@ -559,7 +561,138 @@ curl "https://explorer.thetatoken.org:9000/api/account/top/theta/5"
    ]
 }
 ```
- 
+## Stake APIs
+
+### GetAllStakes
+
+This API returns all stake records.
+
+**REST Uri**: /stake/all
+
+**Returns**
+- stakes: json representation of the stakes
+   - _id: the ID for the stake record
+   - type: this stake is in the validator candidate pool or the guardian candidate pool
+   - holder: the holder account's address
+   - source: the source account's address
+   - amount: the staked thetawei amount 
+   - withdrawn: `true` returns the stake is withdrawn, `false` returns the stake is not withdrawn
+   - return_height: the expected height the tokens return to his staking wallet if a node withdraws its stake
+
+**Example**
+```
+// Request 
+curl https://explorer.thetatoken.org:9000/api/stake/all
+
+// Result
+{
+   "type": "stake",
+   "body": [{
+      "_id": "5eb9f45d38696f556cc3334d",
+      "type": "vcp",
+      "holder": "0x80eab22e27d4b94511f5906484369b868d6552d2",
+      "source": "0x4aefa39caeadd662ae31ab0ce7c8c2c9c0a013e8",
+      "amount": "20000000000000000000000000",
+      "withdrawn": false,
+      "return_height": "18446744073709551615"
+      },{
+         "_id": "5eb9f45d38696f556cc3334e",
+         "type": "vcp",
+         "holder": "0x80eab22e27d4b94511f5906484369b868d6552d2",
+         "source": "0x747f15cac97b973290e106ef32d1b6fe65fef5a1",
+         "amount": "40000000000000000000000000",
+         "withdrawn": false,
+         "return_height": "18446744073709551615"
+      },{
+         "_id": "5eb9f45d38696f556cc33351",
+         "type": "vcp",
+         "holder": "0xa61abd72cdc50d17a3cbdceb57d3d5e4d8839bce",
+         "source": "0x0c9a45926a44a6fc9c8b6f9cb45c20483038698c",
+         "amount": "32000000000000000000000000",
+         "withdrawn": false,
+         "return_height": "18446744073709551615"
+      }
+      ...
+   ]
+}
+```
+
+### GetTotalStakedAmount
+
+This API returns the total amount of stakes.
+
+**REST Uri**: /stake/totalAmount
+
+**Returns**
+
+- totalAmount: the total amount of staked thetawei
+- totalNodes: the total amount of stake nodes
+
+**Example**
+```
+// Request 
+curl https://explorer.thetatoken.org:9000/api/stake/totalAmount
+
+// Result
+{
+   "totalAmount": "317702156000000000000000000",
+   "totalNodes": 12
+}
+```
+
+### GetStakeByAddress
+
+This API returns the stakes being queried with address.
+
+**REST Uri**: /stake/:address
+
+**Returns**
+
+- For each stake it is similar to the returns of the GetAllStakes API. Please [see above](#GetAllStakes).
+
+**Example**
+```
+// Request 
+curl https://explorer.thetatoken.org:9000/api/stake/totalAmount
+
+// Result
+{
+   "type": "stake",
+   "body": {
+   "holderRecords": [],
+   "sourceRecords": [
+      {
+         "_id": "5eb9f60638696f556cc33aa3",
+         "type": "vcp",
+         "holder": "0xe2408dff7a1f9bc247c803e43efa2f0a37b10ba6",
+         "source": "0xc15149236229bd13f0aec783a9cc8e8059fb28da",
+         "amount": "30000000000000000000000000",
+         "withdrawn": false,
+         "return_height": "18446744073709551615"
+      },
+      {
+         "_id": "5eb9f60638696f556cc33aa5",
+         "type": "vcp",
+         "holder": "0x15cc4c3f21417c392119054c8fe5895146e1a493",
+         "source": "0xc15149236229bd13f0aec783a9cc8e8059fb28da",
+         "amount": "30000000000000000000000000",
+         "withdrawn": false,
+         "return_height": "18446744073709551615"
+      },
+      {
+         "_id": "5eb9f60638696f556cc33aa4",
+         "type": "vcp",
+         "holder": "0xa144e6a98b967e585b214bfa7f6692af81987e5b",
+         "source": "0xc15149236229bd13f0aec783a9cc8e8059fb28da",
+         "amount": "30000000000000000000000000",
+         "withdrawn": false,
+         "return_height": "18446744073709551615"
+      }
+   ]
+   }
+}
+```
+
 ## Supply APIs
 
 ### GetThetaAmount
@@ -574,12 +707,11 @@ This API returns the total amount and circulation amount of Theta.
 - circulation_supply: the circulation amount of theta supplied
 
 **Example**
-
+```
 // Request 
 curl https://explorer.thetatoken.org:9000/api/supply/theta
 
 // Result
-```
 {
    "total_supply":1000000000,
    "circulation_supply":1000000000
@@ -597,12 +729,11 @@ This API returns the circulation amount of TFuel.
 - circulation_supply: the circulation amount of tfuel supplied
 
 **Example**
-
+```
 // Request 
 curl https://explorer.thetatoken.org:9000/api/supply/tfuel
 
 // Result
-```
 {
    "circulation_supply":5000000000
 }
