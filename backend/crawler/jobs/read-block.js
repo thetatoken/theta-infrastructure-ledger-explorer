@@ -12,6 +12,11 @@ var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
 var blockDao = null;
+var transactionDao = null;
+var accountDao = null;
+var accountTxDao = null;
+var stakeDao = null;
+var checkpointDao = null;
 var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
@@ -22,14 +27,15 @@ var validTransactionList = [];
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
-exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance, accountTxDaoInstance, accountTxSendDaoInstance, stakeDaoInstance) {
+exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
+  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
-  accountTxSendDao = accountTxSendDaoInstance;
   stakeDao = stakeDaoInstance;
+  checkpointDao = checkpointDaoInstance;
 }
 
 exports.Execute = async function (network_id) {
@@ -95,7 +101,7 @@ exports.Execute = async function (network_id) {
           getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getGcpAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
         }
-        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList).concat(getGcpAsyncList))
+        return Promise.all(getBlockAsyncList, getVcpAsyncList, getGcpAsyncList)
       } else {
         Logger.error('Block crawling is up to date.');
       }
@@ -110,6 +116,8 @@ exports.Execute = async function (network_id) {
         var upsertVcpAsyncList = [];
         var upsertGcpAsyncList = [];
         var upsertTransactionAsyncList = [];
+        let checkpoint_height, checkpoint_hash;
+        var upsertCheckpointAsyncList = []
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
@@ -147,6 +155,10 @@ exports.Execute = async function (network_id) {
                 hcc: result.result.hcc,
                 guardian_votes: result.result.guardian_votes
               }
+              if (result.result.height % 100 === 1) {
+                checkpoint_height = blockInfo.height;
+                checkpoint_hash = blockInfo.hash
+              }
               upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
               // Store the transaction data
               if (txs !== undefined && txs.length > 0) {
@@ -178,11 +190,26 @@ exports.Execute = async function (network_id) {
             }
           }
         }
+        if (!checkpoint_hash)
+          for (var i = 0; i < blockDataList.length; i++) {
+            var result = JSON.parse(blockDataList[i]);
+            if (result.result !== undefined && result.result.BlockHashGcpPairs)
+              result.result.BlockHashGcpPairs.forEach(gcpPair => {
+                if (gcpPair.BlockHash === checkpoint_hash) {
+                  upsertCheckpointAsyncList.push(checkpointDao.insert({
+                    height: checkpoint_height,
+                    hash: checkpoint_hash,
+                    guardians: gcpPair.Gcp.SortedGuardians
+                  }))
+                }
+              })
+          }
         Logger.log(`Number of upsert BLOCKS: ${upsertBlockAsyncList.length}`);
         Logger.log(`Number of upsert VCP: ${upsertVcpAsyncList.length}`);
         Logger.log(`Number of upsert GCP: ${upsertGcpAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
-        return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList, upsertTransactionAsyncList)
+        return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
+          upsertTransactionAsyncList, upsertCheckpointAsyncList)
       }
     })
     .then(() => {

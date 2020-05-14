@@ -9,10 +9,10 @@ var blockDaoLib = require('../mongo-db/block-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
 var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
-var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
+var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
@@ -98,9 +98,6 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountTxDao);
 
-  accountTxSendDao = new accountTxSendDaoLib(__dirname, mongoClient);
-  bluebird.promisifyAll(accountTxSendDao);
-
   stakeDao = new stakeDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(stakeDao);
 
@@ -110,7 +107,10 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountingDao = new accountingDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountingDao);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, accountTxSendDao, stakeDao);
+  checkpointDao = new checkpointDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(checkpointDao);
+
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
