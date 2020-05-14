@@ -1,5 +1,3 @@
-var path = require('path');
-
 //------------------------------------------------------------------------------
 //  DAO for price
 //------------------------------------------------------------------------------
@@ -7,7 +5,6 @@ var path = require('path');
 module.exports = class priceDAO {
 
   constructor(execDir, client) {
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
     this.client = client;
     this.priceInfoCollection = 'price';
   }

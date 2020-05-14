@@ -1,4 +1,3 @@
-var path = require('path');
 //------------------------------------------------------------------------------
 //  DAO for block
 //------------------------------------------------------------------------------
@@ -6,7 +5,6 @@ var path = require('path');
 module.exports = class BlockDAO {
 
   constructor(execDir, client) {
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'mongodb'));
     this.client = client;
     this.blockInfoCollection = 'block';
   }

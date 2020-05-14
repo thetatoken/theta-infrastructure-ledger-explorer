@@ -1,5 +1,3 @@
-var path = require('path');
-
 //------------------------------------------------------------------------------
 //  DAO for transaction
 //------------------------------------------------------------------------------
@@ -7,12 +5,8 @@ var path = require('path');
 module.exports = class TransactionDAO {
 
   constructor(execDir, client) {
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
     this.client = client;
     this.transactionInfoCollection = 'transaction';
-    // this.upsertPolicy = new this.aerospike.WritePolicy({
-    //   exists: this.aerospike.policy.exists.CREATE_OR_REPLACE
-    // });
   }
 
   upsertTransaction(transactionInfo, callback) {

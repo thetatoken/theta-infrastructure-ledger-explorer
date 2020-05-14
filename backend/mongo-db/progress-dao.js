@@ -1,5 +1,3 @@
-var path = require('path');
-
 //------------------------------------------------------------------------------
 //  DAO for chain status
 //------------------------------------------------------------------------------
@@ -7,13 +5,8 @@ var path = require('path');
 module.exports = class ProgressDAO {
 
   constructor(execDir, client) {
-    // console.log(path.join(execDir, 'node_modules', 'mongodb'))
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'mongodb'));
     this.client = client;
     this.progressInfoCollection = 'progress';
-    // this.upsertPolicy = new this.aerospike.WritePolicy({
-    //   exists: this.aerospike.policy.exists.CREATE_OR_REPLACE
-    // });
   }
 
   upsertProgress(network, block_height, count, callback) {
@@ -21,7 +14,6 @@ module.exports = class ProgressDAO {
     const newObject = {
       'network': network,
       'lst_blk_height': block_height,
-      // 'lst_blk_height': 455835,
       'txs_count': count
     }
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);

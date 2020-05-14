@@ -1,4 +1,3 @@
-var path = require('path');
 //------------------------------------------------------------------------------
 //  DAO for stake
 //------------------------------------------------------------------------------
@@ -6,7 +5,6 @@ var path = require('path');
 module.exports = class stakeDAO {
 
   constructor(execDir, client) {
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'mongodb'));
     this.client = client;
     this.stakeInfoCollection = 'stake';
   }

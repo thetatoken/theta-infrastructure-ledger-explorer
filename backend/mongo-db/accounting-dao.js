@@ -1,5 +1,3 @@
-var path = require('path');
-
 //------------------------------------------------------------------------------
 //  DAO for accounting purposes
 //  Require index: `db.accounting.createIndex( { addr: 1, date: 1 } )`
