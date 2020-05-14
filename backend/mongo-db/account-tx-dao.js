@@ -1,5 +1,8 @@
 //------------------------------------------------------------------------------
 //  DAO for account transaction history
+//  Require index: `db.acctTx.createIndex({acct:1, hash:1})`
+//  Require index: `db.acctTx.createIndex({acct:1, ts:1})`
+//  Require index: `db.acctTx.createIndex({acct:1, type:1,ts:1})`
 //------------------------------------------------------------------------------
 
 module.exports = class AccountTxDAO {

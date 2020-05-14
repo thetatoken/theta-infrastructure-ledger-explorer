@@ -1,13 +1,13 @@
-var path = require('path');
 
 //------------------------------------------------------------------------------
 //  DAO for account
+//  Require index: `db.account.createIndex({"balance.thetawei": -1})`
+//  Require index: `db.account.createIndex({"balance.tfuelwei": -1})`
 //------------------------------------------------------------------------------
 
 module.exports = class AccountDAO {
 
   constructor(execDir, client) {
-    // this.aerospike = require(path.join(execDir, 'node_modules', 'aerospike'));
     this.client = client;
     this.accountInfoCollection = 'account';
   }
