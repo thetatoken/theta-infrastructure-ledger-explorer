@@ -384,23 +384,5 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
-/**
- * @param {string[]} strs
- * @return {string[][]}
- */
-var groupAnagrams = function (strs) {
-  if (strs.length === 0) return [];
-  var map = new Map();
-  strs.forEach(s => {
-    var c = s.split('').sort().join('');
-    if (map.has(c)) {
-      var v = map.get(c);
-      v.push(s);
-      map.set(c, v)
-    } else {
-      map.set(c, [s])
-    }
-  })
-  return Array.from(map.values())
-};
+
 module.exports = accountTxRouter;

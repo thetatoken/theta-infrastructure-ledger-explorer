@@ -24,7 +24,10 @@ module.exports = class BlockDAO {
       'state_hash': blockInfo.state_hash,
       'transactions_hash': blockInfo.transactions_hash,
       'num_txs': blockInfo.num_txs,
-      'txs': blockInfo.txs
+      'txs': blockInfo.txs,
+      'children': blockInfo.children,
+      'hcc': blockInfo.hcc,
+      'guardian_votes': blockInfo.guardian_votes
     };
     this.client.upsert(this.blockInfoCollection, queryObject, newObject, callback);
   }
@@ -51,6 +54,7 @@ module.exports = class BlockDAO {
         blockInfo.transactions_hash = record.transactions_hash;
         blockInfo.num_txs = record.num_txs;
         blockInfo.txs = record.txs;
+        blockInfo.guardian_votes = record.guardian_votes
         callback(error, blockInfo);
       }
     })
@@ -73,6 +77,7 @@ module.exports = class BlockDAO {
         blockInfo.transactions_hash = recordList[i].transactions_hash;
         blockInfo.num_txs = recordList[i].num_txs;
         blockInfo.txs = recordList[i].txs;
+        blockInfo.guardian_votes = recordList[i].guardian_votes,
         blockInfoList.push(blockInfo);
       }
       callback(error, blockInfoList)

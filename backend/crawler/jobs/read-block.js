@@ -142,7 +142,10 @@ exports.Execute = async function (network_id) {
                 state_hash: result.result.state_hash,
                 transactions_hash: result.result.transactions_hash,
                 num_txs: result.result.transactions.length,
-                txs: txHelper.getBriefTxs(result.result.transactions)
+                txs: txHelper.getBriefTxs(result.result.transactions),
+                children: result.result.children,
+                hcc: result.result.hcc,
+                guardian_votes: result.result.guardian_votes
               }
               upsertBlockAsyncList.push(blockDao.upsertBlockAsync(blockInfo));
               // Store the transaction data
