@@ -23,6 +23,7 @@
   &.theta,
   &.thetawei {
     &:before { background-image: url('/images/icons/theta-icon@2x.png'); }
+    &.left { float: left; }
   }
 }
 

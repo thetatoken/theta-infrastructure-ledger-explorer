@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var helper = require('../helper/utils');
 var BigNumber = require('bignumber.js');
 
 var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
@@ -57,7 +56,7 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
             let skip = false;
             checkpoint.guardians[i].Stakes.forEach(stake => {
               skip = skip || stake.withdrawn;
-              let theta = !stake.withdrawn ? helper.formatCoin(stake.amount) : new BigNumber(0);
+              let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
               let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
               weight = weight.plus(!multi ? 0 : theta);
             })

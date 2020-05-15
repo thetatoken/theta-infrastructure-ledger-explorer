@@ -62,6 +62,7 @@ table.data {
 
 
 $th-width: 150px;
+$th-width-wide: 230px;
 table.details {
   width: 100%;
   table-layout: fixed;
@@ -83,6 +84,9 @@ table.details {
       font-size: 1.125rem;
       font-weight: $weight-semi;
     }
+  }
+  tbody.cp tr th{
+    width: $th-width-wide;
   }
   tbody tr {
     th,
