@@ -50,21 +50,25 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
       })
       .then(async blockInfo => {
         if (blockInfo.height % 100 === 1) {
-          let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
-          let weight = new BigNumber(0), j = 0;
-          for (let i = 0; i < checkpoint.guardians.length; i++) {
-            let skip = false;
-            checkpoint.guardians[i].Stakes.forEach(stake => {
-              skip = skip || stake.withdrawn;
-              let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
-              let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
-              weight = weight.plus(!multi ? 0 : theta);
-            })
-            // console.log(blockInfo.guardian_votes.Multiplies[j], j)
-            j += skip ? 0 : 1;
-          }
-          blockInfo.total_voted_guardian_stakes  = blockInfo.guardian_votes.Multiplies.length;
-          blockInfo.total_deposited_guardian_stakes = weight;
+          try {
+            let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
+            let weight = new BigNumber(0), j = 0;
+            for (let i = 0; i < checkpoint.guardians.length; i++) {
+              let skip = false;
+              checkpoint.guardians[i].Stakes.forEach(stake => {
+                skip = skip || stake.withdrawn;
+                let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
+                let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
+                weight = weight.plus(!multi ? 0 : theta);
+              })
+              // console.log(blockInfo.guardian_votes.Multiplies[j], j)
+              j += skip ? 0 : 1;
+            }
+            blockInfo.total_voted_guardian_stakes = blockInfo.guardian_votes.Multiplies.length;
+            blockInfo.total_deposited_guardian_stakes = weight;
+          } catch (err) {
+            console.log(err)
+          };
         }
         delete blockInfo.guardian_votes;
         const data = ({

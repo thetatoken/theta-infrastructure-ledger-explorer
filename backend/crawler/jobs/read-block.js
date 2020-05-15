@@ -155,7 +155,6 @@ exports.Execute = async function (network_id) {
                 hcc: result.result.hcc,
                 guardian_votes: result.result.guardian_votes
               }
-              console.log(`[DEBUG] height: ${result.result.height}, %100: ${result.result.height % 100}`)
               if (result.result.height % 100 === 1) {
                 checkpoint_height = blockInfo.height;
                 checkpoint_hash = blockInfo.hash
