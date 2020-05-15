@@ -14,10 +14,11 @@ var priceRouter = (app, priceDao, config) => {
         const time = new Date();
         priceListInfo.forEach(info => {
           const timestamp = new Date(info.last_updated).getTime()
-          isOutDated = isOutDated || time - timestamp > 1000 * 60 * 5;
+          isOutDated = isOutDated || time - timestamp > 1000 * 60 * 10;
         })
         if (isOutDated) {
           priceListInfo = await priceHelper.updatePrice(priceDao, config.coinmarketcap);
+          priceListInfo.forEach(p => p._id = p.name)
         }
         const data = ({
           type: 'price',

@@ -52,20 +52,21 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
         if (blockInfo.height % 100 === 1) {
           try {
             let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
-            let weight = new BigNumber(0), j = 0;
+            let voted = new BigNumber(0), deposited = new BigNumber(0), j = 0;
             for (let i = 0; i < checkpoint.guardians.length; i++) {
-              let skip = false;
+              let skip = true;
               checkpoint.guardians[i].Stakes.forEach(stake => {
-                skip = skip || stake.withdrawn;
+                skip = skip && stake.withdrawn;
                 let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
                 let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
-                weight = weight.plus(!multi ? 0 : theta);
+                voted = voted.plus(multi ? theta : 0);
+                deposited = deposited.plus(theta)
               })
-              // console.log(blockInfo.guardian_votes.Multiplies[j], j)
+              console.log(blockInfo.guardian_votes.Multiplies[j], j, blockInfo.guardian_votes.Multiplies.length)
               j += skip ? 0 : 1;
             }
-            blockInfo.total_voted_guardian_stakes = blockInfo.guardian_votes.Multiplies.length;
-            blockInfo.total_deposited_guardian_stakes = weight;
+            blockInfo.total_deposited_guardian_stakes = deposited;
+            blockInfo.total_voted_guardian_stakes = voted;
           } catch (err) {
             console.log(err)
           };

@@ -90,7 +90,7 @@ export default class BlocksExplorer extends Component {
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
+      if (!price.Theta) {
         this.getPrices();
       }
     }, 1000);
@@ -134,7 +134,10 @@ export default class BlocksExplorer extends Component {
                 </tr>
                 {isCheckPoint && <tr>
                   <th className="cp"># Voted Guardian Stakes</th>
-                  <td>{block.total_voted_guardian_stakes}</td>
+                  <td>
+                    <div className="currency thetawei left">{formatCoin(block.total_voted_guardian_stakes)} Theta</div>
+                    <div className='price'>&nbsp;{`[\$${priceCoin(block.total_voted_guardian_stakes, price['Theta'])} USD]`}</div>
+                  </td>
                 </tr>}
                 {isCheckPoint && <tr>
                   <th className="cp"># Deposited Guardian Stakes</th>

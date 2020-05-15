@@ -22,7 +22,6 @@ exports.updatePrice = function (priceDao, config) {
   // return rp(requestOptions);
   let res = [];
   return rp(requestOptions).then(response => {
-    console.log('API call response:', response);
     Object.keys(response.data).forEach(key => {
       const info = response.data[key];
       const price = {
