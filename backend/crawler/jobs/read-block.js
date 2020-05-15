@@ -101,7 +101,7 @@ exports.Execute = async function (network_id) {
           getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getGcpAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
         }
-        return Promise.all(getBlockAsyncList, getVcpAsyncList, getGcpAsyncList)
+        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList).concat(getGcpAsyncList))
       } else {
         Logger.error('Block crawling is up to date.');
       }
@@ -155,6 +155,7 @@ exports.Execute = async function (network_id) {
                 hcc: result.result.hcc,
                 guardian_votes: result.result.guardian_votes
               }
+              console.log(`[DEBUG] height: ${result.result.height}, %100: ${result.result.height % 100}`)
               if (result.result.height % 100 === 1) {
                 checkpoint_height = blockInfo.height;
                 checkpoint_hash = blockInfo.hash
@@ -190,14 +191,14 @@ exports.Execute = async function (network_id) {
             }
           }
         }
-        if (!checkpoint_hash)
+        if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {
             var result = JSON.parse(blockDataList[i]);
             if (result.result !== undefined && result.result.BlockHashGcpPairs)
               result.result.BlockHashGcpPairs.forEach(gcpPair => {
                 if (gcpPair.BlockHash === checkpoint_hash) {
-                  upsertCheckpointAsyncList.push(checkpointDao.insert({
-                    height: checkpoint_height,
+                  upsertCheckpointAsyncList.push(checkpointDao.insertAsync({
+                    height: parseInt(checkpoint_height),
                     hash: checkpoint_hash,
                     guardians: gcpPair.Gcp.SortedGuardians
                   }))
@@ -207,6 +208,7 @@ exports.Execute = async function (network_id) {
         Logger.log(`Number of upsert BLOCKS: ${upsertBlockAsyncList.length}`);
         Logger.log(`Number of upsert VCP: ${upsertVcpAsyncList.length}`);
         Logger.log(`Number of upsert GCP: ${upsertGcpAsyncList.length}`);
+        Logger.log(`Number of upsert check points: ${upsertCheckpointAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
           upsertTransactionAsyncList, upsertCheckpointAsyncList)

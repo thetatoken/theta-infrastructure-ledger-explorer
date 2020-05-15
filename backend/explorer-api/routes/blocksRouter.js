@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
+var BigNumber = require('bignumber.js');
 
-var blockRouter = (app, blockDao, progressDao, config) => {
+var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   router.get("/blocks/tmp", (req, res) => {
     let { type = 5, startTime = 0, endTime = 0 } = req.query;
@@ -39,15 +41,32 @@ var blockRouter = (app, blockDao, progressDao, config) => {
       })
   })
   router.get("/block/:id", (req, res) => {
-    let blockId = req.params.id;
+    let blockId = Number(req.params.id);
     let latest_block_height;
     console.log('Querying one block by using Id: ' + blockId);
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_block_height = progressInfo.height;
-        return blockDao.getBlockAsync(Number(blockId))
+        return blockDao.getBlockAsync(blockId)
       })
-      .then(blockInfo => {
+      .then(async blockInfo => {
+        if (blockInfo.height % 100 === 1) {
+          let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
+          let weight = new BigNumber(0), j = 0;
+          for (let i = 0; i < checkpoint.guardians.length; i++) {
+            let skip = false;
+            checkpoint.guardians[i].Stakes.forEach(stake => {
+              skip = skip || stake.withdrawn;
+              let theta = !stake.withdrawn ? helper.formatCoin(stake.amount) : new BigNumber(0);
+              weight = weight.plus(theta.multipliedBy(blockInfo.guardian_votes.Multiplies[j] || 0));
+            })
+            // console.log(blockInfo.guardian_votes.Multiplies[j], j)
+            j += skip ? 0 : 1;
+          }
+          blockInfo.total_deposited_guardian_stakes = blockInfo.guardian_votes.Multiplies.length;
+          blockInfo.total_voted_guardian_stakes = weight;
+        }
+        delete blockInfo.guardian_votes;
         const data = ({
           type: 'block',
           body: blockInfo,
