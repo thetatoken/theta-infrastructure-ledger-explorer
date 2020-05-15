@@ -58,13 +58,14 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
             checkpoint.guardians[i].Stakes.forEach(stake => {
               skip = skip || stake.withdrawn;
               let theta = !stake.withdrawn ? helper.formatCoin(stake.amount) : new BigNumber(0);
-              weight = weight.plus(theta.multipliedBy(blockInfo.guardian_votes.Multiplies[j] || 0));
+              let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
+              weight = weight.plus(!multi ? 0 : theta);
             })
             // console.log(blockInfo.guardian_votes.Multiplies[j], j)
             j += skip ? 0 : 1;
           }
-          blockInfo.total_deposited_guardian_stakes = blockInfo.guardian_votes.Multiplies.length;
-          blockInfo.total_voted_guardian_stakes = weight;
+          blockInfo.total_voted_guardian_stakes  = blockInfo.guardian_votes.Multiplies.length;
+          blockInfo.total_deposited_guardian_stakes = weight;
         }
         delete blockInfo.guardian_votes;
         const data = ({
