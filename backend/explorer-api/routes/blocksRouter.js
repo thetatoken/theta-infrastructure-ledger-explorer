@@ -49,7 +49,7 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
         return blockDao.getBlockAsync(blockId)
       })
       .then(async blockInfo => {
-        if (blockInfo.height % 100 === 1) {
+        if (blockInfo.height % 100 === 1 && blockInfo.guardian_votes) {
           try {
             let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
             let voted = new BigNumber(0), deposited = new BigNumber(0), j = 0;
