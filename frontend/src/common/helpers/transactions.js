@@ -87,6 +87,12 @@ export function fee(txn) {
   return f.toString();
 }
 
+export function gasPrice(txn) {
+  let f = _.get(txn, 'data.gas_price');
+  f = BigNumber(f).dividedBy(WEI);
+  return f.toString();
+}
+
 export function value(txn) {
   let values = [
     totalCoinValue(_.get(txn, 'data.inputs'), 'tfuelwei'),

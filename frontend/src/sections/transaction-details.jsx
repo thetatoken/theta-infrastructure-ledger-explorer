@@ -4,8 +4,8 @@ import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
 import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
-import { date, age, fee, status, type } from 'common/helpers/transactions';
-import { formatCoin, priceCoin } from 'common/helpers/utils';
+import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
+import { formatCoin, priceCoin, getHex } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
@@ -353,7 +353,12 @@ const SmartContract = ({ transaction }) => {
   return (
     <table className="details txn-details">
       <tbody>
+        <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
+        <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
 
+        <DetailsRow label="Gas Limit" data={data.gas_limit} />
+        <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="Data" data={getHex(data.data)} />
       </tbody>
     </table>);
 }

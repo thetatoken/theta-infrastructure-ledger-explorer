@@ -29,7 +29,7 @@ export function formatCoin(weiAmount) {
   });
 }
 
-export function priceCoin(weiAmount, price){
+export function priceCoin(weiAmount, price) {
   return new BigNumber(weiAmount).dividedBy(WEI).multipliedBy(price).decimalPlaces(2).toFormat({
     decimalSeparator: '.',
     groupSeparator: ',',
@@ -37,7 +37,7 @@ export function priceCoin(weiAmount, price){
   });
 }
 
-export function sumCoin(weiAmountA, weiAmountB){
+export function sumCoin(weiAmountA, weiAmountB) {
   return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB));
 }
 
@@ -48,6 +48,15 @@ export function getQueryParam(search, name) {
   return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
-export function getTheta(weiAmount){
+export function getTheta(weiAmount) {
   return new BigNumber(weiAmount).dividedBy(WEI).toFixed();
+}
+
+export function getHex(str) {
+  var arr1 = [];
+  for (var n = 0, l = str.length; n < l; n++) {
+    var hex = Number(str.charCodeAt(n)).toString(16);
+    arr1.push(hex);
+  }
+  return '0x' + arr1.join('');
 }
