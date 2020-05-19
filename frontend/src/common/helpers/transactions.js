@@ -23,6 +23,8 @@ export function from(txn, trunc = null, account = null) {
     path = 'data.source.address'
   } else if (txn.type === TxnTypes.WITHDRAW_STAKE) {
     path = 'data.holder.address'
+  } else if (txn.type === TxnTypes.SMART_CONTRACT) {
+    path = 'data.from.address'
   } else {
     path = 'data.inputs[0].address';
   }
@@ -50,6 +52,8 @@ export function to(txn, trunc = null, address = null) {
       return split.Address === address;
     })
     path = 'data.splits[0].Address';
+  } else if (txn.type === TxnTypes.SMART_CONTRACT) {
+    path = 'data.to.address'
   } else {
     const outputs = _.get(txn, 'data.outputs');
     isSelf = outputs.some(output => {
