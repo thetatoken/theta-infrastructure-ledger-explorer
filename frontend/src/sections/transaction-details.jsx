@@ -349,13 +349,13 @@ const DepositStake = ({ transaction, price }) => {
 }
 
 const SmartContract = ({ transaction }) => {
-  let { data } = transaction;
+  let { data, receipt} = transaction;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
         <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
-
+        {receipt && <DetailsRow label="Contract Address" data={<Address hash={_.get(receipt, 'ContractAddress')} />} />}
         <DetailsRow label="Gas Limit" data={data.gas_limit} />
         <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
         <DetailsRow label="Data" data={getHex(data.data)} />

@@ -169,6 +169,7 @@ exports.Execute = async function (network_id) {
                     data: txs[j].raw,
                     block_height: blockInfo.height,
                     timestamp: blockInfo.timestamp,
+                    receipt: txs[j].receipt,
                     status: 'finalized'
                   }
                   const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);

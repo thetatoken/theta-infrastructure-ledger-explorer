@@ -130,8 +130,8 @@ export default class AccountDetails extends Component {
             loading_txns: false,
           })
         } else {
-          this.setState({ hasOtherTxs: false })
           this.handleToggleHideTxn();
+          this.setState({ hasOtherTxs: false })
         }
 
       })
@@ -175,14 +175,18 @@ export default class AccountDetails extends Component {
   }
 
   handleToggleHideTxn = () => {
-    let { accountAddress } = this.props.params;
-    let includeService = !this.state.includeService;
-    this.setState({
-      includeService,
-      currentPage: 1,
-      totalPages: null,
-    });
-    this.getTransactionsByAddress(accountAddress, includeService, 1);
+    if (this.state.hasOtherTxs) {
+      let { accountAddress } = this.props.params;
+      let includeService = !this.state.includeService;
+      this.setState({
+        includeService,
+        currentPage: 1,
+        totalPages: null,
+      });
+      this.getTransactionsByAddress(accountAddress, includeService, 1);
+    } else {
+      this.setState({ loading_txns: false });
+    }
   }
 
   downloadTrasanctionHistory() {
