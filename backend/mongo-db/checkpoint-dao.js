@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //  DAO for check point
-//  Require index: `db.checkpoint.createIndex({height:-1})`
+//  Require index: `db.checkpoint.createIndex({hash:-1})`
 //------------------------------------------------------------------------------
 
 module.exports = class checkpointDAO {
@@ -14,8 +14,8 @@ module.exports = class checkpointDAO {
     this.client.insert(this.checkpointInfoCollection, checkpointInfo, callback);
   }
 
-  getCheckpointByHeight(height, callback) {
-    const queryObject = { 'height': height };
+  getCheckpointByHash(hash, callback) {
+    const queryObject = { 'hash': hash };
     this.client.findOne(this.checkpointInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - ', error, height);

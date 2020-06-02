@@ -51,7 +51,7 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
       .then(async blockInfo => {
         if (blockInfo.height % 100 === 1 && blockInfo.guardian_votes) {
           try {
-            let checkpoint = await checkpointDao.getCheckpointByHeightAsync(blockInfo.height);
+            let checkpoint = await checkpointDao.getCheckpointByHashAsync(blockInfo.hash);
             let voted = new BigNumber(0), deposited = new BigNumber(0), j = 0;
             for (let i = 0; i < checkpoint.guardians.length; i++) {
               let skip = true;
