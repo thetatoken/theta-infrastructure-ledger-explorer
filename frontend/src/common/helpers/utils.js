@@ -21,8 +21,8 @@ export function formatCurrency(num, length = 2) {
   return '$' + num.toFixed(length).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
-export function formatCoin(weiAmount) {
-  return new BigNumber(weiAmount).dividedBy(WEI).decimalPlaces(4).toFormat({
+export function formatCoin(weiAmount, length = 4) {
+  return new BigNumber(weiAmount).dividedBy(WEI).decimalPlaces(length).toFormat({
     decimalSeparator: '.',
     groupSeparator: ',',
     groupSize: 3,
