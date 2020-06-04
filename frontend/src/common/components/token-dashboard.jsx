@@ -12,7 +12,7 @@ import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
-const totalSupply = 1000000000;
+const totalSupply = 870502690;
 export default class TokenDashboard extends Component {
   constructor(props) {
     super(props);
