@@ -29,6 +29,9 @@
       position: absolute;
       left: calc(50% - 44px)
     }
+    .switch{
+      @include breakpoint('phablet', max) { display: none; }
+    }
     .btn.tx {
       font-size: .875rem;
       font-weight: $weight-semi;

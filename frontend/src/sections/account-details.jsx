@@ -260,12 +260,15 @@ export default class AccountDetails extends Component {
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
-                <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                <div className="switch">
+                  <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                  <label className="theta-switch">
+                    <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
+                    <span className="theta-slider"></span>
+                  </label>
+                </div>
               }
-              <label className="theta-switch">
-                <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
-                <span className="theta-slider"></span>
-              </label>
+
             </div>
             <div>
               {loading_txns &&
