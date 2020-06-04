@@ -46,6 +46,16 @@
       margin-right: 1rem;
     }
   }
-
+  @include breakpoint('phablet', max) {
+    .block-txn {
+      .txn-type{
+        &:before{ display: none }
+        font-size: 0.675rem;
+      }
+      .hash{
+        font-size: 0.675rem;
+      }
+    }
+  }
 
 }
