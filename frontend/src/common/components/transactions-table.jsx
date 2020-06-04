@@ -104,8 +104,7 @@ export default class TransactionTable extends Component {
 }
 
 const Value = ({ coins, price }) => {
-  const isMobile = window.screen.width < 560;
-  console.log(isMobile, window.screen.width)
+  const isMobile = window.screen.width <= 560;
   return (
     <React.Fragment>
       <div className="currency theta">

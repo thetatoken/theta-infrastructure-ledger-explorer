@@ -74,4 +74,36 @@
       }
     }
   }
+  @include breakpoint('phablet', max) {
+    margin: 0 5%;
+    flex-wrap: wrap;
+    &.theta{
+      .column{
+        width: 40%
+      }
+      >:first-child{
+        width: 10%
+      }
+      >:nth-child(4){
+        margin-left: 10% 
+      }
+      >:last-child{
+        width: 40% !important;
+      }
+    }
+    &.tfuel{
+      .column{
+        width: 40%
+      }
+      >:first-child{
+        width: 10%
+      }
+      >:nth-child(4){
+        margin-left: 10% 
+      }
+      >:last-child{
+        display: none
+      }
+    }
+  }
 }
