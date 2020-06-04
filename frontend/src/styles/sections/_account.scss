@@ -21,6 +21,9 @@
       left: 0;
       color: $color-font-light;
       cursor: pointer;
+      @include breakpoint('phablet', max) {
+        @include hideColumn();
+      }
     }
     .title{
       position: absolute;
@@ -69,6 +72,12 @@
   .currency{
     width: 50%;
     display: flex;
+  }
+  @include breakpoint('phablet', max) {
+    flex-direction: column;
+    .currency{
+      width: 100%;
+    }
   }
 }
 .price{

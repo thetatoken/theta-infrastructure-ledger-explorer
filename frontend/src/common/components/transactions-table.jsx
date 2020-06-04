@@ -104,15 +104,19 @@ export default class TransactionTable extends Component {
 }
 
 const Value = ({ coins, price }) => {
+  const isMobile = window.screen.width < 560;
+  console.log(isMobile, window.screen.width)
   return (
     <React.Fragment>
       <div className="currency theta">
-        {formatCoin(coins.thetawei)} Theta
-        <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>
+        {formatCoin(coins.thetawei)} 
+        {!isMobile && "Theta"}
+        {!isMobile && <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>}
       </div>
       <div className="currency tfuel">
-        {formatCoin(coins.tfuelwei)} TFuel
-        <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>
+        {formatCoin(coins.tfuelwei)} 
+        {!isMobile && "TFuel"}
+        {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>
     </React.Fragment>)
 }

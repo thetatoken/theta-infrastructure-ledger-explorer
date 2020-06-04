@@ -68,6 +68,14 @@ table.data.txn-table {
       background-size: contain;
     }
   }
+
+  tr .value{
+    @include breakpoint('phablet', max) {
+      .currency:before{
+        top: 0
+      }
+    }
+  }
   tr .to.icon:before { background-image: url('/images/icons/stake-in@2x.png'); }
 
   tr .from.icon:before { background-image: url('/images/icons/stake-out@2x.png'); }
@@ -91,6 +99,8 @@ table.data.txn-table {
   }
   @include breakpoint('tablet-wide', max) {
     tr .to { @include hideColumn(); }
+    tr .from { @include hideColumn(); }
+    tr .icon { @include hideColumn(); }
     tr .type { width: 150px; }
   }
   @include breakpoint('phablet', max) {
@@ -98,7 +108,6 @@ table.data.txn-table {
     tr .type { 
       white-space: normal; 
       width: 110px; }
-    tr .from { @include hideColumn(); }
   }
   @include breakpoint('phone-wide', max) {
     
