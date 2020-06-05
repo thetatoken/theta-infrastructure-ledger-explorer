@@ -208,8 +208,7 @@ const Amount = ({ coins, price }) => {
 }
 
 const Address = ({ hash, truncate = null }) => {
-  hash = truncate ? _.truncate(hash, { length: truncate }) : hash
-  return (<Link to={`/account/${hash}`}>{hash}</Link>)
+  return (<Link to={`/account/${hash}`}>{truncate ? _.truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
 const Fee = ({ transaction }) => {
