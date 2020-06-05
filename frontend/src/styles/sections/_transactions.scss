@@ -49,8 +49,16 @@
       overflow-x: hidden;
       text-overflow: ellipsis;
     }
-
-
+    .currency{
+      @include breakpoint('phablet', max) { 
+        flex-wrap: wrap;
+      }
+      @include breakpoint('phone-small', max) { 
+        &:before{
+          display: none;
+        }
+      }
+    }
   }
 
   

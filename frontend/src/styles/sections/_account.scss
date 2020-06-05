@@ -80,6 +80,8 @@
     flex-direction: column;
     .currency{
       width: 100%;
+      display: flex;
+      flex-wrap: wrap;
     }
   }
 }
