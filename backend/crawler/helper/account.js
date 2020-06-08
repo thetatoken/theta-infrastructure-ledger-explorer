@@ -20,6 +20,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
       case 6:
         counter += tx.data.splits ? tx.data.splits.length + 1 : 1;
         break;
+      case 7:
+        counter = counter + 3;
       case 8:
       case 9:
       case 10:
@@ -80,6 +82,9 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
         // Update to account
         await _updateAccountByAddress(tx.data.to.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+
+        // Update smart contract account
+        await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao);
       case 8:
       case 9:
       case 10:
@@ -122,7 +127,8 @@ async function _updateAccountByAddress(address, accountDao, type) {
           'balance': tmp.result.coins,
           'sequence': tmp.result.sequence,
           'reserved_funds': tmp.result.reserved_funds,
-          'txs_counter': txs_counter
+          'txs_counter': txs_counter,
+          'code': tmp.result.code
         });
       } else {
         return;
