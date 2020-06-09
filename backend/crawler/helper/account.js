@@ -1,7 +1,7 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
 
-exports.updateAccount = async function (accountDao, accountTxDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, transactionList) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -85,6 +85,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
 
         // Update smart contract account
         await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao);
+        _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
       case 8:
       case 9:
       case 10:
@@ -150,5 +151,14 @@ function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
     hash,
     type,
     'ts': timestamp
+  });
+}
+
+function _createSmartContract(address, bytecode, smartContractDao) {
+  smartContractDao.upsertSmartContractAsync({
+    'address': address,
+    'bytecode': bytecode,
+    'api': '',
+    'source_code': ''
   });
 }
