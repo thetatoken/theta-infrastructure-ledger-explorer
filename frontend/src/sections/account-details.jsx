@@ -17,6 +17,7 @@ import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 const NUM_TRANSACTIONS = 20;
 
@@ -282,6 +283,29 @@ export default class AccountDetails extends Component {
               totalPages={totalPages}
               onPageChange={this.handlePageChange}
               disabled={loading_txns} />
+          </React.Fragment>}
+        {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
+          <React.Fragment>
+            <div className='actions'>
+              <div className="title">Contract</div>
+            </div>
+            <Tabs className="theta-tabs">
+              <TabList>
+                <Tab>Code</Tab>
+                <Tab>Read Contract</Tab>
+                <Tab disabled>Write Contract</Tab>
+              </TabList>
+
+              <TabPanel>
+                <h2>Code</h2>
+              </TabPanel>
+              <TabPanel>
+                <h2>Read Contract</h2>
+              </TabPanel>
+              <TabPanel>
+                <h2>Write Contract</h2>
+              </TabPanel>
+            </Tabs>
           </React.Fragment>}
       </div>);
   }

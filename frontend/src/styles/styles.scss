@@ -25,6 +25,7 @@
 @import 'components/json-view';
 @import 'components/stakes-table';
 @import 'components/chart';
+@import 'components/tabs';
 
 // SECTIONS 
 @import 'sections/home';
@@ -32,3 +33,5 @@
 @import 'sections/account';
 @import 'sections/blocks';
 @import 'sections/stakes';
+
+@import '../../node_modules/react-tabs/style/react-tabs.scss';

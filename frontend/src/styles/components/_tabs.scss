@@ -1,0 +1,19 @@
+.theta-tabs {
+  .react-tabs{
+    &__tab{
+      border-bottom: 1px solid transparent;
+      color: $color-font-light;
+    }
+
+    &__tab-list{
+      border-bottom: none;
+    }
+
+    &__tab--selected{
+      background: $color-panel;
+      color: $color-white;
+      border-radius: 5px;
+      border-color: $color-panel;
+    }
+  }
+}
