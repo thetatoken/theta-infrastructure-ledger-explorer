@@ -14,7 +14,7 @@ module.exports = class smartContractDAO {
     const newObject = {
       'address': smartContractInfo.address,
       'bytecode': smartContractInfo.bytecode,
-      'api': smartContractInfo.api,
+      'abi': smartContractInfo.abi,
       'source_code': smartContractInfo.source_code
     }
     const queryObject = { '_id': smartContractInfo.address };
