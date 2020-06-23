@@ -17,10 +17,10 @@ module.exports = class stakeDAO {
   getAllStakes(callback) {
     this.client.findAll(this.stakeInfoCollection, function (error, recordList) {
       if (error) {
-        console.log('ERR - ', error, height);
+        console.log('ERR - ', error);
         // callback(error);
       } else if (!recordList) {
-        callback(Error('NOT_FOUND - ' + height));
+        callback(Error('NOT_FOUND - All Stakes'));
       } else {
         callback(error, recordList)
       }
@@ -35,13 +35,13 @@ module.exports = class stakeDAO {
     const self = this;
     this.client.query(this.stakeInfoCollection, queryHolder, function (error, record) {
       if (error) {
-        console.log('ERR - ', error, height);
+        console.log('ERR - ', error, address);
       } else if (record) {
         holderRecords = record;
       }
       self.client.query(self.stakeInfoCollection, querySource, function (error, record) {
         if (error) {
-          console.log('ERR - ', error, height);
+          console.log('ERR - ', error, address);
         } else if (record) {
           sourceRecords = record;
         }
@@ -55,7 +55,7 @@ module.exports = class stakeDAO {
     const queryObject = { 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, function (err, res) {
       if (err) {
-        console.log('ERR - ', err, height);
+        console.log('ERR - Remove Type', err, type);
         callback(err);
       }
       callback(err, res);
