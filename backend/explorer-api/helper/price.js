@@ -39,6 +39,6 @@ exports.updatePrice = function (priceDao, config) {
     return res;
   }).catch((err) => {
     console.log('API call error:', err.message);
-    return res;
+    return err;
   });
 }
