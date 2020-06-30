@@ -298,6 +298,8 @@ export default class AccountDetails extends Component {
 
               <TabPanel>
                 <h2>Code</h2>
+                <textarea className='code-area' placeholder="Enter your code here.">
+                </textarea>
               </TabPanel>
               <TabPanel>
                 <h2>Read Contract</h2>
