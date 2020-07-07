@@ -1,82 +1,15 @@
 .stake-container{
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 48px;
 }
 
 .stakes{
-    width: 100%;
-    text-align: center;
-    .node-type{
-        color: $color-font-light;
-        width: 112px;
-    }
-    &.half{
-        width: 45%;
-    }
-    .title{
-        display: inline-block;
-        margin-bottom: 38px;
-        font-family: $font-title;
-        font-weight: $weight-bold;
-        font-size: 1.0rem;
-        letter-spacing: 1.5px;
-    }
-    .staked-prct{
-        text-align: right;
-    }
-    .arrow-container{
-        cursor: pointer;
-        color: $color-theta-blue-light;
-        padding: 0;
-        text-align: center;
-        i {
-            border: solid $color-font-light;
-            border-width: 0 2px 2px 0;
-            display: inline-block;
-            padding: 3px;
-            margin: 0 5px;
-        }
-
-        .up {
-            transform: rotate(-135deg);
-            -webkit-transform: rotate(-135deg);
-        }
-
-        .down {
-            transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
-        }
-    }
-    .total{
-        width: 100%;
-        display: flex;
-        flex-direction: row-reverse;
-        color: $color-font-light;
-        font-size: .875rem;
-        padding: .75rem;
-    }
-    .empty{
-        height: 0px;
-        padding: 0;
-    }
-}
-.stake-tb .token .currency{
-    float: right;
-    &.left{
-        float: left;
-    }
-}
-.stake-tb tr:last-child{
-    background-color: transparent !important;
-    border-top: 3px solid $color-table-row-line;
-    td.token{
-        color: $color-white;
-        font-size: 16px;
-    }
-}
-
-td.node-type {
+  width: 100%;
+  text-align: center;
+  .node-type{
+    color: $color-font-light;
+    width: 112px;
     &:before {
       content: '';
       display: inline-block;
@@ -88,8 +21,91 @@ td.node-type {
       background-position: center center;
       background-repeat: no-repeat;
       background-size: contain;
-    }  
+    } 
   }
+  &.half{
+    width: 45%;
+  }
+  .title{
+    display: inline-block;
+    margin-bottom: 38px;
+    font-family: $font-title;
+    font-weight: $weight-bold;
+    font-size: 1.0rem;
+    letter-spacing: 1.5px;
+  }
+  .staked-prct{
+    text-align: right !important;
+  }
+  .arrow-container{
+    cursor: pointer;
+    color: $color-theta-blue-light;
+    padding: 0;
+    text-align: center !important;
+    i {
+      border: solid $color-font-light;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      margin: 0 5px;
+    }
+
+    .up {
+      transform: rotate(-135deg);
+      -webkit-transform: rotate(-135deg);
+    }
+
+    .down {
+      transform: rotate(45deg);
+      -webkit-transform: rotate(45deg);
+    }
+  }
+  .total{
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    color: $color-font-light;
+    font-size: .875rem;
+    padding: .75rem;
+  }
+  .empty{
+    height: 0px;
+    padding: 0;
+  }
+  @include breakpoint('tablet-wide', max) { 
+    .node-type{
+      width: auto;
+      &:before{ display: none; }
+    }
+  }
+  @include breakpoint('phablet', max) { 
+    .half{ 
+      width: 100%; 
+      margin: 30px 3px 0 3px;
+    }
+    .staked{ width: 105px; }
+  }
+  @include breakpoint('phone-small', max) { 
+    .node-type{ width: 65px;}
+  }
+}
+.stake-tb .token .currency{
+  float: right;
+  &.left{
+    float: left;
+  }
+  @include breakpoint('phablet', max) { 
+    &:before { top: 0 } 
+  }
+}
+.stake-tb tr:last-child{
+  background-color: transparent !important;
+  border-top: 3px solid $color-table-row-line;
+  td.token{
+    color: $color-white;
+    font-size: 16px;
+  }
+}
     
-  .node-type.vcp:before { background-image: url('/images/icons/icon_validator-node@2x.png'); }
-  .node-type.gcp:before { background-image: url('/images/icons/icon_guardian-node@2x.png'); }
+.node-type.vcp:before { background-image: url('/images/icons/icon_validator-node@2x.png'); }
+.node-type.gcp:before { background-image: url('/images/icons/icon_guardian-node@2x.png'); }

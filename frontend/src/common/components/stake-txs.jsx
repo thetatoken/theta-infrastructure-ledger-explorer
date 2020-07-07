@@ -21,7 +21,7 @@ export default class StakeTxsTable extends Component {
   }
   static defaultProps = {
     includeDetails: true,
-    truncate: 35,
+    truncate: window.screen.width <= 560 ? 10 : 35,
   }
   componentWillUpdate(nextProps){
     if(nextProps.txs !== this.props.txs){
@@ -64,7 +64,7 @@ export default class StakeTxsTable extends Component {
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
-                  {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} Theta</div></td>}
+                  {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : 'Theta'}</div></td>}
                 </tr>);
             })}
             {txs.length > TRUNC &&

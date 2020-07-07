@@ -21,10 +21,16 @@
       left: 0;
       color: $color-font-light;
       cursor: pointer;
+      @include breakpoint('phablet', max) {
+        @include hideColumn();
+      }
     }
     .title{
       position: absolute;
       left: calc(50% - 44px)
+    }
+    .switch{
+      @include breakpoint('phablet', max) { display: none; }
     }
     .btn.tx {
       font-size: .875rem;
@@ -69,6 +75,14 @@
   .currency{
     width: 50%;
     display: flex;
+  }
+  @include breakpoint('phablet', max) {
+    flex-direction: column;
+    .currency{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 .price{

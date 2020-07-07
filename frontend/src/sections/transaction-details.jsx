@@ -207,8 +207,8 @@ const Amount = ({ coins, price }) => {
     </React.Fragment>)
 }
 
-const Address = ({ hash }) => {
-  return (<Link to={`/account/${hash}`}>{hash}</Link>)
+const Address = ({ hash, truncate = null }) => {
+  return (<Link to={`/account/${hash}`}>{truncate ? _.truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
 const Fee = ({ transaction }) => {
@@ -216,12 +216,15 @@ const Fee = ({ transaction }) => {
 }
 
 const CoinbaseOutput = ({ output, price }) => {
+  const isPhone = window.screen.width <= 560;
+  const isSmallPhone = window.screen.width <= 320;
+  const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
   return (
     <div className="coinbase-output">
       <div>
         <Amount coins={output.coins} price={price} />
       </div>
-      <Address hash={output.address} />
+      <Address hash={output.address} truncate={truncate} />
     </div>);
 }
 

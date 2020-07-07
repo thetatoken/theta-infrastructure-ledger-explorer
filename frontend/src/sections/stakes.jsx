@@ -83,6 +83,8 @@ export default class Blocks extends Component {
 
   render() {
     const { holders, percentage, sortedStakesByHolder, sortedStakesBySource, totalStaked } = this.state;
+    let isTablet = window.screen.width <= 768;
+    const truncate = isTablet ? 10 : 20;
     return (
       <div className="content stakes">
         <div className="page-title stakes">TOTAL STAKED</div>
@@ -91,8 +93,8 @@ export default class Blocks extends Component {
         </div>
         <div className="legend">THETA NODES</div>
         <div className="table-container">
-          <StakesTable type='wallet' stakes={sortedStakesBySource} totalStaked={totalStaked} truncate={20} />
-          <StakesTable type='node' stakes={sortedStakesByHolder} totalStaked={totalStaked} truncate={20} />
+          <StakesTable type='wallet' stakes={sortedStakesBySource} totalStaked={totalStaked} truncate={truncate} />
+          <StakesTable type='node' stakes={sortedStakesByHolder} totalStaked={totalStaked} truncate={truncate} />
         </div>
       </div>
     );
