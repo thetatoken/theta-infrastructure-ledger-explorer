@@ -60,15 +60,18 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/history/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
-    const type = 2;
+    const types = [0, 2];
     const isEqualType = 'true';
 
-    accountDao.getAccountByPkAsync(address)
-      .then(accountInfo => {
-        totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
-        let page = 0;
-        return accountTxDao.getListAsync(address, type, isEqualType, page, totalNumber, false);
-      })
+    // accountDao.getAccountByPkAsync(address)
+    //   .then(accountInfo => {
+    //     totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
+    //     let page = 0;
+    //     return accountTxDao.getListAsync(address, type, isEqualType, page, totalNumber, false);
+    //   })
+    const endTime = Math.ceil(Date.now() / 1000).toString();
+    const startTime = (endTime - 60 * 60 * 24 * 14).toString();
+    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, types)
       .then(async txList => {
         let txHashes = [];
         let txs = [];
@@ -84,23 +87,37 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             'tx_hash': tx.hash,
             'timestamp': `"${new Date(tx.timestamp * 1000).toUTCString()}"`
           }
-          if (data.inputs[0].address === address) {
-            obj.tx_type = 'Send';
-            obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
-            obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
-            obj.from = address;
-            let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
-            obj.to = to.substring(0, to.length - 2)
-          } else {
-            data.outputs.forEach(output => {
-              if (output.address === address) {
-                obj.tx_type = 'Receive';
-                obj.theta_amount = helper.formatCoin(output.coins.thetawei);
-                obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
-                obj.from = data.inputs[0].address;
-                obj.to = address;
-              }
-            })
+          if (tx.type === 2) {
+            if (data.inputs[0].address === address) {
+              obj.tx_type = 'Send';
+              obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
+              obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
+              obj.from = address;
+              let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
+              obj.to = to.substring(0, to.length - 2)
+            } else {
+              data.outputs.forEach(output => {
+                if (output.address === address) {
+                  obj.tx_type = 'Receive';
+                  obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                  obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                  obj.from = data.inputs[0].address;
+                  obj.to = address;
+                }
+              })
+            }
+          } else if (tx.type === 0) {
+            if (data.proposer.address !== address) {
+              data.outputs.forEach(output => {
+                if (output.address === address) {
+                  obj.tx_type = 'Receive';
+                  obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                  obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                  obj.from = '0x00000';
+                  obj.to = address;
+                }
+              })
+            }
           }
           return obj;
         })
@@ -222,6 +239,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
+    const gap = 60 * 60 * 24 * 14;
+    if (endTime - startTime > gap) {
+      startTime = (endTime - gap).toString();
+    }
     accountTxDao.getListByTimeAsync(address, startTime, endTime, null)
       .then(async txList => {
         let txHashes = [];
@@ -342,6 +363,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
+    const gap = 60 * 60 * 24 * 14;
+    if (endTime - startTime > gap) {
+      startTime = (endTime - gap).toString();
+    }
     accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, null)
       .then(async infoList => {
         if (infoList) {

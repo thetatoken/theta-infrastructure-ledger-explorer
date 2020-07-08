@@ -161,7 +161,7 @@ export default class AccountDetails extends Component {
           default:
             break;
         }
-        this.setState({ loading_acct: false, hasTransferTx: res.data.body.txs_counter[2] !== undefined });
+        this.setState({ loading_acct: false, hasTransferTx: (res.data.body.txs_counter[0] || res.data.body.txs_counter[2]) !== undefined });
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
