@@ -71,7 +71,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     //   })
     const endTime = Math.ceil(Date.now() / 1000).toString();
     const startTime = (endTime - 60 * 60 * 24 * 14).toString();
-    accountTxDao.getInfoListByTimeAsync(address, startTime, endTime, types)
+    accountTxDao.getListByTimeAsync(address, startTime, endTime, types)
       .then(async txList => {
         let txHashes = [];
         let txs = [];
