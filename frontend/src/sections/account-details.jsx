@@ -36,7 +36,8 @@ export default class AccountDetails extends Component {
       hasTransferTx: false,
       hasStartDateErr: false,
       hasEndDateErr: false,
-      price: { 'Theta': 0, 'TFuel': 0 }
+      price: { 'Theta': 0, 'TFuel': 0 },
+      isDownloading: false,
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -201,6 +202,7 @@ export default class AccountDetails extends Component {
       this.setState({ hasStartDateErr, hasEndDateErr })
       return
     }
+    this.setState({ isDownloading: true })
     accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
         if (res.status === 200) {
@@ -233,6 +235,7 @@ export default class AccountDetails extends Component {
           this.download.current.download = 'transactions.csv';
           this.download.current.href = url;
           this.download.current.click();
+          this.setState({ isDownloading: false })
         }
       });
   }
@@ -270,7 +273,7 @@ export default class AccountDetails extends Component {
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs,
-      price, hasStartDateErr, hasEndDateErr } = this.state;
+      price, hasStartDateErr, hasEndDateErr, isDownloading } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -315,8 +318,9 @@ export default class AccountDetails extends Component {
                 </div>
                 <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
                 <div className="popup-row buttons">
-                  <div className="popup-reset" onClick={this.resetInput}>Reset</div>
-                  <div className="popup-download export" onClick={this.downloadTrasanctionHistory}>Download</div>
+                  <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
+                  <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
+                  <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
                 </div>
               </Popup>}
               <a ref={this.download}></a>
