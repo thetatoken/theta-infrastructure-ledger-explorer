@@ -34,6 +34,8 @@ export default class AccountDetails extends Component {
       hasOtherTxs: true,
       hasStakes: false,
       hasTransferTx: false,
+      hasStartDateErr: false,
+      hasEndDateErr: false,
       price: { 'Theta': 0, 'TFuel': 0 }
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
@@ -191,7 +193,14 @@ export default class AccountDetails extends Component {
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.params;
     const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
-    const endDate = (new Date(this.endDate.value).getTime()/ 1000).toString();
+    const endDate = (new Date(this.endDate.value).getTime() / 1000).toString();
+    let hasStartDateErr = false, hasEndDateErr = false;
+    if (this.startDate.value === '' || this.endDate.value === '') {
+      if (this.startDate.value === '') hasStartDateErr = true;
+      if (this.endDate.value === '') hasEndDateErr = true;
+      this.setState({ hasStartDateErr, hasEndDateErr })
+      return
+    }
     accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
         if (res.status === 200) {
@@ -239,6 +248,8 @@ export default class AccountDetails extends Component {
       this.startDate.max = this.endDate.value;
       this.startDate.min = this.getDate(date);
     }
+    if (type === 'start' && !this.hasStartDateErr) this.setState({ hasStartDateErr: false })
+    if (type === 'end' && !this.hasEndDateErr) this.setState({ hasEndDateErr: false })
   }
   getDate(date) {
     let year = date.getFullYear();
@@ -258,7 +269,8 @@ export default class AccountDetails extends Component {
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs, price } = this.state;
+      includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs,
+      price, hasStartDateErr, hasEndDateErr } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -293,13 +305,15 @@ export default class AccountDetails extends Component {
               {hasTransferTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
                 <div className="popup-row header">Choose the time period. Must within 7 days.</div>
                 <div className="popup-row">
-                  <div className="popup-label">Start Time:</div>
+                  <div className="popup-label">Start Date:</div>
                   <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')}></input>
                 </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
                 <div className="popup-row">
-                  <div className="popup-label">End Time: </div>
+                  <div className="popup-label">End Date: </div>
                   <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')}></input>
                 </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
                 <div className="popup-row buttons">
                   <div className="popup-reset" onClick={this.resetInput}>Reset</div>
                   <div className="popup-download export" onClick={this.downloadTrasanctionHistory}>Download</div>

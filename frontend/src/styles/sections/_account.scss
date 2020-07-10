@@ -28,6 +28,13 @@
           color: $color-white;
           font-weight: bold;
         }
+        &.err-msg{
+          color: $color-red;
+          padding-left: 30%;
+          &.disable{
+            display: none;
+          }
+        }
         &.buttons{
           display: flex;
           justify-content: space-around;
