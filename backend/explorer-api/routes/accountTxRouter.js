@@ -60,17 +60,12 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/history/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
+    let { startDate, endDate } = req.query;
     const types = [0, 2];
-    const isEqualType = 'true';
-
-    // accountDao.getAccountByPkAsync(address)
-    //   .then(accountInfo => {
-    //     totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
-    //     let page = 0;
-    //     return accountTxDao.getListAsync(address, type, isEqualType, page, totalNumber, false);
-    //   })
-    const endTime = Math.ceil(Date.now() / 1000).toString();
-    const startTime = (endTime - 60 * 60 * 24 * 14).toString();
+    const gap = 60 * 60 * 24 * 8;
+    if (endDate - startDate > gap) {
+      startDate = (endDate - gap).toString();
+    }
     accountTxDao.getListByTimeAsync(address, startTime, endTime, types)
       .then(async txList => {
         let txHashes = [];
