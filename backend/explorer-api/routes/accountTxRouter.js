@@ -66,7 +66,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
     }
-    accountTxDao.getListByTimeAsync(address, startTime, endTime, types)
+    accountTxDao.getListByTimeAsync(address, startDate, endDate, types)
       .then(async txList => {
         let txHashes = [];
         let txs = [];

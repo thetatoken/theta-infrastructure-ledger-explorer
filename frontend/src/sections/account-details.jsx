@@ -190,8 +190,8 @@ export default class AccountDetails extends Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.params;
-    const startDate = (this.startDate.value / 1000).toString();
-    const endDate = (this.endDate.value / 1000).toString();
+    const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
+    const endDate = (new Date(this.endDate.value).getTime()/ 1000).toString();
     accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
         if (res.status === 200) {
@@ -302,7 +302,7 @@ export default class AccountDetails extends Component {
                 </div>
                 <div className="popup-row buttons">
                   <div className="popup-reset" onClick={this.resetInput}>Reset</div>
-                  <div className="popup-download export">Download</div>
+                  <div className="popup-download export" onClick={this.downloadTrasanctionHistory}>Download</div>
                 </div>
               </Popup>}
               <a ref={this.download}></a>
