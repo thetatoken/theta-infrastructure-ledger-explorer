@@ -1,9 +1,8 @@
 import React, { Component } from "react";
+import Popup from "reactjs-popup";
 import { Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
-
-
 
 import { formatCoin, priceCoin, getTheta } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
@@ -39,6 +38,10 @@ export default class AccountDetails extends Component {
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
+    this.startDate = React.createRef();
+    this.endDate = React.createRef();
+    this.handleInput = this.handleInput.bind(this);
+    this.resetInput = this.resetInput.bind(this);
   }
   getEmptyAccount(address) {
     return {
@@ -187,7 +190,9 @@ export default class AccountDetails extends Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.params;
-    accountService.getTransactionHistory(accountAddress)
+    const startDate = (this.startDate.value / 1000).toString();
+    const endDate = (this.endDate.value / 1000).toString();
+    accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
         if (res.status === 200) {
           function convertToCSV(objArray) {
@@ -221,6 +226,35 @@ export default class AccountDetails extends Component {
           this.download.current.click();
         }
       });
+  }
+  handleInput(type) {
+    if (type === 'start' && this.endDate.value == '') {
+      let date = new Date(this.startDate.value)
+      date.setDate(date.getDate() + 7);
+      this.endDate.min = this.startDate.value;
+      this.endDate.max = this.getDate(date);
+    } else if (type === 'end' && this.startDate.value == '') {
+      let date = new Date(this.endDate.value)
+      date.setDate(date.getDate() - 7);
+      this.startDate.max = this.endDate.value;
+      this.startDate.min = this.getDate(date);
+    }
+  }
+  getDate(date) {
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate() + 1;
+    if (month < 10) month = '0' + month;
+    if (day < 10) month = '0' + day
+    return year + '-' + month + '-' + day;
+  }
+  resetInput() {
+    this.startDate.value = '';
+    this.startDate.max = '';
+    this.startDate.min = '';
+    this.endDate.value = '';
+    this.endDate.max = '';
+    this.endDate.min = '';
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
@@ -256,7 +290,21 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
-              {hasTransferTx && <div className="download btn tx export" onClick={this.downloadTrasanctionHistory}>Export Transaction History (CSV)</div>}
+              {hasTransferTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
+                <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                <div className="popup-row">
+                  <div className="popup-label">Start Time:</div>
+                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')}></input>
+                </div>
+                <div className="popup-row">
+                  <div className="popup-label">End Time: </div>
+                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')}></input>
+                </div>
+                <div className="popup-row buttons">
+                  <div className="popup-reset" onClick={this.resetInput}>Reset</div>
+                  <div className="popup-download export">Download</div>
+                </div>
+              </Popup>}
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
