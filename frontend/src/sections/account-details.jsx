@@ -18,7 +18,7 @@ import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 
 const NUM_TRANSACTIONS = 20;
-
+const today = new Date().toISOString().split("T")[0];
 export default class AccountDetails extends Component {
   constructor(props) {
     super(props);
@@ -240,12 +240,13 @@ export default class AccountDetails extends Component {
       });
   }
   handleInput(type) {
-    if (type === 'start' && this.endDate.value == '') {
+    if (type === 'start') {
       let date = new Date(this.startDate.value)
       date.setDate(date.getDate() + 7);
       this.endDate.min = this.startDate.value;
-      this.endDate.max = this.getDate(date);
-    } else if (type === 'end' && this.startDate.value == '') {
+      let newDate = this.getDate(date);
+      this.endDate.max = newDate < today ? newDate : today;
+    } else if (type === 'end') {
       let date = new Date(this.endDate.value)
       date.setDate(date.getDate() - 7);
       this.startDate.max = this.endDate.value;
@@ -255,19 +256,23 @@ export default class AccountDetails extends Component {
     if (type === 'end' && !this.hasEndDateErr) this.setState({ hasEndDateErr: false })
   }
   getDate(date) {
+    console.log('get date:', date)
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
-    let day = date.getDate() + 1;
+    let day = date.getDate();
+    console.log(year, month, day)
+
     if (month < 10) month = '0' + month;
-    if (day < 10) month = '0' + day
+    if (day < 10) day = '0' + day;
+    console.log(year, month, day);
     return year + '-' + month + '-' + day;
   }
   resetInput() {
     this.startDate.value = '';
-    this.startDate.max = '';
+    this.startDate.max = today;
     this.startDate.min = '';
     this.endDate.value = '';
-    this.endDate.max = '';
+    this.endDate.max = today;
     this.endDate.min = '';
   }
   render() {
@@ -309,12 +314,12 @@ export default class AccountDetails extends Component {
                 <div className="popup-row header">Choose the time period. Must within 7 days.</div>
                 <div className="popup-row">
                   <div className="popup-label">Start Date:</div>
-                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')}></input>
+                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
                 </div>
                 <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
                 <div className="popup-row">
                   <div className="popup-label">End Date: </div>
-                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')}></input>
+                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
                 </div>
                 <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
                 <div className="popup-row buttons">
