@@ -41,7 +41,7 @@ module.exports = class AccountTxDAO {
     } else {
       queryObject = { acct: address, type: { $in: types }, ts: { $gte: startTime, $lte: endTime } };
     }
-    this.client.getRecords(this.collection, queryObject, {}, 0, 10000, callback);
+    this.client.getRecords(this.collection, queryObject, {}, 0, 5000, callback);
   }
 
   getTxHashes(address, startTime, endTime, type, callback) {

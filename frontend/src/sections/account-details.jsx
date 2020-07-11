@@ -256,15 +256,11 @@ export default class AccountDetails extends Component {
     if (type === 'end' && !this.hasEndDateErr) this.setState({ hasEndDateErr: false })
   }
   getDate(date) {
-    console.log('get date:', date)
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
     let day = date.getDate();
-    console.log(year, month, day)
-
     if (month < 10) month = '0' + month;
     if (day < 10) day = '0' + day;
-    console.log(year, month, day);
     return year + '-' + month + '-' + day;
   }
   resetInput() {
