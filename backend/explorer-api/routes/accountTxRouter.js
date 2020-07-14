@@ -61,7 +61,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
   router.get("/accountTx/history/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     let { startDate, endDate } = req.query;
-    const types = [0, 2];
+    const types = [0, 2, 5];
     const gap = 60 * 60 * 24 * 8;
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
@@ -82,37 +82,57 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
             'tx_hash': tx.hash,
             'timestamp': `"${new Date(tx.timestamp * 1000).toUTCString()}"`
           }
-          if (tx.type === 2) {
-            if (data.inputs[0].address === address) {
-              obj.tx_type = 'Send';
-              obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
-              obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
-              obj.from = address;
-              let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
-              obj.to = to.substring(0, to.length - 2)
-            } else {
-              data.outputs.forEach(output => {
-                if (output.address === address) {
-                  obj.tx_type = 'Receive';
-                  obj.theta_amount = helper.formatCoin(output.coins.thetawei);
-                  obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
-                  obj.from = data.inputs[0].address;
-                  obj.to = address;
-                }
-              })
-            }
-          } else if (tx.type === 0) {
-            if (data.proposer.address !== address) {
-              data.outputs.forEach(output => {
-                if (output.address === address) {
-                  obj.tx_type = 'Receive';
-                  obj.theta_amount = helper.formatCoin(output.coins.thetawei);
-                  obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
-                  obj.from = '0x00000';
-                  obj.to = address;
-                }
-              })
-            }
+          switch (tx.type) {
+            case 0:
+              if (data.proposer.address !== address) {
+                data.outputs.forEach(output => {
+                  if (output.address === address) {
+                    obj.tx_type = 'Receive';
+                    obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                    obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                    obj.from = '0x00000';
+                    obj.to = address;
+                  }
+                })
+              }
+              break;
+            case 2:
+              if (data.inputs[0].address === address) {
+                obj.tx_type = 'Send';
+                obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
+                obj.from = address;
+                let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
+                obj.to = to.substring(0, to.length - 2)
+              } else {
+                data.outputs.forEach(output => {
+                  if (output.address === address) {
+                    obj.tx_type = 'Receive';
+                    obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                    obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                    obj.from = data.inputs[0].address;
+                    obj.to = address;
+                  }
+                })
+              }
+              break;
+            case 5:
+              if (data.source.address === address) {
+                obj.tx_type = 'Send';
+                obj.theta_amount = helper.formatCoin(data.source.coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.source.coins.tfuelwei);
+                obj.from = address;
+                obj.to = data.target.address;
+              } else if (data.target.address === address) {
+                obj.tx_type = 'Receive';
+                obj.theta_amount = helper.formatCoin(data.source.coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.source.coins.tfuelwei);
+                obj.from = data.source.address;
+                obj.to = address;
+              }
+              break;
+            default:
+              break;
           }
           return obj;
         })

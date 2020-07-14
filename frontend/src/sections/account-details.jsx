@@ -33,7 +33,7 @@ export default class AccountDetails extends Component {
       includeService: false,
       hasOtherTxs: true,
       hasStakes: false,
-      hasTransferTx: false,
+      hasDownloadTx: false,
       hasStartDateErr: false,
       hasEndDateErr: false,
       price: { 'Theta': 0, 'TFuel': 0 },
@@ -167,7 +167,10 @@ export default class AccountDetails extends Component {
           default:
             break;
         }
-        this.setState({ loading_acct: false, hasTransferTx: (res.data.body.txs_counter[0] || res.data.body.txs_counter[2]) !== undefined });
+        this.setState({
+          loading_acct: false, hasDownloadTx: (res.data.body.txs_counter[0]
+            || res.data.body.txs_counter[2] || res.data.body.txs_counter[5]) !== undefined
+        });
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -273,7 +276,7 @@ export default class AccountDetails extends Component {
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs,
+      includeService, hasOtherTxs, hasStakes, holderTxs, hasDownloadTx, sourceTxs,
       price, hasStartDateErr, hasEndDateErr, isDownloading } = this.state;
     return (
       <div className="content account">
@@ -306,7 +309,7 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
-              {hasTransferTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
+              {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
                 <div className="popup-row header">Choose the time period. Must within 7 days.</div>
                 <div className="popup-row">
                   <div className="popup-label">Start Date:</div>
