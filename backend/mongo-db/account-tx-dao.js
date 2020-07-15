@@ -17,7 +17,7 @@ module.exports = class AccountTxDAO {
     this.client.insert(this.collection, tx, callback);
   }
 
-  // deprecated
+  /** @deprecated*/
   upsertInfo(info, callback) {
     const newObject = {
       'tx_type': info.tx_type,
