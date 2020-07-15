@@ -39,7 +39,7 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
-        return transactionDao.getTransactionsAsync(1, latest_transaction_count)
+        return transactionDao.getTransactionsAsync(1, latest_transaction_count, null)
       })
       .then(transactionInfoList => {
         var data = ({
