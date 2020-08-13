@@ -5,18 +5,25 @@ Please click [here to see the Theta Ledger Explorer in action](https://explorer.
 
 ## Blockchain Data Crawler
 ### Setup
-The job of blockchain data crawler is to download and convert the blockchain data to a format more friendly for blockchain data exploration. In our current implementation, it uses a NoSQL database Aerospike to store the converted data. Thus we need to install Aerospike first. Below is the instruction to install Aerospike on Ubuntu Linux. For more information on installing aerospike on different systems, please check [here](https://www.aerospike.com/docs/operations/install).
+The job of blockchain data crawler is to download and convert the blockchain data to a format more friendly for blockchain data exploration. In our current implementation, it uses a NoSQL database MongoDB to store the converted data. Thus we need to install MongoDB first. Below is the instruction to install MongoDB on Ubuntu Linux. For more information on installing MongoDB on different systems, please check [here](https://docs.mongodb.com/manual/administration/install-community/).
 ```
-wget -O aerospike.tgz 'https://www.aerospike.com/download/server/latest/artifact/ubuntu14'
-tar -xvf aerospike.tgz
-cd aerospike-server-community-<version>-ubuntu14.04
-sudo ./asinstall
-```
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
 
-After installing Aerospike, we can start the blockchain data crawler with the following commands.
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+sudo apt-get update
+
+sudo apt-get install -y mongodb-org
+```
+To start MongoDB, use following command.
+```
+sudo systemctl start mongod
+```
+After starting MongoDB, we can start the blockchain data crawler with the following commands.
 ```
 cd backend/crawler
 npm install
+mv config_template.cfg config.cfg
 node run
 ```
 Now the crawler starts to read the data from blockchain, perform necessary transformation, and stores the converted data in the database. Next we can launch the backend API microservice, and the frontend application microservice following the procedure below.
@@ -27,6 +34,7 @@ Now the crawler starts to read the data from blockchain, perform necessary trans
 ``` 
 cd backend/explorer-api
 npm install
+mv config_template.cfg config.cfg
 node run
 ```
 Now the explorer API application is running at https://localhost:9000
@@ -36,6 +44,7 @@ Now the explorer API application is running at https://localhost:9000
 ``` 
 cd frontend
 npm install
+mv config_template.js config.js
 ```
 
 ### Development
