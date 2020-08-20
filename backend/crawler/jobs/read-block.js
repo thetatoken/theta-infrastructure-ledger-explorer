@@ -116,14 +116,16 @@ exports.Execute = async function (network_id) {
         var upsertVcpAsyncList = [];
         var upsertGcpAsyncList = [];
         var upsertTransactionAsyncList = [];
-        let checkpoint_height, checkpoint_hash;
-        var upsertCheckpointAsyncList = []
+        var checkpoint_height, checkpoint_hash;
+        var upsertCheckpointAsyncList = [];
+        var stakes = {};
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
           // Logger.log(blockDataList[i]);
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              stakes.vcp = result.result.BlockHashVcpPairs;
               await stakeDao.removeRecordsAsync('vcp');
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
                 vcpPair.Vcp.SortedCandidates.forEach(candidate => {
@@ -131,6 +133,7 @@ exports.Execute = async function (network_id) {
                 })
               })
             } else if (result.result.BlockHashGcpPairs) {
+              stakes.gcp = result.result.BlockHashGcpPairs;
               await stakeDao.removeRecordsAsync('gcp');
               result.result.BlockHashGcpPairs.forEach(gcpPair => {
                 gcpPair.Gcp.SortedGuardians.forEach(candidate => {
@@ -190,6 +193,8 @@ exports.Execute = async function (network_id) {
             }
           }
         }
+        // console.log('stakes', stakes);
+        upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
         if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {
             var result = JSON.parse(blockDataList[i]);
