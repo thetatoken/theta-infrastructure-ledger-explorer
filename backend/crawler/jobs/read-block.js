@@ -118,7 +118,7 @@ exports.Execute = async function (network_id) {
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
-        var stakes = {};
+        var stakes = { vcp: [], gcp: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
@@ -194,7 +194,9 @@ exports.Execute = async function (network_id) {
           }
         }
         // console.log('stakes', stakes);
-        upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
+        if (stakes.vcp.length !== 0) {
+          upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
+        }
         if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {
             var result = JSON.parse(blockDataList[i]);
