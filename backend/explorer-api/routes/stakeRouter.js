@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var BigNumber = require('bignumber.js');
 
-var stakeRouter = (app, stakeDao, accountDao) => {
+var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -32,17 +32,25 @@ var stakeRouter = (app, stakeDao, accountDao) => {
 
   router.get("/stake/totalAmount", (req, res) => {
     console.log('Querying total staked tokens.');
-    stakeDao.getAllStakesAsync()
-      .then(stakeListInfo => {
-        let total = 0;
-        let holders = new Set();
-        stakeListInfo.forEach(info => {
-          total = helper.sumCoin(total, info.amount)
-          holders.add(info.holder)
-        });
+    // stakeDao.getAllStakesAsync()
+    //   .then(stakeListInfo => {
+    //     let total = 0;
+    //     let holders = new Set();
+    //     stakeListInfo.forEach(info => {
+    //       total = helper.sumCoin(total, info.amount)
+    //       holders.add(info.holder)
+    //     });
+    //     const data = ({
+    //       type: 'stakeTotalAmout',
+    //       body: { totalAmount: total.toFixed(), totalNodes: holders.size },
+    //     });
+    //     res.status(200).send(data);
+    //   })
+    progressDao.getStakeProgressAsync()
+      .then(info => {
         const data = ({
           type: 'stakeTotalAmout',
-          body: { totalAmount: total.toFixed(), totalNodes: holders.size },
+          body: { totalAmount: info.total_amount, totalNodes: info.holder_num },
         });
         res.status(200).send(data);
       })

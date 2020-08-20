@@ -34,11 +34,11 @@ module.exports = class ProgressDAO {
       }
     })
   }
-  upsertStakeProgress(total_amount, holder_count, callback) {
+  upsertStakeProgress(total_amount, holder_num, callback) {
     const queryObject = { '_id': 'stake' };
     const newObject = {
       'total_amount': total_amount,
-      'holder_count': holder_count
+      'holder_num': holder_num
     }
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);
   }
@@ -53,7 +53,7 @@ module.exports = class ProgressDAO {
       } else {
         var stakesInfo = {};
         stakesInfo.total_amount = record.total_amount;
-        stakesInfo.holder_count = record.holder_count;
+        stakesInfo.holder_num = record.holder_num;
         callback(error, stakesInfo);
       }
     })
