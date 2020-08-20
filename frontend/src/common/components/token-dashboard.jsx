@@ -58,7 +58,7 @@ export default class TokenDashboard extends Component {
     stakeService.getAllStake()
       .then(res => {
         const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        let sum = stakeList.reduce((sum, info) => { return info.withdraw ? sum : sumCoin(sum, info.amount) }, 0);
         let newObj = stakeList.reduce((map, obj) => {
           if (!map[obj.holder]) {
             map[obj.holder] = 0;
@@ -111,21 +111,10 @@ export default class TokenDashboard extends Component {
   }
   getTotalStaked() {
     const { type } = this.props;
-    stakeService.getAllStake()
+    stakeService.getTotalStake()
       .then(res => {
-        const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
-        let holderObj = stakeList.reduce((map, obj) => {
-          if (!map[obj.holder]) {
-            map[obj.holder] = {
-              type: obj.type,
-              amount: 0
-            };
-          }
-          map[obj.holder].amount = sumCoin(map[obj.holder].amount, obj.amount).toFixed()
-          return map;
-        }, {});
-        this.setState({ totalStaked: sum, nodeNum: Object.keys(holderObj).length });
+        const stake = _.get(res, 'data.body')
+        this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
       })
       .catch(err => {
         console.log(err);
