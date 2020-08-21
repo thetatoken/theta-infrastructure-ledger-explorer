@@ -80,7 +80,6 @@ export default class TokenDashboard extends Component {
           return obj;
         }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
         this.setState({
-          totalStaked: sum,
           holders: objList.map(obj => { return obj.holder }),
           percentage: objList.map(obj => { return (obj.percentage - '0') })
         });
