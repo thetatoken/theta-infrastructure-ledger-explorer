@@ -29,7 +29,7 @@ export default class Blocks extends Component {
     stakeService.getAllStake()
       .then(res => {
         const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        let sum = stakeList.reduce((sum, info) => { return info.withdraw ? sum : sumCoin(sum, info.amount) }, 0);
         let holderObj = stakeList.reduce((map, obj) => {
           if (!map[obj.holder]) {
             map[obj.holder] = {
