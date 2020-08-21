@@ -25,7 +25,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
     vcpPair.Vcp.SortedCandidates.forEach(candidate => {
       holders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
-        if (!stake.withdrawn) total = helper.sumCoin(total, stake.amount)
+        total = helper.sumCoin(total, stake.amount)
       })
     })
   })
@@ -33,7 +33,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
     gcpPair.Gcp.SortedGuardians.forEach(candidate => {
       holders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
-        if (!stake.withdrawn) total = helper.sumCoin(total, stake.amount)
+        total = helper.sumCoin(total, stake.amount)
       })
     })
   })

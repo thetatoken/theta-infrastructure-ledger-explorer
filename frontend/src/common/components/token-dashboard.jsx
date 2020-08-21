@@ -58,11 +58,9 @@ export default class TokenDashboard extends Component {
     stakeService.getAllStake()
       .then(res => {
         const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return info.withdraw ? sum : sumCoin(sum, info.amount) }, 0);
+        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
         let newObj = stakeList.reduce((map, obj) => {
-          if (!map[obj.holder]) {
-            map[obj.holder] = 0;
-          }
+          if (!map[obj.holder]) map[obj.holder] = 0;
           map[obj.holder] = sumCoin(map[obj.holder], obj.amount).toFixed()
           return map;
         }, {});
