@@ -59,6 +59,10 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     const address = req.params.id.toLowerCase();
     stakeDao.getStakeByAddressAsync(address)
       .then(async stakeListInfo => {
+        // TODO: Remove retry after fix the stake issue
+        if (stakeListInfo.holderRecords.length === 0 && stakeListInfo.sourceRecords.length === 0) {
+          stakeListInfo = await stakeDao.getStakeByAddressAsync(address);
+        }
         if (hasBalance === 'true') {
           for (let i = 0; i < stakeListInfo.holderRecords.length; i++) {
             if (stakeListInfo.holderRecords[i].type === 'gcp') {
