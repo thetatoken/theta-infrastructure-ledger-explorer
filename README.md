@@ -19,12 +19,15 @@ To start MongoDB, use following command.
 ```
 sudo systemctl start mongod
 ```
-After starting MongoDB, we can start the blockchain data crawler with the following commands.
+After starting MongoDB, we can setup the config for crawler with the following commands.
 ```
 cd backend/crawler
 npm install
 mv config_template.cfg config.cfg
-node run
+```
+Now the config.cfg file is created, change `blockchain.start_height` in config file to the snapshot height on the theta node. After setting the config file and start height, we can run crawler using this command.
+```
+node run.js
 ```
 Now the crawler starts to read the data from blockchain, perform necessary transformation, and stores the converted data in the database. Next we can launch the backend API microservice, and the frontend application microservice following the procedure below.
  
