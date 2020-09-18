@@ -8,6 +8,7 @@ var Logger = require('../helper/logger');
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
+var configFileName = 'config.cfg'
 var initialAccounts = {};
 var accountFileName = 'theta-balance-height.json'
 var progressDao = null;
@@ -118,14 +119,16 @@ exports.Execute = async function (network_id) {
         var upsertVcpAsyncList = [];
         var upsertGcpAsyncList = [];
         var upsertTransactionAsyncList = [];
-        let checkpoint_height, checkpoint_hash;
-        var upsertCheckpointAsyncList = []
+        var checkpoint_height, checkpoint_hash;
+        var upsertCheckpointAsyncList = [];
+        var stakes = { vcp: [], gcp: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
           // Logger.log(blockDataList[i]);
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              stakes.vcp = result.result.BlockHashVcpPairs;
               await stakeDao.removeRecordsAsync('vcp');
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
                 vcpPair.Vcp.SortedCandidates.forEach(candidate => {
@@ -133,6 +136,7 @@ exports.Execute = async function (network_id) {
                 })
               })
             } else if (result.result.BlockHashGcpPairs) {
+              stakes.gcp = result.result.BlockHashGcpPairs;
               await stakeDao.removeRecordsAsync('gcp');
               result.result.BlockHashGcpPairs.forEach(gcpPair => {
                 gcpPair.Gcp.SortedGuardians.forEach(candidate => {
@@ -193,6 +197,10 @@ exports.Execute = async function (network_id) {
             }
           }
         }
+        // console.log('stakes', stakes);
+        if (stakes.vcp.length !== 0) {
+          upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
+        }
         if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {
             var result = JSON.parse(blockDataList[i]);
@@ -230,7 +238,17 @@ exports.Execute = async function (network_id) {
       if (error) {
         if (error.message === 'No progress record') {
           Logger.log('Initializng progress record..');
-          progressDao.upsertProgressAsync(network_id, 0, 0);
+          Logger.log('Loading config file: ' + configFileName)
+          try {
+            config = JSON.parse(fs.readFileSync(configFileName));
+          } catch (err) {
+            Logger.log('Error: unable to load ' + configFileName);
+            Logger.log(err);
+            process.exit(1);
+          }
+          const start_height = Number(config.blockchain.start_height) - 1 || 0;
+          Logger.log(`start_height: ${start_height}, type: ${typeof start_height}`);
+          progressDao.upsertProgressAsync(network_id, start_height, 0);
 
           Logger.log('Loading initial accounts file: ' + accountFileName)
           try {

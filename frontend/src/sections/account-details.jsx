@@ -1,9 +1,8 @@
 import React, { Component } from "react";
+import Popup from "reactjs-popup";
 import { Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
-
-
 
 import { formatCoin, priceCoin, getTheta } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
@@ -20,7 +19,7 @@ import StakeTxsTable from "../common/components/stake-txs";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 const NUM_TRANSACTIONS = 20;
-
+const today = new Date().toISOString().split("T")[0];
 export default class AccountDetails extends Component {
   constructor(props) {
     super(props);
@@ -35,11 +34,18 @@ export default class AccountDetails extends Component {
       includeService: false,
       hasOtherTxs: true,
       hasStakes: false,
-      hasTransferTx: false,
-      price: { 'Theta': 0, 'TFuel': 0 }
+      hasDownloadTx: false,
+      hasStartDateErr: false,
+      hasEndDateErr: false,
+      price: { 'Theta': 0, 'TFuel': 0 },
+      isDownloading: false,
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
+    this.startDate = React.createRef();
+    this.endDate = React.createRef();
+    this.handleInput = this.handleInput.bind(this);
+    this.resetInput = this.resetInput.bind(this);
   }
   getEmptyAccount(address) {
     return {
@@ -162,7 +168,10 @@ export default class AccountDetails extends Component {
           default:
             break;
         }
-        this.setState({ loading_acct: false, hasTransferTx: res.data.body.txs_counter[2] !== undefined });
+        this.setState({
+          loading_acct: false, hasDownloadTx: (res.data.body.txs_counter[0]
+            || res.data.body.txs_counter[2] || res.data.body.txs_counter[5]) !== undefined
+        });
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -192,7 +201,17 @@ export default class AccountDetails extends Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.params;
-    accountService.getTransactionHistory(accountAddress)
+    const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
+    const endDate = (new Date(this.endDate.value).getTime() / 1000).toString();
+    let hasStartDateErr = false, hasEndDateErr = false;
+    if (this.startDate.value === '' || this.endDate.value === '') {
+      if (this.startDate.value === '') hasStartDateErr = true;
+      if (this.endDate.value === '') hasEndDateErr = true;
+      this.setState({ hasStartDateErr, hasEndDateErr })
+      return
+    }
+    this.setState({ isDownloading: true })
+    accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
         if (res.status === 200) {
           function convertToCSV(objArray) {
@@ -224,12 +243,46 @@ export default class AccountDetails extends Component {
           this.download.current.download = 'transactions.csv';
           this.download.current.href = url;
           this.download.current.click();
+          this.setState({ isDownloading: false })
         }
       });
   }
+  handleInput(type) {
+    if (type === 'start') {
+      let date = new Date(this.startDate.value)
+      date.setDate(date.getDate() + 7);
+      this.endDate.min = this.startDate.value;
+      let newDate = this.getDate(date);
+      this.endDate.max = newDate < today ? newDate : today;
+    } else if (type === 'end') {
+      let date = new Date(this.endDate.value)
+      date.setDate(date.getDate() - 7);
+      this.startDate.max = this.endDate.value;
+      this.startDate.min = this.getDate(date);
+    }
+    if (type === 'start' && !this.hasStartDateErr) this.setState({ hasStartDateErr: false })
+    if (type === 'end' && !this.hasEndDateErr) this.setState({ hasEndDateErr: false })
+  }
+  getDate(date) {
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    if (month < 10) month = '0' + month;
+    if (day < 10) day = '0' + day;
+    return year + '-' + month + '-' + day;
+  }
+  resetInput() {
+    this.startDate.value = '';
+    this.startDate.max = today;
+    this.startDate.min = '';
+    this.endDate.value = '';
+    this.endDate.max = today;
+    this.endDate.min = '';
+  }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, hasTransferTx, sourceTxs, price } = this.state;
+      includeService, hasOtherTxs, hasStakes, holderTxs, hasDownloadTx, sourceTxs,
+      price, hasStartDateErr, hasEndDateErr, isDownloading } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -261,16 +314,36 @@ export default class AccountDetails extends Component {
         {transactions && transactions.length > 0 &&
           <React.Fragment>
             <div className="actions">
-              {hasTransferTx && <div className="download btn tx export" onClick={this.downloadTrasanctionHistory}>Export Transaction History (CSV)</div>}
+              {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
+                <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                <div className="popup-row">
+                  <div className="popup-label">Start Date:</div>
+                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
+                </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
+                <div className="popup-row">
+                  <div className="popup-label">End Date: </div>
+                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
+                </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
+                <div className="popup-row buttons">
+                  <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
+                  <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
+                  <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
+                </div>
+              </Popup>}
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
-                <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                <div className="switch">
+                  <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                  <label className="theta-switch">
+                    <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
+                    <span className="theta-slider"></span>
+                  </label>
+                </div>
               }
-              <label className="theta-switch">
-                <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
-                <span className="theta-slider"></span>
-              </label>
+
             </div>
             <div>
               {loading_txns &&

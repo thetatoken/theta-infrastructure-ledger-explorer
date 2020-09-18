@@ -12,7 +12,7 @@ import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
-const totalSupply = 1000000000;
+const totalSupply = 870502690;
 export default class TokenDashboard extends Component {
   constructor(props) {
     super(props);
@@ -60,9 +60,7 @@ export default class TokenDashboard extends Component {
         const stakeList = _.get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
         let newObj = stakeList.reduce((map, obj) => {
-          if (!map[obj.holder]) {
-            map[obj.holder] = 0;
-          }
+          if (!map[obj.holder]) map[obj.holder] = 0;
           map[obj.holder] = sumCoin(map[obj.holder], obj.amount).toFixed()
           return map;
         }, {});
@@ -80,7 +78,6 @@ export default class TokenDashboard extends Component {
           return obj;
         }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
         this.setState({
-          totalStaked: sum,
           holders: objList.map(obj => { return obj.holder }),
           percentage: objList.map(obj => { return (obj.percentage - '0') })
         });
@@ -111,21 +108,10 @@ export default class TokenDashboard extends Component {
   }
   getTotalStaked() {
     const { type } = this.props;
-    stakeService.getAllStake()
+    stakeService.getTotalStake()
       .then(res => {
-        const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
-        let holderObj = stakeList.reduce((map, obj) => {
-          if (!map[obj.holder]) {
-            map[obj.holder] = {
-              type: obj.type,
-              amount: 0
-            };
-          }
-          map[obj.holder].amount = sumCoin(map[obj.holder].amount, obj.amount).toFixed()
-          return map;
-        }, {});
-        this.setState({ totalStaked: sum, nodeNum: Object.keys(holderObj).length });
+        const stake = _.get(res, 'data.body')
+        this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
       })
       .catch(err => {
         console.log(err);
@@ -144,10 +130,10 @@ export default class TokenDashboard extends Component {
           </div>
           <div className="column">
             <Detail title={`${token} PRICE (USD)`} value={`\$${tokenInfo.price.toFixed(6)}`} />
-            <Detail title={'MARKET CAP (USD)'} value={formatCurrency(tokenInfo.market_cap)} />
+            <Detail title={'MARKET CAP (USD)'} value={formatCurrency(tokenInfo.market_cap, 0)} />
           </div>
           <div className="column">
-            <Detail title={'24 HR VOLUME (USD)'} value={formatCurrency(tokenInfo.volume_24h)} />
+            <Detail title={'24 HR VOLUME (USD)'} value={formatCurrency(tokenInfo.volume_24h, 0)} />
             <Detail title={'CIRCULATING SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
           {type === 'theta' &&
@@ -199,7 +185,7 @@ const TxnNumber = ({ num }) => {
 const StakedPercent = ({ staked }) => {
   return (
     <React.Fragment>
-      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(4)}%`}
+      {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
     </React.Fragment>
   );
 }

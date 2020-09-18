@@ -39,6 +39,9 @@
   }
 
   @include breakpoint('tablet', max) {
+    > :first-child{
+      margin-top: 5%;
+    }
     .overview {
       margin-top: 0rem;
       flex-flow: column;

@@ -35,21 +35,6 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
       });;
   });
 
-  router.get("/transactions", (req, res) => {
-    progressDao.getProgressAsync(config.blockchain.network_id)
-      .then((progressInfo) => {
-        latest_transaction_count = progressInfo.count;
-        return transactionDao.getTransactionsAsync(1, latest_transaction_count)
-      })
-      .then(transactionInfoList => {
-        var data = ({
-          type: 'transaction_list',
-          body: transactionInfoList,
-        });
-        res.status(200).send(data);
-      });
-  });
-
   router.get("/transactions/range", (req, res) => {
     let totalPageNumber = 0;
     let { pageNumber = 1, limit = 10 } = req.query;

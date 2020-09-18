@@ -35,6 +35,7 @@ export default class StakesTable extends Component {
   render() {
     const { className, type, truncate, totalStaked, stakes } = this.props;
     const { stakeList, isSliced } = this.state;
+    let colSpan = type === 'node' ? 4 : 3;
     return (
       <div className="stakes half">
         <div className="title">{type === 'node' ? 'TOP VALIDATOR / GUARDIAN NODES' : 'TOP STAKING WALLETS'}</div>
@@ -42,7 +43,7 @@ export default class StakesTable extends Component {
           <thead>
             <tr onClick={this.toggleList.bind(this)}>
               <th className="address">ADDRESS</th>
-              {type === 'node' && <th className="type">TYPE</th>}
+              {type === 'node' && <th className="node-type">TYPE</th>}
               <th className="staked">TOKENS STAKED</th>
               <th className="staked-prct">%STAKED</th>
             </tr>
@@ -54,13 +55,13 @@ export default class StakesTable extends Component {
                 <tr key={address}>
                   <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
-                  <td className="staked"><div className="currency thetawei">{formatCoin(record.amount)}</div></td>
+                  <td className="staked"><div className="currency thetawei">{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
             })}
             {stakes.length > TRUNC &&
               <tr>
-                <td className="arrow-container" colSpan="4" onClick={this.toggleList.bind(this)}>
+                <td className="arrow-container" colSpan={colSpan} onClick={this.toggleList.bind(this)}>
                   View {isSliced ? 'More' : 'Less'}
                 </td>
               </tr>
@@ -69,7 +70,7 @@ export default class StakesTable extends Component {
             <tr>
               <td></td>
               {type === 'node' && <td></td>}
-              <td className="staked"><div className="currency thetawei">{formatCoin(totalStaked)}</div></td>
+              <td className="staked"><div className="currency thetawei">{formatCoin(totalStaked, 0)}</div></td>
               <td className="staked-prct">100%</td>
             </tr>
           </tbody>

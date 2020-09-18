@@ -15,16 +15,93 @@
     @include row($justify: flex-end);
     border-top: 1px solid $color-font-light;
     padding-top: 2rem;
-
+    .popup-content{
+      width: 330px !important;
+      background-color: $color-black !important;
+      color: $color-font-light;
+      padding: 10px !important;
+      .popup-row{
+        display: flex;
+        margin-bottom: 10px;
+        &.header{
+          display: block;
+          color: $color-white;
+          font-weight: bold;
+        }
+        &.err-msg{
+          color: $color-red;
+          padding-left: 30%;
+          &.disable{
+            display: none;
+          }
+        }
+        &.buttons{
+          display: flex;
+          justify-content: space-around;
+          .popup-reset{
+            width: 30%;
+            margin: 10px 0 0 0;
+            font-size: .875rem;
+            font-weight: $weight-semi;
+            color: $color-font-light;
+            cursor: pointer;
+            border: 1px solid $color-font-light;
+            text-align: center;
+            border-radius: 15px;
+          }
+          .popup-download{
+            width: 30%;
+            margin: 10px 0 0 0;
+            font-size: .875rem;
+            font-weight: $weight-semi;
+            color: $color-font-light;
+            cursor: pointer;
+            border: 1px solid $color-font-light;
+            text-align: center;
+            border-radius: 15px;
+          }
+          .popup-downloading{
+            width: 40%;
+            margin: 10px 0 0 0;
+            font-size: .875rem;
+            font-weight: $weight-semi;
+            color: $color-font-light;
+            text-align: center;
+          }
+        }
+        .disable{
+          display: none;
+        }
+      }
+      .popup-label{
+        width: 30%;
+        vertical-align: baseline;
+        margin: auto;
+      }
+      .popup-input{
+        width: 70%
+      }
+      .popup-arrow{
+        background-color: $color-black !important;
+        border-right: 1px solid $color-font-light;
+        border-bottom: 1px solid $color-font-light;
+      }
+    }
     .download{
       position: absolute;
       left: 0;
       color: $color-font-light;
       cursor: pointer;
+      @include breakpoint('phablet', max) {
+        @include hideColumn();
+      }
     }
     .title{
       position: absolute;
       left: calc(50% - 44px)
+    }
+    .switch{
+      @include breakpoint('phablet', max) { display: none; }
     }
     .btn.tx {
       font-size: .875rem;
@@ -69,6 +146,14 @@
   .currency{
     width: 50%;
     display: flex;
+  }
+  @include breakpoint('phablet', max) {
+    flex-direction: column;
+    .currency{
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
 }
 .price{

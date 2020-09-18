@@ -17,7 +17,7 @@ module.exports = class AccountTxDAO {
     this.client.insert(this.collection, tx, callback);
   }
 
-  // deprecated
+  /** @deprecated*/
   upsertInfo(info, callback) {
     const newObject = {
       'tx_type': info.tx_type,
@@ -34,14 +34,14 @@ module.exports = class AccountTxDAO {
     this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
 
-  getListByTime(address, startTime, endTime, type, callback) {
+  getListByTime(address, startTime, endTime, types, callback) {
     let queryObject;
-    if (type === null) {
+    if (types === null) {
       queryObject = { acct: address, ts: { $gte: startTime, $lte: endTime } };
     } else {
-      queryObject = { acct: address, type: type, ts: { $gte: startTime, $lte: endTime } };
+      queryObject = { acct: address, type: { $in: types }, ts: { $gte: startTime, $lte: endTime } };
     }
-    this.client.getRecords(this.collection, queryObject, {}, 0, 1000, callback);
+    this.client.getRecords(this.collection, queryObject, {}, 0, 5000, callback);
   }
 
   getTxHashes(address, startTime, endTime, type, callback) {

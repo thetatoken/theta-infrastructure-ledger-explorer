@@ -15,7 +15,7 @@ var accountingRouter = (app, accountingDao) => {
 
         accountingDao.getAsync(wallet, startTime, endTime).then(data => {
             data.forEach(function(info) {
-                let date = new Date(info.date);
+                let date = new Date(info.date * 1000);
                 let month = date.getUTCMonth() + 1;
                 let day = date.getUTCDate();
                 let year = date.getUTCFullYear();

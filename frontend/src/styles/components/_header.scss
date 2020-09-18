@@ -120,10 +120,18 @@
   @include breakpoint('tablet-wide', max) {
     .nav-search .search-input { width: 10rem; }
     .nav-search .search-select { width: 5rem; }
+    .nav .theta-logo { 
+      margin-right: 3%;
+    }
+    .nav a.nav-item{
+      margin-right: 1%;
+      letter-spacing: 0;
+    }
   }
   @include breakpoint('tablet', max) {
     display: block;
     .flex-spacer { display: none; }
+
     .nav-search {
       width: 80%;
       margin: 3rem auto 0;
@@ -134,8 +142,21 @@
   }
   @include breakpoint('phablet', max) {
     width: 95%;
-    .nav .theta-logo { flex: 0 0 6rem; }
+    .nav .theta-logo { 
+      margin-right: 3%;
+      flex: 0 0 6rem; 
+    }
+    .nav-search { margin: 0.5rem auto 0; }
+    .nav a.nav-item{
+      letter-spacing: 0;
+      margin-right: 1%;
+    }
   }
-  
+  @include breakpoint('phone-small', max) {
+    .nav a.nav-item{
+      font-size: 0.8rem;
+      line-height: 0.8rem;
+    }
+  }
 }
 
