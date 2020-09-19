@@ -16,6 +16,7 @@ var priceDaoLib = require('../mongo-db/price-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
+var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -24,9 +25,9 @@ var accountTxRouter = require("./routes/accountTxRouter");
 var stakeRouter = require("./routes/stakeRouter");
 var priceRouter = require("./routes/priceRouter");
 var accountingRouter = require("./routes/accountingRouter");
-
 var supplyRouter = require("./routes/supplyRouter");
-var cors = require('cors')
+var smartContractRouter = require("./routes/smartContractRouter")
+var cors = require('cors');
 var io;
 //------------------------------------------------------------------------------
 //  Global variables
@@ -34,6 +35,18 @@ var io;
 var config = null;
 var configFileName = 'config.cfg';
 var blockDao = null;
+
+var progressDao = null
+var transactionDao = null;
+var accountDao = null;
+var accountTxDao = null;
+var accountTxSendDao = null;
+var stakeDao = null;
+var priceDao = null;
+var txHistoryDao = null;
+var accountingDao = null;
+var checkpointDao = null;
+var smartContractDao = null;
 var isPushingData = false;
 //------------------------------------------------------------------------------
 //  Start from here
@@ -88,6 +101,9 @@ function main() {
       bluebird.promisifyAll(accountingDao);
       checkpointDao = new checkpointDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(checkpointDao);
+      smartContractDao = new smartContractDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(smartContractDao);
+
       //
       var privateKey = fs.readFileSync(config.cert.key, 'utf8');
       var certificate = fs.readFileSync(config.cert.crt, 'utf8');
@@ -127,17 +143,19 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, progressDao, txHistoryDao, config);
       // account router
-      accountRouter(app, accountDao, rpc, config);
+      accountRouter(app, accountDao, rpc);
       // account transaction mapping router
-      accountTxRouter(app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc, config);
+      accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
-      stakeRouter(app, stakeDao, accountDao, progressDao, config);
+      stakeRouter(app, stakeDao, accountDao, progressDao);
       // supply router
-      supplyRouter(app, config);
+      supplyRouter(app);
       // price router
       priceRouter(app, priceDao, config)
       // accounting router
       accountingRouter(app, accountingDao)
+      // smart contract router
+      smartContractRouter(app, smartContractDao)
       // keep push block data
       // pushTopBlocks();
     }
