@@ -15,7 +15,9 @@ module.exports = class smartContractDAO {
       'address': smartContractInfo.address,
       'bytecode': smartContractInfo.bytecode,
       'abi': smartContractInfo.abi,
-      'source_code': smartContractInfo.source_code
+      'source_code': smartContractInfo.source_code,
+      'verification_date': smartContractInfo.verification_date,
+      'compiler_version': smartContractInfo.compiler_version
     }
     const queryObject = { '_id': smartContractInfo.address };
     this.client.upsert(this.smartContractInfoCollection, queryObject, newObject, callback);
@@ -23,13 +25,14 @@ module.exports = class smartContractDAO {
 
   getSmartContractByAddress(address, callback) {
     const queryObject = { '_id': address };
-    this.client.query(this.smartContractInfoCollection, queryObject, function (error, record) {
+    this.client.findOne(this.smartContractInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - SmartContract:', error);
         // callback(error);
       } else if (!record) {
         callback(Error('NOT_FOUND - SmartContract'));
       } else {
+        delete record._id;
         callback(error, record)
       }
     })

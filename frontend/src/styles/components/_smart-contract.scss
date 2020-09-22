@@ -1,0 +1,55 @@
+.version-select{
+  $self: &;
+  &--container{
+    display: flex;
+    margin: 15px 0;
+
+    & label{
+      line-height: 32px;
+    }
+  }
+  &--selector{
+    width: 12rem;
+    margin: 0 5px;
+    &::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid $color-input-text;
+      position: absolute;
+      right: 5px;
+      top: 12px;
+      pointer-events: none;
+    }
+    & select{
+      width: 100%;
+      height: 32px;
+    }
+  }
+}
+.code-buttons{
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 20%;
+  & div{
+    padding: 20px;
+    color: $color-input-text;
+    background: $color-blue;
+    border: none;
+    border-radius: .25rem;
+    font-weight: $weight-medium;
+    cursor: pointer;
+    &:hover{
+      box-shadow: 0 4px 8px 0 rgba($color-blue, 0.2), 0 6px 20px 0 rgba($color-blue, 0.19);
+    }
+    &.reset{
+      background: $color-light;
+      &:hover{
+        background-color: $color-input-background;
+        box-shadow: 0 4px 8px 0 rgba($color-input-background, 0.2), 0 6px 20px 0 rgba($color-input-background, 0.19);
+      }
+    }
+  }
+}

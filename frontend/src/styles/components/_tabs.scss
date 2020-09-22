@@ -17,11 +17,17 @@
     }
 
     &__tab-panel--selected{
-      .code-area{
+      .code-area, .abi-area{
         width: 100%;
-        height: 350px;
         color: $color-font-light;
         resize: none;
+        margin: 10px 0 20px 0;
+      }
+      .code-area{
+        height: 350px;
+      }
+      .abi-area{
+        height: 100px;
       }
     }
   }

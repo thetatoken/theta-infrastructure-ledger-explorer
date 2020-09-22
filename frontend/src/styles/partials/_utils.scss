@@ -9,6 +9,9 @@
   display: none;
 }
 
+.text-danger{
+  color: $color-red;
+}
 
 @mixin flex($direction: row, $justify: flex-start, $align: center, $wrap: nowrap) {
   display: flex;
