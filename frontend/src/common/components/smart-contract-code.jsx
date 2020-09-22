@@ -71,7 +71,9 @@ export default class SmartContractCode extends React.Component {
     if (existingScript && callback) callback();
   }
   reset = () => {
-    this.sourceCode.current.value = '';
+    let a = this.sourceCode.current.value;
+    console.log(a.substring(a.lastIndexOf('contract')))
+    // this.sourceCode.current.value = '';
     this.abi.current.value = '';
   }
   submit = () => {
