@@ -47,11 +47,22 @@ var smartContractRouter = (app, smartContractDao) => {
           console.log(`compile takes ${(+new Date() - start) / 1000} seconds`)
           console.log(`output:`, output)
         }
+        let check = output.errors.reduce((check, err) => {
+          if (err.severity === 'warning') {
+            if (!check.warnings) check.warnings = [];
+            check.warnings.push(err.message);
+          }
+          if (err.severity === 'error') {
+            check.error = error.message;
+          }
+          return check;
+        }, {});
+        console.log(`check:`, check)
         let data = {}
-        if (output.errors) {
-          data = { result: 'Not Verified', err_msg: output.errors[0].message }
+        if (check.error) {
+          data = { result: 'Not Verified', err_msg: check.error }
         } else {
-          data = { result: 'Verified' }
+          data = { result: 'Verified', warning_msg: check.warnings }
           // console.log(`output: `, output)
           for (var contractName in output.contracts['test.sol']) {
             const obj = output.contracts['test.sol'][contractName].evm.bytecode.object;
