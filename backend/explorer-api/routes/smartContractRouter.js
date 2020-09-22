@@ -10,16 +10,17 @@ var smartContractRouter = (app, smartContractDao) => {
   // The api to verify the source and bytecode
   router.get("/smartContract/verify/:address", (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, byteCode, abi, version } = req.query;
+    let { sourceCode, byteCode, abi, version, optimizer } = req.query;
+    console.log(`optimizer: ${optimizer}, type: ${typeof optimizer}, value: ${optimizer === '1'}`)
     // console.log(`sourceCode: ${sourceCode}, abi: ${abi}, version: ${version}, address: ${address}, byteCode: ${byteCode}`)
     try {
       console.log('Verifing the source code and bytecode for address:', address);
-      const start = +new Date();
+      let start = +new Date();
       var input = {
         language: 'Solidity',
         settings: {
           optimizer: {
-            enabled: 0
+            enabled: optimizer === '1'
           },
           outputSelection: {
             '*': {
@@ -41,22 +42,24 @@ var smartContractRouter = (app, smartContractDao) => {
           console.log('error in solc:', err)
           // An error was encountered, display and quit
         } else {
+          start = +new Date();
           output = JSON.parse(solcSnapshot.compile(JSON.stringify(input)))
+          console.log(`compile takes ${(+new Date() - start) / 1000} seconds`)
           console.log(`output:`, output)
-        }
-        // console.log(`output: `, output)
-        for (var contractName in output.contracts['test.sol']) {
-          const obj = output.contracts['test.sol'][contractName].evm.bytecode.object;
-          // console.log('obj', obj)
-          if (contractName === 'AdminUpgradeabilityProxy') {
-            console.log(obj)
-          }
         }
         let data = {}
         if (output.errors) {
           data = { result: 'Not Verified', err_msg: output.errors[0].message }
         } else {
           data = { result: 'Verified' }
+          // console.log(`output: `, output)
+          for (var contractName in output.contracts['test.sol']) {
+            const obj = output.contracts['test.sol'][contractName].evm.bytecode.object;
+            console.log('obj', obj)
+            // if (contractName === 'AdminUpgradeabilityProxy') {
+            //   console.log(obj)
+            // }
+          }
         }
         res.status(200).send(data);
       });

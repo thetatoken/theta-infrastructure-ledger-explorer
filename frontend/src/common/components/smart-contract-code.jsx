@@ -13,6 +13,7 @@ export default class SmartContractCode extends React.Component {
     this.version = React.createRef();
     this.sourceCode = React.createRef()
     this.abi = React.createRef();
+    this.optimizer = React.createRef();
   }
   componentDidMount() {
     this.fetchSmartContract(this.props.address)
@@ -79,9 +80,10 @@ export default class SmartContractCode extends React.Component {
     const version = this.version.current.value;
     const { address } = this.props;
     const byteCode = _.get(this.state, 'smartContract.bytecode')
+    const optimizer = this.optimizer.current.value;
     console.log('Submitting to backend.')
     console.log(`sourceCode: ${sourceCode}, abi: ${abi}, version: ${version}, address: ${address}, byteCode: ${byteCode}`)
-    smartContractService.verifySouceCode(address, byteCode, sourceCode, abi, version)
+    smartContractService.verifySouceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
         console.log('res from verify source code:', res);
       })
@@ -93,14 +95,31 @@ export default class SmartContractCode extends React.Component {
     console.log('sc:', this.state.smartContract)
     return (
       <React.Fragment>
-        {isReleasesReady ? <div className="version-select--container">
-          <label>Please select Compiler Version</label>
-          <div className="version-select--selector">
-            <select ref={this.version}>
-              <Options />
-            </select>
+        <div className="selects-container">
+          {isReleasesReady ? <div className="select--container">
+            <label>Please select Compiler Version</label>
+            <div className="select--selector">
+              <select ref={this.version}>
+                <Options />
+              </select>
+            </div>
+          </div> : ''}
+          <div className="select--container optimizer">
+            <label>
+              <span className="select--tooltip">?
+              <span className="select--tooltip__text">
+                  Select the option you used when compiling this contract.
+              </span></span>
+              Optimization
+            </label>
+            <div className="select--selector optimizer">
+              <select ref={this.optimizer} defaultValue={0}>
+                <option value={1}>Yes</option>
+                <option value={0}>No</option>
+              </select>
+            </div>
           </div>
-        </div> : ''}
+        </div>
         <label htmlFor="txtSourceCode">
           <b>Enter the Solidity Contract Code below &nbsp;</b>
           <span className="text-danger">*</span>
