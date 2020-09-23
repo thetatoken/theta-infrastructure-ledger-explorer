@@ -53,10 +53,7 @@ export function getTheta(weiAmount) {
 }
 
 export function getHex(str) {
-  var arr1 = [];
-  for (var n = 0, l = str.length; n < l; n++) {
-    var hex = Number(str.charCodeAt(n)).toString(16);
-    arr1.push(hex);
-  }
-  return '0x' + arr1.join('');
+  const buffer = Buffer.from(str, 'base64');
+  const bufString = buffer.toString('hex');
+  return '0x' + bufString;
 }
