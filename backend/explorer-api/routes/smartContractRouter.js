@@ -69,16 +69,18 @@ var smartContractRouter = (app, smartContractDao) => {
         if (check.error) {
           data = { result: { verified: false }, err_msg: check.error }
         } else {
-          for (var contractName in output.contracts['test.sol']) {
-            const curCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
-            const processed_compiled_bytecode = helper.processBytecode(curCode, version);
-            const processed_blockchain_bytecode = helper.processBytecode(byteCode, version);
-            if (processed_compiled_bytecode == processed_blockchain_bytecode) {
-              // console.log(`processed_compiled_bytecode:`, processed_compiled_bytecode)
-              verified = true;
-              let abi = output.contracts['test.sol'][contractName].abi;
-              console.log(`Match the code, contractName:${contractName}`);
-              // console.log(`abi: `, abi)
+          if (output.contracts) {
+            for (var contractName in output.contracts['test.sol']) {
+              const curCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
+              const processed_compiled_bytecode = helper.processBytecode(curCode, version);
+              const processed_blockchain_bytecode = helper.processBytecode(byteCode, version);
+              if (processed_compiled_bytecode == processed_blockchain_bytecode) {
+                // console.log(`processed_compiled_bytecode:`, processed_compiled_bytecode)
+                verified = true;
+                let abi = output.contracts['test.sol'][contractName].abi;
+                console.log(`Match the code, contractName:${contractName}`);
+                // console.log(`abi: `, abi)
+              }
             }
           }
           data = { result: { verified }, warning_msg: check.warnings }

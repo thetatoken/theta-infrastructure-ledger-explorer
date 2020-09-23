@@ -360,11 +360,11 @@ const SmartContract = ({ transaction }) => {
       <tbody>
         <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
         <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
-        {receipt && <DetailsRow label="Contract Address" data={receiptAddress} />}
+        {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
         <DetailsRow label="Gas Limit" data={data.gas_limit} />
-        {receipt && <DetailsRow label="Gas Used" data={receipt.GasUsed} />}
+        {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
         <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-        {err && <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> }
+        {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
         <DetailsRow label="Data" data={getHex(data.data)} />
       </tbody>
     </table>);

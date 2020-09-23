@@ -10,10 +10,6 @@ export default class SmartContractCode extends React.Component {
       isReleasesReady: false,
       isVerified: false
     }
-    this.version = React.createRef();
-    this.sourceCode = React.createRef()
-    this.abi = React.createRef();
-    this.optimizer = React.createRef();
   }
   componentDidMount() {
     this.fetchSmartContract(this.props.address)
@@ -23,6 +19,10 @@ export default class SmartContractCode extends React.Component {
       this.fetchSmartContract(address)
     }
   }
+  sourceCodeRef = e => this.sourceCode = e;
+  versionRef = e => this.version = e;
+  optimizerRef = e => this.optimizer = e;
+  abiRef = e => this.abi = e;
   fetchSmartContract(address) {
     if (!address) {
       return;
@@ -71,20 +71,20 @@ export default class SmartContractCode extends React.Component {
     if (existingScript && callback) callback();
   }
   reset = () => {
-    let a = this.sourceCode.current.value;
-    console.log(a.substring(a.lastIndexOf('contract')))
-    // this.sourceCode.current.value = '';
-    this.abi.current.value = '';
+    let a = this.sourceCode.value;
+    this.sourceCode.value = '';
+    this.abi.value = '';
   }
   submit = () => {
-    const sourceCode = this.sourceCode.current.value;
-    const abi = this.abi.current.value;
-    const version = this.version.current.value;
+    const sourceCode = this.sourceCode.value;
+    const abi = this.abi.value;
+    const version = this.version.value;
     const { address } = this.props;
     const byteCode = _.get(this.state, 'smartContract.bytecode')
-    const optimizer = this.optimizer.current.value;
+    const optimizer = this.optimizer.value;
     console.log('Submitting to backend.')
-    console.log(`sourceCode: ${sourceCode}, abi: ${abi}, version: ${version}, address: ${address}, byteCode: ${byteCode}`)
+    console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
+    console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
     smartContractService.verifySouceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
         console.log('res from verify source code:', res);
@@ -101,7 +101,7 @@ export default class SmartContractCode extends React.Component {
           {isReleasesReady ? <div className="select--container">
             <label>Please select Compiler Version</label>
             <div className="select--selector">
-              <select ref={this.version}>
+              <select ref={this.versionRef}>
                 <Options />
               </select>
             </div>
@@ -115,7 +115,7 @@ export default class SmartContractCode extends React.Component {
               Optimization
             </label>
             <div className="select--selector optimizer">
-              <select ref={this.optimizer} defaultValue={0}>
+              <select ref={this.optimizerRef} defaultValue={0}>
                 <option value={1}>Yes</option>
                 <option value={0}>No</option>
               </select>
@@ -126,9 +126,9 @@ export default class SmartContractCode extends React.Component {
           <b>Enter the Solidity Contract Code below &nbsp;</b>
           <span className="text-danger">*</span>
         </label>
-        <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={this.sourceCode} required />
+        <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={this.sourceCodeRef} required />
         <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
-        <textarea className='abi-area' placeholder="Enter your code here." ref={this.abi} />
+        <textarea className='abi-area' placeholder="Enter your code here." ref={this.abiRef} />
         <div className="code-buttons">
           <div onClick={this.submit}>Verify and Publish</div>
           <div className='reset' onClick={this.reset}>Reset</div>
