@@ -21,9 +21,9 @@ export default class BlocksExplorer extends Component {
       price: {}
     };
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
-      this.getOneBlockByHeight(nextProps.params.blockHeight);
+  componentDidUpdate(preProps) {
+    if (preProps.params.blockHeight !== this.props.params.blockHeight) {
+      this.getOneBlockByHeight(this.props.params.blockHeight);
     }
   }
   componentDidMount() {

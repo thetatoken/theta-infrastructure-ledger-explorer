@@ -27,9 +27,9 @@ export default class TransactionExplorer extends Component {
       price: { 'Theta': 0, 'TFuel': 0 }
     };
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
-      this.getOneTransactionByUuid(nextProps.params.transactionHash);
+  componentDidUpdate(preProps) {
+    if (preProps.params.transactionHash !== this.props.params.transactionHash) {
+      this.getOneTransactionByUuid(this.props.params.transactionHash);
       this.getPrices();
     }
   }
@@ -364,7 +364,7 @@ const SmartContract = ({ transaction }) => {
         <DetailsRow label="Gas Limit" data={data.gas_limit} />
         {receipt && <DetailsRow label="Gas Used" data={receipt.GasUsed} />}
         <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-        {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : ''}
+        {err && <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> }
         <DetailsRow label="Data" data={getHex(data.data)} />
       </tbody>
     </table>);

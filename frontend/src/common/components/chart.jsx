@@ -79,9 +79,9 @@ export default class ThetaChart extends Component {
     Chart.defaults.global.defaultFontColor = '#8A8FB5';
     Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.labels !== this.props.labels) {
-      this.updateChart(this.chart, nextProps.labels, nextProps.data);
+  componentDidUpdate(preProps) {
+    if (preProps.labels !== this.props.labels) {
+      this.updateChart(this.chart, this.props.labels, this.props.data);
     }
   }
   getInitialOptions = (type, data, labels, clickType) => {

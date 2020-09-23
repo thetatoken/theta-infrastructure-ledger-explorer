@@ -138,7 +138,6 @@ export default class SmartContractCode extends React.Component {
   }
 }
 const Options = () => {
-  console.log('releases: ', window.soljsonReleases)
   let releases = window.soljsonReleases;
   return (
     <React.Fragment>

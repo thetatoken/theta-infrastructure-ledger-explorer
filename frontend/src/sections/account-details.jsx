@@ -56,10 +56,10 @@ export default class AccountDetails extends Component {
       txs_counter: {}
     }
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
+  componentDidUpdate(preProps) {
+    if (preProps.params.accountAddress !== this.props.params.accountAddress) {
       this.setState({ hasOtherTxs: true, includeService: false })
-      this.fetchData(nextProps.params.accountAddress);
+      this.fetchData(this.props.params.accountAddress);
     }
   }
   componentDidMount() {

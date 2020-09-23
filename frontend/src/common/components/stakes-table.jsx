@@ -26,9 +26,9 @@ export default class StakesTable extends Component {
       this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
     }
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.stakes.length !== this.props.stakes.length) {
-      this.setState({ stakeList: nextProps.stakes.slice(0, TRUNC), isSliced: true })
+  componentDidUpdate(preProps) {
+    if (preProps.stakes.length !== this.props.stakes.length) {
+      this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
     }
   }
 
