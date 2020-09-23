@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import socketClient from 'socket.io-client';
-import { browserHistory } from 'react-router';
+import history from 'common/history'
 import cx from 'classnames';
 
 import { averageFee, hash, age, date } from 'common/helpers/blocks';
@@ -48,7 +48,7 @@ export default class BlockOverviewTable extends Component {
   }
 
   handleRowClick = (height) => {
-    browserHistory.push(`/blocks/${height}`);
+    history.push(`/blocks/${height}`);
   }
 
   render() {

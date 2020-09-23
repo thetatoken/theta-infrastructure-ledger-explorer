@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router";
-import { browserHistory } from 'react-router';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatCoin, sumCoin } from 'common/helpers/utils';
 

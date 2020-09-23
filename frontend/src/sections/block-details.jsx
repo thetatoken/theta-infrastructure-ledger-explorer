@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 
 import { blocksService } from 'common/services/block';
@@ -14,7 +14,7 @@ export default class BlocksExplorer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       block: null,
       totalBlocksNumber: undefined,
       errorType: null,
@@ -22,12 +22,12 @@ export default class BlocksExplorer extends Component {
     };
   }
   componentDidUpdate(preProps) {
-    if (preProps.params.blockHeight !== this.props.params.blockHeight) {
-      this.getOneBlockByHeight(this.props.params.blockHeight);
+    if (preProps.match.params.blockHeight !== this.props.match.params.blockHeight) {
+      this.getOneBlockByHeight(this.props.match.params.blockHeight);
     }
   }
   componentDidMount() {
-    const { blockHeight } = this.props.params;
+    const { blockHeight } = this.props.match.params;
     this.getOneBlockByHeight(blockHeight);
     this.getPrices();
   }
@@ -97,7 +97,7 @@ export default class BlocksExplorer extends Component {
   }
   render() {
     const { block, totalBlocksNumber, errorType, price } = this.state;
-    const height = Number(this.props.params.blockHeight);
+    const height = Number(this.props.match.params.blockHeight);
     const hasNext = totalBlocksNumber > height;
     const hasPrev = height > 1;
     const isCheckPoint = block && (block.total_voted_guardian_stakes != undefined);

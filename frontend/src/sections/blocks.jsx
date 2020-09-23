@@ -10,7 +10,7 @@ export default class Blocks extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       blockHeight: 0,
       blockInfoList: [],
       currentPageNumber: 1,

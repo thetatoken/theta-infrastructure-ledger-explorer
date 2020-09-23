@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Popup from "reactjs-popup";
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
@@ -24,7 +24,7 @@ export default class AccountDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: this.getEmptyAccount(this.props.params.accountAddress),
+      account: this.getEmptyAccount(this.props.match.params.accountAddress),
       transactions: null,
       currentPage: 1,
       totalPages: null,
@@ -57,13 +57,13 @@ export default class AccountDetails extends Component {
     }
   }
   componentDidUpdate(preProps) {
-    if (preProps.params.accountAddress !== this.props.params.accountAddress) {
+    if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
       this.setState({ hasOtherTxs: true, includeService: false })
-      this.fetchData(this.props.params.accountAddress);
+      this.fetchData(this.props.match.params.accountAddress);
     }
   }
   componentDidMount() {
-    const { accountAddress } = this.props.params;
+    const { accountAddress } = this.props.match.params;
     this.fetchData(accountAddress);
   }
   fetchData(address) {
@@ -179,14 +179,14 @@ export default class AccountDetails extends Component {
   }
 
   handlePageChange = pageNumber => {
-    let { accountAddress } = this.props.params;
+    let { accountAddress } = this.props.match.params;
     let { includeService } = this.state;
     this.getTransactionsByAddress(accountAddress, includeService, pageNumber);
   }
 
   handleToggleHideTxn = () => {
     if (this.state.hasOtherTxs) {
-      let { accountAddress } = this.props.params;
+      let { accountAddress } = this.props.match.params;
       let includeService = !this.state.includeService;
       this.setState({
         includeService,
@@ -200,7 +200,7 @@ export default class AccountDetails extends Component {
   }
 
   downloadTrasanctionHistory() {
-    const { accountAddress } = this.props.params;
+    const { accountAddress } = this.props.match.params;
     const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
     const endDate = (new Date(this.endDate.value).getTime() / 1000).toString();
     let hasStartDateErr = false, hasEndDateErr = false;

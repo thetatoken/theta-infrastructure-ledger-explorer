@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
@@ -46,7 +46,7 @@ export default class Dashboard extends Component {
   }
   render() {
     const { thetaInfo, tfuelInfo } = this.state;
-    const { backendAddress } = this.props.route;
+    const { backendAddress } = this.props;
     return (
       <div className="content home">
         <TokenDashboard type='theta' tokenInfo={thetaInfo} />

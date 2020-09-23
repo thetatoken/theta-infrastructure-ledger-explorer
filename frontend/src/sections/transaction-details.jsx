@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { BigNumber } from 'bignumber.js';
 
@@ -19,7 +19,7 @@ export default class TransactionExplorer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       transaction: null,
       totalTransactionsNumber: undefined,
       errorType: null,
@@ -28,13 +28,13 @@ export default class TransactionExplorer extends Component {
     };
   }
   componentDidUpdate(preProps) {
-    if (preProps.params.transactionHash !== this.props.params.transactionHash) {
-      this.getOneTransactionByUuid(this.props.params.transactionHash);
+    if (preProps.match.params.transactionHash !== this.props.match.params.transactionHash) {
+      this.getOneTransactionByUuid(this.props.match.params.transactionHash);
       this.getPrices();
     }
   }
   componentDidMount() {
-    const { transactionHash } = this.props.params;
+    const { transactionHash } = this.props.match.params;
     this.getOneTransactionByUuid(transactionHash.toLowerCase());
     this.getPrices();
   }
@@ -98,7 +98,7 @@ export default class TransactionExplorer extends Component {
     this.setState({ showRaw: !this.state.showRaw });
   }
   render() {
-    const { transactionHash } = this.props.params;
+    const { transactionHash } = this.props.match.params;
     const { transaction, errorType, showRaw, price } = this.state;
     return (
       <div className="content transaction-details">

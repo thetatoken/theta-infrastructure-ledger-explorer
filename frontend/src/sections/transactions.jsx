@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { browserHistory } from 'react-router';
-
+import history from 'common/history'
 import { getQueryParam } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { priceService } from 'common/services/price';
@@ -13,7 +12,7 @@ export default class Transactions extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       transactions: [],
       currentPage: 1,
       totalPages: 0,
@@ -78,7 +77,7 @@ export default class Transactions extends Component {
   }
 
   handleRowClick = (hash) => {
-    browserHistory.push(`/txs/${hash}`);
+    history.push(`/txs/${hash}`);
   }
 
   render() {

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { browserHistory, Link } from "react-router"
+import history from 'common/history'
+import { Link } from 'react-router-dom';
 
 export default class Header extends Component {
   constructor(props) {
@@ -13,16 +14,16 @@ export default class Header extends Component {
     switch (this.searchType.value) {
       case 'address':
         if(value !== ''){
-          browserHistory.push(`/account/${value}`);
+          history.push(`/account/${value}`);
           this.searchInput.value = '';
         }
         break;
       case 'block':
-        browserHistory.push(`/blocks/${value}`);
+        history.push(`/blocks/${value}`);
         this.searchInput.value = '';
         break;
       case 'transaction':
-        browserHistory.push(`/txs/${value}`);
+        history.push(`/txs/${value}`);
         this.searchInput.value = '';
         break;
       default:
@@ -42,7 +43,7 @@ export default class Header extends Component {
           <Link to="/blocks" className="nav-item">Blocks</Link>
           <Link to="/txs" className="nav-item">Transactions</Link>
           <Link to="/stakes" className="nav-item">Stakes</Link>
-          <Link href="https://www.thetatoken.org/" className="nav-item">Learn More</Link>
+          <a href="https://www.thetatoken.org/" className="nav-item">Learn More</a>
         </div>
         <div className="nav-search">
           <input type="text" className="search-input" placeholder="Search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />

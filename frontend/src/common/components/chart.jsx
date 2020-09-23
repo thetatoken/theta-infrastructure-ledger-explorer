@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Chart from "chart.js";
-import { browserHistory, Link } from 'react-router';
+import history from 'common/history'
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
@@ -31,7 +32,7 @@ const getLineOptions = (type, data, labels, clickType) => {
         animateRotate: true
       },
       onClick: (e) => {
-        
+
       },
       tooltips: {
         callbacks: {
@@ -123,12 +124,12 @@ export default class ThetaChart extends Component {
             var activeElement = this.chart.getElementAtEvent(e);
             if (activeElement.length > 0) {
               const address = this.chart.config.data.labels[activeElement[0]._index];
-              if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
+              if (address !== 'Rest Nodes') history.push(`/account/${address}`);
               return;
             }
           }
           if (clickType === 'stake') {
-            browserHistory.push(`/stakes`);
+            history.push(`/stakes`);
           }
         },
         tooltips: {

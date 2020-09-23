@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
+import history from 'common/history'
+import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
 import _ from 'lodash';
 import cx from 'classnames';
@@ -53,7 +54,7 @@ export default class TransactionTable extends Component {
   }
 
   handleRowClick = (hash) => {
-    browserHistory.push(`/txs/${hash}`);
+    history.push(`/txs/${hash}`);
   }
 
   render() {

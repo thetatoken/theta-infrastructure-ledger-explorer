@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
