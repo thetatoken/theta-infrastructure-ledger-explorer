@@ -86,6 +86,9 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
         // Update smart contract account
         if (tx.receipt) {
           await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao);
+          if (tx.receipt.ContractAddress !== tx.data.to.address) {
+            await _updateAccountTxMap(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          }
           _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
         }
         break;
@@ -162,6 +165,10 @@ function _createSmartContract(address, bytecode, smartContractDao) {
     'address': address,
     'bytecode': bytecode,
     'abi': '',
-    'source_code': ''
+    'source_code': '',
+    'verification_date': '',
+    'compiler_version': '',
+    'optimizer': '',
+    'name': ''
   });
 }

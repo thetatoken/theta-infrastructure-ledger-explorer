@@ -352,15 +352,19 @@ const DepositStake = ({ transaction, price }) => {
 }
 
 const SmartContract = ({ transaction }) => {
-  let { data, receipt} = transaction;
+  let { data, receipt } = transaction;
+  let err = _.get(receipt, 'EvmErr');
+  let receiptAddress = err ? <span className="text-disabled">{_.get(receipt, 'ContractAddress')}</span> : <Address hash={_.get(receipt, 'ContractAddress')} />;
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
         <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
-        {receipt && <DetailsRow label="Contract Address" data={<Address hash={_.get(receipt, 'ContractAddress')} />} />}
+        {receipt && <DetailsRow label="Contract Address" data={receiptAddress} />}
         <DetailsRow label="Gas Limit" data={data.gas_limit} />
+        {receipt && <DetailsRow label="Gas Used" data={receipt.GasUsed} />}
         <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
+        {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : ''}
         <DetailsRow label="Data" data={getHex(data.data)} />
       </tbody>
     </table>);

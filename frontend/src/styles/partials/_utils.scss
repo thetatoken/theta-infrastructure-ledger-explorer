@@ -13,6 +13,11 @@
   color: $color-red;
 }
 
+.text-disabled{
+  color: $color-font-light;
+  cursor: not-allowed;
+}
+
 @mixin flex($direction: row, $justify: flex-start, $align: center, $wrap: nowrap) {
   display: flex;
   flex-flow: $direction $wrap;
