@@ -7,7 +7,7 @@ export const smartContractService = {
     }
     return apiService.get(`smartcontract/${address}`, {});
   },
-  verifySouceCode(address, byteCode, sourceCode, abi, version, optimizer) {
+  verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer) {
     if (!address) {
       throw Error('Missing argument');
     }

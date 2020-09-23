@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+import LoadingPanel from 'common/components/loading-panel';
 import { smartContractService } from 'common/services/smartContract';
 
 export default class SmartContractCode extends React.Component {
@@ -8,7 +9,8 @@ export default class SmartContractCode extends React.Component {
     this.state = {
       smartContract: null,
       isReleasesReady: false,
-      isVerified: false
+      isVerified: false,
+      verifying: false
     }
   }
   componentDidMount() {
@@ -85,18 +87,24 @@ export default class SmartContractCode extends React.Component {
     console.log('Submitting to backend.')
     console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
     console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
-    smartContractService.verifySouceCode(address, byteCode, sourceCode, abi, version, optimizer)
+    this.setState({ isVerifying: true })
+    smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
+        this.setState({ isVerifying: false })
         console.log('res from verify source code:', res);
       })
   }
   render() {
     const { address } = this.props;
-    const { smartContract, isReleasesReady } = this.state;
+    const { smartContract, isReleasesReady, isVerifying } = this.state;
     console.log(`address: ${address}`)
     console.log('sc:', this.state.smartContract)
-    return (
+    return (isVerifying ?
       <React.Fragment>
+        <div className="code-loading-text">Verifying your source code......</div>
+        <LoadingPanel />
+      </React.Fragment>
+      :<React.Fragment>
         <div className="selects-container">
           {isReleasesReady ? <div className="select--container">
             <label>Please select Compiler Version</label>
