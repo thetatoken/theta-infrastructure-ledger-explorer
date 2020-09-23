@@ -78,11 +78,11 @@ export default class TransactionTable extends Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(transactions, txn => {
+          {_.map(transactions, (txn, i) => {
             let source = null;
-            source = !account ? 'none' : account.address === from(txn,null,account) ? 'from' : 'to';
+            source = !account ? 'none' : account.address === from(txn, null, account) ? 'from' : 'to';
             return (
-              <tr key={txn.hash} className={TxnClasses[txn.type]}>
+              <tr key={i} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
                 <td className="hash overflow"><Link to={`/txs/${txn.hash}`}>{hash(txn, truncate)}</Link></td>
                 {includeDetails &&
@@ -92,7 +92,7 @@ export default class TransactionTable extends Component {
                     <td className={cx({ 'dim': source === 'to' }, "from overflow")}><Link to={`/account/${from(txn)}`}>{from(txn, 20)}</Link></td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      <Link to={`/account/${to(txn,null,address)}`}>{to(txn, 20, address)}</Link>
+                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address)}</Link>
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
@@ -108,12 +108,12 @@ const Value = ({ coins, price }) => {
   return (
     <React.Fragment>
       <div className="currency theta">
-        {formatCoin(coins.thetawei)} 
+        {formatCoin(coins.thetawei)}
         {!isMobile && "Theta"}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>}
       </div>
       <div className="currency tfuel">
-        {formatCoin(coins.tfuelwei)} 
+        {formatCoin(coins.tfuelwei)}
         {!isMobile && "TFuel"}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>

@@ -315,22 +315,24 @@ export default class AccountDetails extends Component {
           <React.Fragment>
             <div className="actions">
               {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
-                <div className="popup-row header">Choose the time period. Must within 7 days.</div>
-                <div className="popup-row">
-                  <div className="popup-label">Start Date:</div>
-                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
-                </div>
-                <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
-                <div className="popup-row">
-                  <div className="popup-label">End Date: </div>
-                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
-                </div>
-                <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
-                <div className="popup-row buttons">
-                  <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
-                  <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
-                  <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
-                </div>
+                <React.Fragment>
+                  <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                  <div className="popup-row">
+                    <div className="popup-label">Start Date:</div>
+                    <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
+                  </div>
+                  <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
+                  <div className="popup-row">
+                    <div className="popup-label">End Date: </div>
+                    <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
+                  </div>
+                  <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
+                  <div className="popup-row buttons">
+                    <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
+                    <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
+                    <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
+                  </div>
+                </React.Fragment>
               </Popup>}
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
