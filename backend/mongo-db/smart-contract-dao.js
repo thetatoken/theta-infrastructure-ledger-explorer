@@ -10,7 +10,7 @@ module.exports = class smartContractDAO {
   }
 
   upsertSmartContract(smartContractInfo, callback) {
-    // console.log('smartContractInfo in upsert:', smartContractInfo)
+    console.log('smartContractInfo in upsert:', smartContractInfo)
     const newObject = {
       'address': smartContractInfo.address,
       'bytecode': smartContractInfo.bytecode,
@@ -38,5 +38,16 @@ module.exports = class smartContractDAO {
         callback(error, record)
       }
     })
+  }
+
+  checkSmartContract(address, callback) {
+    const queryObject = { '_id': address };
+    return this.client.exist(this.smartContractInfoCollection, queryObject, function (err, res) {
+      if (err) {
+        console.log('error in check SmartContract: ', err);
+        callback(err);
+      }
+      callback(err, res);
+    });
   }
 }

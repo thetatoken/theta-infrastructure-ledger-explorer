@@ -89,7 +89,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
             await _updateAccountTxMap(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao);
           }
-          _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
+          await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
         }
         break;
       case 8:
@@ -160,15 +160,18 @@ function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
   });
 }
 
-function _createSmartContract(address, bytecode, smartContractDao) {
-  smartContractDao.upsertSmartContractAsync({
-    'address': address,
-    'bytecode': bytecode,
-    'abi': '',
-    'source_code': '',
-    'verification_date': '',
-    'compiler_version': '',
-    'optimizer': '',
-    'name': ''
-  });
+async function _createSmartContract(address, bytecode, smartContractDao) {
+  const isExist = await smartContractDao.checkSmartContractAsync({ address });
+  if (!isExist) {
+    smartContractDao.upsertSmartContractAsync({
+      'address': address,
+      'bytecode': bytecode,
+      'abi': '',
+      'source_code': '',
+      'verification_date': '',
+      'compiler_version': '',
+      'optimizer': '',
+      'name': ''
+    });
+  }
 }

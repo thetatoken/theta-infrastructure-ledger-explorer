@@ -31,3 +31,9 @@ exports.processBytecode = function (bytecode, version) {
         return bytecode;
     }
 }
+
+exports.getHex = function (str) {
+    const buffer = Buffer.from(str, 'base64');
+    const bufString = buffer.toString('hex');
+    return '0x' + bufString;
+}
