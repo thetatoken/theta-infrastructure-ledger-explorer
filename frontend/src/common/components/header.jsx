@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
 
-export default class Header extends Component {
+export default class Header extends React.Component {
   constructor(props) {
     super(props);
     this.searchInput = React.createRef();

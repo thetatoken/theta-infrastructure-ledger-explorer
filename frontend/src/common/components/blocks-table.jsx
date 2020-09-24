@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import socketClient from 'socket.io-client';
 import history from 'common/history'
@@ -6,7 +6,7 @@ import cx from 'classnames';
 
 import { averageFee, hash, age, date } from 'common/helpers/blocks';
 
-export default class BlockOverviewTable extends Component {
+export default class BlockOverviewTable extends React.Component {
 
   constructor(props) {
     super(props);

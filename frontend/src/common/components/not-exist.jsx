@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 
 
-export default class NotExist extends Component {
+export default class NotExist extends React.PureComponent {
   render() {
     const { msg } = this.props;
     return (

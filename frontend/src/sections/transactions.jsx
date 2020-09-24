@@ -1,6 +1,5 @@
-import React, { Component } from "react";
+import React from "react";
 import history from 'common/history'
-import { getQueryParam } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { priceService } from 'common/services/price';
 import Pagination from "common/components/pagination";
@@ -8,7 +7,7 @@ import TransactionTable from "common/components/transactions-table";
 
 const NUM_TRANSACTIONS = 50;
 
-export default class Transactions extends Component {
+export default class Transactions extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,30 +44,24 @@ export default class Transactions extends Component {
         console.log(err)
       })
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
         const prices = _.get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }

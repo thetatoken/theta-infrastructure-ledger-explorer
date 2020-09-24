@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import _ from 'lodash';
 import cx from 'classnames';
 
@@ -13,7 +13,7 @@ import { WEI } from 'common/constants';
 import { hash } from 'common/helpers/transactions';
 import { TxnTypeText, TxnClasses } from 'common/constants';
 const totalSupply = 870502690;
-export default class TokenDashboard extends Component {
+export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

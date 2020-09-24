@@ -1,14 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { stakeService } from 'common/services/stake';
 import ThetaChart from 'common/components/chart';
-import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
+import { sumCoin } from 'common/helpers/utils';
 import StakesTable from "../common/components/stakes-table";
 
 import BigNumber from 'bignumber.js';
 
 
-export default class Blocks extends Component {
+export default class Stakes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

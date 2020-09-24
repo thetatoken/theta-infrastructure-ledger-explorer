@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 import Chart from "chart.js";
 import history from 'common/history'
-import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
@@ -58,7 +57,7 @@ const getLineOptions = (type, data, labels, clickType) => {
   }
 }
 
-export default class ThetaChart extends Component {
+export default class ThetaChart extends React.PureComponent {
   constructor(props) {
     super(props);
     this.chart = null;

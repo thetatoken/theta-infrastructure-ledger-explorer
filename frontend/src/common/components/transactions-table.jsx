@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
@@ -12,7 +12,7 @@ import { TxnTypeText, TxnClasses } from 'common/constants';
 
 
 
-export default class TransactionTable extends Component {
+export default class TransactionTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

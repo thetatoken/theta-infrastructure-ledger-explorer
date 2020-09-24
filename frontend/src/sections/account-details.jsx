@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React from "react";
 import Popup from "reactjs-popup";
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
-import { formatCoin, priceCoin, getTheta } from 'common/helpers/utils';
+import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -20,7 +20,7 @@ import SmartContract from 'common/components/smart-contract';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-export default class AccountDetails extends Component {
+export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -72,30 +72,24 @@ export default class AccountDetails extends Component {
     this.getStakeTransactions(address);
     this.getPrices();
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
         const prices = _.get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }

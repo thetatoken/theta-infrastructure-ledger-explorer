@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
-import { formatCoin, sumCoin } from 'common/helpers/utils';
+import { formatCoin } from 'common/helpers/utils';
 
 const TRUNC = 20;
 
-export default class StakesTable extends Component {
+export default class StakesTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

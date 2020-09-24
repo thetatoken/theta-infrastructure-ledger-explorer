@@ -1,9 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
-import { BigNumber } from 'bignumber.js';
 
-import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, getHex } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
@@ -15,7 +14,7 @@ import BodyTag from 'common/components/body-tag';
 
 
 
-export default class TransactionExplorer extends Component {
+export default class TransactionExplorer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -38,30 +37,24 @@ export default class TransactionExplorer extends Component {
     this.getOneTransactionByUuid(transactionHash.toLowerCase());
     this.getPrices();
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
         const prices = _.get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }
@@ -98,7 +91,6 @@ export default class TransactionExplorer extends Component {
     this.setState({ showRaw: !this.state.showRaw });
   }
   render() {
-    const { transactionHash } = this.props.match.params;
     const { transaction, errorType, showRaw, price } = this.state;
     return (
       <div className="content transaction-details">

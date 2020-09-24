@@ -1,15 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import cx from 'classnames';
 
 import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
-import { hash } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
 const TRUNC = 2;
 
 
-export default class StakeTxsTable extends Component {
+export default class StakeTxsTable extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

@@ -1,16 +1,15 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 
 import { blocksService } from 'common/services/block';
-import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist';
 import { BlockStatus, TxnTypeText, TxnClasses } from 'common/constants';
 import { date, hash, prevBlock } from 'common/helpers/blocks';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 
-export default class BlocksExplorer extends Component {
+export default class BlocksExplorer extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -68,30 +67,24 @@ export default class BlocksExplorer extends Component {
       <div className="th-explorer__buttons--no-more">No More</div>
     )
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
         const prices = _.get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }

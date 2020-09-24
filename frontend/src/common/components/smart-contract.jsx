@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React from "react";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import SmartContractCode from './smart-contract-code';
 
-export default class SmartContract extends Component {
+export default class SmartContract extends React.PureComponent {
   constructor(props) {
     super(props)
   }

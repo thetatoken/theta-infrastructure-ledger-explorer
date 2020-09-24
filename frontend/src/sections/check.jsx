@@ -1,9 +1,8 @@
-import React, { Component } from "react";
-import { transactionsService } from 'common/services/transaction';
+import React from "react";
 import { apiService } from '../common/services/api';
 
 
-export default class Check extends Component {
+export default class Check extends React.Component {
   constructor(props) {
     super(props);
     this.searchAddress = React.createRef();
