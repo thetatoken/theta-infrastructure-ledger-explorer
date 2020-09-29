@@ -88,8 +88,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
           await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao);
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
             await _updateAccountTxMap(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao);
+            await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
           }
-          await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
         }
         break;
       case 8:
@@ -161,7 +161,7 @@ function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
 }
 
 async function _createSmartContract(address, bytecode, smartContractDao) {
-  const isExist = await smartContractDao.checkSmartContractAsync({ address });
+  const isExist = await smartContractDao.checkSmartContractAsync(address);
   if (!isExist) {
     smartContractDao.upsertSmartContractAsync({
       'address': address,

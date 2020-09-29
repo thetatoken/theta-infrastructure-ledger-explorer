@@ -10,7 +10,6 @@ module.exports = class smartContractDAO {
   }
 
   upsertSmartContract(smartContractInfo, callback) {
-    console.log('smartContractInfo in upsert:', smartContractInfo)
     const newObject = {
       'address': smartContractInfo.address,
       'bytecode': smartContractInfo.bytecode,
@@ -50,4 +49,5 @@ module.exports = class smartContractDAO {
       callback(err, res);
     });
   }
+
 }
