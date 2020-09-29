@@ -39,7 +39,16 @@ var smartContractRouter = (app, smartContractDao) => {
             '*': {
               '*': ['*']
             }
-          }
+          },
+          metadata: {
+            // Use only literal content and not URLs (false by default)
+            "useLiteralContent": true,
+            // Use the given hash method for the metadata hash that is appended to the bytecode.
+            // The metadata hash can be removed from the bytecode via option "none".
+            // The other options are "ipfs" and "bzzr1".
+            // If the option is omitted, "ipfs" is used by default.
+            "bytecodeHash": "ipfs"
+          },
         },
         sources: {
           'test.sol': {
@@ -49,7 +58,7 @@ var smartContractRouter = (app, smartContractDao) => {
       };
       var output = '';
       // Todos: may need to run a separate node for the verification
-      solc.loadRemoteVersion(version, function (err, solcSnapshot) {
+      solc.loadRemoteVersion(version, async function (err, solcSnapshot) {
         const cur = +new Date();
         console.log(`load Remote version takes: ${(cur - start) / 1000} seconds`)
         if (err) {
@@ -74,25 +83,39 @@ var smartContractRouter = (app, smartContractDao) => {
             return check;
           }, {});
         }
-        console.log(`check:`, check)
+        //console.log(`check:`, check)
         let data = {}
         let verified = false;
         if (check.error) {
           data = { result: { verified: false }, err_msg: check.error }
         } else {
           if (output.contracts) {
+            let hexBytecode = helper.getHex(byteCode).substring(2);
             for (var contractName in output.contracts['test.sol']) {
               const curCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
-              const processed_compiled_bytecode = helper.processBytecode(curCode, version);
-              const processed_blockchain_bytecode = helper.processBytecode(helper.getHex(byteCode), version);
-              console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`)
-              console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
-              if (processed_compiled_bytecode == processed_blockchain_bytecode) {
-                // console.log(`processed_compiled_bytecode:`, processed_compiled_bytecode)
+              const processed_compiled_bytecode = helper.getBytecodeWithoutMetadata(curCode);
+              //console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
+              //console.log(`processed_compiled_bytecode:`, processed_compiled_bytecode)
+              const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
+              //console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
+              if (processed_compiled_bytecode == processed_blockchain_bytecode && processed_compiled_bytecode.length > 0) {
                 verified = true;
                 let abi = output.contracts['test.sol'][contractName].abi;
-                console.log(`Match the code, contractName:${contractName}`);
-                // console.log(`abi: `, abi)
+                //console.log(`Match the code, contractName:${contractName}`);
+                //console.log('code:', curCode)
+                //console.log(`abi: `, abi)
+                const sc = {
+                  'address': address,
+                  'bytecode': byteCode,
+                  'abi': abi,
+                  'source_code': sourceCode,
+                  'verification_date': +new Date(),
+                  'compiler_version': version,
+                  'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
+                  'name': contractName
+                }
+                await smartContractDao.upsertSmartContractAsync(sc);
+                break;
               }
             }
           }

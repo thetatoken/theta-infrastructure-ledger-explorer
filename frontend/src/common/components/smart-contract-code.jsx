@@ -1,16 +1,17 @@
-import React, { Component } from "react";
+import React, { useRef } from "react";
 
 import LoadingPanel from 'common/components/loading-panel';
 import { smartContractService } from 'common/services/smartContract';
 
-export default class SmartContractCode extends React.Component {
+export default class SmartContractCode extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
       smartContract: null,
       isReleasesReady: false,
       isVerified: false,
-      verifying: false
+      isVerifying: false,
+      isCodeEmpty: true
     }
   }
   componentDidMount() {
@@ -21,10 +22,6 @@ export default class SmartContractCode extends React.Component {
       this.fetchSmartContract(address)
     }
   }
-  sourceCodeRef = e => this.sourceCode = e;
-  versionRef = e => this.version = e;
-  optimizerRef = e => this.optimizer = e;
-  abiRef = e => this.abi = e;
   fetchSmartContract(address) {
     if (!address) {
       return;
@@ -69,90 +66,104 @@ export default class SmartContractCode extends React.Component {
         if (callback) callback();
       };
     }
-
     if (existingScript && callback) callback();
   }
-  reset = () => {
-    let a = this.sourceCode.value;
-    this.sourceCode.value = '';
-    this.abi.value = '';
+  setIsVerifing = (val) => {
+    this.setState({ isVerifying: val })
   }
-  submit = () => {
-    const sourceCode = this.sourceCode.value;
-    const abi = this.abi.value;
-    const version = this.version.value;
-    const { address } = this.props;
-    const byteCode = _.get(this.state, 'smartContract.bytecode')
-    const optimizer = this.optimizer.value;
-    console.log('Submitting to backend.')
-    console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
-    console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
-    this.setState({ isVerifying: true })
-    smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
-      .then(res => {
-        this.setState({ isVerifying: false })
-        console.log('res from verify source code:', res);
-      })
-  }
+
   render() {
     const { address } = this.props;
     const { smartContract, isReleasesReady, isVerifying } = this.state;
     console.log(`address: ${address}`)
-    console.log('sc:', this.state.smartContract)
+    console.log('sc:', smartContract)
     return (isVerifying ?
-      <React.Fragment>
+      <>
         <div className="code-loading-text">Verifying your source code......</div>
         <LoadingPanel />
-      </React.Fragment>
-      :<React.Fragment>
-        <div className="selects-container">
-          {isReleasesReady ? <div className="select--container">
-            <label>Please select Compiler Version</label>
-            <div className="select--selector">
-              <select ref={this.versionRef}>
-                <Options />
-              </select>
-            </div>
-          </div> : ''}
-          <div className="select--container optimizer">
-            <label>
-              <span className="select--tooltip">?
-              <span className="select--tooltip__text">
-                  Select the option you used when compiling this contract.
-              </span></span>
-              Optimization
-            </label>
-            <div className="select--selector optimizer">
-              <select ref={this.optimizerRef} defaultValue={0}>
-                <option value={1}>Yes</option>
-                <option value={0}>No</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <label htmlFor="txtSourceCode">
-          <b>Enter the Solidity Contract Code below &nbsp;</b>
-          <span className="text-danger">*</span>
-        </label>
-        <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={this.sourceCodeRef} required />
-        <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
-        <textarea className='abi-area' placeholder="Enter your code here." ref={this.abiRef} />
-        <div className="code-buttons">
-          <div onClick={this.submit}>Verify and Publish</div>
-          <div className='reset' onClick={this.reset}>Reset</div>
-        </div>
-      </React.Fragment>
+      </>
+      : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
+        setIsVerifing={this.setIsVerifing} />
     )
   }
 }
 const Options = () => {
   let releases = window.soljsonReleases;
   return (
-    <React.Fragment>
+    <>
       {Object.keys(releases).map(key => {
         let text = releases[key].match(/^soljson-(.*).js$/)[1];
         return (<option value={text} key={key}>{text}</option>)
       })}
-    </React.Fragment>
+    </>
+  )
+}
+const CodeUploader = props => {
+  const { isReleasesReady, address, setIsVerifing } = props;
+  const sourceCodeRef = useRef(null);
+  const versionRef = useRef(null);
+  const optimizerRef = useRef(null);
+  const abiRef = useRef(null);
+  const reset = () => {
+    sourceCodeRef.current.value = '';
+    abiRef.current.value = '';
+  }
+  const submit = () => {
+    const sourceCode = sourceCodeRef.current.value;
+    const abi = abiRef.current.value;
+    const version = versionRef.current.value;
+    const optimizer = optimizerRef.current.value;
+    const { address } = props;
+    const byteCode = _.get(props, 'smartContract.bytecode');
+    console.log('Submitting to backend.')
+    console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
+    console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
+    setIsVerifing(true);
+    smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
+      .then(res => {
+        setIsVerifing(false);
+        console.log('res from verify source code:', res);
+      })
+  }
+  return (
+    <>
+      <div className="selects-container">
+        {isReleasesReady ? <div className="select--container">
+          <label>Please select Compiler Version</label>
+          <div className="select--selector">
+            <select ref={versionRef}>
+              <Options />
+            </select>
+          </div>
+        </div> : ''}
+        <div className="select--container optimizer">
+          <label>
+            <span className="select--tooltip">?
+              <span className="select--tooltip__text">
+                Select the option you used when compiling this contract.
+              </span></span>
+              Optimization
+            </label>
+          <div className="select--selector optimizer">
+            <select ref={optimizerRef} defaultValue={0}>
+              <option value={1}>Yes</option>
+              <option value={0}>No</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <label htmlFor="txtSourceCode">
+        <b>Enter the Solidity Contract Code below &nbsp;</b>
+        <span className="text-danger">*</span>
+        <span className="text-danger">source code is reqired.</span>
+      </label>
+      <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
+      <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
+      <textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />
+      <div className="code-buttons">
+        <div onClick={submit}>Verify and Publish</div>
+        <div className='reset' onClick={reset}>Reset</div>
+      </div>
+    </>
   )
 }
