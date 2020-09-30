@@ -77,15 +77,24 @@ export default class SmartContractCode extends React.PureComponent {
     const { smartContract, isReleasesReady, isVerifying } = this.state;
     console.log(`address: ${address}`)
     console.log('sc:', smartContract)
-    return (isVerifying ?
-      <>
-        <div className="code-loading-text">Verifying your source code......</div>
-        <LoadingPanel />
-      </>
-      : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
-        setIsVerifing={this.setIsVerifing} />
+    const showView = _.get(smartContract, 'source_code.length')
+    console.log(showView)
+    return (showView ?
+      <CodeViewer contract={smartContract} /> : <CodeUploadWrapper address={address} smartContract={smartContract}
+        isReleasesReady={isReleasesReady} isVerifying={isVerifying} setIsVerifing={this.setIsVerifing} />
     )
   }
+}
+const CodeUploadWrapper = props => {
+  const { address, smartContract, isReleasesReady, isVerifying, setIsVerifing } = props;
+  return (isVerifying ?
+    <>
+      <div className="code-loading-text">Verifying your source code......</div>
+      <LoadingPanel />
+    </>
+    : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
+      setIsVerifing={setIsVerifing} />
+  )
 }
 const Options = () => {
   let releases = window.soljsonReleases;
@@ -113,7 +122,6 @@ const CodeUploader = props => {
     const abi = abiRef.current.value;
     const version = versionRef.current.value;
     const optimizer = optimizerRef.current.value;
-    const { address } = props;
     const byteCode = _.get(props, 'smartContract.bytecode');
     console.log('Submitting to backend.')
     console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
@@ -155,7 +163,7 @@ const CodeUploader = props => {
       <label htmlFor="txtSourceCode">
         <b>Enter the Solidity Contract Code below &nbsp;</b>
         <span className="text-danger">*</span>
-        <span className="text-danger">source code is reqired.</span>
+        <span className="text-danger">source code is reqired. Only Single File Supported</span>
       </label>
       <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
       <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
@@ -166,4 +174,37 @@ const CodeUploader = props => {
       </div>
     </>
   )
+}
+
+const CodeViewer = props => {
+  const { contract } = props;
+  return (
+    <>
+      <div className="contract-info">
+        <div className="contract-info--title">Contract Source Code Verified</div>
+        <div className="contract-info--general">
+          <div className="contract-info--block">
+            <div className="contract-info--cell">
+              <div>Contract Name:</div>
+              <div>{contract.name}</div>
+            </div>
+            <div className="contract-info--cell">
+              <div>Compiler Version:</div>
+              <div>{contract.compiler_version}</div>
+            </div>
+          </div>
+          <div className="contract-info--block">
+            <div className="contract-info--cell">
+              <div>Optimization Enabled:</div>
+              <div><b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with <b>200</b> runs</div>
+            </div>
+            <div className="contract-info--cell">
+              <div>Other Settings:</div>
+              <div><b>default</b> evmVersion</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </>)
 }
