@@ -2,6 +2,8 @@ import React, { useRef } from "react";
 
 import LoadingPanel from 'common/components/loading-panel';
 import { smartContractService } from 'common/services/smartContract';
+import AceEditor from 'common/components/ace-editor';
+import { getHex } from 'common/helpers/utils';
 
 export default class SmartContractCode extends React.PureComponent {
   constructor(props) {
@@ -19,16 +21,15 @@ export default class SmartContractCode extends React.PureComponent {
   }
   componentDidUpdate(preProps) {
     if (this.props.address !== preProps.address) {
-      this.fetchSmartContract(address)
+      this.fetchSmartContract(this.props.address)
     }
   }
-  fetchSmartContract(address) {
+  fetchSmartContract = (address) => {
     if (!address) {
       return;
     }
     smartContractService.getOneByAddress(address)
       .then(res => {
-        console.log(res)
         switch (res.data.type) {
           case 'smart_contract':
             const smartContract = _.get(res, 'data.body')
@@ -75,25 +76,23 @@ export default class SmartContractCode extends React.PureComponent {
   render() {
     const { address } = this.props;
     const { smartContract, isReleasesReady, isVerifying } = this.state;
-    console.log(`address: ${address}`)
-    console.log('sc:', smartContract)
     const showView = _.get(smartContract, 'source_code.length')
-    console.log(showView)
-    return (showView ?
-      <CodeViewer contract={smartContract} /> : <CodeUploadWrapper address={address} smartContract={smartContract}
-        isReleasesReady={isReleasesReady} isVerifying={isVerifying} setIsVerifing={this.setIsVerifing} />
+    return (
+      showView ? <CodeViewer contract={smartContract} /> : <CodeUploadWrapper address={address}
+        smartContract={smartContract} isReleasesReady={isReleasesReady} isVerifying={isVerifying}
+        setIsVerifing={this.setIsVerifing} fetchSmartContract={this.fetchSmartContract} />
     )
   }
 }
 const CodeUploadWrapper = props => {
-  const { address, smartContract, isReleasesReady, isVerifying, setIsVerifing } = props;
+  const { address, smartContract, isReleasesReady, isVerifying, setIsVerifing, fetchSmartContract } = props;
   return (isVerifying ?
     <>
       <div className="code-loading-text">Verifying your source code......</div>
       <LoadingPanel />
     </>
     : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
-      setIsVerifing={setIsVerifing} />
+      setIsVerifing={setIsVerifing} fetchSmartContract={fetchSmartContract} />
   )
 }
 const Options = () => {
@@ -108,7 +107,7 @@ const Options = () => {
   )
 }
 const CodeUploader = props => {
-  const { isReleasesReady, address, setIsVerifing } = props;
+  const { isReleasesReady, address, setIsVerifing, fetchSmartContract } = props;
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
@@ -123,14 +122,19 @@ const CodeUploader = props => {
     const version = versionRef.current.value;
     const optimizer = optimizerRef.current.value;
     const byteCode = _.get(props, 'smartContract.bytecode');
-    console.log('Submitting to backend.')
-    console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
-    console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
+    // console.log('Submitting to backend.')
+    // console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
+    // console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
     setIsVerifing(true);
     smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
         setIsVerifing(false);
         console.log('res from verify source code:', res);
+        let isVerified = _.get(res, 'data.result.verified')
+        console.log('result: ', isVerified)
+        if (isVerified) {
+          fetchSmartContract(address)
+        }
       })
   }
   return (
@@ -175,36 +179,49 @@ const CodeUploader = props => {
     </>
   )
 }
-
 const CodeViewer = props => {
   const { contract } = props;
+  const jsonAbi = contract.abi.map(obj => JSON.stringify(obj))
   return (
     <>
       <div className="contract-info">
-        <div className="contract-info--title">Contract Source Code Verified</div>
-        <div className="contract-info--general">
-          <div className="contract-info--block">
-            <div className="contract-info--cell">
-              <div>Contract Name:</div>
-              <div>{contract.name}</div>
+        <div className="contract-info--block">
+          <div className="contract-info--title verified">Contract Source Code Verified</div>
+          <div className="contract-info--general">
+            <div className="contract-info--raws">
+              <div className="contract-info--cell">
+                <div>Contract Name:</div>
+                <div>{contract.name}</div>
+              </div>
+              <div className="contract-info--cell">
+                <div>Compiler Version:</div>
+                <div>{contract.compiler_version}</div>
+              </div>
             </div>
-            <div className="contract-info--cell">
-              <div>Compiler Version:</div>
-              <div>{contract.compiler_version}</div>
-            </div>
-          </div>
-          <div className="contract-info--block">
-            <div className="contract-info--cell">
-              <div>Optimization Enabled:</div>
-              <div><b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with <b>200</b> runs</div>
-            </div>
-            <div className="contract-info--cell">
-              <div>Other Settings:</div>
-              <div><b>default</b> evmVersion</div>
+            <div className="contract-info--raws">
+              <div className="contract-info--cell">
+                <div>Optimization Enabled:</div>
+                <div><b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with <b>200</b> runs</div>
+              </div>
+              <div className="contract-info--cell">
+                <div>Other Settings:</div>
+                <div><b>default</b> evmVersion</div>
+              </div>
             </div>
           </div>
         </div>
-        <div></div>
+        <div className="contract-info--block">
+          <div className="contract-info--title source-code">Contract Source Code (Solidity)</div>
+          <AceEditor value={contract.source_code} name="contract_source_code" />
+        </div>
+        <div className="contract-info--block">
+          <div className="contract-info--title abi">Contract ABI</div>
+          <AceEditor value={'[' + jsonAbi + ']'} name="contract_abie" height="200px" showGutter={false} />
+        </div>
+        <div className="contract-info--block">
+          <div className="contract-info--title bytecode">Contract Creation Code</div>
+          <AceEditor value={getHex(contract.bytecode)} name="contract_bytecode" height="200px" showGutter={false} />
+        </div>
       </div>
     </>)
 }

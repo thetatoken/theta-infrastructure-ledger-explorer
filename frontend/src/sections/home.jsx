@@ -39,8 +39,6 @@ export default class Dashboard extends React.PureComponent {
     }, 1000);
   }
   render() {
-    console.log('render');
-
     const { thetaInfo, tfuelInfo } = this.state;
     const { backendAddress } = this.props;
     return (
