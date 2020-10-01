@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 
 import LoadingPanel from 'common/components/loading-panel';
 import AceEditor from 'common/components/ace-editor';
-import { getHex } from 'common/helpers/utils';
+import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
 
 export default class SmartContractCode extends React.PureComponent {
@@ -79,23 +79,23 @@ const CodeUploader = props => {
   return (
     <>
       <div className="selects-container">
-        {isReleasesReady ? <div className="select--container">
+        {isReleasesReady ? <div className="select__container">
           <label>Please select Compiler Version</label>
-          <div className="select--selector">
+          <div className="select__selector">
             <select ref={versionRef}>
               <Options />
             </select>
           </div>
         </div> : ''}
-        <div className="select--container optimizer">
+        <div className="select__container optimizer">
           <label>
-            <span className="select--tooltip">?
-              <span className="select--tooltip__text">
+            <span className="select__tooltip">?
+              <span className="select__tooltip--text">
                 Select the option you used when compiling this contract.
               </span></span>
               Optimization
             </label>
-          <div className="select--selector optimizer">
+          <div className="select__selector optimizer">
             <select ref={optimizerRef} defaultValue={0}>
               <option value={1}>Yes</option>
               <option value={0}>No</option>
@@ -120,53 +120,54 @@ const CodeUploader = props => {
 }
 const CodeViewer = props => {
   const { contract } = props;
-  const hasConstructorArguments = _.get(contract, 'constructor_arguments').length > 0;
+  let args = _.get(contract, 'constructor_arguments');
+  const hasConstructorArguments = args ? args.length > 0 : false;
   const jsonAbi = contract.abi.map(obj => JSON.stringify(obj))
   return (
     <>
       <div className="contract-info">
-        <div className="contract-info--block">
-          <div className="contract-info--title verified">Contract Source Code Verified</div>
-          <div className="contract-info--general">
-            <div className="contract-info--raws">
-              <div className="contract-info--cell">
+        <div className="contract-info__block">
+          <div className="contract-info__title verified">Contract Source Code Verified</div>
+          <div className="contract-info__general">
+            <div className="contract-info__raws">
+              <div className="contract-info__cell">
                 <div>Contract Name:</div>
                 <div>{contract.name}</div>
               </div>
-              <div className="contract-info--cell">
+              <div className="contract-info__cell">
                 <div>Compiler Version:</div>
                 <div>{contract.compiler_version}</div>
               </div>
             </div>
-            <div className="contract-info--raws">
-              <div className="contract-info--cell">
+            <div className="contract-info__raws">
+              <div className="contract-info__cell">
                 <div>Optimization Enabled:</div>
                 <div><b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with <b>200</b> runs</div>
               </div>
-              <div className="contract-info--cell">
+              <div className="contract-info__cell">
                 <div>Other Settings:</div>
                 <div><b>default</b> evmVersion</div>
               </div>
             </div>
           </div>
         </div>
-        <div className="contract-info--block">
-          <div className="contract-info--title source-code">Contract Source Code (Solidity)</div>
+        <div className="contract-info__block">
+          <div className="contract-info__title source-code">Contract Source Code (Solidity)</div>
           <AceEditor value={contract.source_code} name="contract_source_code" />
         </div>
-        <div className="contract-info--block">
-          <div className="contract-info--title abi">Contract ABI</div>
+        <div className="contract-info__block">
+          <div className="contract-info__title abi">Contract ABI</div>
           <AceEditor value={'[' + jsonAbi + ']'} name="contract_abie" height="200px" showGutter={false} />
         </div>
-        <div className="contract-info--block">
-          <div className="contract-info--title bytecode">Contract Creation Code</div>
+        <div className="contract-info__block">
+          <div className="contract-info__title bytecode">Contract Creation Code</div>
           <AceEditor value={getHex(contract.bytecode)} name="contract_bytecode" height="200px" showGutter={false} />
         </div>
-        {hasConstructorArguments ? <div className="contract-info--block">
-          <div className="contract-info--title arguments">Constructor Arguments
+        {hasConstructorArguments ? <div className="contract-info__block">
+          <div className="contract-info__title arguments">Constructor Arguments
             <div className="contract-info__title--sub">(ABI-Encoded and is the last bytes of the Contract Creation Code above)</div>
           </div>
-          <AceEditor value={getHex(contract.bytecode)} name="contract_bytecode" height="200px" showGutter={false} />
+          <AceEditor value={getArguments(contract.constructor_arguments)} name="contract_bytecode" height="200px" showGutter={false} />
         </div> : null}
       </div>
     </>)

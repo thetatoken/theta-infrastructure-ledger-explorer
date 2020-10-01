@@ -57,3 +57,13 @@ export function getHex(str) {
   const bufString = buffer.toString('hex');
   return '0x' + bufString;
 }
+
+export function getArguments(str) {
+  let res = str;
+  const num = Math.floor(str.length / 64);
+  res += `\n\n---------------Encoded View---------------\n${num} Constructor Argument${num > 1 ? 's' : ''} found :\n`;
+  for (let i = 0; i < num; i++) {
+    res += `Arg [${i}] : ` + str.substring(i * 64, (i + 1) * 64) + '\n';
+  }
+  return res;
+}

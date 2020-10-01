@@ -9,14 +9,14 @@
   justify-content: space-between;
 }
 .select{
-  &--container{
+  &__container{
     display: flex;
     margin: 15px 0;
     & label{
       line-height: 32px;
     }
   }
-  &--selector{
+  &__selector{
     width: 12rem;
     margin: 0 5px;
     &.optimizer{
@@ -40,12 +40,12 @@
     }
   }
 
-  &--tooltip{
+  &__tooltip{
     $self: &;
     margin: 0 5px;
     color: $color-font-light;
 
-    &__text{
+    &--text{
       width: 250px;
       visibility: hidden;
       position: absolute;
@@ -69,7 +69,7 @@
         border-width: 5px;
       }
     }
-    &:hover #{ $self }__text{
+    &:hover #{ $self }--text{
         visibility: visible;
     }
   }
@@ -103,30 +103,36 @@
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  color: $color-font-light;
+  color: $color-font-main;
   background-color: $color-panel;
-  &--title{
+  &__title{
+    display: flex;
     height: 40px;
     line-height: 40px;
     margin: 20px 0;
     font-weight: $weight-bold;
+    &--sub{
+      color: $color-font-light;
+      font-size: 0.875rem;
+      font-weight: $weight-regular;
+    }
     &.verified{
       margin-top: 0;
       color: $color-green;
     }
   }
-  &--general{
+  &__general{
     display: flex;
     flex-direction: row;
   }
-  &--raws{
+  &__raws{
     width: 50%;
     padding: 0 1rem 0 1rem;
     &:first-child{
       padding-right: 3rem;
     }
   }
-  &--cell{
+  &__cell{
     display: flex;
     height: 40px;
     line-height: 40px;
@@ -140,7 +146,7 @@
       }
     }
   }
-  &--block{
+  &__block{
     margin: 10px 0;
     width: 100%;
   }
