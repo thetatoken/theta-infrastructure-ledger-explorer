@@ -47,7 +47,7 @@ var smartContractRouter = (app, smartContractDao) => {
             // The metadata hash can be removed from the bytecode via option "none".
             // The other options are "ipfs" and "bzzr1".
             // If the option is omitted, "ipfs" is used by default.
-            "bytecodeHash": "ipfs"
+            // "bytecodeHash": "ipfs"
           },
         },
         sources: {
@@ -97,10 +97,13 @@ var smartContractRouter = (app, smartContractDao) => {
               //console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
               //console.log(`processed_compiled_bytecode:`, processed_compiled_bytecode)
               const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
+              const constructor_arguments = hexBytecode.slice(curCode.length);
               //console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
               if (processed_compiled_bytecode == processed_blockchain_bytecode && processed_compiled_bytecode.length > 0) {
                 verified = true;
                 let abi = output.contracts['test.sol'][contractName].abi;
+                console.log('functions?:',output.contracts['test.sol'][contractName].evm.methodIdentifiers)
+                console.log('rest codes:', rest)
                 //console.log(`Match the code, contractName:${contractName}`);
                 //console.log('code:', curCode)
                 //console.log(`abi: `, abi)
@@ -108,11 +111,13 @@ var smartContractRouter = (app, smartContractDao) => {
                   'address': address,
                   'bytecode': byteCode,
                   'abi': abi,
-                  'source_code': sourceCode,
+                  'source_code': helper.stampDate(sourceCode),
                   'verification_date': +new Date(),
                   'compiler_version': version,
                   'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
-                  'name': contractName
+                  'name': contractName,
+                  'function_hash': output.contracts['test.sol'][contractName].evm.methodIdentifiers,
+                  'constructor_arguments': constructor_arguments
                 }
                 await smartContractDao.upsertSmartContractAsync(sc);
                 break;
@@ -121,6 +126,7 @@ var smartContractRouter = (app, smartContractDao) => {
           }
           data = { result: { verified }, warning_msg: check.warnings }
         }
+        console.log(`res in verification:`, data)
         res.status(200).send(data);
       });
     } catch (e) {

@@ -18,7 +18,9 @@ module.exports = class smartContractDAO {
       'verification_date': smartContractInfo.verification_date,
       'compiler_version': smartContractInfo.compiler_version,
       'optimizer': smartContractInfo.optimizer,
-      'name': smartContractInfo.name
+      'name': smartContractInfo.name,
+      'function_hash': smartContractInfo.function_hash,
+      'constructor_arguments': smartContractInfo.constructor_arguments
     }
     const queryObject = { '_id': smartContractInfo.address };
     this.client.upsert(this.smartContractInfoCollection, queryObject, newObject, callback);
