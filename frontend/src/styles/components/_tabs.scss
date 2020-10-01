@@ -3,10 +3,14 @@
     &__tab{
       border-bottom: 1px solid transparent;
       color: $color-font-light;
+      &--disabled{
+        cursor: not-allowed;
+      }
     }
 
     &__tab-list{
       border-bottom: none;
+      user-select: none;
     }
 
     &__tab--selected{

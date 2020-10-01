@@ -103,7 +103,7 @@ var smartContractRouter = (app, smartContractDao) => {
                 verified = true;
                 let abi = output.contracts['test.sol'][contractName].abi;
                 console.log('functions?:',output.contracts['test.sol'][contractName].evm.methodIdentifiers)
-                console.log('rest codes:', rest)
+                console.log('constructor_arguments codes:', constructor_arguments)
                 //console.log(`Match the code, contractName:${contractName}`);
                 //console.log('code:', curCode)
                 //console.log(`abi: `, abi)

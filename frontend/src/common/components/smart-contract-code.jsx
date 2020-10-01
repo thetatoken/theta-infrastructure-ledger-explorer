@@ -13,6 +13,7 @@ export default class SmartContractCode extends React.PureComponent {
       isReleasesReady: false,
       isVerified: false,
       isVerifying: false,
+      isLoading: false,
       isCodeEmpty: true
     }
   }
@@ -28,6 +29,7 @@ export default class SmartContractCode extends React.PureComponent {
     if (!address) {
       return;
     }
+    this.setState({ isLoading: true })
     smartContractService.getOneByAddress(address)
       .then(res => {
         switch (res.data.type) {
@@ -51,6 +53,7 @@ export default class SmartContractCode extends React.PureComponent {
           default:
             break;
         }
+        this.setState({ isLoading: false })
       }).catch(err => {
         console.log(err);
       })
@@ -75,26 +78,21 @@ export default class SmartContractCode extends React.PureComponent {
 
   render() {
     const { address } = this.props;
-    const { smartContract, isReleasesReady, isVerifying } = this.state;
+    const { smartContract, isReleasesReady, isVerifying, isLoading } = this.state;
     const showView = _.get(smartContract, 'source_code.length')
     return (
-      showView ? <CodeViewer contract={smartContract} /> : <CodeUploadWrapper address={address}
-        smartContract={smartContract} isReleasesReady={isReleasesReady} isVerifying={isVerifying}
-        setIsVerifing={this.setIsVerifing} fetchSmartContract={this.fetchSmartContract} />
+      isLoading ? <LoadingPanel /> :
+        showView ? <CodeViewer contract={smartContract} /> : isVerifying ?
+          <>
+            <div className="code-loading-text">Verifying your source code......</div>
+            <LoadingPanel />
+          </>
+          : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
+            setIsVerifing={this.setIsVerifing} fetchSmartContract={this.fetchSmartContract} />
     )
   }
 }
-const CodeUploadWrapper = props => {
-  const { address, smartContract, isReleasesReady, isVerifying, setIsVerifing, fetchSmartContract } = props;
-  return (isVerifying ?
-    <>
-      <div className="code-loading-text">Verifying your source code......</div>
-      <LoadingPanel />
-    </>
-    : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
-      setIsVerifing={setIsVerifing} fetchSmartContract={fetchSmartContract} />
-  )
-}
+
 const Options = () => {
   let releases = window.soljsonReleases;
   return (
@@ -181,6 +179,8 @@ const CodeUploader = props => {
 }
 const CodeViewer = props => {
   const { contract } = props;
+  console.log(contract)
+
   const jsonAbi = contract.abi.map(obj => JSON.stringify(obj))
   return (
     <>
