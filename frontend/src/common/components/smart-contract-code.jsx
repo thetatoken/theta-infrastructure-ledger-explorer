@@ -1,84 +1,25 @@
 import React, { useRef } from "react";
 
 import LoadingPanel from 'common/components/loading-panel';
-import { smartContractService } from 'common/services/smartContract';
 import AceEditor from 'common/components/ace-editor';
 import { getHex } from 'common/helpers/utils';
+import { smartContractService } from 'common/services/smartContract';
 
 export default class SmartContractCode extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      smartContract: null,
-      isReleasesReady: false,
-      isVerified: false,
-      isVerifying: false,
-      isLoading: false,
-      isCodeEmpty: true
+      isCodeEmpty: true,
+      isVerifying: false
     }
   }
-  componentDidMount() {
-    this.fetchSmartContract(this.props.address)
-  }
-  componentDidUpdate(preProps) {
-    if (this.props.address !== preProps.address) {
-      this.fetchSmartContract(this.props.address)
-    }
-  }
-  fetchSmartContract = (address) => {
-    if (!address) {
-      return;
-    }
-    this.setState({ isLoading: true })
-    smartContractService.getOneByAddress(address)
-      .then(res => {
-        switch (res.data.type) {
-          case 'smart_contract':
-            const smartContract = _.get(res, 'data.body')
-            const isVerified = _.get(smartContract, 'verification_date')
-            const hasSourceCode = _.get(smartContract, 'sourceCode')
-            this.setState({
-              smartContract: smartContract,
-              isVerified: isVerified && hasSourceCode,
-              errorType: null
-            })
-            if (!this.state.isVerified) {
-              this.loadReleases(() => {
-                this.setState({ isReleasesReady: true })
-              })
-            }
-            break;
-          case 'error_not_found':
-            break;
-          default:
-            break;
-        }
-        this.setState({ isLoading: false })
-      }).catch(err => {
-        console.log(err);
-      })
-  }
-  loadReleases = (callback) => {
-    const existingScript = document.getElementById('solReleases');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.src = 'https://solc-bin.ethereum.org/bin/list.js';
-      script.id = 'solReleases';
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        if (callback) callback();
-      };
-    }
-    if (existingScript && callback) callback();
-  }
-  setIsVerifing = (val) => {
+  setIsVerifying = (val) => {
+    console.log('set is verifying')
     this.setState({ isVerifying: val })
   }
-
   render() {
-    const { address } = this.props;
-    const { smartContract, isReleasesReady, isVerifying, isLoading } = this.state;
+    const { address, smartContract, isReleasesReady, isLoading, fetchSmartContract } = this.props;
+    const { isVerifying } = this.state;
     const showView = _.get(smartContract, 'source_code.length')
     return (
       isLoading ? <LoadingPanel /> :
@@ -88,7 +29,7 @@ export default class SmartContractCode extends React.PureComponent {
             <LoadingPanel />
           </>
           : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
-            setIsVerifing={this.setIsVerifing} fetchSmartContract={this.fetchSmartContract} />
+            setIsVerifying={this.setIsVerifying} fetchSmartContract={fetchSmartContract} />
     )
   }
 }
@@ -105,7 +46,7 @@ const Options = () => {
   )
 }
 const CodeUploader = props => {
-  const { isReleasesReady, address, setIsVerifing, fetchSmartContract } = props;
+  const { isReleasesReady, address, setIsVerifying, fetchSmartContract } = props;
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
@@ -123,10 +64,10 @@ const CodeUploader = props => {
     // console.log('Submitting to backend.')
     // console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
     // console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
-    setIsVerifing(true);
+    setIsVerifying(true);
     smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
-        setIsVerifing(false);
+        setIsVerifying(false);
         console.log('res from verify source code:', res);
         let isVerified = _.get(res, 'data.result.verified')
         console.log('result: ', isVerified)
@@ -179,8 +120,7 @@ const CodeUploader = props => {
 }
 const CodeViewer = props => {
   const { contract } = props;
-  console.log(contract)
-
+  const hasConstructorArguments = _.get(contract, 'constructor_arguments').length > 0;
   const jsonAbi = contract.abi.map(obj => JSON.stringify(obj))
   return (
     <>
@@ -222,6 +162,12 @@ const CodeViewer = props => {
           <div className="contract-info--title bytecode">Contract Creation Code</div>
           <AceEditor value={getHex(contract.bytecode)} name="contract_bytecode" height="200px" showGutter={false} />
         </div>
+        {hasConstructorArguments ? <div className="contract-info--block">
+          <div className="contract-info--title arguments">Constructor Arguments
+            <div className="contract-info__title--sub">(ABI-Encoded and is the last bytes of the Contract Creation Code above)</div>
+          </div>
+          <AceEditor value={getHex(contract.bytecode)} name="contract_bytecode" height="200px" showGutter={false} />
+        </div> : null}
       </div>
     </>)
 }

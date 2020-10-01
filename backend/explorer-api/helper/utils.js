@@ -31,5 +31,5 @@ exports.stampDate = function (sourceCode) {
     let date = new Date();
     const offset = date.getTimezoneOffset()
     date = new Date(date.getTime() - (offset * 60 * 1000))
-    return `/**\n*Submitted for verification at explorer.thetatoken.org on ${date.toISOString().split('T')[0]}\n*/\n` + sourceCode;
+    return `/**\n *Submitted for verification at explorer.thetatoken.org on ${date.toISOString().split('T')[0]}\n */\n` + sourceCode;
 }

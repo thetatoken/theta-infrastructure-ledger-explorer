@@ -102,8 +102,8 @@ var smartContractRouter = (app, smartContractDao) => {
               if (processed_compiled_bytecode == processed_blockchain_bytecode && processed_compiled_bytecode.length > 0) {
                 verified = true;
                 let abi = output.contracts['test.sol'][contractName].abi;
-                console.log('functions?:',output.contracts['test.sol'][contractName].evm.methodIdentifiers)
-                console.log('constructor_arguments codes:', constructor_arguments)
+                // console.log('functions?:',output.contracts['test.sol'][contractName].evm.methodIdentifiers)
+                // console.log('constructor_arguments codes:', constructor_arguments)
                 //console.log(`Match the code, contractName:${contractName}`);
                 //console.log('code:', curCode)
                 //console.log(`abi: `, abi)
