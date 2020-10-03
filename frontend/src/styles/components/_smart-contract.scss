@@ -44,7 +44,16 @@
     $self: &;
     margin: 0 5px;
     color: $color-font-light;
-
+    &.question-mark{
+      display: inline-block;
+      border: 1px solid $color-font-light;
+      border-radius: 50%;
+      width: 0.875rem;
+      height: 0.875rem;
+      text-align: center;
+      line-height: 0.875rem;
+      font-size: 0.875rem;
+    }
     &--text{
       width: 250px;
       visibility: hidden;
@@ -52,8 +61,9 @@
       z-index: 1;
       background: $color-panel;
       border-radius: 6px;
-      font-size: 0.875rem;
-      padding: 5px 10px;
+      padding: 15px 0 20px 15px;
+      text-align: left;
+      line-height: 25px;
 
       bottom: calc(100% + 10px);
       left: 50%;
@@ -96,6 +106,20 @@
         box-shadow: 0 4px 8px 0 rgba($color-input-background, 0.2), 0 6px 20px 0 rgba($color-input-background, 0.19);
       }
     }
+  }
+}
+.code-error-text{
+  margin-bottom: 30px;
+  &:before{
+    display: inline-block;
+    content: '!';
+    border: 1px solid $color-red;
+    width: 1em;
+    height: 1em;
+    line-height: calc(1em + 3px);
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 5px;
   }
 }
 .contract-info{

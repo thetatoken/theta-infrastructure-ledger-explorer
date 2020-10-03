@@ -63,13 +63,14 @@ var smartContractRouter = (app, smartContractDao) => {
         console.log(`load Remote version takes: ${(cur - start) / 1000} seconds`)
         if (err) {
           console.log('error in solc:', err)
-          // An error was encountered, display and quit
-        } else {
-          start = +new Date();
-          output = JSON.parse(solcSnapshot.compile(JSON.stringify(input)))
-          console.log(`compile takes ${(+new Date() - start) / 1000} seconds`)
-          // console.log(`output:`, output)
+          res.status(200).send({ result: { verified: false }, err_msg: err })
+          return;
         }
+        // An error was encountered, display and quit
+        start = +new Date();
+        output = JSON.parse(solcSnapshot.compile(JSON.stringify(input)))
+        console.log(`compile takes ${(+new Date() - start) / 1000} seconds`)
+        // console.log(`output:`, output)
         let check = {}
         if (output.errors) {
           check = output.errors.reduce((check, err) => {

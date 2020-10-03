@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import LoadingPanel from 'common/components/loading-panel';
 import AceEditor from 'common/components/ace-editor';
@@ -6,30 +6,20 @@ import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
 
 export default class SmartContractCode extends React.PureComponent {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isCodeEmpty: true,
-      isVerifying: false
-    }
-  }
-  setIsVerifying = (val) => {
-    console.log('set is verifying')
-    this.setState({ isVerifying: val })
+  setStates = (keys, vals) => {
+    let newState = {}
+    keys.forEach((key, i) => {
+      newState[key] = vals[i]
+    })
+    this.setState(newState);
   }
   render() {
     const { address, smartContract, isReleasesReady, isLoading, fetchSmartContract } = this.props;
-    const { isVerifying } = this.state;
     const showView = _.get(smartContract, 'source_code.length')
     return (
       isLoading ? <LoadingPanel /> :
-        showView ? <CodeViewer contract={smartContract} /> : isVerifying ?
-          <>
-            <div className="code-loading-text">Verifying your source code......</div>
-            <LoadingPanel />
-          </>
-          : <CodeUploader isReleasesReady={isReleasesReady} smartContract={smartContract} address={address}
-            setIsVerifying={this.setIsVerifying} fetchSmartContract={fetchSmartContract} />
+        showView ? <CodeViewer contract={smartContract} /> : <CodeUploader isReleasesReady={isReleasesReady} 
+        smartContract={smartContract} address={address} fetchSmartContract={fetchSmartContract} />
     )
   }
 }
@@ -38,6 +28,7 @@ const Options = () => {
   let releases = window.soljsonReleases;
   return (
     <>
+      <option value='' key='empty'>[Please select]</option>
       {Object.keys(releases).map(key => {
         let text = releases[key].match(/^soljson-(.*).js$/)[1];
         return (<option value={text} key={key}>{text}</option>)
@@ -46,11 +37,26 @@ const Options = () => {
   )
 }
 const CodeUploader = props => {
-  const { isReleasesReady, address, setIsVerifying, fetchSmartContract } = props;
+  const { isReleasesReady, address, fetchSmartContract } = props;
+  const [isCodeEmpty, setIsCodeEmpty] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
+  const [uploaderSourceCode, setUploaderSourceCode] = useState('');
+  const [uploaderAbi, setUploaderAbi] = useState('');
+  const [uploaderVersion, setUploaderVersion] = useState('');
+  const [uploaderOptimizer, setUploaderOptimizer] = useState(0);
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
   const abiRef = useRef(null);
+  useEffect(() => {
+    if (sourceCodeRef.current) {
+      sourceCodeRef.current.value = uploaderSourceCode;
+      abiRef.current.value = uploaderAbi;
+      optimizerRef.current.value = uploaderOptimizer;
+    }
+    if (versionRef.current) versionRef.current.value = uploaderVersion
+  })
   const reset = () => {
     sourceCodeRef.current.value = '';
     abiRef.current.value = '';
@@ -61,38 +67,45 @@ const CodeUploader = props => {
     const version = versionRef.current.value;
     const optimizer = optimizerRef.current.value;
     const byteCode = _.get(props, 'smartContract.bytecode');
-    // console.log('Submitting to backend.')
-    // console.log(`sourceCode: ${sourceCode}, abi: ${abi}, byteCode: ${byteCode}`)
-    // console.log(`optimizer: ${optimizer},  version: ${version}, address: ${address}`)
+    setUploaderSourceCode(sourceCode);
+    setUploaderAbi(abi);
+    setUploaderVersion(version);
+    setUploaderOptimizer(optimizer);
     setIsVerifying(true);
     smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
         let isVerified = _.get(res, 'data.result.verified')
+        let error = _.get(res, 'data.err_msg')
+        if (error) { setErrMsg(error) }
         console.log('result: ', isVerified)
-        if (isVerified) {
-          fetchSmartContract(address)
-        }
+        if (isVerified) { fetchSmartContract(address) }
       })
   }
-  return (
+  return (isVerifying ?
+    <>
+      <div className="code-loading-text">Verifying your source code......</div>
+      <LoadingPanel />
+    </>
+    :
     <>
       <div className="selects-container">
         {isReleasesReady ? <div className="select__container">
           <label>Please select Compiler Version</label>
           <div className="select__selector">
-            <select ref={versionRef}>
+            <select ref={versionRef} defaultValue=''>
               <Options />
             </select>
           </div>
         </div> : ''}
         <div className="select__container optimizer">
           <label>
-            <span className="select__tooltip">?
-              <span className="select__tooltip--text">
+            <div className="select__tooltip question-mark">?
+              <div className="select__tooltip--text">
                 Select the option you used when compiling this contract.
-              </span></span>
+              </div>
+            </div>
               Optimization
             </label>
           <div className="select__selector optimizer">
@@ -111,6 +124,7 @@ const CodeUploader = props => {
       <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
       <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
       <textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />
+      {errMsg.length ? <div className='code-error-text text-danger'>Validation failed with an error: {errMsg}</div> : null}
       <div className="code-buttons">
         <div onClick={submit}>Verify and Publish</div>
         <div className='reset' onClick={reset}>Reset</div>

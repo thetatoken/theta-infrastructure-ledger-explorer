@@ -79,7 +79,7 @@ export default class SmartContract extends React.PureComponent {
         <Tabs className="theta-tabs">
           <TabList>
             <Tab>Code</Tab>
-            <Tab>Read Contract</Tab>
+            <Tab disabled={!isVerified}>Read Contract</Tab>
             <Tab disabled>Write Contract</Tab>
           </TabList>
 
