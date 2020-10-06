@@ -17,14 +17,15 @@ exports.formatCoin = function (weiAmount) {
 exports.getBytecodeWithoutMetadata = function (bytecode) {
     // Last 4 chars of bytecode specify byte size of metadata component,
     const metadataSize = parseInt(bytecode.slice(-4), 16) * 2 + 4;
-    console.log('metadataSize:', metadataSize)
-    return bytecode.slice(0, bytecode.length - metadataSize);
+    const metadataStarts = bytecode.slice(bytecode.length - metadataSize, bytecode.length - metadataSize + 14)
+    const endPoint = bytecode.indexOf(metadataStarts)
+    console.log('metadataSize:', metadataSize, 'endPoint:', endPoint)
+    return bytecode.slice(0, endPoint);
 }
 
 exports.getHex = function (str) {
     const buffer = Buffer.from(str, 'base64');
     const bufString = buffer.toString('hex');
-    console.log(bufString.length)
     return '0x' + bufString;
 }
 exports.stampDate = function (sourceCode) {
