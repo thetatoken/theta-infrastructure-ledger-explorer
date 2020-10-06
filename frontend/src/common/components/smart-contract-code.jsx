@@ -18,8 +18,8 @@ export default class SmartContractCode extends React.PureComponent {
     const showView = _.get(smartContract, 'source_code.length')
     return (
       isLoading ? <LoadingPanel /> :
-        showView ? <CodeViewer contract={smartContract} /> : <CodeUploader isReleasesReady={isReleasesReady} 
-        smartContract={smartContract} address={address} fetchSmartContract={fetchSmartContract} />
+        showView ? <CodeViewer contract={smartContract} /> : <CodeUploader isReleasesReady={isReleasesReady}
+          smartContract={smartContract} address={address} fetchSmartContract={fetchSmartContract} />
     )
   }
 }
@@ -63,8 +63,20 @@ const CodeUploader = props => {
   }
   const submit = () => {
     const sourceCode = sourceCodeRef.current.value;
-    const abi = abiRef.current.value;
     const version = versionRef.current.value;
+    if (sourceCode === '') {
+      setIsCodeEmpty(true);
+      sourceCodeRef.current.focus();
+      return;
+    } else if(isCodeEmpty){
+      setIsCodeEmpty(false);
+    }
+    if(version === ''){
+      versionRef.current.classList.add('isEmpty');
+      versionRef.current.focus();
+      return;
+    }
+    const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
     const byteCode = _.get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
@@ -84,6 +96,13 @@ const CodeUploader = props => {
         else setErrMsg('Code does not match.')
       })
   }
+  const resetBorder = e => {
+    if(e.target.value === ''){
+      e.target.classList.add('isEmpty')
+    }else{
+      e.target.classList.remove('isEmpty')
+    }
+  }
   return (isVerifying ?
     <>
       <div className="code-loading-text">Verifying your source code......</div>
@@ -95,7 +114,7 @@ const CodeUploader = props => {
         {isReleasesReady ? <div className="select__container">
           <label>Please select Compiler Version</label>
           <div className="select__selector">
-            <select ref={versionRef} defaultValue=''>
+            <select ref={versionRef} defaultValue='' onChange={resetBorder}>
               <Options />
             </select>
           </div>
@@ -120,7 +139,7 @@ const CodeUploader = props => {
       <label htmlFor="txtSourceCode">
         <b>Enter the Solidity Contract Code below &nbsp;</b>
         <span className="text-danger">*</span>
-        <span className="text-danger">source code is reqired. Only Single File Supported</span>
+        <span className="text-danger">{isCodeEmpty ? 'source code is reqired. ' : ''}Only Single File Supported</span>
       </label>
       <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
       <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
