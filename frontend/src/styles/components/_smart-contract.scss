@@ -148,6 +148,9 @@
   &__general{
     display: flex;
     flex-direction: row;
+    @include breakpoint('phablet', max) {
+      flex-direction: column;
+    }
   }
   &__raws{
     width: 50%;
@@ -155,17 +158,20 @@
     &:first-child{
       padding-right: 3rem;
     }
+    @include breakpoint('phablet', max) {
+      width: 100%;
+    }
   }
   &__cell{
     display: flex;
-    height: 40px;
     line-height: 40px;
     &:first-child{
       border-bottom: 1px solid $color-light;
     }
     & > div{
-      width: 50%;
+      width: 40%;
       &:nth-child(2){
+        flex: 1;
         color: $color-font-light;
       }
     }

@@ -80,7 +80,8 @@ const CodeUploader = props => {
         let error = _.get(res, 'data.err_msg')
         if (error) { setErrMsg(error) }
         console.log('result: ', isVerified)
-        if (isVerified) { fetchSmartContract(address) }
+        if (isVerified === true) { fetchSmartContract(address) }
+        else setErrMsg('Code does not match.')
       })
   }
   return (isVerifying ?
