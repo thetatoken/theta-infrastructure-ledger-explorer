@@ -1,6 +1,8 @@
 var fs = require('fs')
 var express = require('express');
 var app = express();
+var compression = require('compression')
+
 var bluebird = require("bluebird");
 var rpc = require('../crawler/api/rpc.js');
 // var asClient = require('../db/aerospike-client.js')
@@ -111,6 +113,8 @@ function main() {
         key: privateKey,
         cert: certificate
       };
+      app.use(compression());
+
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
         res.writeHead(200, {

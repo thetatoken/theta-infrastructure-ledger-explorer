@@ -56,10 +56,6 @@ const buildSASS = done => {
       displayError(err);
       done();
     })
-    .pipe(prefixer({
-      browsers: ['last 2 versions', 'ie >=10'],
-      cascade: false
-    }))
     .on("error", async (err) => {
       displayError(err);
       done();
