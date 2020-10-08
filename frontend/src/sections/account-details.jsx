@@ -1,7 +1,10 @@
 import React from "react";
 import Popup from "reactjs-popup";
 import { Link } from 'react-router-dom';
-import _ from 'lodash';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import compact from 'lodash/compact';
+// import 
 import cx from 'classnames';
 
 import { formatCoin, priceCoin } from 'common/helpers/utils';
@@ -75,7 +78,7 @@ export default class AccountDetails extends React.Component {
   getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
           if (info._id === 'THETA') price.Theta = info.price;
@@ -100,7 +103,7 @@ export default class AccountDetails extends React.Component {
     }
     stakeService.getStakeByAddress(address)
       .then(res => {
-        const stakes = _.get(res, 'data.body');
+        const stakes = get(res, 'data.body');
         this.setState({
           holderTxs: stakes.holderRecords,
           sourceTxs: stakes.sourceRecords,
@@ -118,16 +121,16 @@ export default class AccountDetails extends React.Component {
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
-        const txs = _.get(res, 'data.body');
+        const txs = get(res, 'data.body');
         if (!txs) {
           this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
           return
         }
         if (txs.length !== 0) {
           this.setState({
-            transactions: _.get(res, 'data.body'),
-            currentPage: _.get(res, 'data.currentPageNumber'),
-            totalPages: _.get(res, 'data.totalPageNumber'),
+            transactions: get(res, 'data.body'),
+            currentPage: get(res, 'data.currentPageNumber'),
+            totalPages: get(res, 'data.totalPageNumber'),
             loading_txns: false,
           })
         } else {
@@ -362,7 +365,7 @@ export default class AccountDetails extends React.Component {
 const Balance = ({ balance, price }) => {
   return (
     <div className="act balance">
-      {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
+      {map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
         {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
         <div className='price'>{`[\$${priceCoin(v, price[CurrencyLabels[k]])} USD]`}</div>
       </div>)}
@@ -376,7 +379,7 @@ const Address = ({ hash }) => {
 const HashList = ({ hashes }) => {
   return (
     <React.Fragment>
-      {_.map(_.compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
+      {map(compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
     </React.Fragment>
   )
 }

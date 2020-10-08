@@ -1,5 +1,9 @@
 import React from "react";
 import history from 'common/history'
+import get from 'lodash/get';
+import orderBy from 'lodash/orderBy';
+import toNumber from 'lodash/toNumber';
+
 import { transactionsService } from 'common/services/transaction';
 import { priceService } from 'common/services/price';
 import Pagination from "common/components/pagination";
@@ -32,9 +36,9 @@ export default class Transactions extends React.Component {
       .then(res => {
         if (res.data.type == 'transaction_list') {
           this.setState({
-            transactions: _.orderBy(res.data.body, 'number', 'desc'),
-            currentPage: _.toNumber(res.data.currentPageNumber),
-            totalPages: _.toNumber(res.data.totalPageNumber),
+            transactions: orderBy(res.data.body, 'number', 'desc'),
+            currentPage: toNumber(res.data.currentPageNumber),
+            totalPages: toNumber(res.data.totalPageNumber),
             loading: false,
           })
         }
@@ -47,7 +51,7 @@ export default class Transactions extends React.Component {
   getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
           if (info._id === 'THETA') price.Theta = info.price;

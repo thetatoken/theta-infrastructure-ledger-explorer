@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
+import get from 'lodash/get';
+import map from 'lodash/map';
 
 import { blocksService } from 'common/services/block';
 import NotExist from 'common/components/not-exist';
@@ -70,7 +72,7 @@ export default class BlocksExplorer extends React.PureComponent {
   getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
           if (info._id === 'THETA') price.Theta = info.price;
@@ -161,7 +163,7 @@ export default class BlocksExplorer extends React.PureComponent {
             <h3>Transactions</h3>
             <table className="data transactions">
               <tbody>
-                {_.map(block.txs, (t, i) => <Transaction key={i} txn={t} />)}
+                {map(block.txs, (t, i) => <Transaction key={i} txn={t} />)}
               </tbody>
             </table>
 

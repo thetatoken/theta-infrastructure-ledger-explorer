@@ -1,6 +1,9 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate';
 
 import { TxnTypes, TxnClasses, TxnPurpose } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
@@ -40,7 +43,7 @@ export default class TransactionExplorer extends React.Component {
   getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
           if (info._id === 'THETA') price.Theta = info.price;
@@ -180,7 +183,7 @@ function _getAddressShortHash(address) {
 }
 
 function _renderIds(ids) {
-  return _.map(ids, i => <div key={i}>{i}</div>)
+  return map(ids, i => <div key={i}>{i}</div>)
 }
 
 
@@ -200,7 +203,7 @@ const Amount = ({ coins, price }) => {
 }
 
 const Address = ({ hash, truncate = null }) => {
-  return (<Link to={`/account/${hash}`}>{truncate ? _.truncate(hash, { length: truncate }) : hash}</Link>)
+  return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
 const Fee = ({ transaction }) => {
@@ -284,9 +287,9 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={_.map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
+        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
           : <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />}
-        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
@@ -309,8 +312,8 @@ const Coinbase = ({ transaction, price }) => {
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="Proposer" data={<Address hash={_.get(data, 'proposer.address')} />}></DetailsRow>
-        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        <DetailsRow label="Proposer" data={<Address hash={get(data, 'proposer.address')} />}></DetailsRow>
+        <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
@@ -321,10 +324,10 @@ const WithdrawStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
-        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
+        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
+        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
@@ -335,23 +338,23 @@ const DepositStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
-        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
+        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
+        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
 
 const SmartContract = ({ transaction }) => {
   let { data, receipt } = transaction;
-  let err = _.get(receipt, 'EvmErr');
-  let receiptAddress = err ? <span className="text-disabled">{_.get(receipt, 'ContractAddress')}</span> : <Address hash={_.get(receipt, 'ContractAddress')} />;
+  let err = get(receipt, 'EvmErr');
+  let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
-        <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
+        <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
+        <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
         {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
         <DetailsRow label="Gas Limit" data={data.gas_limit} />
         {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}

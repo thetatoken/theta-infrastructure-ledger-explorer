@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import get from 'lodash/get';
 
 import LoadingPanel from 'common/components/loading-panel';
 import AceEditor from 'common/components/ace-editor';
@@ -15,7 +16,7 @@ export default class SmartContractCode extends React.PureComponent {
   }
   render() {
     const { address, smartContract, isReleasesReady, isLoading, fetchSmartContract } = this.props;
-    const showView = _.get(smartContract, 'source_code.length')
+    const showView = get(smartContract, 'source_code.length')
     return (
       isLoading ? <LoadingPanel /> :
         showView ? <CodeViewer contract={smartContract} /> : <CodeUploader isReleasesReady={isReleasesReady}
@@ -78,7 +79,7 @@ const CodeUploader = props => {
     }
     const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
-    const byteCode = _.get(props, 'smartContract.bytecode');
+    const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
     setUploaderAbi(abi);
     setUploaderVersion(version);
@@ -88,8 +89,8 @@ const CodeUploader = props => {
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
-        let isVerified = _.get(res, 'data.result.verified')
-        let error = _.get(res, 'data.err_msg')
+        let isVerified = get(res, 'data.result.verified')
+        let error = get(res, 'data.err_msg')
         if (error) { setErrMsg(error) }
         console.log('result: ', isVerified)
         if (isVerified === true) { fetchSmartContract(address) }
@@ -154,7 +155,7 @@ const CodeUploader = props => {
 }
 const CodeViewer = props => {
   const { contract } = props;
-  let args = _.get(contract, 'constructor_arguments');
+  let args = get(contract, 'constructor_arguments');
   const hasConstructorArguments = args ? args.length > 0 : false;
   const jsonAbi = contract.abi.map(obj => JSON.stringify(obj))
   return (

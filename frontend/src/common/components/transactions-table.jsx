@@ -2,7 +2,7 @@ import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
-import _ from 'lodash';
+import map from 'lodash/map';
 import cx from 'classnames';
 
 import { truncateMiddle } from 'common/helpers/utils';
@@ -79,7 +79,7 @@ export default class TransactionTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(transactions, (txn, i) => {
+          {map(transactions, (txn, i) => {
             let source = null;
             source = !account ? 'none' : account.address === from(txn, null, account) ? 'from' : 'to';
             return (

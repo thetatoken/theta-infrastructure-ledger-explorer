@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
-import _ from 'lodash';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate'
 import cx from 'classnames';
 
 import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
@@ -53,13 +54,13 @@ export default class StakeTxsTable extends React.PureComponent {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(transactions, record => {
+            {map(transactions, record => {
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
                   <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>
                   {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
-                  <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
+                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
                   {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : 'Theta'}</div></td>}

@@ -1,12 +1,14 @@
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
+import reduce from 'lodash/reduce';
+import get from 'lodash/get';
+import truncate from 'lodash/truncate';
 
 import { GWEI } from 'common/constants';
 
 export function averageFee(block) {
   BigNumber.set({ DECIMAL_PLACES: 2 });
-  return _.reduce(block.txs, (bn, t) => bn.plus(new BigNumber(_.get(t, 'raw.fee.tfuelwei', 0))), new BigNumber(0))
+  return reduce(block.txs, (bn, t) => bn.plus(new BigNumber(get(t, 'raw.fee.tfuelwei', 0))), new BigNumber(0))
     .dividedBy(block.num_txs)
     .dividedBy(GWEI)
     .toString(10);
@@ -14,9 +16,9 @@ export function averageFee(block) {
 
 
 export function hash(block, trunc = null) {
-  let a = _.get(block, 'hash')
+  let a = get(block, 'hash')
   if (trunc && trunc > 0) {
-    a = _.truncate(a, { length: trunc });
+    a = truncate(a, { length: trunc });
   }
   return a;
 }

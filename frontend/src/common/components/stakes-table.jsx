@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import { formatCoin } from 'common/helpers/utils';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate'
 
 const TRUNC = 20;
 
@@ -48,11 +50,11 @@ export default class StakesTable extends React.Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(stakeList, record => {
+            {map(stakeList, record => {
               const address = type === 'node' ? record.holder : record.source;
               return (
                 <tr key={address}>
-                  <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
+                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
                   <td className="staked"><div className="currency thetawei">{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
+import get from 'lodash/get';
 
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
@@ -20,7 +21,7 @@ export default class Dashboard extends React.PureComponent {
   getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
         let thetaInfo, tfuelInfo;
         prices.forEach(info => {
           if (info._id === 'THETA') thetaInfo = info;

@@ -1,4 +1,5 @@
 import React from "react";
+import get from 'lodash/get';
 
 import { stakeService } from 'common/services/stake';
 import ThetaChart from 'common/components/chart';
@@ -28,7 +29,7 @@ export default class Stakes extends React.Component {
   getAllStakes() {
     stakeService.getAllStake()
       .then(res => {
-        const stakeList = _.get(res, 'data.body')
+        const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
         let holderObj = stakeList.reduce((map, obj) => {
           if (!map[obj.holder]) {

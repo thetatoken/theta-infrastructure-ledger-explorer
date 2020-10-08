@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDom from 'react-dom';
+import { render } from 'react-dom';
 import { Router, Switch, Route } from "react-router-dom";
 import history from 'common/history'
 import App from 'app';
@@ -17,7 +17,7 @@ import config from '../config';
 const app = document.querySelector('#app-root');
 const backendSocketAddress = `${config.socketApi.host}:${config.socketApi.port}`;
 
-ReactDom.render(
+render(
   <Router history={history}>
     <App backendAddress={backendSocketAddress} >
       <Switch>

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
 
 import { WEI } from 'common/constants';

@@ -1,7 +1,6 @@
 import React from "react";
 import Chart from "chart.js";
 import history from 'common/history'
-import _ from 'lodash';
 import cx from 'classnames';
 
 
