@@ -12,7 +12,8 @@ export default class SmartContract extends React.PureComponent {
       smartContract: null,
       isVerified: false,
       isReleasesReady: false,
-      isLoading: false
+      isLoading: false,
+      tabIndex: 0
     }
   }
   componentDidMount() {
@@ -27,7 +28,7 @@ export default class SmartContract extends React.PureComponent {
     if (!address) {
       return;
     }
-    this.setState({ isLoading: true })
+    this.setState({ isLoading: true, tabIndex: 0 })
     smartContractService.getOneByAddress(address)
       .then(res => {
         switch (res.data.type) {
@@ -75,16 +76,19 @@ export default class SmartContract extends React.PureComponent {
 
     return (stateMutability === "view" || stateMutability === "pure" || constant === true);
   }
+  setTabIndex = index => {
+    this.setState({tabIndex: index})
+  }
   render() {
     const { address } = this.props;
-    const { smartContract, isVerified, isLoading, isReleasesReady } = this.state;
+    const { smartContract, isVerified, isLoading, isReleasesReady, tabIndex } = this.state;
     const abi = get(smartContract, 'abi');
     return (
       <React.Fragment>
         <div className='actions'>
           <div className="title">Contract</div>
         </div>
-        <Tabs className="theta-tabs">
+        <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
             <Tab>Code</Tab>
             <Tab disabled={!isVerified}>Read Contract</Tab>
