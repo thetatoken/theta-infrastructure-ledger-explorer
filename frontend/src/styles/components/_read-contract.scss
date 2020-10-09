@@ -1,0 +1,23 @@
+.read-contract{
+  &__wrapper{
+    width: 100%;
+    margin: 10px;
+    margin-bottom: none;
+    background-color: $color-panel;
+    border-radius: 6px;
+  }
+  &__title{
+    border-bottom: 1px solid $color-line;
+    padding: 15px 10px;
+  }
+  &__content{
+    padding: 15px 10px;
+  }
+  &__output{
+    display: flex;
+    &--unit{
+      color: $color-font-light;
+      font-style: italic;
+    }
+  }
+}

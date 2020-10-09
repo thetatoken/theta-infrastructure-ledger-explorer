@@ -5,9 +5,11 @@ export default class App extends React.Component {
     return (
       <div id="app-container">
         <Header />
+        <React.StrictMode>
         <div id="app-content">
           {this.props.children}
         </div> 
+        </React.StrictMode>
       </div>
     );
   }

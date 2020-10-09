@@ -3,6 +3,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import SmartContractCode from './smart-contract-code';
 import ReadContract from './read-contract';
 import { smartContractService } from 'common/services/smartContract';
+import get from 'lodash/get';
 
 export default class SmartContract extends React.PureComponent {
   constructor(props) {
@@ -31,9 +32,9 @@ export default class SmartContract extends React.PureComponent {
       .then(res => {
         switch (res.data.type) {
           case 'smart_contract':
-            const smartContract = _.get(res, 'data.body')
-            const isVerified = _.get(smartContract, 'verification_date')
-            const hasSourceCode = _.get(smartContract, 'source_code')
+            const smartContract = get(res, 'data.body')
+            const isVerified = get(smartContract, 'verification_date')
+            const hasSourceCode = get(smartContract, 'source_code')
             this.setState({
               smartContract: smartContract,
               isVerified: isVerified && hasSourceCode
@@ -68,9 +69,16 @@ export default class SmartContract extends React.PureComponent {
     }
     if (existingScript && callback) callback();
   }
+  isReadFunction = (functionData) => {
+    const constant = get(functionData, ['constant'], null);
+    const stateMutability = get(functionData, ['stateMutability'], null);
+
+    return (stateMutability === "view" || stateMutability === "pure" || constant === true);
+  }
   render() {
     const { address } = this.props;
     const { smartContract, isVerified, isLoading, isReleasesReady } = this.state;
+    const abi = get(smartContract, 'abi');
     return (
       <React.Fragment>
         <div className='actions'>
@@ -88,7 +96,7 @@ export default class SmartContract extends React.PureComponent {
               isLoading={isLoading} isReleasesReady={isReleasesReady} fetchSmartContract={this.fetchSmartContract} />
           </TabPanel>
           <TabPanel>
-            <ReadContract />
+            {abi && <ReadContract abi={abi.filter(this.isReadFunction)} address={address}/>}
           </TabPanel>
           <TabPanel>
             <h2>Write Contract</h2>

@@ -27,7 +27,7 @@ export const TxnTypeText = {
   '7': 'Smart Contract',
   '8': 'Deposit Stake',
   '9': 'Withdraw Stake',
-  '10':'Deposit Stake'
+  '10': 'Deposit Stake'
 }
 
 export const TxnClasses = {
@@ -68,3 +68,26 @@ export const TxnPurpose = {
   0: 'Validator Staking',
   1: 'Guardian Staking',
 }
+
+export const TokenTypes = {
+  THETA: 'theta',
+  THETA_FUEL: 'tfuel',
+};
+
+export const Networks = {
+  __deprecated__ETHEREUM: 'ethereum',
+  THETA_TESTNET: 'testnet',
+  THETA_TESTNET_AMBER: 'testnet_amber',
+  THETA_TESTNET_SAPPHIRE: 'testnet_sapphire',
+  THETA_MAINNET: 'mainnet',
+  THETA_PRIVATENET: 'privatenet',
+};
+
+export const NetworkUrlOfChainId = {
+  'https://explorer.thetatoken.org': Networks.THETA_MAINNET,
+  'https://beta-explorer.thetatoken.org': Networks.THETA_TESTNET,
+  'https://guardian-testnet-explorer-amber.thetatoken.org': Networks.THETA_TESTNET_AMBER,
+  'https://guardian-testnet-explorer.thetatoken.org': Networks.THETA_TESTNET_SAPPHIRE,
+  'https://smart-contracts-sandbox-explorer.thetatoken.org': Networks.THETA_PRIVATENET,
+  'https://localhost': Networks.THETA_PRIVATENET,
+};
