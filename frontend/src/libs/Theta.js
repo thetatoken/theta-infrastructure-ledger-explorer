@@ -1,9 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import ThetaJS from './thetajs.esm';
-import { TokenTypes } from "../common/constants";
 import Config from '../config';
 
-console.log('Config in theta', Config)
 export default class Theta {
   static _chainId = Config.defaultThetaChainID;
 

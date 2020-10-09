@@ -10,7 +10,6 @@ import ThetaJS from '../../libs/thetajs.esm'
 const web3 = new Web3("http://localhost:3000");
 export default function ReadContract(props) {
   const { abi, address } = props;
-  console.log(abi);
   return (<div>
     {abi.map((data, i) => {
       return (<FunctionUnit key={i} functionData={data} index={i + 1} address={address} abi={abi}>{JSON.stringify(data)}</FunctionUnit>)
@@ -29,20 +28,8 @@ const FunctionUnit = (props) => {
   const hasInput = inputs.length > 0 || false;
   const vm_error = get(callResult, 'vm_error');
 
-  if (inputs.length) console.log('inputValues', inputValues)
-  function parseJSON(value) {
-    try {
-      const json = JSON.parse(value);
-
-      return json;
-    } catch (e) {
-      return null;
-    }
-  }
   async function fetchFunction() {
     var contract = new web3.eth.Contract(abi, address);
-    // console.log(contract.methods[functionData.name]);
-    // contract.methods[functionData.name]().call().then(console.log)
     const senderSequence = 1;
     const functionInputs = get(functionData, ['inputs'], []);
     const functionOutputs = get(functionData, ['outputs'], []);
@@ -54,7 +41,6 @@ const FunctionUnit = (props) => {
 
     try {
       const encodedParameters = web3.eth.abi.encodeParameters(inputTypes, inputValues).slice(2);
-      console.log('encodedParameters', encodedParameters);
       const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
       const gasLimit = 2000000;
       const data = functionSignature + encodedParameters;
@@ -67,7 +53,6 @@ const FunctionUnit = (props) => {
         gasLimit: gasLimit
       }, senderSequence);
       const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-      console.log('chain id:', Theta.chainId)
       const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
       const callResponseJSON = await callResponse.json();
       const result = get(callResponseJSON, 'result');
@@ -107,16 +92,13 @@ const FunctionUnit = (props) => {
     return true;
   }
   const shouldSubmit = () => {
-    console.log('in Should submit')
     const newErrs = inputs.map((input, i) => (checkInput(inputValues[i], input.type) ?
       undefined : `Invalid ${input.type}`))
-    console.log('new errs:', newErrs)
     setInputErrors(newErrs);
     return newErrs.reduce((pre, cur) => pre && (cur === undefined), true)
   }
   const onSubmit = () => {
     if (!shouldSubmit()) return;
-    console.log('In on submit, input values:', inputValues)
     fetchFunction();
   }
   const onChange = (i) => {
@@ -129,7 +111,6 @@ const FunctionUnit = (props) => {
   useEffect(() => {
     if (inputs.length === 0) fetchFunction();
   }, [])
-  console.log('inputErrors: ', inputErrors)
   return (<div className="read-contract__wrapper">
     <div className="read-contract__title">{`${index}. ${functionData.name}`}</div>
     <div className="read-contract__content">
