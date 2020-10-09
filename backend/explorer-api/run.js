@@ -125,7 +125,7 @@ function main() {
         res.end();
       });
       // start server program
-      var server = require('https').createServer(options, app);
+      var server = require('spdy').createServer(options, app);
       io = require('socket.io')(server);
 
       io.on('connection', onClientConnect);
@@ -137,8 +137,8 @@ function main() {
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
-      var https = require('https').createServer(options, app);
-      https.listen(config.server.port, () => {
+      var h2 = require('spdy').createServer(options, app);
+      h2.listen(config.server.port, () => {
         console.log("rest api running on port.", 9000);
       });
       // REST services

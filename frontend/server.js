@@ -42,10 +42,10 @@ var options = {
   key: privateKey,
   cert: certificate
 };
-var https = require('https').createServer(options, app);
+var h2 = require('spdy').createServer(options, app);
 
 
-https.listen(port, function (err) {
+h2.listen(port, function (err) {
   if (err) {
     console.log(err);
     return;
