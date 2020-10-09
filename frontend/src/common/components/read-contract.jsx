@@ -20,26 +20,22 @@ export default function ReadContract(props) {
 
 const FunctionUnit = (props) => {
   const { functionData, index, address, abi } = props;
-  const [callResult, setCallResult] = useState(null);
   const inputs = get(functionData, 'inputs');
   const outputs = get(functionData, 'outputs');
+  const [callResult, setCallResult] = useState(null);
+  const [inputValues, setInputValues] = useState(new Array(inputs.length));
+  const [inputErrors, setInputErrors] = useState(new Array(inputs.length));
   const decodedParameters = get(callResult, 'decodedParameters');
+  const hasInput = inputs.length > 0 || false;
+  const vm_error = get(callResult, 'vm_error');
+
+  if (inputs.length) console.log('inputValues', inputValues)
   function parseJSON(value) {
     try {
       const json = JSON.parse(value);
 
       return json;
     } catch (e) {
-      return null;
-    }
-  }
-  function initContract(abiStr, address) {
-    try {
-      const abiJSON = parseJSON(abiStr);
-
-      return new web3.eth.Contract(abiJSON, address);
-    } catch (e) {
-      console.log('error: ', e)
       return null;
     }
   }
@@ -55,32 +51,22 @@ const FunctionUnit = (props) => {
     const inputTypes = map(functionInputs, ({ name, type }) => {
       return type;
     });
-    const inputValues = map(functionInputs, ({ name, type }) => {
-      if (type.includes('[]')) {
-        return parseJSON(inputs[name]);
-      }
-      else if (type === "boolean" || type === "bool") {
-        return Boolean(parseJSON(inputs[name]));
-      }
 
-      return inputs[name];
-    });
-    console.log('inputTypes:', inputTypes)
-    console.log('inputValues', inputValues)
-    const encodedParameters = web3.eth.abi.encodeParameters(inputTypes, inputValues).slice(2);
-    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
-    const gasLimit = 2000000;
-    const data = functionSignature + encodedParameters;
-    const tx = Theta.unsignedSmartContractTx({
-      from: address,
-      to: address,
-      data: data,
-      value: 0,
-      transactionFee: gasPrice,
-      gasLimit: gasLimit
-    }, senderSequence);
-    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
     try {
+      const encodedParameters = web3.eth.abi.encodeParameters(inputTypes, inputValues).slice(2);
+      console.log('encodedParameters', encodedParameters);
+      const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+      const gasLimit = 2000000;
+      const data = functionSignature + encodedParameters;
+      const tx = Theta.unsignedSmartContractTx({
+        from: address,
+        to: address,
+        data: data,
+        value: 0,
+        transactionFee: gasPrice,
+        gasLimit: gasLimit
+      }, senderSequence);
+      const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
       console.log('chain id:', Theta.chainId)
       const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
       const callResponseJSON = await callResponse.json();
@@ -97,23 +83,100 @@ const FunctionUnit = (props) => {
       setCallResult({ vm_error: e.message })
     }
   }
+  const onBlur = (e, i) => {
+    let val = e.target.value;
+    let type = inputs[i].type;
+    let newVals = inputValues.slice();
+    newVals[i] = val;
+    setInputValues(newVals);
+    let errs = inputErrors.slice();
+    if (checkInput(val, type)) {
+      let newVals = inputValues.slice();
+      newVals[i] = val;
+      setInputValues(newVals);
+      errs[i] = undefined;
+    } else {
+      errs[i] = `Invalid ${type}`;
+    }
+    setInputErrors(errs)
+  }
+  const checkInput = (val, type) => {
+    if (type === 'address') {
+      return web3.utils.isAddress(val)
+    }
+    return true;
+  }
+  const shouldSubmit = () => {
+    console.log('in Should submit')
+    const newErrs = inputs.map((input, i) => (checkInput(inputValues[i], input.type) ?
+      undefined : `Invalid ${input.type}`))
+    console.log('new errs:', newErrs)
+    setInputErrors(newErrs);
+    return newErrs.reduce((pre, cur) => pre && (cur === undefined), true)
+  }
+  const onSubmit = () => {
+    if (!shouldSubmit()) return;
+    console.log('In on submit, input values:', inputValues)
+    fetchFunction();
+  }
+  const onChange = (i) => {
+    if (inputErrors[i]) {
+      let errs = inputErrors.slice();
+      errs[i] = undefined;
+      setInputErrors(errs)
+    }
+  }
   useEffect(() => {
     if (inputs.length === 0) fetchFunction();
   }, [])
+  console.log('inputErrors: ', inputErrors)
   return (<div className="read-contract__wrapper">
     <div className="read-contract__title">{`${index}. ${functionData.name}`}</div>
     <div className="read-contract__content">
-      {inputs && inputs.length > 0 &&
-        <div className="read-contract__inputs">
-          {JSON.stringify(inputs)}
+      {hasInput &&
+        <>
+          <div className="read-contract__inputs">
+            {inputs.map((input, i) =>
+              <React.Fragment key={i}>
+                <div className="read-contract__input" >
+                  <label>{`${input.name}(${input.type}): `}</label>
+                  <div style={{ flex: 1 }}>
+                    <input type="text" placeholder={`${input.name}(${input.type})`} onBlur={e => onBlur(e, i)}
+                      onChange={() => onChange(i)} className={inputErrors[i] ? 'error' : ''}></input>
+                    {inputErrors[i] && <div className="read-contract__input--error text-danger">{inputErrors[i]}</div>}
+                  </div>
+                </div>
+              </React.Fragment>)}
+          </div>
+          <div className="read-contract__input--row">
+            <button className="read-contract__input--query" onClick={onSubmit}>Query</button>
+            {vm_error && <div className="error">{vm_error}</div>}
+          </div>
+          <div className="read-contract__outputs-templates">
+            {outputs.map((output, i) =>
+              <div key={i} className="read-contract__outputs-template">&#8627;{` ${output.name} ${output.type}`}</div>
+            )}
+          </div>
+        </>}
+      {decodedParameters && !hasInput &&
+        <div className="read-contract__outputs">
+          {outputs.map((output, i) =>
+            <div className="read-contract__output" key={i}>
+              <div className="read-contract__output--content">{decodedParameters[i]}</div>
+              <div className="read-contract__output--unit">{output.type}</div>
+            </div>)}
         </div>}
-      <div className="read-contract__outputs">
-        {outputs.map((output, i) =>
-          <div className="read-contract__output" key={i}>
-            <div className="read-contract__output--content">{decodedParameters ? decodedParameters[i] : null}</div>
-            <div className="read-contract__output--unit">{output.type}</div>
-          </div>)}
-      </div>
+      {decodedParameters && hasInput &&
+        <div className="read-contract__outputs">
+          <div className="read-contract__output--response">[ <b>${functionData.name}</b> method Response ]</div>
+          {outputs.map((output, i) =>
+            <div className="read-contract__output" key={i}>
+              <div className="read-contract__output--unit">
+                <span className="text-green">&#8658;</span>
+                {`${output.name} ${output.type}: ${decodedParameters[i]}`}
+              </div>
+            </div>)}
+        </div>}
     </div>
   </div>)
 }
