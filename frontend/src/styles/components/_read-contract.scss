@@ -51,6 +51,9 @@
       border: 1px solid $color-input-background;
       width: 100%;
     }
+    &--error{
+      margin: 0 15px;
+    }
     & .error{
       border-color: $color-red;
     }

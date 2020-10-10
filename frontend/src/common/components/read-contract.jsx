@@ -23,7 +23,7 @@ const FunctionUnit = (props) => {
   const outputs = get(functionData, 'outputs');
   const [callResult, setCallResult] = useState(null);
   const [inputValues, setInputValues] = useState(new Array(inputs.length));
-  const [inputErrors, setInputErrors] = useState(new Array(inputs.length));
+  // const [inputErrors, setInputErrors] = useState(new Array(inputs.length));
   const decodedParameters = get(callResult, 'decodedParameters');
   const hasInput = inputs.length > 0 || false;
   const vm_error = get(callResult, 'vm_error');
@@ -38,7 +38,6 @@ const FunctionUnit = (props) => {
     const inputTypes = map(functionInputs, ({ name, type }) => {
       return type;
     });
-
     try {
       const encodedParameters = web3.eth.abi.encodeParameters(inputTypes, inputValues).slice(2);
       const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
@@ -74,41 +73,42 @@ const FunctionUnit = (props) => {
     let newVals = inputValues.slice();
     newVals[i] = val;
     setInputValues(newVals);
-    let errs = inputErrors.slice();
-    if (checkInput(val, type)) {
-      let newVals = inputValues.slice();
-      newVals[i] = val;
-      setInputValues(newVals);
-      errs[i] = undefined;
-    } else {
-      errs[i] = `Invalid ${type}`;
-    }
-    setInputErrors(errs)
+    // let errs = inputErrors.slice();
+    // if (checkInput(val, type)) {
+    //   let newVals = inputValues.slice();
+    //   newVals[i] = val;
+    //   setInputValues(newVals);
+    //   errs[i] = undefined;
+    // } else {
+    //   errs[i] = `Invalid ${type}`;
+    // }
+    // setInputErrors(errs)
   }
-  const checkInput = (val, type) => {
-    if (type === 'address') {
-      return web3.utils.isAddress(val)
-    }
-    return true;
-  }
-  const shouldSubmit = () => {
-    const newErrs = inputs.map((input, i) => (checkInput(inputValues[i], input.type) ?
-      undefined : `Invalid ${input.type}`))
-    setInputErrors(newErrs);
-    return newErrs.reduce((pre, cur) => pre && (cur === undefined), true)
-  }
+  // const checkInput = (val, type) => {
+  //   if (type === 'address') {
+  //     return web3.utils.isAddress(val)
+  //   }
+  //   return true;
+  // }
+  // const shouldSubmit = () => {
+  //   const newErrs = inputs.map((input, i) => (checkInput(inputValues[i], input.type) ?
+  //     undefined : `Invalid ${input.type}`))
+  //   setInputErrors(newErrs);
+  //   return newErrs.reduce((pre, cur) => pre && (cur === undefined), true)
+  // }
   const onSubmit = () => {
-    if (!shouldSubmit()) return;
     fetchFunction();
   }
-  const onChange = (i) => {
-    if (inputErrors[i]) {
-      let errs = inputErrors.slice();
-      errs[i] = undefined;
-      setInputErrors(errs)
-    }
-  }
+  // const onChange = (i) => {
+  //   if (inputErrors[i]) {
+  //     let errs = inputErrors.slice();
+  //     errs[i] = undefined;
+  //     setInputErrors(errs)
+  //   }
+  // }
   useEffect(() => {
+    console.log('in use effect')
+    console.log('address:', address)
     if (inputs.length === 0) fetchFunction();
   }, [])
   return (<div className="read-contract__wrapper">
@@ -123,15 +123,14 @@ const FunctionUnit = (props) => {
                   <label>{`${input.name}(${input.type}): `}</label>
                   <div style={{ flex: 1 }}>
                     <input type="text" placeholder={`${input.name}(${input.type})`} onBlur={e => onBlur(e, i)}
-                      onChange={() => onChange(i)} className={inputErrors[i] ? 'error' : ''}></input>
-                    {inputErrors[i] && <div className="read-contract__input--error text-danger">{inputErrors[i]}</div>}
+                      onChange={() => onChange(i)}></input>
                   </div>
                 </div>
               </React.Fragment>)}
           </div>
           <div className="read-contract__input--row">
             <button className="read-contract__input--query" onClick={onSubmit}>Query</button>
-            {vm_error && <div className="error">{vm_error}</div>}
+            {vm_error && <div className="text-danger read-contract__input--error">Error: {vm_error}</div>}
           </div>
           <div className="read-contract__outputs-templates">
             {outputs.map((output, i) =>
