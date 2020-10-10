@@ -23,13 +23,12 @@ const FunctionUnit = (props) => {
   const outputs = get(functionData, 'outputs');
   const [callResult, setCallResult] = useState(null);
   const [inputValues, setInputValues] = useState(new Array(inputs.length));
-  // const [inputErrors, setInputErrors] = useState(new Array(inputs.length));
   const decodedParameters = get(callResult, 'decodedParameters');
   const hasInput = inputs.length > 0 || false;
   const vm_error = get(callResult, 'vm_error');
 
   async function fetchFunction() {
-    var contract = new web3.eth.Contract(abi, address);
+    const contract = new web3.eth.Contract(abi, address);
     const senderSequence = 1;
     const functionInputs = get(functionData, ['inputs'], []);
     const functionOutputs = get(functionData, ['outputs'], []);
@@ -55,7 +54,6 @@ const FunctionUnit = (props) => {
       const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
       const callResponseJSON = await callResponse.json();
       const result = get(callResponseJSON, 'result');
-      const errorMessage = get(result, 'vm_error');
 
       setCallResult(merge(result, {
         outputs: functionOutputs,
@@ -73,42 +71,13 @@ const FunctionUnit = (props) => {
     let newVals = inputValues.slice();
     newVals[i] = val;
     setInputValues(newVals);
-    // let errs = inputErrors.slice();
-    // if (checkInput(val, type)) {
-    //   let newVals = inputValues.slice();
-    //   newVals[i] = val;
-    //   setInputValues(newVals);
-    //   errs[i] = undefined;
-    // } else {
-    //   errs[i] = `Invalid ${type}`;
-    // }
-    // setInputErrors(errs)
   }
-  // const checkInput = (val, type) => {
-  //   if (type === 'address') {
-  //     return web3.utils.isAddress(val)
-  //   }
-  //   return true;
-  // }
-  // const shouldSubmit = () => {
-  //   const newErrs = inputs.map((input, i) => (checkInput(inputValues[i], input.type) ?
-  //     undefined : `Invalid ${input.type}`))
-  //   setInputErrors(newErrs);
-  //   return newErrs.reduce((pre, cur) => pre && (cur === undefined), true)
-  // }
+
   const onSubmit = () => {
     fetchFunction();
   }
-  // const onChange = (i) => {
-  //   if (inputErrors[i]) {
-  //     let errs = inputErrors.slice();
-  //     errs[i] = undefined;
-  //     setInputErrors(errs)
-  //   }
-  // }
+
   useEffect(() => {
-    console.log('in use effect')
-    console.log('address:', address)
     if (inputs.length === 0) fetchFunction();
   }, [])
   return (<div className="read-contract__wrapper">
