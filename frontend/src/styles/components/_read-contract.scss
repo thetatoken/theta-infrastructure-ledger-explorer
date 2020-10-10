@@ -27,14 +27,15 @@
       color: $color-font-light;
     }
   }
-  &__outputs-templates{
-    margin-top: 15px;
-  }
   &__outputs-template{
-    margin-top: 5px;
+    margin-top: 15px;
     color: $color-font-light;
-    font-style: italic;
   }
+  // &__outputs-template{
+  //   margin-top: 5px;
+  //   color: $color-font-light;
+  //   font-style: italic;
+  // }
   &__inputs{
     margin-top: -1rem;
   }
@@ -53,6 +54,9 @@
     }
     &--error{
       margin: 0 15px;
+      flex: 1;
+      display: flex;
+      align-items: center;
     }
     & .error{
       border-color: $color-red;

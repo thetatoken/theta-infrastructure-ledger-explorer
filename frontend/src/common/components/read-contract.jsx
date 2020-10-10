@@ -91,8 +91,7 @@ const FunctionUnit = (props) => {
                 <div className="read-contract__input" >
                   <label>{`${input.name}(${input.type}): `}</label>
                   <div style={{ flex: 1 }}>
-                    <input type="text" placeholder={`${input.name}(${input.type})`} onBlur={e => onBlur(e, i)}
-                      onChange={() => onChange(i)}></input>
+                    <input type="text" placeholder={`${input.name}(${input.type})`} onBlur={e => onBlur(e, i)}></input>
                   </div>
                 </div>
               </React.Fragment>)}
@@ -101,10 +100,11 @@ const FunctionUnit = (props) => {
             <button className="read-contract__input--query" onClick={onSubmit}>Query</button>
             {vm_error && <div className="text-danger read-contract__input--error">Error: {vm_error}</div>}
           </div>
-          <div className="read-contract__outputs-templates">
-            {outputs.map((output, i) =>
-              <div key={i} className="read-contract__outputs-template">&#8627;{` ${output.name} ${output.type}`}</div>
-            )}
+          <div className="read-contract__outputs-template">
+            &#8627;&nbsp;
+            {outputs.map((output, i) => <span key={i}>{(i == 0 ? '' : ', ') + output.name} <i>{output.type}</i></span>)}
+            {/* {outputs.map((output, i) => { return ` ${output.name} ${output.type}` } */}
+            {/* )} */}
           </div>
         </>}
       {decodedParameters && !hasInput &&
