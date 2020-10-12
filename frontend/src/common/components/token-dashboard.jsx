@@ -10,9 +10,7 @@ import ThetaChart from 'common/components/chart';
 
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
-import { hash } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
-const totalSupply = 870502690;
+
 export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -139,7 +137,7 @@ export default class TokenDashboard extends React.PureComponent {
           {type === 'theta' &&
             <div className="column">
               <Detail title={'TOTAL STAKED NODES'} value={nodeNum} />
-              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />
+              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
             </div>}
           {type === 'tfuel' && <div className="column">
             <Detail title={'24 HR BLOCKS'} value={formatNumber(blockNum)} />
@@ -182,7 +180,7 @@ const TxnNumber = ({ num }) => {
   );
 }
 
-const StakedPercent = ({ staked }) => {
+const StakedPercent = ({ staked, totalSupply }) => {
   return (
     <React.Fragment>
       {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}

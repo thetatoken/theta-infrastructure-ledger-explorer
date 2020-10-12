@@ -23,7 +23,7 @@ After starting MongoDB, we can setup the config for crawler with the following c
 ```
 cd backend/crawler
 npm install
-mv config_template.cfg config.cfg
+mv config.cfg.template config.cfg
 ```
 Now the config.cfg file is created, change `blockchain.start_height` in config file to the snapshot height on the theta node. After setting the config file and start height, we can run crawler using this command.
 ```
@@ -37,7 +37,7 @@ Now the crawler starts to read the data from blockchain, perform necessary trans
 ``` 
 cd backend/explorer-api
 npm install
-mv config_template.cfg config.cfg
+mv config.cfg.template config.cfg
 node run
 ```
 Now the explorer API application is running at https://localhost:9000
@@ -47,7 +47,7 @@ Now the explorer API application is running at https://localhost:9000
 ``` 
 cd frontend
 npm install
-mv config_template.js config.js
+mv src/config.js.template src/config.js
 ```
 
 ### Development
