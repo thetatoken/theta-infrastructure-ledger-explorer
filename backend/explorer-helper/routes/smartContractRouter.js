@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var solc = require('solc');
 var downloader = require('../helper/solcDownloader');
+var fs = require('fs')
 
 var smartContractRouter = (app) => {
   router.use(bodyParser.urlencoded({ extended: true }));
@@ -11,7 +12,7 @@ var smartContractRouter = (app) => {
   // The api to verify the source and bytecode
   router.get("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, byteCode, abi, version, optimizer } = req.query;
+    let { sourceCode, byteCode, abi, version, versionFullName, optimizer } = req.query;
     console.log(`optimizer: ${optimizer}, type: ${typeof optimizer}, value: ${optimizer === '1'}`)
     try {
       console.log('Verifing the source code and bytecode for address:', address);
@@ -38,11 +39,19 @@ var smartContractRouter = (app) => {
       // Todos: may need to run a separate node for the verification
       console.log(`load remote version starts.`)
       console.log(`version: ${version}`);
-      let result = await downloader.downloadByVersion(version, './libs');
-      console.log('result in smart contract router: ', result)
+      const prefix = './libs';
+      const fileName = prefix + '/' + versionFullName;
+      if (!fs.existsSync(fileName)) {
+        console.log(`file ${fileName} does not exsit, downloading`)
+        await downloader.downloadByVersion(version, './libs');
+      }else{
+        console.log(`file ${fileName} exsits, skip download process`)
+      }
+      // let result = await downloader.downloadByVersion(version, './libs');
+      // console.log('result in smart contract router: ', result)
       console.log(`Download solc-js file takes: ${(+new Date() - start) / 1000} seconds`)
       start = +new Date();
-      const solcjs = solc.setupMethods(require('.' + result.fileName));
+      const solcjs = solc.setupMethods(require('.' + fileName));
       console.log(`load solc-js version takes: ${(+new Date() - start) / 1000} seconds`)
       // console.log('solcjs: ', solcjs)
       // return;
@@ -79,6 +88,7 @@ var smartContractRouter = (app) => {
       //console.log(`check:`, check)
       let data = {}
       let verified = false;
+      let sc;
       if (check.error) {
         data = { result: { verified: false }, err_msg: check.error }
       } else {
@@ -104,13 +114,13 @@ var smartContractRouter = (app) => {
               //console.log(`Match the code, contractName:${contractName}`);
               //console.log('code:', curCode)
               //console.log(`abi: `, abi)
-              const sc = {
+              const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
+              sc = {
                 'address': address,
-                'bytecode': byteCode,
                 'abi': abi,
                 'source_code': helper.stampDate(sourceCode),
                 'verification_date': +new Date(),
-                'compiler_version': version,
+                'compiler_version': breifVersion,
                 'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
                 'name': contractName,
                 'function_hash': output.contracts['test.sol'][contractName].evm.methodIdentifiers,

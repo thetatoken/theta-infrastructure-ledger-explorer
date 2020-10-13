@@ -32,7 +32,7 @@ const Options = () => {
       <option value='' key='empty'>[Please select]</option>
       {Object.keys(releases).map(key => {
         let text = releases[key].match(/^soljson-(.*).js$/)[1];
-        return (<option value={text} key={key}>{text}</option>)
+        return (<option value={key} key={key}>{text}</option>)
       })}
     </>
   )
@@ -56,7 +56,7 @@ const CodeUploader = props => {
       abiRef.current.value = uploaderAbi;
       optimizerRef.current.value = uploaderOptimizer;
     }
-    if (versionRef.current) versionRef.current.value = uploaderVersion
+    if (versionRef.current) versionRef.current.value = uploaderVersion;
   })
   const reset = () => {
     sourceCodeRef.current.value = '';
@@ -65,18 +65,7 @@ const CodeUploader = props => {
   const submit = () => {
     const sourceCode = sourceCodeRef.current.value;
     const version = versionRef.current.value;
-    if (sourceCode === '') {
-      setIsCodeEmpty(true);
-      sourceCodeRef.current.focus();
-      return;
-    } else if(isCodeEmpty){
-      setIsCodeEmpty(false);
-    }
-    if(version === ''){
-      versionRef.current.classList.add('isEmpty');
-      versionRef.current.focus();
-      return;
-    }
+    const versionFullname = window.soljsonReleases[version]
     const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
     const byteCode = get(props, 'smartContract.bytecode');
@@ -84,23 +73,40 @@ const CodeUploader = props => {
     setUploaderAbi(abi);
     setUploaderVersion(version);
     setUploaderOptimizer(optimizer);
+    if (sourceCode === '') {
+      setIsCodeEmpty(true);
+      sourceCodeRef.current.focus();
+      return;
+    } else if (isCodeEmpty) {
+      setIsCodeEmpty(false);
+    }
+    if (version === '') {
+      versionRef.current.classList.add('isEmpty');
+      versionRef.current.focus();
+      return;
+    }
     setIsVerifying(true);
-    smartContractService.verifySourceCode(address, byteCode, sourceCode, abi, version, optimizer)
+
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
         let isVerified = get(res, 'data.result.verified')
         let error = get(res, 'data.err_msg')
-        if (error) { setErrMsg(error) }
         console.log('result: ', isVerified)
         if (isVerified === true) { fetchSmartContract(address) }
+        else if (error) { setErrMsg(error) }
         else setErrMsg('Code does not match.')
+      }).catch(e => {
+        setIsVerifying(false);
+        setErrMsg('Something wrong in the verification process.')
+        console.log('error:', e)
       })
   }
   const resetBorder = e => {
-    if(e.target.value === ''){
+    if (e.target.value === '') {
       e.target.classList.add('isEmpty')
-    }else{
+    } else {
       e.target.classList.remove('isEmpty')
     }
   }

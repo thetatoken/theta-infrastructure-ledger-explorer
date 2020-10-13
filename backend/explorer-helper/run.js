@@ -55,8 +55,8 @@ function main() {
   });
 
 
-  var h2 = require('spdy').createServer(options, app);
-  h2.listen(config.server.port, () => {
+  var http = require('http').createServer(app);
+  http.listen(config.server.port, () => {
     console.log("rest api running on port.", config.server.port);
   });
 

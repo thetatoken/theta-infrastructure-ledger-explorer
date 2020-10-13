@@ -4,6 +4,7 @@
   "description": "",
   "main": "run.js",
   "dependencies": {
+    "axios": "^0.20.0",
     "bignumber.js": "^8.0.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
