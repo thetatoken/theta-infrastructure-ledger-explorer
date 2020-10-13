@@ -103,7 +103,7 @@ var smartContractRouter = (app) => {
         }
         data = { result: { verified }, warning_msg: check.warnings, smart_contract: sc }
       }
-      console.log(`Source code verification result: ${verified}, sending back result`).
+      console.log(`Source code verification result: ${verified}, sending back result`);
       res.status(200).send(data);
     } catch (e) {
       console.log('Error in catch:', e)
