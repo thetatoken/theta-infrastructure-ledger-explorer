@@ -139,7 +139,7 @@ function main() {
 
       var h2 = require('spdy').createServer(options, app);
       h2.listen(config.server.port, () => {
-        console.log("rest api running on port.", 9000);
+        console.log("rest api running on port.", config.server.port);
       });
       // REST services
       // blocks router

@@ -117,7 +117,7 @@ const FunctionUnit = (props) => {
         </div>}
       {decodedParameters && hasInput &&
         <div className="read-contract__outputs">
-          <div className="read-contract__output--response">[ <b>${functionData.name}</b> method Response ]</div>
+          <div className="read-contract__output--response">[ <b>{functionData.name}</b> method Response ]</div>
           {outputs.map((output, i) =>
             <div className="read-contract__output" key={i}>
               <div className="read-contract__output--unit">
