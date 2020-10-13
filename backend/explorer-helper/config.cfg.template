@@ -5,8 +5,5 @@
     "server": {
         "port": 9090
     },
-    "cert":{
-        "key": "",
-        "crt": ""
-    }
+    "shouldDownloadAll": false
 }

@@ -4,8 +4,6 @@ var app = express();
 var compression = require('compression')
 var downloader = require('./helper/solcDownloader');
 
-var bluebird = require("bluebird");
-
 var smartContractRouter = require("./routes/smartContractRouter")
 var cors = require('cors');
 
@@ -35,12 +33,6 @@ function main() {
   }
   console.log(config);
 
-  var privateKey = fs.readFileSync(config.cert.key, 'utf8');
-  var certificate = fs.readFileSync(config.cert.crt, 'utf8');
-  var options = {
-    key: privateKey,
-    cert: certificate
-  };
   app.use(cors());
   app.use(compression());
 
@@ -64,11 +56,5 @@ function main() {
   // smart contract router
   smartContractRouter(app);
 
-
-  // downloader.downloadByVersion('0.7.1').then(res => {
-  //   console.log('res:', res)
-  // }).catch(e => {
-  //   console.log('Error in after downloadByVersion catch:', e)
-  // })
-  // downloader.downloadAll('./libs');
+  if(config.shouldDownloadAll)  downloader.downloadAll('./libs');
 }
