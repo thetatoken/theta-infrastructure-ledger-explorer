@@ -35,7 +35,7 @@ var smartContractRouter = (app) => {
         }
       };
       var output = '';
-      console.log(`load remote version starts.`)
+      console.log(`Loading specific version starts.`)
       console.log(`version: ${version}`);
       const prefix = './libs';
       const fileName = prefix + '/' + versionFullName;
@@ -103,6 +103,7 @@ var smartContractRouter = (app) => {
         }
         data = { result: { verified }, warning_msg: check.warnings, smart_contract: sc }
       }
+      console.log(`Source code verification result: ${verified}, sending back result`).
       res.status(200).send(data);
     } catch (e) {
       console.log('Error in catch:', e)

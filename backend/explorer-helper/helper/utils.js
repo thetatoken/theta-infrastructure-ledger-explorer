@@ -8,7 +8,6 @@ exports.getBytecodeWithoutMetadata = function (bytecode) {
     const metadataSize = parseInt(bytecode.slice(-4), 16) * 2 + 4;
     const metadataStarts = bytecode.slice(bytecode.length - metadataSize, bytecode.length - metadataSize + 14)
     const endPoint = bytecode.indexOf(metadataStarts)
-    console.log('metadataSize:', metadataSize, 'endPoint:', endPoint)
     return bytecode.slice(0, endPoint);
 }
 
