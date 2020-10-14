@@ -1,4 +1,7 @@
 import BigNumber from 'bignumber.js';
+import Web3 from "web3";
+
+const web3 = new Web3("http://localhost:3000");
 
 import { WEI } from 'common/constants';
 
@@ -65,4 +68,36 @@ export function getArguments(str) {
     res += `Arg [${i}] : ` + str.substring(i * 64, (i + 1) * 64) + '\n';
   }
   return res;
+}
+
+export function decodeLogs(logs, abi) {
+  return logs.map(log => {
+    try {
+      let event = null;
+      for (let i = 0; i < abi.length; i++) {
+        let item = abi[i];
+        if (item.type != "event") continue;
+        let signature = item.name + "(" + item.inputs.map(function (input) { return input.type; }).join(",") + ")";
+        let hash = web3.utils.sha3(signature);
+        if (hash == log.topics[0]) {
+          event = item;
+          break;
+        }
+      }
+      if (event != null) {
+        let inputs = event.inputs;
+        let data = web3.eth.abi.decodeLog(inputs, log.data, log.topics);
+        log.decode = {
+          result: data,
+          eventName: event.name
+        }
+      } else {
+        log.decode = 'No matched event.';
+      }
+      return log;
+    } catch (e) {
+      log.decode = 'Something wrong while decoding, met error' + e;
+      return log;
+    }
+  })
 }

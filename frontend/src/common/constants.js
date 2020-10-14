@@ -1,6 +1,7 @@
 export const WEI = 1000000000000000000;
 export const GWEI = 1000000000;
 
+export const ZeroAddress = '0x0000000000000000000000000000000000000000';
 
 export const TxnTypes = {
   COINBASE: 0,

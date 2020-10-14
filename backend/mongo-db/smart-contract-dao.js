@@ -6,7 +6,7 @@ module.exports = class smartContractDAO {
 
   constructor(execDir, client) {
     this.client = client;
-    this.smartContractInfoCollection = 'smartContract';
+    this.collection = 'smartContract';
   }
 
   upsertSmartContract(smartContractInfo, callback) {
@@ -23,12 +23,12 @@ module.exports = class smartContractDAO {
       'constructor_arguments': smartContractInfo.constructor_arguments
     }
     const queryObject = { '_id': smartContractInfo.address };
-    this.client.upsert(this.smartContractInfoCollection, queryObject, newObject, callback);
+    this.client.upsert(this.collection, queryObject, newObject, callback);
   }
 
   getSmartContractByAddress(address, callback) {
     const queryObject = { '_id': address };
-    this.client.findOne(this.smartContractInfoCollection, queryObject, function (error, record) {
+    this.client.findOne(this.collection, queryObject, function (error, record) {
       if (error) {
         console.log('ERR - SmartContract:', error);
         // callback(error);
@@ -43,7 +43,7 @@ module.exports = class smartContractDAO {
 
   checkSmartContract(address, callback) {
     const queryObject = { '_id': address };
-    return this.client.exist(this.smartContractInfoCollection, queryObject, function (err, res) {
+    return this.client.exist(this.collection, queryObject, function (err, res) {
       if (err) {
         console.log('error in check SmartContract: ', err);
         callback(err);
@@ -52,4 +52,9 @@ module.exports = class smartContractDAO {
     });
   }
 
+  getAbi(address, callback){
+    const queryObject = { '_id': address };
+    let projectionObject = { abi: 1, _id: 0 };
+    this.client.queryWithProjection(this.collection, queryObject, projectionObject, callback);
+  }
 }

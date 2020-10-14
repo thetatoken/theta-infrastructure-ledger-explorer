@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactJson from 'react-json-view'
 import cx from 'classnames'
-import { getHex } from 'common/helpers/utils';
+import { getHex, decodeLogs } from 'common/helpers/utils';
 import { TxnTypes } from 'common/constants';
 import get from 'lodash/get';
 import has from 'lodash/has';
 
-export default function JsonView({ json, onClose, className }) {
+export default function JsonView({ json, onClose, className, abi }) {
   if (get(json, 'type') === TxnTypes.SMART_CONTRACT) {
     if (has(json, 'data.data')) json.data.data = getHex(json.data.data);
     if (has(json, 'receipt.EvmRet')) json.receipt.EvmRet = getHex(json.receipt.EvmRet);
@@ -16,7 +16,9 @@ export default function JsonView({ json, onClose, className }) {
         return obj;
       })
     }
+    json.receipt.Logs = decodeLogs(json.receipt.Logs, abi);
   }
+
   return (
     <div className={cx("modal json-view", className)}>
       <button className="modal-close btn tx" onClick={onClose} />

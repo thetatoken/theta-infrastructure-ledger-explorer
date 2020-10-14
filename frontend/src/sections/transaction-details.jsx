@@ -5,11 +5,12 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
 
-import { TxnTypes, TxnClasses, TxnPurpose } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, getHex } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
+import { smartContractService } from 'common/services/smartContract';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
@@ -26,7 +27,8 @@ export default class TransactionExplorer extends React.Component {
       totalTransactionsNumber: undefined,
       errorType: null,
       showRaw: false,
-      price: { 'Theta': 0, 'TFuel': 0 }
+      price: { 'Theta': 0, 'TFuel': 0 },
+      abi: {}
     };
   }
   componentDidUpdate(preProps) {
@@ -72,6 +74,16 @@ export default class TransactionExplorer extends React.Component {
                 totalTransactionsNumber: res.data.totalTxsNumber,
                 errorType: null
               })
+              const type = get(res, 'data.body.type');
+              const to = get(res, 'data.body.data.to.address');
+              if (type === TxnTypes.SMART_CONTRACT && to !== ZeroAddress) {
+                smartContractService.getAbiByAddress(to.toLowerCase())
+                  .then(result => {
+                    if (result.data.type === 'smart_contract_abi') {
+                      this.setState({ abi: result.data.body.abi })
+                    }
+                  })
+              }
               break;
             case 'error_not_found':
               this.setState({
@@ -94,7 +106,7 @@ export default class TransactionExplorer extends React.Component {
     this.setState({ showRaw: !this.state.showRaw });
   }
   render() {
-    const { transaction, errorType, showRaw, price } = this.state;
+    const { transaction, errorType, showRaw, price, abi } = this.state;
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
@@ -171,7 +183,8 @@ export default class TransactionExplorer extends React.Component {
               <JsonView
                 json={transaction}
                 onClose={this.handleToggleDetailsClick}
-                className="tx-raw" />}
+                className="tx-raw"
+                abi={abi} />}
           </React.Fragment>}
       </div>);
   }

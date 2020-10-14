@@ -12,5 +12,11 @@ export const smartContractService = {
       throw Error('Missing argument');
     }
     return apiService.get(`smartcontract/verify/${address}`, { params: { sourceCode, abi, version, versionFullName, optimizer } });
+  },
+  getAbiByAddress(address){
+    if (!address) {
+      throw Error('Missing argument');
+    }
+    return apiService.get(`smartcontract/abi/${address}`, {});
   }
 };
