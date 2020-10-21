@@ -78,25 +78,29 @@ export function decodeLogs(logs, abi) {
         let item = abi[i];
         if (item.type != "event") continue;
         let signature = item.name + "(" + item.inputs.map(function (input) { return input.type; }).join(",") + ")";
+        // console.log("signature: ",signature)
         let hash = web3.utils.sha3(signature);
+        // console.log("hash:", hash)
         if (hash == log.topics[0]) {
           event = item;
           break;
         }
       }
+      // console.log(event);
       if (event != null) {
         let inputs = event.inputs;
         let data = web3.eth.abi.decodeLog(inputs, log.data, log.topics);
+        // console.log('data:', data)
         log.decode = {
           result: data,
           eventName: event.name
         }
       } else {
-        log.decode = 'No matched event.';
+        log.decode = 'No matched event or the smart contract source code has not been verified.';
       }
       return log;
     } catch (e) {
-      log.decode = 'Something wrong while decoding, met error' + e;
+      log.decode = 'Something wrong while decoding, met error: ' + e;
       return log;
     }
   })
