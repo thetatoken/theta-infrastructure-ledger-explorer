@@ -17,6 +17,9 @@ var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
 var accountingJob = require('./jobs/accounting.js');
+var express = require('express');
+var app = express();
+var cors = require('cors')
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -60,6 +63,21 @@ function main() {
       Logger.log('Mongo DB connection succeeded');
       setupGetBlockCronJob(mongoClient, network_id);
     }
+  });
+
+  app.use(cors());
+  app.get('/ping', function (req, res) {
+    console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+    res.writeHead(200, {
+      'Content-Type': 'text/plain',
+      'Content-Length': 2
+    });
+    res.write('OK');
+    res.end();
+  });
+  var http = require('http').createServer(app);
+  http.listen('8080', () => {
+    console.log("rest api running on port. 8080");
   });
 }
 
