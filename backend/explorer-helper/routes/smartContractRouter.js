@@ -8,11 +8,12 @@ var fs = require('fs')
 
 var smartContractRouter = (app) => {
   router.use(bodyParser.urlencoded({ extended: true }));
+  router.use(bodyParser.json({limit: '1mb'}));
 
   // The api to verify the source and bytecode
-  router.get("/verify/:address", async (req, res) => {
+  router.post("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, byteCode, abi, version, versionFullName, optimizer } = req.query;
+    let { sourceCode, byteCode, abi, version, versionFullName, optimizer } = req.body;
     try {
       console.log('Verifing the source code and bytecode for address:', address);
       let start = +new Date();

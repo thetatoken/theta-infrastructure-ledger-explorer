@@ -5,18 +5,19 @@ var helper = require('../helper/utils');
 var axios = require("axios").default;
 
 var smartContractRouter = (app, smartContractDao) => {
+  router.use(bodyParser.json({limit: '1mb'}));
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to verify the source and bytecode
-  router.get("/smartContract/verify/:address", async (req, res) => {
+  router.post("/smartContract/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, abi, version, optimizer, versionFullName } = req.query;
-    console.log('Verifying source code for address', address)
+    let { sourceCode, abi, version, optimizer, versionFullName } = req.body;
+    console.log('Verifying source code for address', address);
     try {
       let sc = await smartContractDao.getSmartContractByAddressAsync(address)
       let byteCode = sc.bytecode;
-      let result = await axios.get(`http://localhost:9090/api/verify/${address}`, {
-        params: { byteCode, sourceCode, abi, version, optimizer, versionFullName }
+      let result = await axios.post(`http://localhost:9090/api/verify/${address}`, {
+        byteCode, sourceCode, abi, version, optimizer, versionFullName
       })
       console.log('Received response from verification server.', result.data.result);
       if (result.data.result.verified === true) {
