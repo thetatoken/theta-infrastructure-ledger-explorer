@@ -89,8 +89,8 @@ export function decodeLogs(logs, abi) {
       // console.log(event);
       if (event != null) {
         let inputs = event.inputs;
-        let data = web3.eth.abi.decodeLog(inputs, log.data, log.topics);
-        // console.log('data:', data)
+        let topics = log.topics.slice(1);
+        let data = web3.eth.abi.decodeLog(inputs, log.data, topics);
         log.decode = {
           result: data,
           eventName: event.name
