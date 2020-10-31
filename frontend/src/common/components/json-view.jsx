@@ -7,16 +7,20 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 
 export default function JsonView({ json, onClose, className, abi }) {
-  if (get(json, 'type') === TxnTypes.SMART_CONTRACT) {
-    if (has(json, 'data.data')) json.data.data = getHex(json.data.data);
-    if (has(json, 'receipt.EvmRet')) json.receipt.EvmRet = getHex(json.receipt.EvmRet);
-    if (has(json, 'receipt.Logs')) {
-      json.receipt.Logs = json.receipt.Logs.map(obj => {
+  let jsonTmp = JSON.parse(JSON.stringify(json));
+  if (get(jsonTmp, 'type') === TxnTypes.SMART_CONTRACT) {
+    if (has(jsonTmp, 'data.data')) jsonTmp.data.data = getHex(jsonTmp.data.data);
+    if (has(jsonTmp, 'receipt.EvmRet')) {
+      let err = get(jsonTmp, 'receipt.EvmErr');
+      jsonTmp.receipt.EvmRet = err === '' ? getHex(jsonTmp.receipt.EvmRet) : Buffer.from(jsonTmp.receipt.EvmRet, 'base64').toString();
+    }
+    if (has(jsonTmp, 'receipt.Logs')) {
+      jsonTmp.receipt.Logs = jsonTmp.receipt.Logs.map(obj => {
         obj.data = getHex(obj.data)
         return obj;
       })
     }
-    json.receipt.Logs = decodeLogs(json.receipt.Logs, abi);
+    jsonTmp.receipt.Logs = decodeLogs(jsonTmp.receipt.Logs, abi);
   }
 
   return (
@@ -24,7 +28,7 @@ export default function JsonView({ json, onClose, className, abi }) {
       <button className="modal-close btn tx" onClick={onClose} />
       <div className="modal-content">
         <ReactJson
-          src={json}
+          src={jsonTmp}
           theme="ocean"
           collapsed={3}
           displayDataTypes={false}
