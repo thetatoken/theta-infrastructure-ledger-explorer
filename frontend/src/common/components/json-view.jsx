@@ -11,8 +11,11 @@ export default function JsonView({ json, onClose, className, abi }) {
   if (get(jsonTmp, 'type') === TxnTypes.SMART_CONTRACT) {
     if (has(jsonTmp, 'data.data')) jsonTmp.data.data = getHex(jsonTmp.data.data);
     if (has(jsonTmp, 'receipt.EvmRet')) {
-      let err = get(jsonTmp, 'receipt.EvmErr');
-      jsonTmp.receipt.EvmRet = err === '' ? getHex(jsonTmp.receipt.EvmRet) : Buffer.from(jsonTmp.receipt.EvmRet, 'base64').toString();
+      let emvRet = jsonTmp.receipt.EvmRet;
+      jsonTmp.receipt.EvmRet = {
+        text: Buffer.from(emvRet, 'base64').toString(),
+        hex: getHex(emvRet)
+      }
     }
     if (has(jsonTmp, 'receipt.Logs')) {
       jsonTmp.receipt.Logs = jsonTmp.receipt.Logs.map(obj => {
