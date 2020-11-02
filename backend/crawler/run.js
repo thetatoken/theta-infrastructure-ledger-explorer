@@ -1,4 +1,4 @@
-var schedule = require('node-schedule');
+var schedule = require('node-schedule-tz');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
@@ -119,14 +119,15 @@ function setupGetBlockCronJob(mongoClient, network_id) {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
   }, 1000);
+
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
-  schedule.scheduleJob('0 0 0 * * *', readTxHistoryJob.Execute);
+  schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
 
   accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 0 * * *', accountingJob.RecordTFuelPrice); // GMT mid-night
+  schedule.scheduleJob('Record TFuel Price','0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // GMT mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 7 * * *', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
+  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 }
 
 
