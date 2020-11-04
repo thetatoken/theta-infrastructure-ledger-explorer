@@ -22,9 +22,9 @@ export default class StakeTxsTable extends React.PureComponent {
     includeDetails: true,
     truncate: window.screen.width <= 560 ? 10 : 35,
   }
-  componentDidUpdate(preProps){
-    if(preProps.txs !== this.props.txs){
-        this.setState({ transactions: this.props.txs.slice(0, TRUNC), isSliced: true })
+  componentDidUpdate(preProps) {
+    if (preProps.txs !== this.props.txs) {
+      this.setState({ transactions: this.props.txs.slice(0, TRUNC), isSliced: true })
     }
   }
   toggleList() {
@@ -38,7 +38,7 @@ export default class StakeTxsTable extends React.PureComponent {
   render() {
     const { txs, type, className, truncate, price } = this.props;
     const { transactions, isSliced } = this.state;
-    let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.amount) }, 0);
+    let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.withdrawn ? 0 : tx.amount) }, 0);
     return (
       <div className="stakes">
         <div className="title">{type === 'source' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
