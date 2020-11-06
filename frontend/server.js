@@ -19,7 +19,7 @@ app.use(express.static('public'));
 
 // healthy check from ELB 
 app.get('/ping', function (req, res) {
-  log.Info('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+  console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
   res.writeHead(200, {
     'Content-Type': 'text/plain',
     'Content-Length': 2
