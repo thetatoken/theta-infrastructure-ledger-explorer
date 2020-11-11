@@ -23,13 +23,22 @@ export default class BlocksExplorer extends Component {
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
-      this.getOneBlockByHeight(nextProps.params.blockHeight);
+      this.fetchData(nextProps.params.blockHeight)
     }
   }
   componentDidMount() {
     const { blockHeight } = this.props.params;
-    this.getOneBlockByHeight(blockHeight);
-    this.getPrices();
+    this.fetchData(blockHeight, false);
+  }
+  fetchData(height, hasPrice = true) {
+    if (Number(height) && height > 0) {
+      this.getOneBlockByHeight(height);
+      if (!hasPrice) this.getPrices();
+    } else {
+      this.setState({
+        errorType: 'error_not_found'
+      });
+    }
   }
   getOneBlockByHeight(height) {
     const { totalBlocksNumber } = this.state;

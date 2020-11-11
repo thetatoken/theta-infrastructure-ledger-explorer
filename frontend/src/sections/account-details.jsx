@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import _ from 'lodash';
 import cx from 'classnames';
 
-import { formatCoin, priceCoin, getTheta } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getTheta, validateHex } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -63,13 +63,17 @@ export default class AccountDetails extends Component {
   }
   componentDidMount() {
     const { accountAddress } = this.props.params;
-    this.fetchData(accountAddress);
+    this.fetchData(accountAddress, false);
   }
-  fetchData(address) {
-    this.getOneAccountByAddress(address);
-    this.getTransactionsByAddress(address, false, 1);
-    this.getStakeTransactions(address);
-    this.getPrices();
+  fetchData(address, hasPrice = true) {
+    if (validateHex(address, 40)) {
+      this.getOneAccountByAddress(address);
+      this.getTransactionsByAddress(address, false, 1);
+      this.getStakeTransactions(address);
+      if (!hasPrice) this.getPrices();
+    } else {
+      this.setState({ errorType: 'invalid_address' })
+    }
   }
   getPrices() {
     priceService.getAllprices()
@@ -281,8 +285,9 @@ export default class AccountDetails extends Component {
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
-        {errorType === 'error_not_found' &&
-          <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />}
+        {errorType === 'invalid_address' &&
+          // <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />
+          <NotExist msg="Note: Invalid address."/>}
         {account && !errorType &&
           <React.Fragment>
             <table className="details account-info">

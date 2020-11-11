@@ -60,3 +60,8 @@ export function getHex(str) {
   }
   return '0x' + arr1.join('');
 }
+
+export function validateHex(hash, limit) {
+  const reg = new RegExp("^(0x){0,1}[0-9a-f]{" + limit + "}$");
+  return reg.test(hash);
+}

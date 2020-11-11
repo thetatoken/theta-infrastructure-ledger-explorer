@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, getHex } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getHex, validateHex } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import NotExist from 'common/components/not-exist';
@@ -29,14 +29,23 @@ export default class TransactionExplorer extends Component {
   }
   componentWillUpdate(nextProps) {
     if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
-      this.getOneTransactionByUuid(nextProps.params.transactionHash);
-      this.getPrices();
+      this.fetchData(nextProps.params.transactionHash.toLowerCase())
     }
   }
   componentDidMount() {
     const { transactionHash } = this.props.params;
-    this.getOneTransactionByUuid(transactionHash.toLowerCase());
-    this.getPrices();
+    const hash = transactionHash.toLowerCase()
+    this.fetchData(hash, false);
+  }
+  fetchData(hash, hasPrice = true) {
+    if (validateHex(hash, 64)) {
+      this.getOneTransactionByUuid(hash);
+      if (!hasPrice) this.getPrices();
+    } else {
+      this.setState({
+        errorType: 'error_not_found'
+      });
+    }
   }
   getPrices() {
     priceService.getAllprices()
@@ -89,7 +98,6 @@ export default class TransactionExplorer extends Component {
       this.setState({
         errorType: 'error_not_found'
       });
-      console.log('Wrong Height')
     }
   }
   handleToggleDetailsClick = e => {

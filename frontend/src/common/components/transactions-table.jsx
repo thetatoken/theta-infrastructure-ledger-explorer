@@ -78,11 +78,11 @@ export default class TransactionTable extends Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(transactions, txn => {
+          {_.map(transactions, (txn, i) => {
             let source = null;
             source = !account ? 'none' : account.address === from(txn,null,account) ? 'from' : 'to';
             return (
-              <tr key={txn.hash} className={TxnClasses[txn.type]}>
+              <tr key={i} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
                 <td className="hash overflow"><Link to={`/txs/${txn.hash}`}>{hash(txn, truncate)}</Link></td>
                 {includeDetails &&
