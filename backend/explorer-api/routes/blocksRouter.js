@@ -45,53 +45,58 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
     let blockId = Number(req.params.id);
     let latest_block_height;
     console.log('Querying one block by using Id: ' + blockId);
-    progressDao.getProgressAsync(config.blockchain.network_id)
-      .then((progressInfo) => {
-        latest_block_height = progressInfo.height;
-        return blockDao.getBlockAsync(blockId)
-      })
-      .then(async blockInfo => {
-        if (blockInfo.height % 100 === 1 && blockInfo.guardian_votes) {
-          try {
-            let checkpoint = await checkpointDao.getCheckpointByHashAsync(blockInfo.guardian_votes.Block);
-            let voted = new BigNumber(0), deposited = new BigNumber(0), j = 0;
-            for (let i = 0; i < checkpoint.guardians.length; i++) {
-              let skip = true;
-              checkpoint.guardians[i].Stakes.forEach(stake => {
-                skip = skip && stake.withdrawn;
-                let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
-                let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
-                voted = voted.plus(multi ? theta : 0);
-                deposited = deposited.plus(theta)
-              })
-              console.log(blockInfo.guardian_votes.Multiplies[j], j, blockInfo.guardian_votes.Multiplies.length)
-              j += skip ? 0 : 1;
-            }
-            blockInfo.total_deposited_guardian_stakes = deposited;
-            blockInfo.total_voted_guardian_stakes = voted;
-          } catch (err) {
-            console.log(err)
-          };
-        }
-        delete blockInfo.guardian_votes;
-        const data = ({
-          type: 'block',
-          body: blockInfo,
-          totalBlocksNumber: latest_block_height
+    if (blockId > 0) {
+      progressDao.getProgressAsync(config.blockchain.network_id)
+        .then((progressInfo) => {
+          latest_block_height = progressInfo.height;
+          return blockDao.getBlockAsync(blockId)
+        })
+        .then(async blockInfo => {
+          if (blockInfo.height % 100 === 1 && blockInfo.guardian_votes) {
+            try {
+              let checkpoint = await checkpointDao.getCheckpointByHashAsync(blockInfo.guardian_votes.Block);
+              let voted = new BigNumber(0), deposited = new BigNumber(0), j = 0;
+              for (let i = 0; i < checkpoint.guardians.length; i++) {
+                let skip = true;
+                checkpoint.guardians[i].Stakes.forEach(stake => {
+                  skip = skip && stake.withdrawn;
+                  let theta = !stake.withdrawn ? stake.amount : new BigNumber(0);
+                  let multi = !blockInfo.guardian_votes.Multiplies[j] ? 0 : 1
+                  voted = voted.plus(multi ? theta : 0);
+                  deposited = deposited.plus(theta)
+                })
+                console.log(blockInfo.guardian_votes.Multiplies[j], j, blockInfo.guardian_votes.Multiplies.length)
+                j += skip ? 0 : 1;
+              }
+              blockInfo.total_deposited_guardian_stakes = deposited;
+              blockInfo.total_voted_guardian_stakes = voted;
+            } catch (err) {
+              console.log(err)
+            };
+          }
+          delete blockInfo.guardian_votes;
+          const data = ({
+            type: 'block',
+            body: blockInfo,
+            totalBlocksNumber: latest_block_height
+          });
+          res.status(200).send(data);
+        })
+        .catch(error => {
+          if (error.message.includes('NOT_FOUND')) {
+            const err = {
+              type: 'error_not_found',
+              error
+            };
+            res.status(404).send(err);
+          } else {
+            console.log('ERR - ', error)
+          }
         });
-        res.status(200).send(data);
-      })
-      .catch(error => {
-        if (error.message.includes('NOT_FOUND')) {
-          const err = {
-            type: 'error_not_found',
-            error
-          };
-          res.status(404).send(err);
-        } else {
-          console.log('ERR - ', error)
-        }
-      });
+    } else {
+      res.status(400).send({ type: 'invalid_height' });
+    }
+
   });
   router.get("/blocks/top_blocks", (req, res) => {
     numberOfBlocks = 1;

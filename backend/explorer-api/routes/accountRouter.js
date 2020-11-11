@@ -8,6 +8,10 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
+    if(!helper.validateHex(address, 40)){
+      res.status(400).send({type: 'invalid_address'})
+      return;
+    }
     // console.log('Querying one account by using Id: ' + address);
     accountDao.getAccountByPkAsync(address)
       .then(accountInfo => {
@@ -33,6 +37,10 @@ var accountRouter = (app, accountDao, rpc) => {
   router.get("/account/update/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     // console.log('Updating one account by Id:', address);
+    if(!helper.validateHex(address, 40)){
+      res.status(400).send({type: 'invalid_address'})
+      return;
+    }
     rpc.getAccountAsync([{ 'address': address }])
       .then(async function (data) {
         let tmp = JSON.parse(data);

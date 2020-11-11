@@ -9,6 +9,10 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
   router.get("/transaction/:hash", (req, res) => {
     let hash = helper.normalize(req.params.hash.toLowerCase());
     console.log('Querying one transaction by using uuid: ' + hash);
+    if(!helper.validateHex(hash, 64)){
+      res.status(400).send({type: 'invalid_hash'})
+      return;
+    }
     progressDao.getProgressAsync(config.blockchain.network_id)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;

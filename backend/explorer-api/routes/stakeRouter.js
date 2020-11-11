@@ -57,6 +57,10 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     console.log('Querying stake by address.');
     let { hasBalance = false } = req.query;
     const address = req.params.id.toLowerCase();
+    if(!helper.validateHex(address, 40)){
+      res.status(400).send({type: 'invalid_address'})
+      return;
+    }
     stakeDao.getStakeByAddressAsync(address)
       .then(async stakeListInfo => {
         // TODO: Remove retry after fix the stake issue

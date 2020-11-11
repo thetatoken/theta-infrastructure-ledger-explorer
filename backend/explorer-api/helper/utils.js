@@ -13,3 +13,8 @@ exports.sumCoin = function (weiAmountA, weiAmountB) {
 exports.formatCoin = function (weiAmount) {
     return new BigNumber(weiAmount).dividedBy(WEI);
 }
+
+exports.validateHex = function (hash, limit = 64) {
+    const reg = new RegExp("^(0x){0,1}[0-9a-f]{" + limit + "}$");
+    return reg.test(hash);
+}

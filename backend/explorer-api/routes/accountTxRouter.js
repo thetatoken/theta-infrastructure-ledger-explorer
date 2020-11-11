@@ -61,6 +61,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/history/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
     let { startDate, endDate } = req.query;
     const types = [0, 2, 5];
     const gap = 60 * 60 * 24 * 8;
@@ -154,6 +158,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
+    if(!helper.validateHex(address, 40)){
+      res.status(400).send({type: 'invalid_address'})
+      return;
+    }
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
     type = parseInt(type);
     pageNumber = parseInt(pageNumber);
@@ -253,6 +261,10 @@ var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transact
 
   router.get("/accountTx/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
+    if(!helper.validateHex(address, 40)){
+      res.status(400).send({type: 'invalid_address'})
+      return;
+    }
     let { startTime = 0 } = req.query;
     const endTime = Math.ceil(Date.now() / 1000).toString();
     const gap = 60 * 60 * 24 * 14;
