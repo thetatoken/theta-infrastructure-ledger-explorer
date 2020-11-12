@@ -62,6 +62,6 @@ export function getHex(str) {
 }
 
 export function validateHex(hash, limit) {
-  const reg = new RegExp("^(0x){0,1}[0-9a-f]{" + limit + "}$");
+  const reg = new RegExp("^(0x){0,1}[0-9a-fA-F]{" + limit + "}$");
   return reg.test(hash);
 }

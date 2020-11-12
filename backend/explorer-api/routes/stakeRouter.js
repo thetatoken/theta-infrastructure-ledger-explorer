@@ -56,7 +56,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
     let { hasBalance = false } = req.query;
-    const address = req.params.id.toLowerCase();
+    const address = helper.normalize(req.params.id.toLowerCase());
     if(!helper.validateHex(address, 40)){
       res.status(400).send({type: 'invalid_address'})
       return;
