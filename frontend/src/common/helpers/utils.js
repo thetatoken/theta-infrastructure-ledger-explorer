@@ -86,14 +86,14 @@ export function decodeLogs(logs, abi) {
           break;
         }
       }
-      // console.log(event);
       if (event != null) {
         let inputs = event.inputs;
         let topics = log.topics.slice(1);
         let data = web3.eth.abi.decodeLog(inputs, log.data, topics);
         log.decode = {
           result: data,
-          eventName: event.name
+          eventName: event.name,
+          event: event
         }
       } else {
         log.decode = 'No matched event or the smart contract source code has not been verified.';

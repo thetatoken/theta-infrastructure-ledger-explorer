@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
@@ -7,7 +7,7 @@ import _truncate from 'lodash/truncate';
 
 import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, getHex } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getHex, decodeLogs } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -15,6 +15,7 @@ import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
 import BodyTag from 'common/components/body-tag';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 
 
@@ -168,7 +169,7 @@ export default class TransactionExplorer extends React.Component {
               <SplitContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
-              <SmartContract transaction={transaction} price={price} />}
+              <SmartContract transaction={transaction} price={price} abi={abi} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
               <WithdrawStake transaction={transaction} price={price} />}
@@ -359,25 +360,112 @@ const DepositStake = ({ transaction, price }) => {
     </table>);
 }
 
-const SmartContract = ({ transaction }) => {
+const SmartContract = ({ transaction, abi }) => {
+  const [tabIndex, setTabIndex] = useState(0);
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
+  let logs = get(transaction, 'receipt.Logs');
+  logs = JSON.parse(JSON.stringify(logs));
+  logs = logs.map(obj => {
+    obj.data = getHex(obj.data)
+    return obj;
+  })
+  logs = decodeLogs(logs, abi);
+  const logLength = (logs || []).length;
+  return (
+    <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+      <TabList>
+        <Tab>Overview</Tab>
+        <Tab disabled={logLength == 0} >{`Logs(${logLength})`}</Tab>
+      </TabList>
+
+      <TabPanel>
+        <table className="details txn-details">
+          <tbody>
+            <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
+            <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
+            {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+            <DetailsRow label="Gas Limit" data={data.gas_limit} />
+            {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
+            <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
+            {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
+            <DetailsRow label="Data" data={getHex(data.data)} />
+          </tbody>
+        </table>
+      </TabPanel>
+      <TabPanel>
+        {logs.map((log, i) => <Log log={log} key={i} />)}
+      </TabPanel>
+    </Tabs>
+  );
+}
+
+const Log = ({ log }) => {
+  console.log('log:', log);
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
-        <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
-        {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-        <DetailsRow label="Gas Limit" data={data.gas_limit} />
-        {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
-        <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-        {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
-        <DetailsRow label="Data" data={getHex(data.data)} />
+        <DetailsRow label="Address" data={<Address hash={get(log, 'address')} />} />
+        <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
+        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
+        <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
       </tbody>
-    </table>);
+    </table>
+  )
+}
+const EventName = ({ event }) => {
+  let index = 1;
+  return (
+    <span className="text-grey">
+      {event.name}(
+      {event.inputs.map((input, i) => {
+        return (<span key={i}>
+          {input.indexed ? `indexed_topic_${++index} ` : ''}
+          <span className="text-green">{`${input.type} `}</span>
+          <span className="text-danger">{`${input.name}`}</span>
+          {i === event.inputs.length - 1 ? ')' : ', '}
+        </span>)
+      })}
+    </span>
+  )
+}
+const Topics = ({ topics }) => {
+  console.log(topics, 'topics')
+  return (
+    <>
+      {topics.map((topic, i) => {
+        return <p key={i}>{topic}</p>
+      })}
+    </>
+  )
 }
 
-
-
-
+const LogData = ({ data, decode }) => {
+  const isDisabled = typeof decode !== 'object';
+  const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
+  const [decodeData, setDecodeData] = useState({});
+  useEffect(() => {
+    if (typeof decode === 'string') return;
+    let _data = JSON.parse(JSON.stringify(decode.result));
+    Object.keys(_data).forEach(k => {
+      if (k === '__length__') delete _data[k];
+      if (k.match(/^[0-9]+/)) delete _data[k];
+    })
+    setDecodeData(_data);
+  }, [decode]);
+  return (<div className="sc-log__data">
+    <div className="sc-log__data--buttons">
+      <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
+        onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
+      <div className={cx("sc-log__data--button", { active: model === 'hex' })}
+        onClick={() => setModel('hex')}>Hex</div>
+    </div>
+    {model === 'hex' ? data : Object.keys(decodeData).map((k, i) => {
+      return (<div key={i}>
+        <span className="text-grey">{k}: </span>
+        {decodeData[k]}
+      </div>)
+    })}
+  </div>)
+}

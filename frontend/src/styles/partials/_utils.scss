@@ -19,6 +19,9 @@
   color: $color-font-light;
   cursor: not-allowed;
 }
+.text-grey {
+  color: $color-font-light;
+}
 
 @mixin flex($direction: row, $justify: flex-start, $align: center, $wrap: nowrap) {
   display: flex;

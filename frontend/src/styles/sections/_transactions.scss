@@ -93,3 +93,42 @@
 .txn-type.withdraw-stake:before { background-image: url('/images/icons/icon_withdraw-stake-transaction@2x.png'); }
 
 .txn-type.update-validators:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
+
+.sc-log {
+  &__data {
+    position: relative;
+    padding-right: 20%;
+    &--buttons {
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 5px;
+      background-color: $color-black;
+      color: $color-font-light;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    &--button {
+      padding: 2px 5px;
+      &.active {
+        background-color: $color-line;
+        color: $color-font-main;
+      }
+      &.disabled {
+        cursor: not-allowed;
+        &:hover {
+          opacity: 1;
+        }
+      }
+      &:first-child {
+        border-radius: 4px 0 0 4px;
+      }
+      &:last-child {
+        border-radius: 0 4px 4px 0;
+      }
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
