@@ -111,7 +111,7 @@ const FunctionUnit = (props) => {
         <div className="read-contract__outputs">
           {outputs.map((output, i) =>
             <div className="read-contract__output" key={i}>
-              <div className="read-contract__output--content">{decodedParameters[i]}</div>
+              <div className="read-contract__output--content">{decodedParameters[i].toString()}</div>
               <div className="read-contract__output--unit">{output.type}</div>
             </div>)}
         </div>}
