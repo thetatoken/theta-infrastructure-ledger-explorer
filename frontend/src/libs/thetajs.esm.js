@@ -664,8 +664,6 @@ class TxSigner {
     }
 }
 
-var Web3Utils = require('web3-utils');
-
 class SmartContractTx extends Tx{
     constructor(fromAddress, toAddress, gasLimit, gasPrice, data, value, senderSequence){
         super();
