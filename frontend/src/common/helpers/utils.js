@@ -1,7 +1,5 @@
 import BigNumber from 'bignumber.js';
-import Web3 from "web3";
-
-const web3 = new Web3("http://localhost:3000");
+import { ethers } from "ethers";
 
 import { WEI } from 'common/constants';
 
@@ -71,25 +69,25 @@ export function getArguments(str) {
 }
 
 export function decodeLogs(logs, abi) {
+  const iface = new ethers.utils.Interface(abi);
   return logs.map(log => {
     try {
       let event = null;
       for (let i = 0; i < abi.length; i++) {
         let item = abi[i];
         if (item.type != "event") continue;
-        let signature = item.name + "(" + item.inputs.map(function (input) { return input.type; }).join(",") + ")";
-        // console.log("signature: ",signature)
-        let hash = web3.utils.sha3(signature);
-        // console.log("hash:", hash)
+        const hash = iface.getEventTopic(item.name)
         if (hash == log.topics[0]) {
           event = item;
           break;
         }
       }
       if (event != null) {
-        let inputs = event.inputs;
-        let topics = log.topics.slice(1);
-        let data = web3.eth.abi.decodeLog(inputs, log.data, topics);
+        let bigNumberData = iface.decodeEventLog(event.name, log.data, log.topics);
+        let data = {};
+        Object.keys(bigNumberData).forEach(k => {
+          data[k] = bigNumberData[k].toString();
+        })
         log.decode = {
           result: data,
           eventName: event.name,

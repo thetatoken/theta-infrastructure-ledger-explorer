@@ -29,7 +29,7 @@ export default class TransactionExplorer extends React.Component {
       errorType: null,
       showRaw: false,
       price: { 'Theta': 0, 'TFuel': 0 },
-      abi: {}
+      abi: []
     };
   }
   componentDidUpdate(preProps) {
@@ -402,7 +402,6 @@ const SmartContract = ({ transaction, abi }) => {
 }
 
 const Log = ({ log }) => {
-  console.log('log:', log);
   return (
     <table className="details txn-details">
       <tbody>
@@ -431,7 +430,6 @@ const EventName = ({ event }) => {
   )
 }
 const Topics = ({ topics }) => {
-  console.log(topics, 'topics')
   return (
     <>
       {topics.map((topic, i) => {
