@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
 
 var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));

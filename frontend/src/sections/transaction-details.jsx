@@ -32,13 +32,13 @@ export default class TransactionExplorer extends React.Component {
       abi: []
     };
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.transactionHash !== this.props.params.transactionHash) {
-      this.fetchData(nextProps.params.transactionHash.toLowerCase())
+  componentDidUpdate(preProps) {
+    if (preProps.match.params.transactionHash !== this.props.match.params.transactionHash) {
+      this.fetchData(this.props.match.params.transactionHash.toLowerCase())
     }
   }
   componentDidMount() {
-    const { transactionHash } = this.props.params;
+    const { transactionHash } = this.props.mathch.params;
     const hash = transactionHash.toLowerCase()
     this.fetchData(hash, false);
   }

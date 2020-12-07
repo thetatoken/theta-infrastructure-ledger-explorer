@@ -22,13 +22,13 @@ export default class BlocksExplorer extends React.PureComponent {
       price: {}
     };
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.blockHeight !== this.props.params.blockHeight) {
-      this.fetchData(nextProps.params.blockHeight)
+  componentDidUpdate(preProps) {
+    if (preProps.match.params.blockHeight !== this.props.match.params.blockHeight) {
+      this.getOneBlockByHeight(this.props.match.params.blockHeight);
     }
   }
   componentDidMount() {
-    const { blockHeight } = this.props.params;
+    const { blockHeight } = this.propsmatch.params;
     this.fetchData(blockHeight, false);
   }
   fetchData(height, hasPrice = true) {
