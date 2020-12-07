@@ -38,7 +38,7 @@ export default class TransactionExplorer extends React.Component {
     }
   }
   componentDidMount() {
-    const { transactionHash } = this.props.mathch.params;
+    const { transactionHash } = this.props.match.params;
     const hash = transactionHash.toLowerCase()
     this.fetchData(hash, false);
   }

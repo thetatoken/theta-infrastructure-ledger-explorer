@@ -28,7 +28,7 @@ export default class BlocksExplorer extends React.PureComponent {
     }
   }
   componentDidMount() {
-    const { blockHeight } = this.propsmatch.params;
+    const { blockHeight } = this.props.match.params;
     this.fetchData(blockHeight, false);
   }
   fetchData(height, hasPrice = true) {
