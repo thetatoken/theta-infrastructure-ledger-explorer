@@ -1,0 +1,14 @@
+import { NetworkUrlOfChainId } from 'common/constants';
+const host = 'https://localhost';
+const config = {
+    restApi: {
+        host: host,
+        port: 9000
+    },
+    socketApi: {
+        host: host,
+        port: 3030
+    },
+    defaultThetaChainID: NetworkUrlOfChainId[host]
+};
+export default config;
