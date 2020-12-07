@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 const ELLIPSE = '&#8230;'
 
-export default class Pagination extends React.Component {
+export default class Pagination extends React.PureComponent {
   constructor(props) {
     super(props);
     this.handlePrevious = this.handlePrevious.bind(this);

@@ -1,14 +1,18 @@
 import { BigNumber } from 'bignumber.js';
-import _ from 'lodash';
+import reduce from 'lodash/reduce';
+import get from 'lodash/get';
+import truncate from 'lodash/truncate';
+import isNumber from 'lodash/isNumber';
+import capitalize from 'lodash/capitalize';
+import chain from 'lodash/chain';
+// import 
 import moment from 'moment';
-
 import { TxnTypes, TxnTypeText, TxnStatus, WEI } from 'common/constants';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
 
 export function totalCoinValue(set, key = 'tfuelwei') {
-  //_.forEach(set, v => console.log(_.get(v, `coins.${key}`, 0)))
-  return _.reduce(set, (acc, v) => acc + parseInt(_.get(v, `coins.${key}`, 0)), 0)
+  return reduce(set, (acc, v) => acc + parseInt(get(v, `coins.${key}`, 0)), 0)
 }
 
 export function from(txn, trunc = null, account = null) {
@@ -28,9 +32,9 @@ export function from(txn, trunc = null, account = null) {
   } else {
     path = 'data.inputs[0].address';
   }
-  let addr = _.get(txn, path);
+  let addr = get(txn, path);
   if (trunc && trunc > 0) {
-    addr = _.truncate(addr, { length: trunc });
+    addr = truncate(addr, { length: trunc });
   }
 
   return addr;
@@ -47,7 +51,7 @@ export function to(txn, trunc = null, address = null) {
   } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
     path = 'data.holder.address';
   } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
-    const splits = _.get(txn, 'data.splits');
+    const splits = get(txn, 'data.splits');
     isSelf = splits.some(split => {
       return split.Address === address;
     })
@@ -55,15 +59,15 @@ export function to(txn, trunc = null, address = null) {
   } else if (txn.type === TxnTypes.SMART_CONTRACT) {
     path = 'data.to.address'
   } else {
-    const outputs = _.get(txn, 'data.outputs');
+    const outputs = get(txn, 'data.outputs');
     isSelf = outputs.some(output => {
       return output.address === address;
     })
     path = 'data.outputs[0].address';
   }
-  let addr = isSelf ? address : _.get(txn, path);
+  let addr = isSelf ? address : get(txn, path);
   if (trunc && trunc > 0) {
-    addr = _.truncate(addr, { length: trunc });
+    addr = truncate(addr, { length: trunc });
   }
   return addr;
 }
@@ -80,28 +84,28 @@ export function status(txn) {
   if (!txn.status) {
     return "Finalized";
   }
-  return _.capitalize(txn.status);
+  return capitalize(txn.status);
 }
 
 
 
 export function fee(txn) {
-  let f = _.get(txn, 'data.fee.tfuelwei');
+  let f = get(txn, 'data.fee.tfuelwei');
   f = BigNumber(f).dividedBy(WEI);
   return f.toString();
 }
 
 export function gasPrice(txn) {
-  let f = _.get(txn, 'data.gas_price');
+  let f = get(txn, 'data.gas_price');
   f = BigNumber(f).dividedBy(WEI);
   return f.toString();
 }
 
 export function value(txn) {
   let values = [
-    totalCoinValue(_.get(txn, 'data.inputs'), 'tfuelwei'),
-    totalCoinValue(_.get(txn, 'data.inputs'), 'thetawei')];
-  return _.chain(values)
+    totalCoinValue(get(txn, 'data.inputs'), 'tfuelwei'),
+    totalCoinValue(get(txn, 'data.inputs'), 'thetawei')];
+  return chain(values)
     .map(v => v ? new BigNumber(v).dividedBy(WEI) : "0")
     .filter(Boolean)
     .map(v => v.toString(10))
@@ -109,21 +113,21 @@ export function value(txn) {
 }
 
 export function hash(txn, trunc = null) {
-  let a = _.get(txn, 'hash')
+  let a = get(txn, 'hash')
   if (trunc && trunc > 0) {
-    a = _.truncate(a, { length: trunc });
+    a = truncate(a, { length: trunc });
   }
   return a;
 }
 
 export function age(txn) {
-  if (!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
+  if (!txn.timestamp || !isNumber(parseInt(txn.timestamp)))
     return null;
   return moment(parseInt(txn.timestamp) * 1000).fromNow(true);
 }
 
 export function date(txn) {
-  if (!txn.timestamp || !_.isNumber(parseInt(txn.timestamp)))
+  if (!txn.timestamp || !isNumber(parseInt(txn.timestamp)))
     return null;
   return moment(parseInt(txn.timestamp) * 1000).format("MM/DD/YY hh:mma");
 }
@@ -133,11 +137,11 @@ export function coins(txn, account = null) {
   let outputs = null, inputs = null, index = 0;
   switch (txn.type) {
     case TxnTypes.COINBASE:
-      outputs = _.get(txn, 'data.outputs');
+      outputs = get(txn, 'data.outputs');
       if (!account || txn.data.proposer.address === account.address) {
         coins = {
-          'thetawei': totalCoinValue(_.get(txn, 'data.outputs'), 'thetawei').toFixed(),
-          'tfuelwei': totalCoinValue(_.get(txn, 'data.outputs'), 'tfuelwei').toFixed()
+          'thetawei': totalCoinValue(get(txn, 'data.outputs'), 'thetawei').toFixed(),
+          'tfuelwei': totalCoinValue(get(txn, 'data.outputs'), 'tfuelwei').toFixed()
         }
       } else if (outputs.some(output => { return output.address === account.address; })) {
         index = outputs.findIndex(e => e.address === account.address);
@@ -145,12 +149,12 @@ export function coins(txn, account = null) {
       }
       break;
     case TxnTypes.TRANSFER:
-      outputs = _.get(txn, 'data.outputs');
-      inputs = _.get(txn, 'data.inputs')
+      outputs = get(txn, 'data.outputs');
+      inputs = get(txn, 'data.inputs')
       if (!account) {
         coins = {
-          'thetawei': totalCoinValue(_.get(txn, 'data.inputs'), 'thetawei').toFixed(),
-          'tfuelwei': totalCoinValue(_.get(txn, 'data.inputs'), 'tfuelwei').toFixed()
+          'thetawei': totalCoinValue(get(txn, 'data.inputs'), 'thetawei').toFixed(),
+          'tfuelwei': totalCoinValue(get(txn, 'data.inputs'), 'tfuelwei').toFixed()
         }
       } else if (inputs.some(input => { return input.address === account.address; })) {
         index = inputs.findIndex(e => e.address === account.address);

@@ -12,7 +12,7 @@ function orderTxs(txs, ids) {
   return ids.map(function (id) { return hashOfResults[id] });
 }
 
-var accountTxRouter = (app, accountDao, accountTxDao, accountTxSendDao, transactionDao, rpc) => {
+var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   // @deprecated
   // router.get("/accountTx/counter/:address", async (req, res) => {

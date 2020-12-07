@@ -1,20 +1,21 @@
-import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
+import React from "react";
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
+import get from 'lodash/get';
+import map from 'lodash/map';
 
 import { blocksService } from 'common/services/block';
-import LinkButton from "common/components/link-button";
 import NotExist from 'common/components/not-exist';
 import { BlockStatus, TxnTypeText, TxnClasses } from 'common/constants';
 import { date, hash, prevBlock } from 'common/helpers/blocks';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 
-export default class BlocksExplorer extends Component {
+export default class BlocksExplorer extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       block: null,
       totalBlocksNumber: undefined,
       errorType: null,
@@ -77,36 +78,30 @@ export default class BlocksExplorer extends Component {
       <div className="th-explorer__buttons--no-more">No More</div>
     )
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }
   render() {
     const { block, totalBlocksNumber, errorType, price } = this.state;
-    const height = Number(this.props.params.blockHeight);
+    const height = Number(this.props.match.params.blockHeight);
     const hasNext = totalBlocksNumber > height;
     const hasPrev = height > 1;
     const isCheckPoint = block && (block.total_voted_guardian_stakes != undefined);
@@ -177,7 +172,7 @@ export default class BlocksExplorer extends Component {
             <h3>Transactions</h3>
             <table className="data transactions">
               <tbody>
-                {_.map(block.txs, (t, i) => <Transaction key={i} txn={t} />)}
+                {map(block.txs, (t, i) => <Transaction key={i} txn={t} />)}
               </tbody>
             </table>
 

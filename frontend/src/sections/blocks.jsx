@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 
 import { blocksService } from 'common/services/block';
 import BlocksTable from "common/components/blocks-table";
@@ -6,11 +6,11 @@ import Pagination from "common/components/pagination";
 
 const MAX_BLOCKS = 50;
 
-export default class Blocks extends Component {
+export default class Blocks extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       blockHeight: 0,
       blockInfoList: [],
       currentPageNumber: 1,

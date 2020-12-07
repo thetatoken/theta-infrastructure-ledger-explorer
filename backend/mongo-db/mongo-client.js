@@ -187,3 +187,11 @@ exports.remove = function (collectionName, queryObject, callback) {
     callback();
   }
 }
+
+exports.createIndex = function (collectionName, queryObject, callback) {
+  var collection = _db.collection(collectionName);
+  collection.createIndex(queryObject, function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  })
+}

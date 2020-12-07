@@ -1,0 +1,186 @@
+.code-loading-text{
+  position: absolute;
+  top: 10%;
+  width: 100%;
+  text-align: center;
+}
+.selects-container{
+  display: flex;
+  justify-content: space-between;
+}
+.select{
+  &__container{
+    display: flex;
+    margin: 15px 0;
+    & label{
+      line-height: 32px;
+    }
+  }
+  &__selector{
+    width: 12rem;
+    margin: 0 5px;
+    &.optimizer{
+      width: 10rem;
+    }
+    &::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid $color-input-text;
+      position: absolute;
+      right: 5px;
+      top: 12px;
+      pointer-events: none;
+    }
+    & select{
+      width: 100%;
+      height: 32px;
+      &.isEmpty{
+        border-color: $color-red;
+      }
+    }
+  }
+
+  &__tooltip{
+    $self: &;
+    margin: 0 5px;
+    color: $color-font-light;
+    &.question-mark{
+      display: inline-block;
+      border: 1px solid $color-font-light;
+      border-radius: 50%;
+      width: 0.875rem;
+      height: 0.875rem;
+      text-align: center;
+      line-height: 0.875rem;
+      font-size: 0.875rem;
+    }
+    &--text{
+      width: 250px;
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      background: $color-panel;
+      border-radius: 6px;
+      padding: 15px 0 20px 15px;
+      text-align: left;
+      line-height: 25px;
+
+      bottom: calc(100% + 10px);
+      left: 50%;
+      margin-left: -125px;
+      &:after{
+        content: '';
+        position: absolute;
+        border-style: solid;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-color: $color-panel transparent transparent transparent;
+        border-width: 5px;
+      }
+    }
+    &:hover #{ $self }--text{
+        visibility: visible;
+    }
+  }
+}
+.code-buttons{
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0 20%;
+  & div{
+    padding: 20px;
+    color: $color-input-text;
+    background: $color-blue;
+    border: none;
+    border-radius: .25rem;
+    font-weight: $weight-medium;
+    cursor: pointer;
+    &:hover{
+      box-shadow: 0 4px 8px 0 rgba($color-blue, 0.2), 0 6px 20px 0 rgba($color-blue, 0.19);
+    }
+    &.reset{
+      background: $color-light;
+      &:hover{
+        background-color: $color-input-background;
+        box-shadow: 0 4px 8px 0 rgba($color-input-background, 0.2), 0 6px 20px 0 rgba($color-input-background, 0.19);
+      }
+    }
+  }
+}
+.code-error-text{
+  margin-bottom: 30px;
+  &:before{
+    display: inline-block;
+    content: '!';
+    border: 1px solid $color-red;
+    width: 1em;
+    height: 1em;
+    line-height: calc(1em + 3px);
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+}
+.contract-info{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  color: $color-font-main;
+  background-color: $color-panel;
+  &__title{
+    display: flex;
+    height: 40px;
+    line-height: 40px;
+    margin: 20px 0;
+    font-weight: $weight-bold;
+    &--sub{
+      color: $color-font-light;
+      font-size: 0.875rem;
+      font-weight: $weight-regular;
+    }
+    &.verified{
+      margin-top: 0;
+      color: $color-green;
+    }
+  }
+  &__general{
+    display: flex;
+    flex-direction: row;
+    @include breakpoint('phablet', max) {
+      flex-direction: column;
+    }
+  }
+  &__raws{
+    width: 50%;
+    padding: 0 1rem 0 1rem;
+    &:first-child{
+      padding-right: 3rem;
+    }
+    @include breakpoint('phablet', max) {
+      width: 100%;
+    }
+  }
+  &__cell{
+    display: flex;
+    line-height: 40px;
+    &:first-child{
+      border-bottom: 1px solid $color-light;
+    }
+    & > div{
+      width: 40%;
+      &:nth-child(2){
+        flex: 1;
+        color: $color-font-light;
+      }
+    }
+  }
+  &__block{
+    margin: 10px 0;
+    width: 100%;
+  }
+}

@@ -1,4 +1,4 @@
-var schedule = require('node-schedule');
+var schedule = require('node-schedule-tz');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
@@ -13,6 +13,7 @@ var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
+var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
@@ -128,19 +129,23 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   checkpointDao = new checkpointDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(checkpointDao);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao);
+  smartContractDao = new smartContractDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(smartContractDao);
+
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
   }, 1000);
+
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
-  schedule.scheduleJob('0 0 0 * * *', readTxHistoryJob.Execute);
+  schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
 
   accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 0 * * *', accountingJob.RecordTFuelPrice); // GMT mid-night
+  schedule.scheduleJob('Record TFuel Price','0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // GMT mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
-  schedule.scheduleJob('0 0 7 * * *', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
+  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 }
 
 

@@ -1,10 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import Popup from "reactjs-popup";
-import { Link } from 'react-router';
-import _ from 'lodash';
+import { Link } from 'react-router-dom';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import compact from 'lodash/compact';
+// import 
 import cx from 'classnames';
 
-import { formatCoin, priceCoin, getTheta, validateHex } from 'common/helpers/utils';
+import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
 import { CurrencyLabels } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -16,14 +19,15 @@ import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
+import SmartContract from 'common/components/smart-contract';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-export default class AccountDetails extends Component {
+export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: this.getEmptyAccount(this.props.params.accountAddress),
+      account: this.getEmptyAccount(this.props.match.params.accountAddress),
       transactions: null,
       currentPage: 1,
       totalPages: null,
@@ -55,14 +59,14 @@ export default class AccountDetails extends Component {
       txs_counter: {}
     }
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.params.accountAddress !== this.props.params.accountAddress) {
+  componentDidUpdate(preProps) {
+    if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
       this.setState({ hasOtherTxs: true, includeService: false })
-      this.fetchData(nextProps.params.accountAddress);
+      this.fetchData(this.props.match.params.accountAddress);
     }
   }
   componentDidMount() {
-    const { accountAddress } = this.props.params;
+    const { accountAddress } = this.props.match.params;
     this.fetchData(accountAddress, false);
   }
   fetchData(address, hasPrice = true) {
@@ -75,30 +79,24 @@ export default class AccountDetails extends Component {
       this.setState({ errorType: 'invalid_address' })
     }
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }
@@ -109,7 +107,7 @@ export default class AccountDetails extends Component {
     }
     stakeService.getStakeByAddress(address)
       .then(res => {
-        const stakes = _.get(res, 'data.body');
+        const stakes = get(res, 'data.body');
         this.setState({
           holderTxs: stakes.holderRecords,
           sourceTxs: stakes.sourceRecords,
@@ -127,21 +125,21 @@ export default class AccountDetails extends Component {
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
       .then(res => {
-        const txs = _.get(res, 'data.body');
+        const txs = get(res, 'data.body');
         if (!txs) {
           this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
           return
         }
         if (txs.length !== 0) {
           this.setState({
-            transactions: _.get(res, 'data.body'),
-            currentPage: _.get(res, 'data.currentPageNumber'),
-            totalPages: _.get(res, 'data.totalPageNumber'),
+            transactions: get(res, 'data.body'),
+            currentPage: get(res, 'data.currentPageNumber'),
+            totalPages: get(res, 'data.totalPageNumber'),
             loading_txns: false,
           })
         } else {
-          this.setState({ hasOtherTxs: false })
           this.handleToggleHideTxn();
+          this.setState({ hasOtherTxs: false })
         }
 
       })
@@ -182,24 +180,28 @@ export default class AccountDetails extends Component {
   }
 
   handlePageChange = pageNumber => {
-    let { accountAddress } = this.props.params;
+    let { accountAddress } = this.props.match.params;
     let { includeService } = this.state;
     this.getTransactionsByAddress(accountAddress, includeService, pageNumber);
   }
 
   handleToggleHideTxn = () => {
-    let { accountAddress } = this.props.params;
-    let includeService = !this.state.includeService;
-    this.setState({
-      includeService,
-      currentPage: 1,
-      totalPages: null,
-    });
-    this.getTransactionsByAddress(accountAddress, includeService, 1);
+    if (this.state.hasOtherTxs) {
+      let { accountAddress } = this.props.match.params;
+      let includeService = !this.state.includeService;
+      this.setState({
+        includeService,
+        currentPage: 1,
+        totalPages: null,
+      });
+      this.getTransactionsByAddress(accountAddress, includeService, 1);
+    } else {
+      this.setState({ loading_txns: false });
+    }
   }
 
   downloadTrasanctionHistory() {
-    const { accountAddress } = this.props.params;
+    const { accountAddress } = this.props.match.params;
     const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
     const endDate = (new Date(this.endDate.value).getTime() / 1000).toString();
     let hasStartDateErr = false, hasEndDateErr = false;
@@ -315,22 +317,24 @@ export default class AccountDetails extends Component {
           <React.Fragment>
             <div className="actions">
               {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
-                <div className="popup-row header">Choose the time period. Must within 7 days.</div>
-                <div className="popup-row">
-                  <div className="popup-label">Start Date:</div>
-                  <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
-                </div>
-                <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
-                <div className="popup-row">
-                  <div className="popup-label">End Date: </div>
-                  <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
-                </div>
-                <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
-                <div className="popup-row buttons">
-                  <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
-                  <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
-                  <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
-                </div>
+                <React.Fragment>
+                  <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                  <div className="popup-row">
+                    <div className="popup-label">Start Date:</div>
+                    <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
+                  </div>
+                  <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
+                  <div className="popup-row">
+                    <div className="popup-label">End Date: </div>
+                    <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
+                  </div>
+                  <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
+                  <div className="popup-row buttons">
+                    <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
+                    <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
+                    <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
+                  </div>
+                </React.Fragment>
               </Popup>}
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
@@ -357,6 +361,8 @@ export default class AccountDetails extends Component {
               onPageChange={this.handlePageChange}
               disabled={loading_txns} />
           </React.Fragment>}
+        {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
+          <SmartContract address={account.address} />}
       </div>);
   }
 }
@@ -364,7 +370,7 @@ export default class AccountDetails extends Component {
 const Balance = ({ balance, price }) => {
   return (
     <div className="act balance">
-      {_.map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
+      {map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
         {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
         <div className='price'>{`[\$${priceCoin(v, price[CurrencyLabels[k]])} USD]`}</div>
       </div>)}
@@ -378,7 +384,7 @@ const Address = ({ hash }) => {
 const HashList = ({ hashes }) => {
   return (
     <React.Fragment>
-      {_.map(_.compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
+      {map(compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
     </React.Fragment>
   )
 }

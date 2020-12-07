@@ -1,12 +1,13 @@
-import React, { Component } from "react";
-import { Link } from 'react-router';
+import React from "react";
+import { Link } from 'react-router-dom';
+import get from 'lodash/get';
 
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
 import TokenDashboard from "common/components/token-dashboard";
 import { priceService } from 'common/services/price';
 
-export default class Dashboard extends Component {
+export default class Dashboard extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,36 +18,30 @@ export default class Dashboard extends Component {
   componentDidMount() {
     this.getPrices();
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
+        let thetaInfo, tfuelInfo;
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-                this.setState({ thetaInfo: info })
-              return;
-            case 'TFUEL':
-                this.setState({ tfuelInfo: info })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') thetaInfo = info;
+          else if (info._id === 'TFUEL') tfuelInfo = info;
         })
+        this.setState({ thetaInfo, tfuelInfo })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { thetaInfo, tfuelInfo } = this.state;
-      if (!thetaInfo || !tfuelInfo) {
-        this.getPrices();
+      if ((!thetaInfo || !tfuelInfo) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }
   render() {
     const { thetaInfo, tfuelInfo } = this.state;
-    const { backendAddress } = this.props.route;
+    const { backendAddress } = this.props;
     return (
       <div className="content home">
         <TokenDashboard type='theta' tokenInfo={thetaInfo} />

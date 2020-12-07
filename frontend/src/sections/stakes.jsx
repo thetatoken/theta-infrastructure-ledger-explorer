@@ -1,14 +1,15 @@
-import React, { Component } from "react";
+import React from "react";
+import get from 'lodash/get';
 
 import { stakeService } from 'common/services/stake';
 import ThetaChart from 'common/components/chart';
-import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
+import { sumCoin } from 'common/helpers/utils';
 import StakesTable from "../common/components/stakes-table";
 
 import BigNumber from 'bignumber.js';
 
 
-export default class Blocks extends Component {
+export default class Stakes extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,8 +29,8 @@ export default class Blocks extends Component {
   getAllStakes() {
     stakeService.getAllStake()
       .then(res => {
-        const stakeList = _.get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        const stakeList = get(res, 'data.body')
+        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.withdrawn ? 0 : info.amount) }, 0);
         let holderObj = stakeList.reduce((map, obj) => {
           if (!map[obj.holder]) {
             map[obj.holder] = {
@@ -37,7 +38,7 @@ export default class Blocks extends Component {
               amount: 0
             };
           }
-          map[obj.holder].amount = sumCoin(map[obj.holder].amount, obj.amount).toFixed()
+          map[obj.holder].amount = sumCoin(map[obj.holder].amount, obj.withdrawn ? 0 : obj.amount).toFixed()
           return map;
         }, {});
         let sourceObj = stakeList.reduce((map, obj) => {
@@ -46,7 +47,7 @@ export default class Blocks extends Component {
               amount: 0
             };
           }
-          map[obj.source].amount = sumCoin(map[obj.source].amount, obj.amount).toFixed()
+          map[obj.source].amount = sumCoin(map[obj.source].amount, obj.withdrawn ? 0 : obj.amount).toFixed()
           return map;
         }, {});
         let sortedStakesByHolder = Array.from(Object.keys(holderObj), key => {

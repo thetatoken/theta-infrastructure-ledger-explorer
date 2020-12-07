@@ -53,7 +53,8 @@ var accountRouter = (app, accountDao, rpc) => {
             'balance': tmp.result.coins,
             'sequence': tmp.result.sequence,
             'reserved_funds': tmp.result.reserved_funds,
-            'txs_counter': txs_counter
+            'txs_counter': txs_counter,
+            'code': tmp.result.code
           }
           await accountDao.upsertAccountAsync(newInfo);
           const data = ({

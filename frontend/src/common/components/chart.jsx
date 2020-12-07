@@ -1,7 +1,6 @@
-import React, { Component } from "react";
+import React from "react";
 import Chart from "chart.js";
-import { browserHistory, Link } from 'react-router';
-import _ from 'lodash';
+import history from 'common/history'
 import cx from 'classnames';
 
 
@@ -31,7 +30,7 @@ const getLineOptions = (type, data, labels, clickType) => {
         animateRotate: true
       },
       onClick: (e) => {
-        
+
       },
       tooltips: {
         callbacks: {
@@ -57,7 +56,7 @@ const getLineOptions = (type, data, labels, clickType) => {
   }
 }
 
-export default class ThetaChart extends Component {
+export default class ThetaChart extends React.PureComponent {
   constructor(props) {
     super(props);
     this.chart = null;
@@ -79,9 +78,9 @@ export default class ThetaChart extends Component {
     Chart.defaults.global.defaultFontColor = '#8A8FB5';
     Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.labels !== this.props.labels) {
-      this.updateChart(this.chart, nextProps.labels, nextProps.data);
+  componentDidUpdate(preProps) {
+    if (preProps.labels !== this.props.labels) {
+      this.updateChart(this.chart, this.props.labels, this.props.data);
     }
   }
   getInitialOptions = (type, data, labels, clickType) => {
@@ -123,12 +122,12 @@ export default class ThetaChart extends Component {
             var activeElement = this.chart.getElementAtEvent(e);
             if (activeElement.length > 0) {
               const address = this.chart.config.data.labels[activeElement[0]._index];
-              if (address !== 'Rest Nodes') browserHistory.push(`/account/${address}`);
+              if (address !== 'Rest Nodes') history.push(`/account/${address}`);
               return;
             }
           }
           if (clickType === 'stake') {
-            browserHistory.push(`/stakes`);
+            history.push(`/stakes`);
           }
         },
         tooltips: {

@@ -1,7 +1,8 @@
-import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
+import React from "react";
+import history from 'common/history'
+import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
-import _ from 'lodash';
+import map from 'lodash/map';
 import cx from 'classnames';
 
 import { truncateMiddle } from 'common/helpers/utils';
@@ -11,7 +12,7 @@ import { TxnTypeText, TxnClasses } from 'common/constants';
 
 
 
-export default class TransactionTable extends Component {
+export default class TransactionTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,7 +54,7 @@ export default class TransactionTable extends Component {
   }
 
   handleRowClick = (hash) => {
-    browserHistory.push(`/txs/${hash}`);
+    history.push(`/txs/${hash}`);
   }
 
   render() {
@@ -78,9 +79,9 @@ export default class TransactionTable extends Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(transactions, (txn, i) => {
+          {map(transactions, (txn, i) => {
             let source = null;
-            source = !account ? 'none' : account.address === from(txn,null,account) ? 'from' : 'to';
+            source = !account ? 'none' : account.address === from(txn, null, account) ? 'from' : 'to';
             return (
               <tr key={i} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
@@ -92,7 +93,7 @@ export default class TransactionTable extends Component {
                     <td className={cx({ 'dim': source === 'to' }, "from overflow")}><Link to={`/account/${from(txn)}`}>{from(txn, 20)}</Link></td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      <Link to={`/account/${to(txn,null,address)}`}>{to(txn, 20, address)}</Link>
+                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address)}</Link>
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
@@ -108,12 +109,12 @@ const Value = ({ coins, price }) => {
   return (
     <React.Fragment>
       <div className="currency theta">
-        {formatCoin(coins.thetawei)} 
+        {formatCoin(coins.thetawei)}
         {!isMobile && "Theta"}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>}
       </div>
       <div className="currency tfuel">
-        {formatCoin(coins.tfuelwei)} 
+        {formatCoin(coins.tfuelwei)}
         {!isMobile && "TFuel"}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>

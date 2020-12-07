@@ -1,7 +1,7 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
 
-exports.updateAccount = async function (accountDao, accountTxDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, transactionList) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -20,6 +20,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
       case 6:
         counter += tx.data.splits ? tx.data.splits.length + 1 : 1;
         break;
+      case 7:
+        counter = counter + 3;
       case 8:
       case 9:
       case 10:
@@ -80,6 +82,16 @@ exports.updateAccount = async function (accountDao, accountTxDao, transactionLis
         // Update to account
         await _updateAccountByAddress(tx.data.to.address, accountDao, tx.type);
         await _updateAccountTxMap(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+
+        // Update smart contract account
+        if (tx.receipt) {
+          await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
+          if (tx.receipt.ContractAddress !== tx.data.to.address) {
+            await _updateAccountTxMap(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao);
+            await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
+          }
+        }
+        break;
       case 8:
       case 9:
       case 10:
@@ -122,7 +134,8 @@ async function _updateAccountByAddress(address, accountDao, type) {
           'balance': tmp.result.coins,
           'sequence': tmp.result.sequence,
           'reserved_funds': tmp.result.reserved_funds,
-          'txs_counter': txs_counter
+          'txs_counter': txs_counter,
+          'code': tmp.result.code
         });
       } else {
         return;
@@ -145,4 +158,20 @@ function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
     type,
     'ts': timestamp
   });
+}
+
+async function _createSmartContract(address, bytecode, smartContractDao) {
+  const isExist = await smartContractDao.checkSmartContractAsync(address);
+  if (!isExist) {
+    smartContractDao.upsertSmartContractAsync({
+      'address': address,
+      'bytecode': bytecode,
+      'abi': '',
+      'source_code': '',
+      'verification_date': '',
+      'compiler_version': '',
+      'optimizer': '',
+      'name': ''
+    });
+  }
 }

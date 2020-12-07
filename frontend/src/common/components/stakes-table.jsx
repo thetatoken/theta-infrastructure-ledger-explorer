@@ -1,12 +1,13 @@
-import React, { Component } from "react";
-import { Link } from "react-router";
-import { browserHistory } from 'react-router';
+import React from "react";
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
-import { formatCoin, sumCoin } from 'common/helpers/utils';
+import { formatCoin } from 'common/helpers/utils';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate'
 
 const TRUNC = 20;
 
-export default class StakesTable extends Component {
+export default class StakesTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -26,9 +27,9 @@ export default class StakesTable extends Component {
       this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
     }
   }
-  componentWillUpdate(nextProps) {
-    if (nextProps.stakes.length !== this.props.stakes.length) {
-      this.setState({ stakeList: nextProps.stakes.slice(0, TRUNC), isSliced: true })
+  componentDidUpdate(preProps) {
+    if (preProps.stakes.length !== this.props.stakes.length) {
+      this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
     }
   }
 
@@ -49,11 +50,11 @@ export default class StakesTable extends Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(stakeList, record => {
+            {map(stakeList, record => {
               const address = type === 'node' ? record.holder : record.source;
               return (
                 <tr key={address}>
-                  <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
+                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
                   <td className="staked"><div className="currency thetawei">{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>

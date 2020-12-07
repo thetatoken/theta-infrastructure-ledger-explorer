@@ -4,15 +4,18 @@
   "description": "",
   "main": "run.js",
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "axios": "^0.20.0",
     "bignumber.js": "^8.0.1",
-    "body-parser": "^1.18.3",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "mongodb": "^3.1.13",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "socketio": "^1.0.0"
+    "socketio": "^1.0.0",
+    "spdy": "^4.0.2"
   },
   "devDependencies": {},
   "scripts": {

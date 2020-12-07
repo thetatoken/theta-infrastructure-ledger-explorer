@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Link } from "react-router";
+import React from "react";
+import { Link } from "react-router-dom";
 
 
-export default class LinkButton extends Component {
+export default class LinkButton extends React.Component {
   constructor(props){
     super(props);
   }

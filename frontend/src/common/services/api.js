@@ -1,6 +1,6 @@
 import { httpClient } from './http';
 import Raven from 'raven-js';
-import config from '../../../config';
+import config from '../../config';
 
 const API_URI = `${config.restApi.host}:${config.restApi.port}/api`;
 

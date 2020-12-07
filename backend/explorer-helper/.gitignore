@@ -1,0 +1,5 @@
+node_modules/*
+config.cfg
+cert/*
+package-lock.json
+libs/*

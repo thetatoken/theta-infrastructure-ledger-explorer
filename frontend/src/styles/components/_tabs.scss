@@ -1,0 +1,38 @@
+.theta-tabs {
+  .react-tabs{
+    &__tab{
+      border-bottom: 1px solid transparent;
+      color: $color-font-light;
+      &--disabled{
+        cursor: not-allowed;
+      }
+    }
+
+    &__tab-list{
+      border-bottom: none;
+      user-select: none;
+    }
+
+    &__tab--selected{
+      background: $color-panel;
+      color: $color-white;
+      border-radius: 5px;
+      border-color: $color-panel;
+    }
+
+    &__tab-panel--selected{
+      .code-area, .abi-area{
+        width: 100%;
+        color: $color-font-light;
+        resize: none;
+        margin: 10px 0 20px 0;
+      }
+      .code-area{
+        height: 350px;
+      }
+      .abi-area{
+        height: 100px;
+      }
+    }
+  }
+}

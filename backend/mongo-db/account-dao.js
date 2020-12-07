@@ -20,7 +20,8 @@ module.exports = class AccountDAO {
       'sequence': accountInfo.sequence,
       'reserved_funds': accountInfo.reserved_funds === null ? 'null' : accountInfo.reserved_funds,
       // 'lst_updt_blk': accountInfo.last_updated_block_height,
-      'txs_counter': accountInfo.txs_counter
+      'txs_counter': accountInfo.txs_counter,
+      'code': accountInfo.code
     }
     const queryObject = { '_id': newObject.address };
     this.client.upsert(this.accountInfoCollection, queryObject, newObject, callback);
@@ -56,6 +57,7 @@ module.exports = class AccountDAO {
         accountInfo.sequence = recordList[i].sequence;
         accountInfo.reserved_funds = recordList[i].reserved_funds;
         accountInfo.txs_counter = recordList[i].txs_counter;
+        accountInfo.code = recordList[i].code;
         accountInfoList.push(accountInfo)
       }
       callback(error, accountInfoList)
@@ -77,6 +79,7 @@ module.exports = class AccountDAO {
         accountInfo.sequence = record.sequence;
         accountInfo.reserved_funds = record.reserved_funds;
         accountInfo.txs_counter = record.txs_counter;
+        accountInfo.code = record.code;
         callback(error, accountInfo);
       }
     })

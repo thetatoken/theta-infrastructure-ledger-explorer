@@ -4,6 +4,7 @@ var stakeHelper = require('../helper/stake');
 var txHelper = require('../helper/transactions');
 var fs = require('fs');
 var Logger = require('../helper/logger');
+const { createIndexes } = require('../helper/utils');
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -18,6 +19,7 @@ var accountDao = null;
 var accountTxDao = null;
 var stakeDao = null;
 var checkpointDao = null;
+var smartContractDao = null;
 var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
@@ -25,11 +27,12 @@ var crawled_block_height_progress = 0;
 var latest_block_height = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
+
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance) {
+  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -37,6 +40,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   accountTxDao = accountTxDaoInstance;
   stakeDao = stakeDaoInstance;
   checkpointDao = checkpointDaoInstance;
+  smartContractDao = smartContractDaoInstance;
 }
 
 exports.Execute = async function (network_id) {
@@ -51,10 +55,7 @@ exports.Execute = async function (network_id) {
     })
     .then(async function (data) {
       const result = JSON.parse(data);
-      // Logger.log(result)
       const pendingTxList = result.result.tx_hashes;
-      // Logger.log(`Number of PENDING transactions: ${pendingTxList.length}`);
-      // const pendingTxList = ["12311", "23411", "34511", "45611", "56711", "67811", "78911", "89011", "90111", "12211", "12411", "12511"];
       let upsertTransactionAsyncList = [];
       for (let hash of pendingTxList) {
         const transaction = {
@@ -74,12 +75,7 @@ exports.Execute = async function (network_id) {
     .then(() => {
       return rpc.getStatusAsync([]) // read block height from chain
     })
-    // .catch(err => {
-    //   Logger.log(err)
-    //   Logger.log('Met error after get status.')
-    // })
     .then(function (data) {
-      // Logger.log(data);
       var result = JSON.parse(data);
       latest_block_height = +result.result.latest_finalized_block_height;
       Logger.log('Latest block height: ' + latest_block_height);
@@ -97,7 +93,6 @@ exports.Execute = async function (network_id) {
         var getVcpAsyncList = [];
         var getGcpAsyncList = [];
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
-          // Logger.log('Crawling new block: ' + i.toString());
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
           getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getGcpAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
@@ -107,10 +102,6 @@ exports.Execute = async function (network_id) {
         Logger.error('Block crawling is up to date.');
       }
     })
-    // .catch(err => {
-    //   Logger.log(err)
-    //   Logger.log('Met error after get blocks.')
-    // })
     .then(async function (blockDataList) {
       if (blockDataList) {
         var upsertBlockAsyncList = [];
@@ -123,7 +114,7 @@ exports.Execute = async function (network_id) {
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
-          // Logger.log(blockDataList[i]);
+
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
               stakes.vcp = result.result.BlockHashVcpPairs;
@@ -173,6 +164,7 @@ exports.Execute = async function (network_id) {
                     data: txs[j].raw,
                     block_height: blockInfo.height,
                     timestamp: blockInfo.timestamp,
+                    receipt: txs[j].receipt,
                     status: 'finalized'
                   }
                   const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
@@ -187,14 +179,11 @@ exports.Execute = async function (network_id) {
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
-                  // Logger.log('validTransactionList length', validTransactionList.length);
-                  // Logger.log('upsertTransactionAsyncList length', upsertTransactionAsyncList.length);
                 }
               }
             }
           }
         }
-        // console.log('stakes', stakes);
         if (stakes.vcp.length !== 0) {
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
         }
@@ -222,7 +211,7 @@ exports.Execute = async function (network_id) {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, accountTxDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, validTransactionList);
     })
     .then(async function () {
       validTransactionList = [];
@@ -243,10 +232,11 @@ exports.Execute = async function (network_id) {
             Logger.log(err);
             process.exit(1);
           }
+          Logger.log('Creating indexes...')
+          await createIndexes();
           const start_height = Number(config.blockchain.start_height) - 1 || 0;
           Logger.log(`start_height: ${start_height}, type: ${typeof start_height}`);
           progressDao.upsertProgressAsync(network_id, start_height, 0);
-
           Logger.log('Loading initial accounts file: ' + accountFileName)
           try {
             initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
@@ -255,18 +245,12 @@ exports.Execute = async function (network_id) {
             Logger.error(err);
             process.exit(1);
           }
-          // let counter = 1
-          // for (let address of Object.keys(initialAccounts)) {
-          //   Logger.log(counter++)
-          //   await accountHelper.updateAccountByAddress(address, accountDao)
-          // }
           Object.keys(initialAccounts).forEach(function (address, i) {
             setTimeout(function () {
               Logger.log(i)
               accountHelper.updateAccountByAddress(address, accountDao)
             }, i * 10);
           })
-          // return Promise.all(getAccountAysncList)
         } else {
           Logger.error(error);
         }

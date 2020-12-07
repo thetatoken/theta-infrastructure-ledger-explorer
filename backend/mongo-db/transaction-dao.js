@@ -22,6 +22,7 @@ module.exports = class TransactionDAO {
       'number': transactionInfo.number,
       'block_height': transactionInfo.block_height,
       'timestamp': transactionInfo.timestamp,
+      'receipt': transactionInfo.receipt,
       'status': transactionInfo.status
     }
     const queryObject = { '_id': newObject.hash };
@@ -62,6 +63,7 @@ module.exports = class TransactionDAO {
         transactionInfo.block_height = record.block_height;
         transactionInfo.timestamp = record.timestamp;
         transactionInfo.status = record.status;
+        transactionInfo.receipt = record.receipt;
         callback(error, transactionInfo);
       }
     })

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import _ from 'lodash';
+import React from "react";
+import get from 'lodash/get';
 import cx from 'classnames';
 
 import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
@@ -10,10 +10,8 @@ import ThetaChart from 'common/components/chart';
 
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
-import { hash } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
-const totalSupply = 1000000000;
-export default class TokenDashboard extends Component {
+
+export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,7 +39,7 @@ export default class TokenDashboard extends Component {
   getTransactionHistory() {
     transactionsService.getTransactionHistory()
       .then(res => {
-        const txHistory = _.get(res, 'data.body.data');
+        const txHistory = get(res, 'data.body.data');
         let txTs = [];
         let txNumber = []
         txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach(info => {
@@ -57,7 +55,7 @@ export default class TokenDashboard extends Component {
   getAllStakes() {
     stakeService.getAllStake()
       .then(res => {
-        const stakeList = _.get(res, 'data.body')
+        const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
         let newObj = stakeList.reduce((map, obj) => {
           if (!map[obj.holder]) map[obj.holder] = 0;
@@ -89,7 +87,7 @@ export default class TokenDashboard extends Component {
   getTransactionNumber() {
     transactionsService.getTotalTransactionNumber(24)
       .then(res => {
-        const txnNum = _.get(res, 'data.body.total_num_tx');
+        const txnNum = get(res, 'data.body.total_num_tx');
         this.setState({ txnNum })
       })
       .catch(err => {
@@ -99,7 +97,7 @@ export default class TokenDashboard extends Component {
   getBlockNumber() {
     blocksService.getTotalBlockNumber(24)
       .then(res => {
-        const blockNum = _.get(res, 'data.body.total_num_block');
+        const blockNum = get(res, 'data.body.total_num_block');
         this.setState({ blockNum })
       })
       .catch(err => {
@@ -110,7 +108,7 @@ export default class TokenDashboard extends Component {
     const { type } = this.props;
     stakeService.getTotalStake()
       .then(res => {
-        const stake = _.get(res, 'data.body')
+        const stake = get(res, 'data.body')
         this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
       })
       .catch(err => {
@@ -139,7 +137,7 @@ export default class TokenDashboard extends Component {
           {type === 'theta' &&
             <div className="column">
               <Detail title={'TOTAL STAKED NODES'} value={nodeNum} />
-              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} />} />
+              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
             </div>}
           {type === 'tfuel' && <div className="column">
             <Detail title={'24 HR BLOCKS'} value={formatNumber(blockNum)} />
@@ -182,7 +180,7 @@ const TxnNumber = ({ num }) => {
   );
 }
 
-const StakedPercent = ({ staked }) => {
+const StakedPercent = ({ staked, totalSupply }) => {
   return (
     <React.Fragment>
       {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}

@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import BigNumber from 'bignumber.js';
+import { ethers } from "ethers";
 
 import { WEI } from 'common/constants';
 
@@ -53,15 +53,58 @@ export function getTheta(weiAmount) {
 }
 
 export function getHex(str) {
-  var arr1 = [];
-  for (var n = 0, l = str.length; n < l; n++) {
-    var hex = Number(str.charCodeAt(n)).toString(16);
-    arr1.push(hex);
+  const buffer = Buffer.from(str, 'base64');
+  const bufString = buffer.toString('hex');
+  return '0x' + bufString;
+}
+
+export function getArguments(str) {
+  let res = str;
+  const num = Math.floor(str.length / 64);
+  res += `\n\n---------------Encoded View---------------\n${num} Constructor Argument${num > 1 ? 's' : ''} found :\n`;
+  for (let i = 0; i < num; i++) {
+    res += `Arg [${i}] : ` + str.substring(i * 64, (i + 1) * 64) + '\n';
   }
-  return '0x' + arr1.join('');
+  return res;
 }
 
 export function validateHex(hash, limit) {
   const reg = new RegExp("^(0x){0,1}[0-9a-fA-F]{" + limit + "}$");
   return reg.test(hash);
+}
+
+export function decodeLogs(logs, abi) {
+  const iface = new ethers.utils.Interface(abi);
+  return logs.map(log => {
+    try {
+      let event = null;
+      for (let i = 0; i < abi.length; i++) {
+        let item = abi[i];
+        if (item.type != "event") continue;
+        const hash = iface.getEventTopic(item.name)
+        if (hash == log.topics[0]) {
+          event = item;
+          break;
+        }
+      }
+      if (event != null) {
+        let bigNumberData = iface.decodeEventLog(event.name, log.data, log.topics);
+        let data = {};
+        Object.keys(bigNumberData).forEach(k => {
+          data[k] = bigNumberData[k].toString();
+        })
+        log.decode = {
+          result: data,
+          eventName: event.name,
+          event: event
+        }
+      } else {
+        log.decode = 'No matched event or the smart contract source code has not been verified.';
+      }
+      return log;
+    } catch (e) {
+      log.decode = 'Something wrong while decoding, met error: ' + e;
+      return log;
+    }
+  })
 }

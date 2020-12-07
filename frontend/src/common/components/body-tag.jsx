@@ -8,8 +8,8 @@ class BodyTag extends React.Component {
   componentDidMount() {
   	this.updateValues(this.props);
   }
-  componentWillReceiveProps(nextProps) {
-    this.updateValues(nextProps);
+  componentDidUpdate(preProps) {
+    this.updateValues(this.props);
   }
   updateValues(props) {
   	let { className, id } = props;

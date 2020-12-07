@@ -1,15 +1,14 @@
-import React, { Component } from "react";
-import { browserHistory, Link } from 'react-router';
-import _ from 'lodash';
+import React from "react";
+import { Link } from 'react-router-dom';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate'
 import cx from 'classnames';
 
 import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
-import { hash } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
 const TRUNC = 2;
 
 
-export default class StakeTxsTable extends Component {
+export default class StakeTxsTable extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,9 +22,9 @@ export default class StakeTxsTable extends Component {
     includeDetails: true,
     truncate: window.screen.width <= 560 ? 10 : 35,
   }
-  componentWillUpdate(nextProps){
-    if(nextProps.txs !== this.props.txs){
-        this.setState({ transactions: nextProps.txs.slice(0, TRUNC), isSliced: true })
+  componentDidUpdate(preProps) {
+    if (preProps.txs !== this.props.txs) {
+      this.setState({ transactions: this.props.txs.slice(0, TRUNC), isSliced: true })
     }
   }
   toggleList() {
@@ -39,7 +38,7 @@ export default class StakeTxsTable extends Component {
   render() {
     const { txs, type, className, truncate, price } = this.props;
     const { transactions, isSliced } = this.state;
-    let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.amount) }, 0);
+    let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.withdrawn ? 0 : tx.amount) }, 0);
     return (
       <div className="stakes">
         <div className="title">{type === 'source' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
@@ -55,13 +54,13 @@ export default class StakeTxsTable extends Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {_.map(transactions, record => {
+            {map(transactions, record => {
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
                   <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>
                   {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
-                  <td className="address"><Link to={`/account/${address}`}>{_.truncate(address, { length: truncate })}</Link></td>
+                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
                   {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : 'Theta'}</div></td>}

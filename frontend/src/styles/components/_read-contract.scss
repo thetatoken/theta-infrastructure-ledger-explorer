@@ -1,0 +1,79 @@
+.read-contract{
+  &__wrapper{
+    width: 100%;
+    margin: 10px;
+    margin-bottom: none;
+    background-color: $color-panel;
+    border-radius: 6px;
+  }
+  &__title{
+    border-bottom: 1px solid $color-line;
+    padding: 15px 10px;
+  }
+  &__content{
+    padding: 15px 10px;
+  }
+  &__output{
+    display: flex;
+    &--content{
+      margin-right: 5px;
+    }
+    &--unit{
+      color: $color-font-light;
+      font-style: italic;
+    }
+    &--response{
+      margin: 10px 0;
+      color: $color-font-light;
+    }
+  }
+  &__outputs-template{
+    margin-top: 15px;
+    color: $color-font-light;
+  }
+  // &__outputs-template{
+  //   margin-top: 5px;
+  //   color: $color-font-light;
+  //   font-style: italic;
+  // }
+  &__inputs{
+    margin-top: -1rem;
+  }
+  &__input{
+    display: flex;
+    margin-top: 1rem;
+    label{
+      line-height: 34px;
+      margin-right: 1rem;
+    }
+    input{
+      border-radius: 6px;
+      background-color: transparent;
+      border: 1px solid $color-input-background;
+      width: 100%;
+    }
+    &--error{
+      margin: 0 15px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    & .error{
+      border-color: $color-red;
+    }
+    &--row{
+      display: flex;
+    }
+    &--query{
+      height: 2rem;
+      width: 5rem;
+      margin: 5px 0;
+      background-color: $color-input-background;
+      border-color: $color-input-background;
+      color: $color-white;
+      &:focus{
+        outline: none;
+      }
+    }
+  }
+}

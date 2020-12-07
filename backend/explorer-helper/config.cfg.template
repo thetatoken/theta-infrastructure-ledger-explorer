@@ -1,0 +1,9 @@
+{
+    "log": {
+        "level": "debug"
+    },
+    "server": {
+        "port": 9090
+    },
+    "shouldDownloadAll": false
+}

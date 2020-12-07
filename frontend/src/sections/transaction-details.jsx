@@ -1,30 +1,35 @@
-import React, { Component } from "react";
-import { Link } from 'react-router';
+import React, { useCallback, useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
-import { BigNumber } from 'bignumber.js';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import _truncate from 'lodash/truncate';
 
-import { TxnTypes, TxnTypeText, TxnClasses, TxnPurpose } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, getHex, validateHex } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
+import { smartContractService } from 'common/services/smartContract';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
 import BodyTag from 'common/components/body-tag';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 
 
-export default class TransactionExplorer extends Component {
+export default class TransactionExplorer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      backendAddress: this.props.route.backendAddress,
+      backendAddress: this.props.backendAddress,
       transaction: null,
       totalTransactionsNumber: undefined,
       errorType: null,
       showRaw: false,
-      price: { 'Theta': 0, 'TFuel': 0 }
+      price: { 'Theta': 0, 'TFuel': 0 },
+      abi: []
     };
   }
   componentWillUpdate(nextProps) {
@@ -47,30 +52,24 @@ export default class TransactionExplorer extends Component {
       });
     }
   }
-  getPrices() {
+  getPrices(counter = 0) {
     priceService.getAllprices()
       .then(res => {
-        const prices = _.get(res, 'data.body');
+        const prices = get(res, 'data.body');
+        let price = {};
         prices.forEach(info => {
-          switch (info._id) {
-            case 'THETA':
-              this.setState({ price: { ...this.state.price, 'Theta': info.price } })
-              return;
-            case 'TFUEL':
-              this.setState({ price: { ...this.state.price, 'TFuel': info.price } })
-              return;
-            default:
-              return;
-          }
+          if (info._id === 'THETA') price.Theta = info.price;
+          else if (info._id === 'TFUEL') price.TFuel = info.price;
         })
+        this.setState({ price })
       })
       .catch(err => {
         console.log(err);
       });
     setTimeout(() => {
       let { price } = this.state;
-      if (!price.Theta || !price.TFuel) {
-        this.getPrices();
+      if ((!price.Theta || !price.TFuel) && counter++ < 4) {
+        this.getPrices(counter);
       }
     }, 1000);
   }
@@ -85,6 +84,16 @@ export default class TransactionExplorer extends Component {
                 totalTransactionsNumber: res.data.totalTxsNumber,
                 errorType: null
               })
+              const type = get(res, 'data.body.type');
+              const to = get(res, 'data.body.data.to.address');
+              if (type === TxnTypes.SMART_CONTRACT && to !== ZeroAddress) {
+                smartContractService.getAbiByAddress(to.toLowerCase())
+                  .then(result => {
+                    if (result.data.type === 'smart_contract_abi') {
+                      this.setState({ abi: result.data.body.abi })
+                    }
+                  })
+              }
               break;
             case 'error_not_found':
               this.setState({
@@ -106,8 +115,7 @@ export default class TransactionExplorer extends Component {
     this.setState({ showRaw: !this.state.showRaw });
   }
   render() {
-    const { transactionHash } = this.props.params;
-    const { transaction, errorType, showRaw, price } = this.state;
+    const { transaction, errorType, showRaw, price, abi } = this.state;
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
@@ -169,7 +177,7 @@ export default class TransactionExplorer extends Component {
               <SplitContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
-              <SmartContract transaction={transaction} price={price} />}
+              <SmartContract transaction={transaction} price={price} abi={abi} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
               <WithdrawStake transaction={transaction} price={price} />}
@@ -184,7 +192,8 @@ export default class TransactionExplorer extends Component {
               <JsonView
                 json={transaction}
                 onClose={this.handleToggleDetailsClick}
-                className="tx-raw" />}
+                className="tx-raw"
+                abi={abi} />}
           </React.Fragment>}
       </div>);
   }
@@ -196,7 +205,7 @@ function _getAddressShortHash(address) {
 }
 
 function _renderIds(ids) {
-  return _.map(ids, i => <div key={i}>{i}</div>)
+  return map(ids, i => <div key={i}>{i}</div>)
 }
 
 
@@ -216,7 +225,7 @@ const Amount = ({ coins, price }) => {
 }
 
 const Address = ({ hash, truncate = null }) => {
-  return (<Link to={`/account/${hash}`}>{truncate ? _.truncate(hash, { length: truncate }) : hash}</Link>)
+  return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
 const Fee = ({ transaction }) => {
@@ -300,9 +309,9 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={_.map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
+        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
           : <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />}
-        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
@@ -325,8 +334,8 @@ const Coinbase = ({ transaction, price }) => {
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="Proposer" data={<Address hash={_.get(data, 'proposer.address')} />}></DetailsRow>
-        <DetailsRow label="Amount" data={_.map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        <DetailsRow label="Proposer" data={<Address hash={get(data, 'proposer.address')} />}></DetailsRow>
+        <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
@@ -337,10 +346,10 @@ const WithdrawStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
-        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
+        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
+        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
@@ -351,29 +360,118 @@ const DepositStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="Stake Addr." data={<Address hash={_.get(data, 'holder.address')} />} />
-        <DetailsRow label="Stake" data={<Amount coins={_.get(data, 'source.coins')} price={price} />} />
-        <DetailsRow label="Purpose" data={TxnPurpose[_.get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={_.get(data, 'source.address')} />} />
+        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
+        <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
+        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
       </tbody>
     </table>);
 }
 
-const SmartContract = ({ transaction }) => {
-  let { data } = transaction;
+const SmartContract = ({ transaction, abi }) => {
+  const [tabIndex, setTabIndex] = useState(0);
+  let { data, receipt } = transaction;
+  let err = get(receipt, 'EvmErr');
+  let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
+  let logs = get(transaction, 'receipt.Logs');
+  logs = JSON.parse(JSON.stringify(logs));
+  logs = logs.map(obj => {
+    obj.data = getHex(obj.data)
+    return obj;
+  })
+  logs = decodeLogs(logs, abi);
+  const logLength = (logs || []).length;
+  return (
+    <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+      <TabList>
+        <Tab>Overview</Tab>
+        <Tab disabled={logLength == 0} >{`Logs(${logLength})`}</Tab>
+      </TabList>
+
+      <TabPanel>
+        <table className="details txn-details">
+          <tbody>
+            <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
+            <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
+            {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+            <DetailsRow label="Gas Limit" data={data.gas_limit} />
+            {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
+            <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
+            {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
+            <DetailsRow label="Data" data={getHex(data.data)} />
+          </tbody>
+        </table>
+      </TabPanel>
+      <TabPanel>
+        {logs.map((log, i) => <Log log={log} key={i} />)}
+      </TabPanel>
+    </Tabs>
+  );
+}
+
+const Log = ({ log }) => {
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="From Addr." data={<Address hash={_.get(data, 'from.address')} />} />
-        <DetailsRow label="To Addr." data={<Address hash={_.get(data, 'to.address')} />} />
-
-        <DetailsRow label="Gas Limit" data={data.gas_limit} />
-        <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-        <DetailsRow label="Data" data={getHex(data.data)} />
+        <DetailsRow label="Address" data={<Address hash={get(log, 'address')} />} />
+        <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
+        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
+        <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
       </tbody>
-    </table>);
+    </table>
+  )
+}
+const EventName = ({ event }) => {
+  let index = 1;
+  return (
+    <span className="text-grey">
+      {event.name}(
+      {event.inputs.map((input, i) => {
+        return (<span key={i}>
+          {input.indexed ? `indexed_topic_${++index} ` : ''}
+          <span className="text-green">{`${input.type} `}</span>
+          <span className="text-danger">{`${input.name}`}</span>
+          {i === event.inputs.length - 1 ? ')' : ', '}
+        </span>)
+      })}
+    </span>
+  )
+}
+const Topics = ({ topics }) => {
+  return (
+    <>
+      {topics.map((topic, i) => {
+        return <p key={i}>{topic}</p>
+      })}
+    </>
+  )
 }
 
-
-
-
+const LogData = ({ data, decode }) => {
+  const isDisabled = typeof decode !== 'object';
+  const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
+  const [decodeData, setDecodeData] = useState({});
+  useEffect(() => {
+    if (typeof decode === 'string') return;
+    let _data = JSON.parse(JSON.stringify(decode.result));
+    Object.keys(_data).forEach(k => {
+      if (k === '__length__') delete _data[k];
+      if (k.match(/^[0-9]+/)) delete _data[k];
+    })
+    setDecodeData(_data);
+  }, [decode]);
+  return (<div className="sc-log__data">
+    <div className="sc-log__data--buttons">
+      <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
+        onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
+      <div className={cx("sc-log__data--button", { active: model === 'hex' })}
+        onClick={() => setModel('hex')}>Hex</div>
+    </div>
+    {model === 'hex' ? data : Object.keys(decodeData).map((k, i) => {
+      return (<div key={i}>
+        <span className="text-grey">{k}: </span>
+        {decodeData[k]}
+      </div>)
+    })}
+  </div>)
+}
