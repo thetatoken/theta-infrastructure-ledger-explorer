@@ -74,7 +74,7 @@ export function validateHex(hash, limit) {
 }
 
 export function decodeLogs(logs, abi) {
-  const iface = new ethers.utils.Interface(abi);
+  const iface = new ethers.utils.Interface(abi || []);
   return logs.map(log => {
     try {
       let event = null;

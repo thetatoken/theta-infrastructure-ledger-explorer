@@ -27,7 +27,7 @@ const FunctionUnit = (props) => {
   const vm_error = get(callResult, 'vm_error');
 
   async function fetchFunction() {
-    const iface = new ethers.utils.Interface(abi);
+    const iface = new ethers.utils.Interface(abi || []);
     const senderSequence = 1;
     const functionInputs = get(functionData, ['inputs'], []);
     const functionOutputs = get(functionData, ['outputs'], []);
