@@ -132,3 +132,12 @@
     }
   }
 }
+
+.sc-item {
+  &__image {
+    max-width: 250px;
+    @include breakpoint('tablet', max) {
+      width: 100%;
+    }
+  }
+}
