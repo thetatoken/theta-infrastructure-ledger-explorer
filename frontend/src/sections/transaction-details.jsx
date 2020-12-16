@@ -375,6 +375,8 @@ const DepositStake = ({ transaction, price }) => {
 
 const SmartContract = ({ transaction, abi }) => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [hasItems, setHasItems] = useState(false);
+
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
@@ -386,6 +388,15 @@ const SmartContract = ({ transaction, abi }) => {
   })
   logs = decodeLogs(logs, abi);
   const logLength = (logs || []).length;
+  useEffect(() => {
+    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    if (arr.length === 0) return;
+    logs.forEach(log => {
+      const tokenId = get(log, 'decode.result.tokenId');
+      if (tokenId === undefined) return;
+      if (!hasItems) setHasItems(true);
+    })
+  }, [logs, abi])
   return (
     <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
       <TabList>
@@ -403,7 +414,7 @@ const SmartContract = ({ transaction, abi }) => {
             <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
             {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
             <DetailsRow label="Data" data={getHex(data.data)} />
-            <DetailsRow label="Items" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />
+            {hasItems && <DetailsRow label="Items" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />}
           </tbody>
         </table>
       </TabPanel>
@@ -415,6 +426,14 @@ const SmartContract = ({ transaction, abi }) => {
 }
 
 const Log = ({ log, abi }) => {
+  const [hasItem, setHasItem] = useState(false);
+  useEffect(() => {
+    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    if (arr.length === 0) return;
+    const tokenId = get(log, 'decode.result.tokenId');
+    if (tokenId === undefined) return;
+    if (!hasItem) setHasItem(true);
+  }, [log, abi])
   return (
     <table className="details txn-details">
       <tbody>
@@ -422,7 +441,7 @@ const Log = ({ log, abi }) => {
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
         <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
-        <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />
+        {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />}
       </tbody>
     </table>
   )
@@ -532,16 +551,18 @@ const Item = props => {
             setItem(data);
           }).catch(e => {
             console.log('error occurs in fetch url:', e)
+            setItem('Error occurs')
           })
       }
       catch (e) {
-        console.log('error occurs:', e)
+        console.log('error occurs:', e);
+        setItem('Error occurs')
       }
     }
     fetchUrl();
   }, [log, abi])
 
-  return item ? (<div className="sc-item">
+  return typeof item === 'object' ? (<div className="sc-item">
     <div className="sc-item__row">
       <span className="text-grey">Name:</span> {item.name}
     </div>
@@ -551,5 +572,5 @@ const Item = props => {
     <div className="sc-item__row">
       <img className="sc-item__image" src={item.image}></img>
     </div>
-  </div>) : <></>
+  </div>) : <div className="sc-item text-danger">{item}</div>
 }

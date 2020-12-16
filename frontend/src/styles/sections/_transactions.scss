@@ -138,6 +138,11 @@
 }
 .sc-item {
   margin-right: 10px;
+  &__row {
+    &:last-child {
+      margin-top: 5px;
+    }
+  }
   &__image {
     max-width: 250px;
     @include breakpoint('tablet', max) {
