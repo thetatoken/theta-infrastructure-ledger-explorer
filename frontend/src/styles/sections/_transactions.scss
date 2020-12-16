@@ -132,8 +132,12 @@
     }
   }
 }
-
+.sc-items {
+  display: flex;
+  flex-flow: row wrap;
+}
 .sc-item {
+  margin-right: 10px;
   &__image {
     max-width: 250px;
     @include breakpoint('tablet', max) {

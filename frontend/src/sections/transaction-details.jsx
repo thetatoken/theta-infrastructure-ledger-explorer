@@ -385,7 +385,6 @@ const SmartContract = ({ transaction, abi }) => {
     return obj;
   })
   logs = decodeLogs(logs, abi);
-
   const logLength = (logs || []).length;
   return (
     <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
@@ -404,6 +403,7 @@ const SmartContract = ({ transaction, abi }) => {
             <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
             {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
             <DetailsRow label="Data" data={getHex(data.data)} />
+            <DetailsRow label="Items" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />
           </tbody>
         </table>
       </TabPanel>
@@ -415,65 +415,6 @@ const SmartContract = ({ transaction, abi }) => {
 }
 
 const Log = ({ log, abi }) => {
-  const [item, setItem] = useState();
-  useEffect(() => {
-    const tokenId = get(log, 'decode.result.tokenId');
-    if (tokenId === undefined) return;
-    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
-    if (arr.length === 0) return;
-    const functionData = arr[0];
-    const address = get(log, 'address');
-    const inputValues = [tokenId]
-
-    async function fetchUrl() {
-      const iface = new ethers.utils.Interface(abi || []);
-      const senderSequence = 1;
-      const functionInputs = get(functionData, ['inputs'], []);
-      const functionOutputs = get(functionData, ['outputs'], []);
-      const functionSignature = iface.getSighash(functionData.name)
-
-      const inputTypes = map(functionInputs, ({ name, type }) => {
-        return type;
-      });
-      try {
-        var abiCoder = new ethers.utils.AbiCoder();
-        var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
-        const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
-        const gasLimit = 2000000;
-        const data = functionSignature + encodedParameters;
-        const tx = Theta.unsignedSmartContractTx({
-          from: address,
-          to: address,
-          data: data,
-          value: 0,
-          transactionFee: gasPrice,
-          gasLimit: gasLimit
-        }, senderSequence);
-        const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
-        const callResponseJSON = await callResponse.json();
-        const result = get(callResponseJSON, 'result');
-        let outputValues = get(result, 'vm_return');
-        const outputTypes = map(functionOutputs, ({ name, type }) => {
-          return type;
-        });
-        outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
-        const url = abiCoder.decode(outputTypes, outputValues)[0];
-        console.log('url:', url)
-        fetch(url)
-          .then(res => res.json())
-          .then(data => {
-            setItem(data);
-          }).catch(e => {
-            console.log('error occurs in fetch url:', e)
-          })
-      }
-      catch (e) {
-        console.log('error occurs:', e)
-      }
-    }
-    fetchUrl();
-  }, [log, abi])
   return (
     <table className="details txn-details">
       <tbody>
@@ -481,7 +422,7 @@ const Log = ({ log, abi }) => {
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
         <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
-        {item && <DetailsRow label="Item" data={<Item item={item} />} />}
+        <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />
       </tbody>
     </table>
   )
@@ -540,8 +481,67 @@ const LogData = ({ data, decode }) => {
   </div>)
 }
 const Item = props => {
-  const { item } = props;
-  return (<div className="sc-item">
+  const { log, abi } = props;
+  const [item, setItem] = useState();
+  useEffect(() => {
+    const tokenId = get(log, 'decode.result.tokenId');
+    if (tokenId === undefined) return;
+    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    if (arr.length === 0) return;
+    const functionData = arr[0];
+    const address = get(log, 'address');
+    const inputValues = [tokenId]
+
+    async function fetchUrl() {
+      const iface = new ethers.utils.Interface(abi || []);
+      const senderSequence = 1;
+      const functionInputs = get(functionData, ['inputs'], []);
+      const functionOutputs = get(functionData, ['outputs'], []);
+      const functionSignature = iface.getSighash(functionData.name)
+
+      const inputTypes = map(functionInputs, ({ name, type }) => {
+        return type;
+      });
+      try {
+        var abiCoder = new ethers.utils.AbiCoder();
+        var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+        const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+        const gasLimit = 2000000;
+        const data = functionSignature + encodedParameters;
+        const tx = Theta.unsignedSmartContractTx({
+          from: address,
+          to: address,
+          data: data,
+          value: 0,
+          transactionFee: gasPrice,
+          gasLimit: gasLimit
+        }, senderSequence);
+        const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponseJSON = await callResponse.json();
+        const result = get(callResponseJSON, 'result');
+        let outputValues = get(result, 'vm_return');
+        const outputTypes = map(functionOutputs, ({ name, type }) => {
+          return type;
+        });
+        outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+        const url = abiCoder.decode(outputTypes, outputValues)[0];
+        fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            setItem(data);
+          }).catch(e => {
+            console.log('error occurs in fetch url:', e)
+          })
+      }
+      catch (e) {
+        console.log('error occurs:', e)
+      }
+    }
+    fetchUrl();
+  }, [log, abi])
+
+  return item ? (<div className="sc-item">
     <div className="sc-item__row">
       <span className="text-grey">Name:</span> {item.name}
     </div>
@@ -551,5 +551,5 @@ const Item = props => {
     <div className="sc-item__row">
       <img className="sc-item__image" src={item.image}></img>
     </div>
-  </div>)
+  </div>) : <></>
 }
