@@ -56,6 +56,9 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     console.log('Querying stake by address.');
     let { hasBalance = false } = req.query;
     const address = helper.normalize(req.params.id.toLowerCase());
+    const origin = req.headers.origin;
+    const regex = /^chrome-extension:.*$/;
+    const isChromeExt = origin && regex.test(origin);
     if(!helper.validateHex(address, 40)){
       res.status(400).send({type: 'invalid_address'})
       return;
@@ -73,6 +76,10 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
               stakeListInfo.holderRecords[i].source_tfuelwei_balance = accInfo.balance.tfuelwei;
             }
           }
+        }
+        if(isChromeExt) {
+          const stakes = JSON.parse(JSON.stringify(stakeListInfo));
+          stakeListInfo.stakes = stakes;
         }
         const data = ({
           type: 'stake',
