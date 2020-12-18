@@ -56,6 +56,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     console.log('Querying stake by address.');
     let { hasBalance = false } = req.query;
     const address = helper.normalize(req.params.id.toLowerCase());
+    //TODO: Remove isChromeExt related after review
     const origin = req.headers.origin;
     const regex = /^chrome-extension:.*$/;
     const isChromeExt = origin && regex.test(origin);
@@ -77,6 +78,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
             }
           }
         }
+        //TODO: Remove isChromeExt related after review
         if(isChromeExt) {
           const stakes = JSON.parse(JSON.stringify(stakeListInfo));
           stakeListInfo.stakes = stakes;
