@@ -389,6 +389,7 @@ const SmartContract = ({ transaction, abi }) => {
   logs = decodeLogs(logs, abi);
   const logLength = (logs || []).length;
   useEffect(() => {
+    if(!abi) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
     if (arr.length === 0) return;
     logs.forEach(log => {
@@ -428,6 +429,7 @@ const SmartContract = ({ transaction, abi }) => {
 const Log = ({ log, abi }) => {
   const [hasItem, setHasItem] = useState(false);
   useEffect(() => {
+    if(!abi) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
     if (arr.length === 0) return;
     const tokenId = get(log, 'decode.result.tokenId');
