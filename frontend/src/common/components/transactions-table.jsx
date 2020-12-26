@@ -28,7 +28,8 @@ export default class TransactionTable extends React.Component {
   }
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.transactions && nextProps.transactions.length && nextProps.transactions !== prevState.transactions) {
-      return { transactions: nextProps.transactions, account: nextProps.account };
+      let txs = nextProps.transactions.sort((a, b) => b.block_height - a.block_height);
+      return { transactions: txs, account: nextProps.account };
     }
     return prevState;
   }
