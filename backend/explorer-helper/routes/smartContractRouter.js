@@ -8,7 +8,7 @@ var fs = require('fs')
 
 var smartContractRouter = (app) => {
   router.use(bodyParser.urlencoded({ extended: true }));
-  router.use(bodyParser.json({limit: '1mb'}));
+  router.use(bodyParser.json({ limit: '1mb' }));
 
   // The api to verify the source and bytecode
   router.post("/verify/:address", async (req, res) => {
@@ -43,7 +43,7 @@ var smartContractRouter = (app) => {
       if (!fs.existsSync(fileName)) {
         console.log(`file ${fileName} does not exsit, downloading`)
         await downloader.downloadByVersion(version, './libs');
-      }else{
+      } else {
         console.log(`file ${fileName} exsits, skip download process`)
       }
       console.log(`Download solc-js file takes: ${(+new Date() - start) / 1000} seconds`)
@@ -75,15 +75,16 @@ var smartContractRouter = (app) => {
         if (output.contracts) {
           let hexBytecode = helper.getHex(byteCode).substring(2);
           for (var contractName in output.contracts['test.sol']) {
-            const curCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
-            const processed_compiled_bytecode = helper.getBytecodeWithoutMetadata(curCode);
-            const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
-            const constructor_arguments = hexBytecode.slice(curCode.length);
+            const byteCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
+            const deployedBytecode = output.contracts['test.sol'][contractName].evm.deployedBytecode.object;
+            const processed_compiled_bytecode = helper.getBytecodeWithoutMetadata(deployedBytecode);
+            // const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
+            const constructor_arguments = hexBytecode.slice(byteCode.length);
             // console.log(`contract name:`, contractName)
             // console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
             // console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
             // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
-            if (!processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode) && processed_compiled_bytecode.length > 0) {
+            if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
               verified = true;
               let abi = output.contracts['test.sol'][contractName].abi;
               const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
