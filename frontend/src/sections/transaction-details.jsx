@@ -90,9 +90,9 @@ export default class TransactionExplorer extends React.Component {
                 errorType: null
               })
               const type = get(res, 'data.body.type');
-              const to = get(res, 'data.body.data.to.address');
-              if (type === TxnTypes.SMART_CONTRACT && to !== ZeroAddress) {
-                smartContractService.getAbiByAddress(to.toLowerCase())
+              if (type === TxnTypes.SMART_CONTRACT) {
+                const address = get(res, 'data.body.receipt.ContractAddress');
+                smartContractService.getAbiByAddress(address.toLowerCase())
                   .then(result => {
                     if (result.data.type === 'smart_contract_abi') {
                       this.setState({ abi: result.data.body.abi })
