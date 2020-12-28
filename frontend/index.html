@@ -19,6 +19,15 @@
 
   <div id="app-root"></div>
   <script type="text/javascript" src="/js/app.js" charset="utf-8"></script>
+  <script>
+    document.addEventListener('copy', function (e) {
+      let text = window.getSelection().toString().trim();
+      if(!text.match(/^0x.*$/)) return;
+      text = text.replace(/[\n\r]+/g, '');
+      e.clipboardData.setData('text/plain', text);
+      e.preventDefault();
+    });
+  </script>
 </body>
 
 </html>
