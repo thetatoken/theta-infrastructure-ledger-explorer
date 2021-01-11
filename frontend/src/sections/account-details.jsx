@@ -8,7 +8,7 @@ import compact from 'lodash/compact';
 import cx from 'classnames';
 
 import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
-import { CurrencyLabels } from 'common/constants';
+import { CurrencyLabels, TxnTypeText } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
@@ -21,8 +21,12 @@ import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 import SmartContract from 'common/components/smart-contract';
 
+import { Multiselect } from 'multiselect-react-dropdown';
+
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
+const typeOptions = Object.keys(TxnTypeText).map(key => ({ value: key, label: TxnTypeText[key] }))
+console.log(typeOptions)
 export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -42,11 +46,13 @@ export default class AccountDetails extends React.Component {
       hasEndDateErr: false,
       price: { 'Theta': 0, 'TFuel': 0 },
       isDownloading: false,
+      selectedTypes: typeOptions.filter(obj => obj.value !== '0' && obj.value !== '5')
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
     this.startDate = React.createRef();
     this.endDate = React.createRef();
+    this.select = React.createRef();
     this.handleInput = this.handleInput.bind(this);
     this.resetInput = this.resetInput.bind(this);
   }
@@ -284,12 +290,13 @@ export default class AccountDetails extends React.Component {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasStakes, holderTxs, hasDownloadTx, sourceTxs,
       price, hasStartDateErr, hasEndDateErr, isDownloading } = this.state;
+
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
         {errorType === 'invalid_address' &&
           // <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />
-          <NotExist msg="Note: Invalid address."/>}
+          <NotExist msg="Note: Invalid address." />}
         {account && !errorType &&
           <React.Fragment>
             <table className="details account-info">
@@ -339,13 +346,33 @@ export default class AccountDetails extends React.Component {
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
-                <div className="switch">
-                  <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
-                  <label className="theta-switch">
-                    <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
-                    <span className="theta-slider"></span>
-                  </label>
-                </div>
+                <>
+                  Display
+                  <Multiselect
+                    options={typeOptions} // Options to display in the dropdown
+                    displayValue="label" // Property name to display in the dropdown options
+                    style={{
+                      multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
+                      searchBox: { maxHeight: '35px', overflow: 'scroll', paddingTop: 0 },
+                      optionContainer: { background: 'rgba(124,129,163,.35)' },
+                      inputField: { margin: 0 },
+                      chips: { display: 'none' }
+                    }}
+                    closeOnSelect={false}
+                    showCheckbox={true}
+                    avoidHighlightFirstOption={true}
+                    placeholder={`${this.state.selectedTypes.length} selected types`}
+                    selectedValues={this.state.selectedTypes}
+                  />
+                  Txs
+                </>
+                // <div className="switch">
+                //   <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
+                //   <label className="theta-switch">
+                //     <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
+                //     <span className="theta-slider"></span>
+                //   </label>
+                // </div>
               }
 
             </div>
