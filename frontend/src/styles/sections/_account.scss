@@ -100,6 +100,25 @@
       position: absolute;
       left: calc(50% - 44px)
     }
+    .refresh {
+      cursor: pointer;
+      height: 100%;
+      width: 15px;
+      margin-right: 5px;
+      border-radius: 5px;
+      &:hover {
+        color: $color-green;
+      }
+    }
+    .filter {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: $color-font-light;
+      @include breakpoint('phablet', max) {
+        @include hideColumn();
+      }
+    }
     .switch{
       @include breakpoint('phablet', max) { display: none; }
     }
@@ -159,4 +178,9 @@
 .price{
   margin-left: 5px;
   color: $color-light;
+}
+#search_input {
+  &::placeholder {
+    color: $color-white;
+  }
 }
