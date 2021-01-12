@@ -162,8 +162,11 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
       res.status(400).send({type: 'invalid_address'})
       return;
     }
-    let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10 } = req.query;
+    let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10, types = null } = req.query;
     type = parseInt(type);
+    if(types !== -1 && types !== null) {
+      type = JSON.parse(types).map(c => parseInt(c))
+    }
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);
     let totalNumber = 0;
