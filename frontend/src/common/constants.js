@@ -31,6 +31,10 @@ export const TxnTypeText = {
   '10': 'Deposit Stake'
 }
 
+export const TypeOptions = Object.keys(TxnTypeText)
+  .map(key => ({ value: key, label: TxnTypeText[key] }))
+  .filter(o => o.value !== '8')
+
 export const TxnClasses = {
   '0': 'coinbase',
   '1': 'slash',

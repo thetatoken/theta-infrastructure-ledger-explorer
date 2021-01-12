@@ -8,7 +8,7 @@ import compact from 'lodash/compact';
 import cx from 'classnames';
 
 import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
-import { CurrencyLabels, TxnTypeText } from 'common/constants';
+import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
@@ -25,8 +25,7 @@ import { Multiselect } from 'multiselect-react-dropdown';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-const typeOptions = Object.keys(TxnTypeText).map(key => ({ value: key, label: TxnTypeText[key] }))
-console.log(typeOptions)
+console.log(TypeOptions)
 export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -46,7 +45,9 @@ export default class AccountDetails extends React.Component {
       hasEndDateErr: false,
       price: { 'Theta': 0, 'TFuel': 0 },
       isDownloading: false,
-      selectedTypes: typeOptions.filter(obj => obj.value !== '0' && obj.value !== '5')
+      hasRefreshBtn: false,
+      selectedTypes: TypeOptions.filter(obj => obj.value !== '0' && obj.value !== '5'),
+      typeOptions: null
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -78,7 +79,6 @@ export default class AccountDetails extends React.Component {
   fetchData(address, hasPrice = true) {
     if (validateHex(address, 40)) {
       this.getOneAccountByAddress(address);
-      this.getTransactionsByAddress(address, false, 1);
       this.getStakeTransactions(address);
       if (!hasPrice) this.getPrices();
     } else {
@@ -124,12 +124,12 @@ export default class AccountDetails extends React.Component {
         console.log(err);
       });
   }
-  getTransactionsByAddress(address, includeService, page = 1) {
+  getTransactionsByAddress(address, types, page = 1) {
     if (!address) {
       return;
     }
     this.setState({ loading_txns: true });
-    transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, includeService)
+    transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, types)
       .then(res => {
         const txs = get(res, 'data.body');
         if (!txs) {
@@ -144,8 +144,8 @@ export default class AccountDetails extends React.Component {
             loading_txns: false,
           })
         } else {
-          this.handleToggleHideTxn();
-          this.setState({ hasOtherTxs: false })
+          // this.handleToggleHideTxn();
+          this.setState({ hasOtherTxs: false, loading_txns: false })
         }
 
       })
@@ -165,9 +165,15 @@ export default class AccountDetails extends React.Component {
       .then(res => {
         switch (res.data.type) {
           case 'account':
+            const txs_counter = get(res, 'data.body.txs_counter');
+            let typeOptions = Object.keys(txs_counter).map(k => ({ value: k, label: TxnTypeText[k] }))
+            let restOptions = typeOptions.filter(o => o.value !== '0' || o.value !== '5');
+            let selectedTypes = restOptions.length > 0 ? restOptions : typeOptions;
             this.setState({
               account: res.data.body,
-              errorType: null
+              errorType: null,
+              selectedTypes: selectedTypes,
+              typeOptions: typeOptions
             })
             break;
           case 'error_not_found':
@@ -179,6 +185,8 @@ export default class AccountDetails extends React.Component {
           loading_acct: false, hasDownloadTx: (res.data.body.txs_counter[0]
             || res.data.body.txs_counter[2] || res.data.body.txs_counter[5]) !== undefined
         });
+        let types = this.state.selectedTypes.map(o => o.value);
+        this.getTransactionsByAddress(address, types, 1);
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -187,23 +195,9 @@ export default class AccountDetails extends React.Component {
 
   handlePageChange = pageNumber => {
     let { accountAddress } = this.props.match.params;
-    let { includeService } = this.state;
-    this.getTransactionsByAddress(accountAddress, includeService, pageNumber);
-  }
-
-  handleToggleHideTxn = () => {
-    if (this.state.hasOtherTxs) {
-      let { accountAddress } = this.props.match.params;
-      let includeService = !this.state.includeService;
-      this.setState({
-        includeService,
-        currentPage: 1,
-        totalPages: null,
-      });
-      this.getTransactionsByAddress(accountAddress, includeService, 1);
-    } else {
-      this.setState({ loading_txns: false });
-    }
+    let { selectedTypes } = this.state;
+    let types = selectedTypes.map(o => o.value);
+    this.getTransactionsByAddress(accountAddress, types, pageNumber);
   }
 
   downloadTrasanctionHistory() {
@@ -286,11 +280,22 @@ export default class AccountDetails extends React.Component {
     this.endDate.max = today;
     this.endDate.min = '';
   }
+  handleSelect = (selectedList, selectedItem) => {
+    this.setState({
+      selectedTypes: selectedList,
+      hasRefreshBtn: selectedList.length > 0 ? true : false
+    })
+  }
+  handleTxsRefresh = () => {
+    const { accountAddress } = this.props.match.params;
+    const { selectedTypes } = this.state;
+    const types = selectedTypes.map(o => o.value);
+    this.getTransactionsByAddress(accountAddress, types, 1);
+  }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasStakes, holderTxs, hasDownloadTx, sourceTxs,
-      price, hasStartDateErr, hasEndDateErr, isDownloading } = this.state;
-
+      price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn, typeOptions } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -346,18 +351,21 @@ export default class AccountDetails extends React.Component {
               <a ref={this.download}></a>
               <div className="title">Transactions</div>
               {hasOtherTxs &&
-                <>
+                <div className="filter">
+                  {hasRefreshBtn && <span className="refresh" onClick={this.handleTxsRefresh}>&#x21bb;</span>}
                   Display
                   <Multiselect
-                    options={typeOptions} // Options to display in the dropdown
+                    options={typeOptions || TypeOptions} // Options to display in the dropdown
                     displayValue="label" // Property name to display in the dropdown options
                     style={{
                       multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
                       searchBox: { maxHeight: '35px', overflow: 'scroll', paddingTop: 0 },
-                      optionContainer: { background: 'rgba(124,129,163,.35)' },
+                      optionContainer: { background: '#1b1f2a' },
                       inputField: { margin: 0 },
                       chips: { display: 'none' }
                     }}
+                    onSelect={this.handleSelect}
+                    onRemove={this.handleSelect}
                     closeOnSelect={false}
                     showCheckbox={true}
                     avoidHighlightFirstOption={true}
@@ -365,7 +373,7 @@ export default class AccountDetails extends React.Component {
                     selectedValues={this.state.selectedTypes}
                   />
                   Txs
-                </>
+                </div>
                 // <div className="switch">
                 //   <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
                 //   <label className="theta-switch">
