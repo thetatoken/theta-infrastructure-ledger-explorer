@@ -158,13 +158,13 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
 
   router.get("/accountTx/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
-    if(!helper.validateHex(address, 40)){
-      res.status(400).send({type: 'invalid_address'})
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
       return;
     }
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10, types = null } = req.query;
     type = parseInt(type);
-    if(types !== -1 && types !== null) {
+    if (types !== -1 && types !== null) {
       type = JSON.parse(types).map(c => parseInt(c))
     }
     pageNumber = parseInt(pageNumber);
@@ -177,7 +177,11 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
       accountDao.getAccountByPkAsync(address)
         .then(accountInfo => {
           if (isEqualType === 'true') {
-            totalNumber = accountInfo.txs_counter[type] ? accountInfo.txs_counter[type] : 0;
+            totalNumber = Array.isArray(type) ? Object.keys(accountInfo.txs_counter)
+              .reduce((total, key) => {
+                key = parseInt(key)
+                return type.indexOf(key) < 0 ? total : total + accountInfo.txs_counter[key]
+              }, 0) : accountInfo.txs_counter[type] || 0;
           } else {
             if (accountInfo.txs_counter) {
               totalNumber = Object.keys(accountInfo.txs_counter).reduce((total, key) => {
@@ -264,8 +268,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
 
   router.get("/accountTx/latest/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
-    if(!helper.validateHex(address, 40)){
-      res.status(400).send({type: 'invalid_address'})
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
       return;
     }
     let { startTime = 0 } = req.query;

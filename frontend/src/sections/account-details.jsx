@@ -25,7 +25,6 @@ import { Multiselect } from 'multiselect-react-dropdown';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-console.log(TypeOptions)
 export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -167,7 +166,7 @@ export default class AccountDetails extends React.Component {
           case 'account':
             const txs_counter = get(res, 'data.body.txs_counter');
             let typeOptions = Object.keys(txs_counter).map(k => ({ value: k, label: TxnTypeText[k] }))
-            let restOptions = typeOptions.filter(o => o.value !== '0' || o.value !== '5');
+            let restOptions = typeOptions.filter(o => o.value !== '0' && o.value !== '5');
             let selectedTypes = restOptions.length > 0 ? restOptions : typeOptions;
             this.setState({
               account: res.data.body,
@@ -291,6 +290,7 @@ export default class AccountDetails extends React.Component {
     const { selectedTypes } = this.state;
     const types = selectedTypes.map(o => o.value);
     this.getTransactionsByAddress(accountAddress, types, 1);
+    this.setState({ hasRefreshBtn: false });
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,

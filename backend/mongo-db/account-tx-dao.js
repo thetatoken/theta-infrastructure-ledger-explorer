@@ -29,7 +29,6 @@ module.exports = class AccountTxDAO {
 
   getList(address, type, isEqualType, pageNumber, limitNumber, reverse, callback) {
     const typeObject = isEqualType === 'true' ? (Array.isArray(type) ? { $in: type } : type) : { $ne: type };
-    console.log('typeObject:', typeObject)
     const queryObject = { acct: address, type: typeObject };
     const sortObject = { ts: reverse ? 1 : -1 };
     this.client.getRecords(this.collection, queryObject, sortObject, pageNumber, limitNumber, callback);
