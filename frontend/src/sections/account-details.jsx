@@ -358,9 +358,9 @@ export default class AccountDetails extends React.Component {
                     displayValue="label" // Property name to display in the dropdown options
                     style={{
                       multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
-                      searchBox: { maxHeight: '35px', overflow: 'scroll', paddingTop: 0 },
+                      searchBox: { maxHeight: '35px', overflow: 'scroll', padding: 0 },
                       optionContainer: { background: '#1b1f2a' },
-                      inputField: { margin: 0 },
+                      inputField: { margin: 0, height: '100%', width: '100%' },
                       chips: { display: 'none' }
                     }}
                     onSelect={this.handleSelect}
