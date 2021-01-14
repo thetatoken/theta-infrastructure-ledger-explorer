@@ -156,10 +156,10 @@ export default class TransactionExplorer extends React.Component {
               </tbody>
             </table>
 
-            <div className="details-header">
+            {transaction.type !== TxnTypes.SMART_CONTRACT && <div className="details-header">
               <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
               <button className="btn tx raw" onClick={this.handleToggleDetailsClick}>view raw txn</button>
-            </div>
+            </div>}
             {transaction.type === TxnTypes.COINBASE &&
               <Coinbase transaction={transaction} price={price} />}
 
@@ -182,7 +182,8 @@ export default class TransactionExplorer extends React.Component {
               <SplitContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
-              <SmartContract transaction={transaction} price={price} abi={abi} />}
+              <SmartContract transaction={transaction} price={price} abi={abi}
+                handleToggleDetailsClick={this.handleToggleDetailsClick} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
               <WithdrawStake transaction={transaction} price={price} />}
@@ -373,7 +374,7 @@ const DepositStake = ({ transaction, price }) => {
     </table>);
 }
 
-const SmartContract = ({ transaction, abi }) => {
+const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
 
@@ -389,7 +390,7 @@ const SmartContract = ({ transaction, abi }) => {
   logs = decodeLogs(logs, abi);
   const logLength = (logs || []).length;
   useEffect(() => {
-    if(!abi) return;
+    if (!abi) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
     if (arr.length === 0) return;
     logs.forEach(log => {
@@ -399,37 +400,51 @@ const SmartContract = ({ transaction, abi }) => {
     })
   }, [logs, abi])
   return (
-    <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
-      <TabList>
-        <Tab>Overview</Tab>
-        <Tab disabled={logLength == 0} >{`Logs(${logLength})`}</Tab>
-      </TabList>
-      <TabPanel>
-        <table className="details txn-details">
-          <tbody>
-            <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
-            <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
-            {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-            <DetailsRow label="Gas Limit" data={data.gas_limit} />
-            {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
-            <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-            {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
-            <DetailsRow label="Data" data={getHex(data.data)} />
-            {hasItems && <DetailsRow label="Items" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />}
-          </tbody>
-        </table>
-      </TabPanel>
-      <TabPanel>
-        {logs.map((log, i) => <Log log={log} key={i} abi={abi} />)}
-      </TabPanel>
-    </Tabs>
+    <>
+      <div className="details-header item">
+        <div className="txn-type smart-contract items">Items</div>
+      </div>
+      <table className="details txn-details item">
+        <tbody>
+          {/* {hasItems && <DetailsRow label="Item" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />} */}
+          {hasItems && logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
+        </tbody>
+      </table>
+      <div className="details-header">
+        <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
+        <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
+      </div>
+      <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+        <TabList>
+          <Tab>Overview</Tab>
+          <Tab disabled={logLength == 0} >{`Logs(${logLength})`}</Tab>
+        </TabList>
+        <TabPanel>
+          <table className="details txn-details">
+            <tbody>
+              <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
+              <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
+              {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+              <DetailsRow label="Gas Limit" data={data.gas_limit} />
+              {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
+              <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
+              {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
+              <DetailsRow label="Data" data={getHex(data.data)} />
+            </tbody>
+          </table>
+        </TabPanel>
+        <TabPanel>
+          {logs.map((log, i) => <Log log={log} key={i} abi={abi} />)}
+        </TabPanel>
+      </Tabs>
+    </>
   );
 }
 
 const Log = ({ log, abi }) => {
   const [hasItem, setHasItem] = useState(false);
   useEffect(() => {
-    if(!abi) return;
+    if (!abi) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
     if (arr.length === 0) return;
     const tokenId = get(log, 'decode.result.tokenId');
@@ -443,7 +458,7 @@ const Log = ({ log, abi }) => {
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
         <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
-        {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />}
+        {/* {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />} */}
       </tbody>
     </table>
   )
@@ -564,15 +579,17 @@ const Item = props => {
     fetchUrl();
   }, [log, abi])
 
-  return typeof item === 'object' ? (<div className="sc-item">
-    <div className="sc-item__row">
-      <span className="text-grey">Name:</span> {item.name}
+  return typeof item === 'object' ? (
+    <div className="sc-item">
+      <div className="sc-item__column">
+        <img className="sc-item__image" src={item.image}></img>
+      </div>
+      <div className="sc-item__column">
+        <div className="sc-item__text">Name</div>
+        <div className="sc-item__text name">{item.name}</div>
+        <div className="sc-item__text">Description</div>
+        <div className="sc-item__text">{item.description}</div>
+      </div>
     </div>
-    <div className="sc-item__row">
-      <span className="text-grey">Description:</span> {item.description}
-    </div>
-    <div className="sc-item__row">
-      <img className="sc-item__image" src={item.image}></img>
-    </div>
-  </div>) : <div className="sc-item text-danger">{item}</div>
+  ) : <div className="sc-item text-danger">{item}</div>
 }

@@ -68,6 +68,9 @@ table.details {
   table-layout: fixed;
   margin-bottom: 48px;
   background-color: $color-panel;
+  &.item {
+    margin-bottom: 0;
+  }
   thead tr {
     th:first-child {
       width: 7rem;

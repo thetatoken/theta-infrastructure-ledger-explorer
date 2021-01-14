@@ -143,7 +143,6 @@ export default class AccountDetails extends React.Component {
             loading_txns: false,
           })
         } else {
-          // this.handleToggleHideTxn();
           this.setState({ hasOtherTxs: false, loading_txns: false })
         }
 
@@ -374,13 +373,6 @@ export default class AccountDetails extends React.Component {
                   />
                   Txs
                 </div>
-                // <div className="switch">
-                //   <button className="btn tx">{includeService ? 'Hide' : 'Show'} Service Payments</button>
-                //   <label className="theta-switch">
-                //     <input type="checkbox" checked={includeService} onChange={this.handleToggleHideTxn}></input>
-                //     <span className="theta-slider"></span>
-                //   </label>
-                // </div>
               }
 
             </div>
