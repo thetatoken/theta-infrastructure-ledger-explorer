@@ -587,8 +587,12 @@ const Item = props => {
       <div className="sc-item__column">
         <div className="sc-item__text">Name</div>
         <div className="sc-item__text name">{item.name}</div>
-        <div className="sc-item__text">Description</div>
-        <div className="sc-item__text">{item.description}</div>
+        {item.description && item.description.length > 0 &&
+          <>
+            <div className="sc-item__text">Description</div>
+            <div className="sc-item__text">{item.description}</div>
+          </>
+        }
       </div>
     </div>
   ) : <div className="sc-item text-danger">{item}</div>
