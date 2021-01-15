@@ -45,7 +45,7 @@ export default class AccountDetails extends React.Component {
       price: { 'Theta': 0, 'TFuel': 0 },
       isDownloading: false,
       hasRefreshBtn: false,
-      selectedTypes: TypeOptions.filter(obj => obj.value !== '0' && obj.value !== '5'),
+      selectedTypes: TypeOptions.filter(obj => obj.value !== '5'),
       typeOptions: null
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
@@ -165,7 +165,7 @@ export default class AccountDetails extends React.Component {
           case 'account':
             const txs_counter = get(res, 'data.body.txs_counter');
             let typeOptions = Object.keys(txs_counter).map(k => ({ value: k, label: TxnTypeText[k] }))
-            let restOptions = typeOptions.filter(o => o.value !== '0' && o.value !== '5');
+            let restOptions = typeOptions.filter(o => o.value !== '5');
             let selectedTypes = restOptions.length > 0 ? restOptions : typeOptions;
             this.setState({
               account: res.data.body,
