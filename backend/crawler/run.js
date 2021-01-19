@@ -14,10 +14,12 @@ var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
+var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
 var accountingJob = require('./jobs/accounting.js');
+var activeActJob = require('./jobs/read-active-accounts.js');
 var express = require('express');
 var app = express();
 var cors = require('cors')
@@ -132,6 +134,9 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   smartContractDao = new smartContractDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(smartContractDao);
 
+  activeAccountDao = new activeAccountDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(activeAccountDao);
+
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
@@ -142,10 +147,21 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
 
   accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
-  schedule.scheduleJob('Record TFuel Price','0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // GMT mid-night
+  schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // PST mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
+
+  activeActJob.Initialize(accountTxDao, activeAccountDao);
+  activeAccountDao.getLatestRecordsAsync(1)
+    .then(() => { }).catch(err => {
+      console.log(err.message.includes('NO_RECORD'))
+      if (err.message.includes('NO_RECORD')) {
+        activeActJob.Execute();
+      }
+    })
+  // activeActJob.Execute();
+  schedule.scheduleJob('Record TFuel Earning', '0 22 10 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
 }
 
 
