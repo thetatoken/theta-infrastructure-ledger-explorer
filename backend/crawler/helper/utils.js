@@ -28,6 +28,7 @@ exports.createIndexes = async function () {
 
     await createIndexAsync('checkpoint', { height: -1 })
 
+    await createIndexAsync('activeAct', { timestamp: -1 })
 }
 function _createIndex(collectionName, object, callback) {
     createIndex(collectionName, object, callback);
