@@ -161,7 +161,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
       }
     })
   // activeActJob.Execute();
-  schedule.scheduleJob('Record TFuel Earning', '0 22 10 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
+  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
 }
 
 
