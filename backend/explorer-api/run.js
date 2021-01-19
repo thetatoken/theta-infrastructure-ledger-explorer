@@ -19,6 +19,7 @@ var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
+var activeAccountDaoLib = require('../mongo-db/active-account-dao.js')
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -28,7 +29,8 @@ var stakeRouter = require("./routes/stakeRouter");
 var priceRouter = require("./routes/priceRouter");
 var accountingRouter = require("./routes/accountingRouter");
 var supplyRouter = require("./routes/supplyRouter");
-var smartContractRouter = require("./routes/smartContractRouter")
+var smartContractRouter = require("./routes/smartContractRouter");
+var activeActRouter = require("./routes/activeActRouter");
 var cors = require('cors');
 var io;
 //------------------------------------------------------------------------------
@@ -105,7 +107,8 @@ function main() {
       bluebird.promisifyAll(checkpointDao);
       smartContractDao = new smartContractDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(smartContractDao);
-
+      activeActDao = new activeAccountDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(activeActDao);
       //
       var privateKey = fs.readFileSync(config.cert.key, 'utf8');
       var certificate = fs.readFileSync(config.cert.crt, 'utf8');
@@ -160,6 +163,8 @@ function main() {
       accountingRouter(app, accountingDao)
       // smart contract router
       smartContractRouter(app, smartContractDao)
+      // active account router
+      activeActRouter(app, activeActDao);
       // keep push block data
       // pushTopBlocks();
     }
