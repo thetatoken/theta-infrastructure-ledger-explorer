@@ -155,7 +155,7 @@ function main() {
       // supply router
       supplyRouter(app, progressDao, config);
       // price router
-      priceRouter(app, priceDao, config)
+      priceRouter(app, priceDao, progressDao, config)
       // accounting router
       accountingRouter(app, accountingDao)
       // smart contract router
