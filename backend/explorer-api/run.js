@@ -156,9 +156,9 @@ function main() {
       // stake router
       stakeRouter(app, stakeDao, accountDao, progressDao);
       // supply router
-      supplyRouter(app);
+      supplyRouter(app, progressDao, config);
       // price router
-      priceRouter(app, priceDao, config)
+      priceRouter(app, priceDao, progressDao, config)
       // accounting router
       accountingRouter(app, accountingDao)
       // smart contract router

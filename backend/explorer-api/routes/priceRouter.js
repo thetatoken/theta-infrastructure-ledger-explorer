@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var priceHelper = require('../helper/price');
 
-var priceRouter = (app, priceDao, config) => {
+var priceRouter = (app, priceDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/price/all", (req, res) => {
@@ -18,11 +18,12 @@ var priceRouter = (app, priceDao, config) => {
         })
         if (isOutDated) {
           let tmp = await priceHelper.updatePrice(priceDao, config.coinmarketcap);
-          if(!tmp.error){
+          if (!tmp.error) {
             priceListInfo = tmp;
             priceListInfo.forEach(p => p._id = p.name)
           }
         }
+        await updateSupply(priceListInfo, progressDao, config);
         const data = ({
           type: 'price',
           body: priceListInfo,
@@ -32,6 +33,7 @@ var priceRouter = (app, priceDao, config) => {
       .catch(async error => {
         if (error.message.includes('NOT_FOUND')) {
           const priceListInfo = await priceHelper.updatePrice(priceDao, config.coinmarketcap);
+          await updateSupply(priceListInfo, progressDao, config);
           const data = ({
             type: 'price',
             body: priceListInfo,
@@ -48,3 +50,16 @@ var priceRouter = (app, priceDao, config) => {
 }
 
 module.exports = priceRouter;
+
+async function updateSupply(priceListInfo, progressDao, config) {
+  if (config.blockchain.network_id !== 'main_net_chain') return;
+  for (let info of priceListInfo) {
+    if (info._id === 'TFUEL') {
+      let progressInfo = await progressDao.getProgressAsync(config.blockchain.network_id);
+      const height = progressInfo.height;
+      const supply = 5000000000 + ~~((height - 4164982) / 100) * 4800;
+      info.total_supply = supply;
+      info.circulating_supply = supply;
+    }
+  }
+}
