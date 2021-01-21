@@ -1,7 +1,7 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
 
-exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -36,58 +36,58 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
     switch (tx.type) { // TODO: Add other type cases
       case 0:
         await _updateAccountByAddress(tx.data.proposer.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         for (let output of tx.data.outputs) {
           await _updateAccountByAddress(output.address, accountDao, tx.type);
-          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountMaps(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         }
         break;
       case 2:
         // Update inputs account
         for (let input of tx.data.inputs) {
           await _updateAccountByAddress(input.address, accountDao, tx.type);
-          await _updateAccountTxMap(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountMaps(input.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         }
         // Update outputs account
         for (let output of tx.data.outputs) {
           await _updateAccountByAddress(output.address, accountDao, tx.type);
-          await _updateAccountTxMap(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountMaps(output.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         }
         break;
       case 3:
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         break;
       case 5:
         // Update source account
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         // Update target account
         await _updateAccountByAddress(tx.data.target.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.target.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.target.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         break;
       case 6:
         await _updateAccountByAddress(tx.data.initiator.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.initiator.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         for (let split of tx.data.splits) {
           await _updateAccountByAddress(split.Address, accountDao, tx.type);
-          await _updateAccountTxMap(split.Address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+          await _updateAccountMaps(split.Address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         }
         break;
       case 7:
         // Update from account
         await _updateAccountByAddress(tx.data.from.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.from.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.from.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update to account
         await _updateAccountByAddress(tx.data.to.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update smart contract account
         if (tx.receipt) {
           await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
-            await _updateAccountTxMap(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao);
+            await _updateAccountMaps(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
             await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
           }
         }
@@ -97,11 +97,11 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
       case 10:
         // Update source account
         await _updateAccountByAddress(tx.data.source.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.source.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update holder account
         await _updateAccountByAddress(tx.data.holder.address, accountDao, tx.type);
-        await _updateAccountTxMap(tx.data.holder.address, tx.hash, tx.type, tx.timestamp, accountTxDao);
+        await _updateAccountMaps(tx.data.holder.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         break
       default:
         break;
@@ -151,13 +151,17 @@ async function _updateAccountByAddress(address, accountDao, type) {
     })
 }
 
-function _updateAccountTxMap(address, hash, type, timestamp, accountTxDao) {
+async function _updateAccountMaps(address, hash, type, timestamp, accountTxDao, dailyAccountDao) {
   accountTxDao.insertAsync({
     'acct': address,
     hash,
     type,
     'ts': timestamp
   });
+  const isExist = await dailyAccountDao.checkAccountAsync(address);
+  if (!isExist) {
+    dailyAccountDao.insertAsync({ address })
+  }
 }
 
 async function _createSmartContract(address, bytecode, smartContractDao) {

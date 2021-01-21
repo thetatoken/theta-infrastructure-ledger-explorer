@@ -20,6 +20,7 @@ var accountTxDao = null;
 var stakeDao = null;
 var checkpointDao = null;
 var smartContractDao = null;
+var dailyAccountDao = null;
 var max_block_per_crawl = 2;
 var target_crawl_height;
 var txs_count = 0;
@@ -32,7 +33,7 @@ var validTransactionList = [];
 //  All the implementation goes below
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance) {
+  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -41,6 +42,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   stakeDao = stakeDaoInstance;
   checkpointDao = checkpointDaoInstance;
   smartContractDao = smartContractDaoInstance;
+  dailyAccountDao = dailyAccountDaoInstance;
 }
 
 exports.Execute = async function (network_id) {
@@ -211,7 +213,7 @@ exports.Execute = async function (network_id) {
       }
     })
     .then(() => {
-      accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, dailyAccountDao, validTransactionList);
     })
     .then(async function () {
       validTransactionList = [];

@@ -15,6 +15,7 @@ var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao')
+var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
@@ -137,7 +138,10 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   activeAccountDao = new activeAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(activeAccountDao);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao);
+  dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(dailyAccountDao);
+
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao, dailyAccountDao);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
@@ -152,15 +156,13 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 
-  activeActJob.Initialize(accountTxDao, activeAccountDao);
+  activeActJob.Initialize(dailyAccountDao, activeAccountDao);
   activeAccountDao.getLatestRecordsAsync(1)
     .then(() => { }).catch(err => {
-      console.log(err.message.includes('NO_RECORD'))
       if (err.message.includes('NO_RECORD')) {
         activeActJob.Execute();
       }
     })
-  // activeActJob.Execute();
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
 }
 

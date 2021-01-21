@@ -3,7 +3,7 @@
 //  Require index: `db.activeAct.createIndex({timestamp:-1})`
 //------------------------------------------------------------------------------
 
-module.exports = class BlockDAO {
+module.exports = class ActiveAccountDAO {
 
   constructor(execDir, client) {
     this.client = client;
