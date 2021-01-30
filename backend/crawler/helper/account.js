@@ -151,7 +151,7 @@ async function _updateAccountByAddress(address, accountDao, type) {
             }
             await accountDao.upsertAccountAsync({
               address,
-              'balance': accountInfo.coins,
+              'balance': accountInfo.balance,
               'sequence': accountInfo.sequence,
               'reserved_funds': accountInfo.reserved_funds,
               'txs_counter': txs_counter,
