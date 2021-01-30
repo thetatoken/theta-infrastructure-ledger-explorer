@@ -141,14 +141,31 @@ async function _updateAccountByAddress(address, accountDao, type) {
         const msg = tmp.error.message;
         if (msg.includes('is not found')) {
           const isExist = await accountDao.checkAccountAsync(address);
-          if (isExist) return;
+          if (isExist) {
+            const accountInfo = await accountDao.getAccountByPkAsync(address);
+            let txs_counter = {};
+            if (type !== null && type !== undefined) {
+              accountInfo.txs_counter = accountInfo.txs_counter || {};
+              accountInfo.txs_counter[`${type}`] = accountInfo.txs_counter[`${type}`] === undefined ? 1 : accountInfo.txs_counter[`${type}`] + 1;
+              txs_counter = accountInfo.txs_counter;
+            }
+            await accountDao.upsertAccountAsync({
+              address,
+              'balance': accountInfo.coins,
+              'sequence': accountInfo.sequence,
+              'reserved_funds': accountInfo.reserved_funds,
+              'txs_counter': txs_counter,
+              'code': accountInfo.code
+            });
+            return;
+          };
           console.log('upsert new account:', address)
           await accountDao.upsertAccountAsync({
             address,
-            'balance': { "thetawei" : "0", "tfuelwei" : "0" },
+            'balance': { "thetawei": "0", "tfuelwei": "0" },
             'sequence': 0,
             'reserved_funds': [],
-            'txs_counter': {},
+            'txs_counter': { [`${type}`]: 1 },
             'code': '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
           });
         }
