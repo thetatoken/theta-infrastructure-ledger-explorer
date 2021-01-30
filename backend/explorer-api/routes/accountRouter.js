@@ -8,8 +8,8 @@ var accountRouter = (app, accountDao, rpc) => {
 
   router.get("/account/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    if(!helper.validateHex(address, 40)){
-      res.status(400).send({type: 'invalid_address'})
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
       return;
     }
     // console.log('Querying one account by using Id: ' + address);
@@ -37,8 +37,8 @@ var accountRouter = (app, accountDao, rpc) => {
   router.get("/account/update/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     // console.log('Updating one account by Id:', address);
-    if(!helper.validateHex(address, 40)){
-      res.status(400).send({type: 'invalid_address'})
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
       return;
     }
     rpc.getAccountAsync([{ 'address': address }])
@@ -63,6 +63,25 @@ var accountRouter = (app, accountDao, rpc) => {
           });
           res.status(200).send(data);
         } else {
+          const isExist = await accountDao.checkAccountAsync(address);
+          if (isExist) {
+            const accountInfo = await accountDao.getAccountByPkAsync(address);
+            const txs_counter = accountInfo ? accountInfo.txs_counter : {};
+            const newInfo = {
+              address,
+              'balance': accountInfo.balance,
+              'sequence': accountInfo.sequence,
+              'reserved_funds': accountInfo.reserved_funds,
+              'txs_counter': txs_counter,
+              'code': accountInfo.code
+            }
+            const data = ({
+              type: 'account',
+              body: newInfo,
+            });
+            res.status(200).send(data);
+            return;
+          }
           const err = ({
             type: 'error_not_found'
           });

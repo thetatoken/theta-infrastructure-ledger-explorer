@@ -137,6 +137,21 @@ async function _updateAccountByAddress(address, accountDao, type) {
           'txs_counter': txs_counter,
           'code': tmp.result.code
         });
+      } else if (tmp.error) {
+        const msg = tmp.error.message;
+        if (msg.includes('is not found')) {
+          const isExist = await accountDao.checkAccountAsync(address);
+          if (isExist) return;
+          console.log('upsert new account:', address)
+          await accountDao.upsertAccountAsync({
+            address,
+            'balance': { "thetawei" : "0", "tfuelwei" : "0" },
+            'sequence': 0,
+            'reserved_funds': [],
+            'txs_counter': {},
+            'code': '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
+          });
+        }
       } else {
         return;
       }
