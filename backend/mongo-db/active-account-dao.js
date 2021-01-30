@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//  DAO for block
+//  DAO for active account history
 //  Require index: `db.activeAct.createIndex({timestamp:-1})`
 //------------------------------------------------------------------------------
 
@@ -29,5 +29,9 @@ module.exports = class ActiveAccountDAO {
       }
       callback(error, activeActList)
     })
+  }
+  getInfoListByTime(start, end, callback) {
+    const queryObject = { timestamp: { $gte: start, $lte: end } };
+    this.client.getRecords(this.collection, queryObject, {}, 0, 0, callback);
   }
 }
