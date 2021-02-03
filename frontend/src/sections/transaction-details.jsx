@@ -428,7 +428,9 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-              {err ? <DetailsRow label="Error Message" data={<span className="text-danger">{err}</span>} /> : null}
+              {err ? <DetailsRow label="Error Message" data={<span className="text-danger">
+                {Buffer.from(get(transaction, 'receipt.EvmRet'), 'base64').toString() || err}
+              </span>} /> : null}
               <DetailsRow label="Data" data={getHex(data.data)} />
             </tbody>
           </table>
