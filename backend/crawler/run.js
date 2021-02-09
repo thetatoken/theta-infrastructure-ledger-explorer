@@ -18,6 +18,7 @@ var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 
 var readBlockCronJob = require('./jobs/read-block.js');
+var readPreFeeCronJob = require('./jobs/read-previous-fee.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
 var accountingJob = require('./jobs/accounting.js');
 var activeActJob = require('./jobs/read-active-accounts.js');
@@ -140,6 +141,13 @@ function setupGetBlockCronJob(mongoClient, network_id) {
 
   dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(dailyAccountDao);
+
+
+  readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
+  let readPreFeeTimer;
+  readPreFeeTimer = setInterval(async function () {
+    await readPreFeeCronJob.Execute(network_id, readPreFeeTimer);
+  }, 1000);
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao, dailyAccountDao);
   setTimeout(async function run() {
