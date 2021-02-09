@@ -58,5 +58,50 @@ module.exports = class ProgressDAO {
       }
     })
   }
+  upsertFee(fee, callback) {
+    const queryObject = { '_id': 'fee' };
+    const newObject = {
+      'total_fee': fee,
+    }
+    this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);
+  }
+  getFee(callback) {
+    const queryObject = { '_id': 'fee' };
+    this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
+      if (error) {
+        console.log(error);
+        callback(error);
+      } else if (!record) {
+        callback(Error('No fee record'));
+      } else {
+        var feeInfo = {};
+        feeInfo.total_fee = record.total_fee;
+        callback(error, feeInfo);
+      }
+    })
+  }
+
+  upsertFeeProgress(height, callback) {
+    const queryObject = { '_id': 'fee_progress' };
+    const newObject = {
+      'block_height': height,
+    }
+    this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);
+  }
+  getFeeProgress(callback) {
+    const queryObject = { '_id': 'fee_progress' };
+    this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
+      if (error) {
+        console.log(error);
+        callback(error);
+      } else if (!record) {
+        callback(Error('No fee progress record'));
+      } else {
+        var feeProgressInfo = {};
+        feeProgressInfo.block_height = record.block_height;
+        callback(error, feeProgressInfo);
+      }
+    })
+  }
 
 }
