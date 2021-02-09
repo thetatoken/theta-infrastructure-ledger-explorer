@@ -5,6 +5,9 @@ var { createIndex } = require('../../mongo-db/mongo-client.js');
 exports.sumCoin = function (weiAmountA, weiAmountB) {
     return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB))
 }
+exports.timeCoin = function(amountA, amountB) {
+    return new BigNumber(amountA).times(amountB);
+}
 exports.createIndexes = async function () {
     const createIndexAsync = bluebird.promisify(_createIndex);
     await createIndexAsync('block', { timestamp: -1 })

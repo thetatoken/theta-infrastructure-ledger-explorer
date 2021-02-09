@@ -175,7 +175,6 @@ exports.Execute = async function (network_id) {
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   } else {
-                    // TODO: get transaction's number
                     const tx = await transactionDao.getTransactionByPkAsync(transaction.hash);
                     transaction.number = tx.number;
                     validTransactionList.push(transaction);
@@ -209,7 +208,7 @@ exports.Execute = async function (network_id) {
         Logger.log(`Number of upsert check points: ${upsertCheckpointAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
-          upsertTransactionAsyncList, upsertCheckpointAsyncList)
+          upsertTransactionAsyncList, upsertCheckpointAsyncList, txHelper.updateFees(validTransactionList, progressDao))
       }
     })
     .then(() => {
