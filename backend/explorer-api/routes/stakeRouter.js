@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
-
+let startTime = +new Date();
+const cachePeriod = 6 * 1000 // 6 seconds
+let cacheData;
 var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -31,12 +33,23 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
 
   router.get("/stake/totalAmount", (req, res) => {
     console.log('Querying total staked tokens.');
+    let cur = +new Date();
+    if (cur - startTime < cachePeriod && cacheData) {
+      if (cacheData.type === 'stakeTotalAmout') {
+        res.status(200).send(cacheData);
+      } else if (cacheData.type === 'error_not_found') {
+        res.status(404).send(cacheData);
+      }
+      return;
+    }
+    startTime = cur;
     progressDao.getStakeProgressAsync()
       .then(info => {
         const data = ({
           type: 'stakeTotalAmout',
           body: { totalAmount: info.total_amount, totalNodes: info.holder_num },
         });
+        cacheData = data;
         res.status(200).send(data);
       })
       .catch(error => {
@@ -45,6 +58,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
             type: 'error_not_found',
             error
           });
+          cacheData = err;
           res.status(404).send(err);
         } else {
           console.log('ERR - ', error)
@@ -60,8 +74,8 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     const origin = req.headers.origin;
     const regex = /^chrome-extension:.*$/;
     const isChromeExt = origin && regex.test(origin);
-    if(!helper.validateHex(address, 40)){
-      res.status(400).send({type: 'invalid_address'})
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
       return;
     }
     stakeDao.getStakeByAddressAsync(address)
@@ -79,7 +93,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
           }
         }
         //TODO: Remove isChromeExt related after review
-        if(isChromeExt) {
+        if (isChromeExt) {
           const stakes = JSON.parse(JSON.stringify(stakeListInfo));
           stakeListInfo.stakes = stakes;
         }
