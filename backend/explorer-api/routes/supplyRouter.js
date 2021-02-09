@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
+var helper = require('../helper/utils');
 
-var supplyRouter = (app, progressDao, config) => {
+
+var supplyRouter = (app, progressDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to get total amount of Theta
@@ -40,6 +42,21 @@ var supplyRouter = (app, progressDao, config) => {
       })
   });
 
+  router.get("/supply/tfuel/burnt", async (req, res) => {
+    console.log('Querying the total Tfuel burnt amount.');
+    try {
+      let accountInfo = await rpc.getAccountAsync([{ 'address': '0x0' }]);
+      let burntAmount = JSON.parse(accountInfo).result.coins.tfuelwei;
+      const feeInfo = await progressDao.getFeeAsync()
+      burntAmount = helper.sumCoin(burntAmount, feeInfo.total_fee)
+      const data = ({
+        "total_tfule_burnt": burntAmount,
+      })
+      res.status(200).send(data);
+    } catch (e) {
+      res.status(400).send(err.message);
+    }
+  })
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

@@ -156,7 +156,7 @@ function main() {
       // stake router
       stakeRouter(app, stakeDao, accountDao, progressDao);
       // supply router
-      supplyRouter(app, progressDao, config);
+      supplyRouter(app, progressDao, rpc, config);
       // price router
       priceRouter(app, priceDao, progressDao, config)
       // accounting router
