@@ -6,7 +6,7 @@ exports.getBriefTxs = function (txs) {
     let fee;
     if (tx.type === 7) {
       const gasUsed = tx.receipt.GasUsed;
-      const gasPrice = tx.data.gas_price;
+      const gasPrice = tx.raw.gas_price;
       fee = {
         'thetawei': '0',
         'tfuelwei': helper.timeCoin(gasUsed, gasPrice)

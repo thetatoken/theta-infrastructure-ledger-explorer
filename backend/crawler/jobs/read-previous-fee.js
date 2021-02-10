@@ -36,6 +36,6 @@ exports.Execute = async function (network_id, readPreFeeTimer) {
     await txHelper.updateFees(txsInfoList, progressDao)
     await progressDao.upsertFeeProgressAsync(height - 1);
   } catch (e) {
-    console.log('Error occurs while updating fee and fee progress:', e);
+    console.log('Error occurs while updating fee and fee progress:', e.message);
   }
 }
