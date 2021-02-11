@@ -43,9 +43,11 @@ exports.updateFees = async function (transactions, progressDao) {
       const gasUsed = tx.receipt.GasUsed;
       const gasPrice = tx.data.gas_price;
       return helper.sumCoin(pre, helper.timeCoin(gasUsed, gasPrice));
-    } else if (tx.type !== null) {
-      let tfuelwei = tx.data.fee ? tx.data.fee.tfuelwei : 0;
+    } else if (tx.type != null) {
+      let tfuelwei = tx.data && tx.data.fee ? tx.data.fee.tfuelwei : 0;
       return helper.sumCoin(pre, tfuelwei);
+    } else {
+      return pre;
     }
   }, fee)
   await progressDao.upsertFeeAsync(updatedFee.toString());
