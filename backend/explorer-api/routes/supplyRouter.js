@@ -45,15 +45,16 @@ var supplyRouter = (app, progressDao, rpc, config) => {
   router.get("/supply/tfuel/burnt", async (req, res) => {
     console.log('Querying the total Tfuel burnt amount.');
     try {
-      let accountInfo = await rpc.getAccountAsync([{ 'address': '0x0' }]);
-      let burntAmount = JSON.parse(accountInfo).result.coins.tfuelwei;
+      let response = await rpc.getAccountAsync([{ 'address': '0x0' }]);
+      let account = JSON.parse(response).result;
+      let burntAmount = account ? account.coins.tfuelwei : 0;
       const feeInfo = await progressDao.getFeeAsync()
       burntAmount = helper.sumCoin(burntAmount, feeInfo.total_fee)
       const data = ({
         "total_tfule_burnt": burntAmount,
       })
       res.status(200).send(data);
-    } catch (e) {
+    } catch (err) {
       res.status(400).send(err.message);
     }
   })
