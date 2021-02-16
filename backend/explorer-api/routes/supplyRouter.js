@@ -51,7 +51,7 @@ var supplyRouter = (app, progressDao, rpc, config) => {
       const feeInfo = await progressDao.getFeeAsync()
       burntAmount = helper.sumCoin(burntAmount, feeInfo.total_fee).toFixed();
       const data = ({
-        "total_tfule_burnt": burntAmount,
+        "total_tfuel_burnt": burntAmount,
       })
       res.status(200).send(data);
     } catch (err) {
