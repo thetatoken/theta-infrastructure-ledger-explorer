@@ -47,11 +47,13 @@ var supplyRouter = (app, progressDao, rpc, config) => {
     try {
       let response = await rpc.getAccountAsync([{ 'address': '0x0' }]);
       let account = JSON.parse(response).result;
-      let burntAmount = account ? account.coins.tfuelwei : 0;
+      const addressZeroBalance = account ? account.coins.tfuelwei : 0;
       const feeInfo = await progressDao.getFeeAsync()
-      burntAmount = helper.sumCoin(burntAmount, feeInfo.total_fee).toFixed();
+      const burntAmount = helper.sumCoin(addressZeroBalance, feeInfo.total_fee).toFixed();
       const data = ({
-        "total_tfuel_burnt": burntAmount,
+        "address_zero_tfuelwei_balance": addressZeroBalance,
+        "total_tfuelwei_burnt_as_transaction_fee": feeInfo.total_fee,
+        "total_tfuelwei_burnt": burntAmount,
       })
       res.status(200).send(data);
     } catch (err) {
