@@ -4,6 +4,8 @@ var fs = require('fs');
 var rpc = require('./api/rpc.js');
 var Logger = require('./helper/logger');
 var mongoClient = require('../mongo-db/mongo-client.js')
+const Redis = require("ioredis");
+const redis = new Redis();
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
@@ -69,7 +71,9 @@ function main() {
       setupGetBlockCronJob(mongoClient, network_id);
     }
   });
-
+  redis.on("connect", () => {
+    console.log('connected to Redis');
+  });
   app.use(cors());
   app.get('/ping', function (req, res) {
     console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -106,13 +110,13 @@ function main() {
 
 function setupGetBlockCronJob(mongoClient, network_id) {
   // initialize DAOs
-  progressDao = new progressDaoLib(__dirname, mongoClient);
+  progressDao = new progressDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(progressDao);
 
-  blockDao = new blockDaoLib(__dirname, mongoClient);
+  blockDao = new blockDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(blockDao);
 
-  transactionDao = new transactionDaoLib(__dirname, mongoClient);
+  transactionDao = new transactionDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(transactionDao);
 
   accountDao = new accountDaoLib(__dirname, mongoClient);

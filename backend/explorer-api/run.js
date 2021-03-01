@@ -5,7 +5,8 @@ var compression = require('compression')
 
 var bluebird = require("bluebird");
 var rpc = require('../crawler/api/rpc.js');
-// var asClient = require('../db/aerospike-client.js')
+const Redis = require("ioredis");
+const redis = new Redis();
 var mongoClient = require('../mongo-db/mongo-client.js')
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
@@ -76,6 +77,9 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
+  redis.on("connect", () => {
+    console.log('connected to Redis');
+  });
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(config.mongo.uri, function (err) {
     if (err) {
@@ -83,11 +87,11 @@ function main() {
       process.exit(1);
     } else {
       console.log('Mongo connection succeeded');
-      blockDao = new blockDaoLib(__dirname, mongoClient);
+      blockDao = new blockDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(blockDao);
-      progressDao = new progressDaoLib(__dirname, mongoClient);
+      progressDao = new progressDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(progressDao);
-      transactionDao = new transactionDaoLib(__dirname, mongoClient);
+      transactionDao = new transactionDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(transactionDao);
       accountDao = new accountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountDao);
@@ -97,7 +101,7 @@ function main() {
       bluebird.promisifyAll(accountTxSendDao);
       stakeDao = new stakeDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(stakeDao);
-      priceDao = new priceDaoLib(__dirname, mongoClient);
+      priceDao = new priceDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(priceDao);
       txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(txHistoryDao);
@@ -169,6 +173,7 @@ function main() {
       // pushTopBlocks();
     }
   });
+
 }
 
 function onClientConnect(client) {

@@ -4,13 +4,16 @@
 
 module.exports = class priceDAO {
 
-  constructor(execDir, client) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.priceInfoCollection = 'price';
+    this.redis = redis;
   }
 
   upsertPrice(priceInfo, callback) {
     // console.log('priceInfo in upsert:', priceInfo)
+    let self = this;
+    const redis_key = `price_${priceInfo.name}`;
     const newObject = {
       'price': priceInfo.price,
       'volume_24h': priceInfo.volume_24h,
@@ -20,7 +23,15 @@ module.exports = class priceDAO {
       'last_updated': priceInfo.last_updated
     }
     const queryObject = { '_id': priceInfo.name };
-    this.client.upsert(this.priceInfoCollection, queryObject, newObject, callback);
+    this.client.upsert(this.priceInfoCollection, queryObject, newObject, function (error, record) {
+      if (error) {
+        console.log('ERR - ', error);
+      } else {
+        newObject._id = newObject.name;
+        self.redis.set(redis_key, JSON.stringify(newObject))
+        callback(error, record);
+      }
+    });
   }
 
   getPrice(callback) {
