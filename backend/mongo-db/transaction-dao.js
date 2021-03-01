@@ -6,7 +6,7 @@
 //  Require index: `db.transaction.createIndex({number:1,status:1})`
 //  Require index: `db.transaction.createIndex({number:-1,status:1})`
 //------------------------------------------------------------------------------
-
+const redis_key = 'tx_id';
 module.exports = class TransactionDAO {
 
   constructor(execDir, client, redis) {
@@ -17,7 +17,7 @@ module.exports = class TransactionDAO {
 
   upsertTransaction(transactionInfo, callback) {
     let self = this;
-    const redis_key = 'tx_id:' + transactionInfo.hash;
+    const redis_field = transactionInfo.hash;
     const newObject = {
       'hash': transactionInfo.hash,
       'type': transactionInfo.type,
@@ -33,7 +33,7 @@ module.exports = class TransactionDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.set(redis_key, JSON.stringify(newObject))
+        self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
         callback(error, record);
       }
     });
@@ -58,8 +58,8 @@ module.exports = class TransactionDAO {
   }
   getTransactionByPk(pk, callback) {
     let self = this;
-    const redis_key = 'tx_id:' + pk;
-    this.redis.get(redis_key, (err, reply) => {
+    const redis_field = pk;
+    this.redis.hget(redis_key, redis_field, (err, reply) => {
       if (err) {
         console.log('Redis get transaction by pk met error:', err);
       } else if (reply) {
@@ -83,7 +83,7 @@ module.exports = class TransactionDAO {
             transactionInfo.timestamp = record.timestamp;
             transactionInfo.status = record.status;
             transactionInfo.receipt = record.receipt;
-            self.redis.set(redis_key, JSON.stringify(newObject))
+            self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
             callback(error, transactionInfo);
           }
         })
@@ -108,8 +108,9 @@ module.exports = class TransactionDAO {
   }
   getTransactionsByPk(pks, callback) {
     let self = this;
-    const redis_key = 'tx_ids:' + pks.joinn('_');
-    this.redis.get(redis_key, (err, reply) => {
+    const redis_key = 'tx_ids'
+    const redis_field = pks.joinn('_');
+    this.redis.hget(redis_key, redis_field, (err, reply) => {
       if (err) {
         console.log('Redis get transactions by pks met error:', err);
       } else if (reply) {
@@ -123,7 +124,7 @@ module.exports = class TransactionDAO {
           } else if (!transactions) {
             callback(Error('NOT_FOUND - ' + pks));
           } else {
-            self.redis.set(redis_key, JSON.stringify(transactions))
+            self.redis.hset(redis_key, redis_field, JSON.stringify(transactions))
             callback(error, transactions);
           }
         })

@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 //  DAO for price
 //------------------------------------------------------------------------------
+const redis_key = 'price';
 
 module.exports = class priceDAO {
 
@@ -13,7 +14,7 @@ module.exports = class priceDAO {
   upsertPrice(priceInfo, callback) {
     // console.log('priceInfo in upsert:', priceInfo)
     let self = this;
-    const redis_key = `price_${priceInfo.name}`;
+    const redis_field = priceInfo.name;
     const newObject = {
       'price': priceInfo.price,
       'volume_24h': priceInfo.volume_24h,
@@ -28,22 +29,34 @@ module.exports = class priceDAO {
         console.log('ERR - ', error);
       } else {
         newObject._id = newObject.name;
-        self.redis.set(redis_key, JSON.stringify(newObject))
+        self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
         callback(error, record);
       }
     });
   }
 
   getPrice(callback) {
-    const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
-    this.client.query(this.priceInfoCollection, queryObject, function (error, recordList) {
-      if (error) {
-        console.log('ERR - Prices:', error);
-        // callback(error);
-      } else if (!recordList || recordList.length === 0) {
-        callback(Error('NOT_FOUND - Prices'));
+    let self = this;
+    this.redis.hmget(redis_key, 'THETA', 'TFUEL', (err, list) => {
+      if (err) {
+        console.log('Redis get price met error:', err);
+      } else if (list[0] && list[1]) {
+        console.log('Redis get price returns.');
+        const records = list.map(obj_str => JSON.parse(obj_str))
+        callback(null, records);
       } else {
-        callback(error, recordList)
+        const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
+        this.client.query(this.priceInfoCollection, queryObject, function (error, recordList) {
+          if (error) {
+            console.log('ERR - Prices:', error);
+            callback(error);
+          } else if (!recordList || recordList.length === 0) {
+            callback(Error('NOT_FOUND - Prices'));
+          } else {
+            self.redis.hmset(redis_key, 'THETA', JSON.stringify(recordList[0]), 'TFUEL', JSON.stringify(recordList[1]));
+            callback(error, recordList)
+          }
+        })
       }
     })
   }
