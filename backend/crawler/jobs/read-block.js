@@ -49,6 +49,7 @@ exports.Execute = async function (network_id) {
   await progressDao.getProgressAsync(network_id)
     .then(function (progressInfo) {
       Logger.log('Start a new crawler progress');
+      console.log('progressInfo:', progressInfo);
       txs_count = progressInfo.count;
       crawled_block_height_progress = progressInfo.height;
       Logger.log('DB transaction count progress: ' + txs_count.toString());
@@ -108,6 +109,8 @@ exports.Execute = async function (network_id) {
       if (blockDataList) {
         var upsertBlockAsyncList = [];
         var upsertVcpAsyncList = [];
+        var updateVcpAsyncList = [];
+        var updateGcpAsyncList = [];
         var upsertGcpAsyncList = [];
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
@@ -119,21 +122,27 @@ exports.Execute = async function (network_id) {
 
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              if (upsertVcpAsyncList.length > 0) continue;
               stakes.vcp = result.result.BlockHashVcpPairs;
-              await stakeDao.removeRecordsAsync('vcp');
+              // await stakeDao.removeRecordsAsync('vcp');
               result.result.BlockHashVcpPairs.forEach(vcpPair => {
                 vcpPair.Vcp.SortedCandidates.forEach(candidate => {
-                  upsertVcpAsyncList.push(stakeHelper.updateStake(candidate, 'vcp', stakeDao));
+                  updateVcpAsyncList.push(candidate);
+                  // upsertVcpAsyncList.push(stakeHelper.updateStake(candidate, 'vcp', stakeDao));
                 })
               })
+              upsertVcpAsyncList.push(stakeHelper.updateStakes(updateVcpAsyncList, 'vcp', stakeDao));
             } else if (result.result.BlockHashGcpPairs) {
+              if (upsertGcpAsyncList.length > 0) continue;
               stakes.gcp = result.result.BlockHashGcpPairs;
-              await stakeDao.removeRecordsAsync('gcp');
+              // await stakeDao.removeRecordsAsync('gcp');
               result.result.BlockHashGcpPairs.forEach(gcpPair => {
                 gcpPair.Gcp.SortedGuardians.forEach(candidate => {
-                  upsertGcpAsyncList.push(stakeHelper.updateStake(candidate, 'gcp', stakeDao));
+                  updateGcpAsyncList.push(candidate);
+                  // upsertGcpAsyncList.push(stakeHelper.updateStake(candidate, 'gcp', stakeDao));
                 })
               })
+              upsertGcpAsyncList.push(stakeHelper.updateStakes(updateGcpAsyncList, 'gcp', stakeDao));
             } else {  //handle block response
               var txs = result.result.transactions;
               const blockInfo = {
