@@ -13,7 +13,8 @@ module.exports = class BlockDAO {
 
   upsertBlock(blockInfo, callback) {
     let self = this;
-    const queryObject = { '_id': parseInt(blockInfo.height) };
+    let height = parseInt(blockInfo.height);
+    const queryObject = { '_id': height };
     const newObject = {
       'epoch': blockInfo.epoch,
       'status': blockInfo.status,

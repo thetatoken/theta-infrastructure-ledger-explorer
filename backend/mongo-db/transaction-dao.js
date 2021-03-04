@@ -109,7 +109,7 @@ module.exports = class TransactionDAO {
   getTransactionsByPk(pks, callback) {
     let self = this;
     const redis_key = 'tx_ids'
-    const redis_field = pks.joinn('_');
+    const redis_field = pks.join('_');
     this.redis.hget(redis_key, redis_field, (err, reply) => {
       if (err) {
         console.log('Redis get transactions by pks met error:', err);
