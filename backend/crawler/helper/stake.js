@@ -6,6 +6,7 @@ exports.updateStake = async function (candidate, type, stakeDao) {
   let insertList = [];
   stakes.forEach(stake => {
     const stakeInfo = {
+      '_id': `${type}_${holder}_${stake.source}`,
       'type': type,
       'holder': holder,
       'source': stake.source,
@@ -17,7 +18,9 @@ exports.updateStake = async function (candidate, type, stakeDao) {
   });
   await Promise.all(insertList);
 }
-
+exports.updateStakes = async function (candidateList, type, stakeDao) {
+  await stakeDao.updateStakesAsync(candidateList, type);
+}
 exports.updateTotalStake = function (totalStake, progressDao) {
   let total = 0;
   let holders = new Set();
