@@ -18,8 +18,12 @@ exports.Execute = async function (network_id, readPreFeeTimer) {
     height = feeProgressInfo.block_height;
   } catch (e) {
     if (e.message === 'No fee progress record') {
-      const progressInfo = await progressDao.getProgressAsync(network_id);
-      height = progressInfo.height;
+      try {
+        const progressInfo = await progressDao.getProgressAsync(network_id);
+        height = progressInfo.height;
+      } catch (e) {
+        height = 0;
+      }
     } else {
       console.log('Error occurs in get fee:', e)
     }
