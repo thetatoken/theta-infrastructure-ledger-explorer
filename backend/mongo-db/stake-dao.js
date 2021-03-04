@@ -5,14 +5,84 @@
 
 module.exports = class stakeDAO {
 
-  constructor(execDir, client) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.stakeInfoCollection = 'stake';
+    this.redis = redis;
   }
 
   insert(stakeInfo, callback) {
-    this.client.insert(this.stakeInfoCollection, stakeInfo, callback);
+    let self = this;
+    const queryObj = { _id: stakeInfo._id };
+    this.client.upsert(this.stakeInfoCollection, queryObj, stakeInfo, async function (error, record) {
+      if (error) {
+        console.log('error happend in stake upsert')
+        // console.log('ERR - ', error);
+      } else {
+        const redis_key = `stake_${stakeInfo.type}`;
+        const field = `${stakeInfo.type}_${stakeInfo.holder}_${stakeInfo.source}`;
+        await self.redis.hset(redis_key, field, JSON.stringify(stakeInfo))
+        console.log('In stake upsert else.')
+        callback(error, record);
+      }
+    });
   }
+
+  async updateStakes(candidateList, type, callback) {
+    console.log('In update stakes.')
+    let updateStakeList = [];
+    let existKeys = new Set();
+    try {
+      const keys = await this.redis.hkeys(`stake_${type}`);
+      console.log('keys:', type, keys)
+      console.log(`Redis get stakes by type:${type} returns.`);
+      existKeys = new Set(keys);
+    } catch (e) {
+      console.log(`Redis get stakes by type:${type} met error:`, e);
+    }
+    for (let candidate of candidateList) {
+      const holder = candidate.Holder;
+      const stakes = candidate.Stakes;
+      for (let stake of stakes) {
+        const id = `${type}_${holder}_${stake.source}`;
+        const stakeInfo = {
+          '_id': id,
+          'type': type,
+          'holder': holder,
+          'source': stake.source,
+          'amount': stake.amount,
+          'withdrawn': stake.withdrawn,
+          'return_height': stake.return_height
+        }
+        if (existKeys.has(id)) {
+          // console.log(`In has id: ${id}`)
+          try {
+            let stakeStr = await this.redis.hget(`stake_${type}`, id);
+            // console.log('compare:', JSON.stringify(stakeInfo) === stakeStr);
+            existKeys.delete(id);
+            // console.log('existKeys:', existKeys)
+            if (stakeStr !== JSON.stringify(stakeInfo)) {
+              updateStakeList.push(stakeInfo);
+            }
+          } catch (e) {
+            console.log(`Redis get stakes by ${type} ${id} met error:`, e)
+          }
+        } else {
+          updateStakeList.push(stakeInfo);
+        }
+      };
+    };
+    let deleteKeys = [...existKeys];
+    console.log('updateStakeList:', updateStakeList);
+    console.log('deleteKeys:', deleteKeys);
+
+    for (let stake of updateStakeList) {
+      await this.insert(stake, () => { });
+    }
+    await this.removeRecordsById(type, deleteKeys, () => { });
+    callback();
+  }
+
 
   getAllStakes(callback) {
     this.client.findAll(this.stakeInfoCollection, function (error, recordList) {
@@ -50,7 +120,21 @@ module.exports = class stakeDAO {
       })
     })
   }
-
+  removeRecordsById(type, ids, callback) {
+    let self = this;
+    const queryObject = { id: { $in: ids }, 'type': type };
+    this.client.remove(this.stakeInfoCollection, queryObject, async function (err, res) {
+      if (err) {
+        console.log('ERR - Remove ids', err, type, ids);
+        callback(err);
+      }
+      const redis_key = `stake_${type}`;
+      for (let id of ids) {
+        self.redis.hdel(redis_key, id);
+      }
+      callback(err, res);
+    })
+  }
   removeRecords(type, callback) {
     const queryObject = { 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, function (err, res) {

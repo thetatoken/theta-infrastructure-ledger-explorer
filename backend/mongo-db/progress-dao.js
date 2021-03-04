@@ -23,7 +23,10 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.set(redis_key, JSON.stringify(newObject))
+        var progressInfo = {};
+        progressInfo.height = newObject.lst_blk_height;
+        progressInfo.count = newObject.txs_count;
+        self.redis.set(redis_key, JSON.stringify(progressInfo))
         callback(error, record);
       }
     });
