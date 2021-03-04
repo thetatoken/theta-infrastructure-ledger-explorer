@@ -60,6 +60,8 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
+  bluebird.promisifyAll(redis);
+
   // connect to mongoDB
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(config.mongo.uri, function (error) {
@@ -125,7 +127,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountTxDao);
 
-  stakeDao = new stakeDaoLib(__dirname, mongoClient);
+  stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(stakeDao);
 
   txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);

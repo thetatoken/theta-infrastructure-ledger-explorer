@@ -77,9 +77,12 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
+  bluebird.promisifyAll(redis);
+
   redis.on("connect", () => {
     console.log('connected to Redis');
   });
+
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(config.mongo.uri, function (err) {
     if (err) {
@@ -99,7 +102,7 @@ function main() {
       bluebird.promisifyAll(accountTxDao);
       accountTxSendDao = new accountTxSendDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountTxSendDao);
-      stakeDao = new stakeDaoLib(__dirname, mongoClient);
+      stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(stakeDao);
       priceDao = new priceDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(priceDao);
