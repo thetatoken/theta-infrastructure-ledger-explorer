@@ -5,8 +5,6 @@ var compression = require('compression')
 
 var bluebird = require("bluebird");
 var rpc = require('../crawler/api/rpc.js');
-const Redis = require("ioredis");
-const redis = new Redis();
 var mongoClient = require('../mongo-db/mongo-client.js')
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
@@ -37,6 +35,11 @@ var io;
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
+var Redis = require("ioredis");
+var redis = null;
+var redisConfig = null;
+var redisEnabled = false;
+
 var config = null;
 var configFileName = 'config.cfg';
 var blockDao = null;
@@ -77,11 +80,16 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
-  bluebird.promisifyAll(redis);
 
-  redis.on("connect", () => {
-    console.log('connected to Redis');
-  });
+  redisConfig = config.redis;
+  redisEnabled = redisConfig.enabled;
+  if (redisConfig && redisEnabled) {
+    redis = new Redis();
+    bluebird.promisifyAll(redis);
+    redis.on("connect", () => {
+      console.log('connected to Redis');
+    });
+  }
 
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
   mongoClient.connect(config.mongo.uri, function (err) {
@@ -90,11 +98,11 @@ function main() {
       process.exit(1);
     } else {
       console.log('Mongo connection succeeded');
-      blockDao = new blockDaoLib(__dirname, mongoClient, redis);
+      blockDao = new blockDaoLib(__dirname, mongoClient, redis, redisEnabled);
       bluebird.promisifyAll(blockDao);
-      progressDao = new progressDaoLib(__dirname, mongoClient, redis);
+      progressDao = new progressDaoLib(__dirname, mongoClient, redis, redisEnabled);
       bluebird.promisifyAll(progressDao);
-      transactionDao = new transactionDaoLib(__dirname, mongoClient, redis);
+      transactionDao = new transactionDaoLib(__dirname, mongoClient, redis, redisEnabled);
       bluebird.promisifyAll(transactionDao);
       accountDao = new accountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountDao);
@@ -102,9 +110,9 @@ function main() {
       bluebird.promisifyAll(accountTxDao);
       accountTxSendDao = new accountTxSendDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountTxSendDao);
-      stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
+      stakeDao = new stakeDaoLib(__dirname, mongoClient, redis, redisEnabled);
       bluebird.promisifyAll(stakeDao);
-      priceDao = new priceDaoLib(__dirname, mongoClient, redis);
+      priceDao = new priceDaoLib(__dirname, mongoClient, redis, redisEnabled);
       bluebird.promisifyAll(priceDao);
       txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(txHistoryDao);

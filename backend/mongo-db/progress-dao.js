@@ -4,10 +4,11 @@
 
 module.exports = class ProgressDAO {
 
-  constructor(execDir, client, redis) {
+  constructor(execDir, client, redis, redisEnabled) {
     this.client = client;
     this.progressInfoCollection = 'progress';
     this.redis = redis;
+    this.redisEnabled = redisEnabled;
   }
 
   upsertProgress(network, block_height, count, callback) {
@@ -26,38 +27,51 @@ module.exports = class ProgressDAO {
         var progressInfo = {};
         progressInfo.height = newObject.lst_blk_height;
         progressInfo.count = newObject.txs_count;
-        self.redis.set(redis_key, JSON.stringify(progressInfo))
+        if (self.redisEnabled) {
+          self.redis.set(redis_key, JSON.stringify(progressInfo))
+        }
         callback(error, record);
       }
     });
   }
   getProgress(network, callback) {
     let self = this;
-    const redis_key = 'progress_network:' + network;
-    this.redis.get(redis_key, (err, reply) => {
-      if (err) {
-        console.log('Redis get progress met error:', err);
-      } else if (reply) {
-        console.log('Redis get progress returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { '_id': network };
-        this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
-          if (error) {
-            console.log(error);
-            callback(error);
-          } else if (!record) {
-            callback(Error('No progress record'));
-          } else {
-            var progressInfo = {};
-            progressInfo.height = record.lst_blk_height;
-            progressInfo.count = record.txs_count;
+    if (this.redisEnabled) {
+      const redis_key = 'progress_network:' + network;
+      this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get progress met error:', err);
+        } else if (reply) {
+          console.log('Redis get progress returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          console.log('Database get progress.');
+          query();
+        }
+      })
+    } else {
+      query();
+    }
+    function query() {
+      const queryObject = { '_id': network };
+      self.client.findOne(self.progressInfoCollection, queryObject, function (error, record) {
+        if (error) {
+          console.log(error);
+          callback(error);
+        } else if (!record) {
+          callback(Error('No progress record'));
+        } else {
+          var progressInfo = {};
+          progressInfo.height = record.lst_blk_height;
+          progressInfo.count = record.txs_count;
+          if (self.redisEnabled) {
             self.redis.set(redis_key, JSON.stringify(progressInfo));
-            callback(error, progressInfo);
           }
-        })
-      }
-    })
+          callback(error, progressInfo);
+        }
+      })
+    }
+
   }
   upsertStakeProgress(total_amount, holder_num, callback) {
     let self = this;
@@ -71,38 +85,49 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.set(redis_key, JSON.stringify(newObject))
+        if (self.redisEnabled) {
+          self.redis.set(redis_key, JSON.stringify(newObject))
+        }
         callback(error, record);
       }
     });
   }
   getStakeProgress(callback) {
     let self = this;
-    const redis_key = 'progress_stake';
-    this.redis.get(redis_key, (err, reply) => {
-      if (err) {
-        console.log('Redis get stake progress met error:', err);
-      } else if (reply) {
-        console.log('Redis get stake progress returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { '_id': 'stake' };
-        this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
-          if (error) {
-            console.log(error);
-            callback(error);
-          } else if (!record) {
-            callback(Error('No stake progress record'));
-          } else {
-            var stakesInfo = {};
-            stakesInfo.total_amount = record.total_amount;
-            stakesInfo.holder_num = record.holder_num;
+    if (this.redisEnabled) {
+      const redis_key = 'progress_stake';
+      this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get stake progress met error:', err);
+        } else if (reply) {
+          console.log('Redis get stake progress returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          console.log('Database get stake progress.');
+          query();
+        }
+      })
+    } else {
+      query()
+    }
+    function query() {
+      self.client.findOne(self.progressInfoCollection, queryObject, function (error, record) {
+        if (error) {
+          console.log(error);
+          callback(error);
+        } else if (!record) {
+          callback(Error('No stake progress record'));
+        } else {
+          var stakesInfo = {};
+          stakesInfo.total_amount = record.total_amount;
+          stakesInfo.holder_num = record.holder_num;
+          if (self.redisEnabled) {
             self.redis.set(redis_key, JSON.stringify(stakesInfo));
-            callback(error, stakesInfo);
           }
-        })
-      }
-    })
+          callback(error, stakesInfo);
+        }
+      })
+    }
   }
   upsertFee(fee, callback) {
     let self = this;
@@ -115,37 +140,49 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.set(redis_key, JSON.stringify(newObject));
+        if (self.redisEnabled) {
+          self.redis.set(redis_key, JSON.stringify(newObject));
+        }
         callback(error, record);
       }
     });
   }
   getFee(callback) {
     let self = this;
-    const redis_key = 'progress_fee';
-    this.redis.get(redis_key, (err, reply) => {
-      if (err) {
-        console.log('Redis get fee progress met error:', err);
-      } else if (reply) {
-        console.log('Redis get fee progress returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { '_id': 'fee' };
-        this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
-          if (error) {
-            console.log(error);
-            callback(error);
-          } else if (!record) {
-            callback(Error('No fee record'));
-          } else {
-            var feeInfo = {};
-            feeInfo.total_fee = record.total_fee;
+    if (this.redisEnabled) {
+      const redis_key = 'progress_fee';
+      this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get fee progress met error:', err);
+        } else if (reply) {
+          console.log('Redis get fee progress returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          console.log('Database get fee progress.');
+          query();
+        }
+      })
+    } else {
+      query()
+    }
+    function query() {
+      const queryObject = { '_id': 'fee' };
+      self.client.findOne(self.progressInfoCollection, queryObject, function (error, record) {
+        if (error) {
+          console.log(error);
+          callback(error);
+        } else if (!record) {
+          callback(Error('No fee record'));
+        } else {
+          var feeInfo = {};
+          feeInfo.total_fee = record.total_fee;
+          if (self.redisEnabled) {
             self.redis.set(redis_key, JSON.stringify(feeInfo))
-            callback(error, feeInfo);
           }
-        })
-      }
-    })
+          callback(error, feeInfo);
+        }
+      })
+    }
   }
 
   upsertFeeProgress(height, callback) {
@@ -159,36 +196,48 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.set(redis_key, JSON.stringify(newObject));
+        if (self.redisEnabled) {
+          self.redis.set(redis_key, JSON.stringify(newObject));
+        }
         callback(error, record);
       }
     });
   }
   getFeeProgress(callback) {
     let self = this;
-    const redis_key = 'progress_fee_height';
-    this.redis.get(redis_key, (err, reply) => {
-      if (err) {
-        console.log('Redis get fee height progress met error:', err);
-      } else if (reply) {
-        console.log('Redis get fee height progress returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { '_id': 'fee_progress' };
-        this.client.findOne(this.progressInfoCollection, queryObject, function (error, record) {
-          if (error) {
-            console.log(error);
-            callback(error);
-          } else if (!record) {
-            callback(Error('No fee progress record'));
-          } else {
-            var feeProgressInfo = {};
-            feeProgressInfo.block_height = record.block_height;
+    if (this.redisEnabled) {
+      const redis_key = 'progress_fee_height';
+      this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get fee height progress met error:', err);
+        } else if (reply) {
+          console.log('Redis get fee height progress returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          console.log('Database get fee height progress.');
+          query(self.redisEnabled);
+        }
+      })
+    } else {
+      query(this.redisEnabled);
+    }
+    function query(redisEnabled) {
+      const queryObject = { '_id': 'fee_progress' };
+      self.client.findOne(self.progressInfoCollection, queryObject, function (error, record) {
+        if (error) {
+          console.log(error);
+          callback(error);
+        } else if (!record) {
+          callback(Error('No fee progress record'));
+        } else {
+          var feeProgressInfo = {};
+          feeProgressInfo.block_height = record.block_height;
+          if (redisEnabled) {
             self.redis.set(redis_key, JSON.stringify(feeProgressInfo));
-            callback(error, feeProgressInfo);
           }
-        })
-      }
-    })
+          callback(error, feeProgressInfo);
+        }
+      })
+    }
   }
 }

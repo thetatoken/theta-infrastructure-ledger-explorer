@@ -27,5 +27,8 @@
     "cert":{
         "key": "",
         "crt": ""
+    },
+    "redis": {
+        "enabled": false
     }
 }

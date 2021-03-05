@@ -4,8 +4,6 @@ var fs = require('fs');
 var rpc = require('./api/rpc.js');
 var Logger = require('./helper/logger');
 var mongoClient = require('../mongo-db/mongo-client.js')
-const Redis = require("ioredis");
-const redis = new Redis();
 var progressDaoLib = require('../mongo-db/progress-dao.js');
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
@@ -18,6 +16,11 @@ var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
+
+var Redis = require("ioredis");
+var redis;
+var redisConfig = null;
+var redisEnabled = false;
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readPreFeeCronJob = require('./jobs/read-previous-fee.js');
@@ -55,12 +58,20 @@ function main() {
     Logger.log(err);
     process.exit(1);
   }
-  Logger.log(config);
+  Logger.log(JSON.stringify(config));
   const network_id = config.blockchain.network_id;
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
-  bluebird.promisifyAll(redis);
+  redisConfig = config.redis;
+  redisEnabled = redisConfig.enabled;
+  if (redisConfig && redisEnabled) {
+    redis = new Redis();
+    bluebird.promisifyAll(redis);
+    redis.on("connect", () => {
+      console.log('connected to Redis');
+    });
+  }
 
   // connect to mongoDB
   mongoClient.init(__dirname, config.mongo.address, config.mongo.port, config.mongo.dbName);
@@ -73,9 +84,7 @@ function main() {
       setupGetBlockCronJob(mongoClient, network_id);
     }
   });
-  redis.on("connect", () => {
-    console.log('connected to Redis');
-  });
+
   app.use(cors());
   app.get('/ping', function (req, res) {
     console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -112,13 +121,13 @@ function main() {
 
 function setupGetBlockCronJob(mongoClient, network_id) {
   // initialize DAOs
-  progressDao = new progressDaoLib(__dirname, mongoClient, redis);
+  progressDao = new progressDaoLib(__dirname, mongoClient, redis, redisEnabled);
   bluebird.promisifyAll(progressDao);
 
-  blockDao = new blockDaoLib(__dirname, mongoClient, redis);
+  blockDao = new blockDaoLib(__dirname, mongoClient, redis, redisEnabled);
   bluebird.promisifyAll(blockDao);
 
-  transactionDao = new transactionDaoLib(__dirname, mongoClient, redis);
+  transactionDao = new transactionDaoLib(__dirname, mongoClient, redis, redisEnabled);
   bluebird.promisifyAll(transactionDao);
 
   accountDao = new accountDaoLib(__dirname, mongoClient);
@@ -127,7 +136,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountTxDao);
 
-  stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
+  stakeDao = new stakeDaoLib(__dirname, mongoClient, redis, redisEnabled);
   bluebird.promisifyAll(stakeDao);
 
   txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);

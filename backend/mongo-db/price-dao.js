@@ -5,10 +5,11 @@ const redis_key = 'price';
 
 module.exports = class priceDAO {
 
-  constructor(execDir, client, redis) {
+  constructor(execDir, client, redis, redisEnabled) {
     this.client = client;
     this.priceInfoCollection = 'price';
     this.redis = redis;
+    this.redisEnabled = redisEnabled;
   }
 
   upsertPrice(priceInfo, callback) {
@@ -29,7 +30,9 @@ module.exports = class priceDAO {
         console.log('ERR - ', error);
       } else {
         newObject._id = newObject.name;
-        self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
+        if (self.redisEnabled) {
+          self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
+        }
         callback(error, record);
       }
     });
@@ -37,29 +40,39 @@ module.exports = class priceDAO {
 
   async getPrice(callback) {
     let self = this;
-    let list = [];
-    try {
-      list = await this.redis.hmget(redis_key, 'THETA', 'TFUEL');
-    } catch (e) {
-      console.log('Redis get price met error:', err);
-    }
-    if (list[0] && list[1]) {
-      console.log('Redis get price returns.');
-      const records = list.map(obj_str => JSON.parse(obj_str))
-      callback(null, records);
-      return;
-    }
-    const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
-    this.client.query(this.priceInfoCollection, queryObject, function (error, recordList) {
-      if (error) {
-        console.log('ERR - Prices:', error);
-        callback(error);
-      } else if (!recordList || recordList.length === 0) {
-        callback(Error('NOT_FOUND - Prices'));
-      } else {
-        self.redis.hmset(redis_key, 'THETA', JSON.stringify(recordList[0]), 'TFUEL', JSON.stringify(recordList[1]));
-        callback(error, recordList)
+    if (this.redisEnabled) {
+      let list = [];
+      try {
+        list = await this.redis.hmget(redis_key, 'THETA', 'TFUEL');
+      } catch (e) {
+        console.log('Redis get price met error:', e);
       }
-    })
+      if (list[0] && list[1]) {
+        console.log('Redis get price returns.');
+        const records = list.map(obj_str => JSON.parse(obj_str))
+        callback(null, records);
+        return;
+      }
+      query();
+    } else {
+      query();
+    }
+
+    function query() {
+      const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
+      self.client.query(self.priceInfoCollection, queryObject, function (error, recordList) {
+        if (error) {
+          console.log('ERR - Prices:', error);
+          callback(error);
+        } else if (!recordList || recordList.length === 0) {
+          callback(Error('NOT_FOUND - Prices'));
+        } else {
+          if (self.redisEnabled) {
+            self.redis.hmset(redis_key, 'THETA', JSON.stringify(recordList[0]), 'TFUEL', JSON.stringify(recordList[1]));
+          }
+          callback(error, recordList)
+        }
+      })
+    }
   }
 }

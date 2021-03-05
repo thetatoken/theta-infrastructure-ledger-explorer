@@ -65,7 +65,6 @@ var blockRouter = (app, blockDao, progressDao, checkpointDao, config) => {
                   voted = voted.plus(multi ? theta : 0);
                   deposited = deposited.plus(theta)
                 })
-                console.log(blockInfo.guardian_votes.Multiplies[j], j, blockInfo.guardian_votes.Multiplies.length)
                 j += skip ? 0 : 1;
               }
               blockInfo.total_deposited_guardian_stakes = deposited;

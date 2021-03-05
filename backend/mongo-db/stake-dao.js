@@ -5,10 +5,11 @@
 
 module.exports = class stakeDAO {
 
-  constructor(execDir, client, redis) {
+  constructor(execDir, client, redis, redisEnabled) {
     this.client = client;
     this.stakeInfoCollection = 'stake';
     this.redis = redis;
+    this.redisEnabled = redisEnabled;
   }
 
   insert(stakeInfo, callback) {
@@ -21,14 +22,40 @@ module.exports = class stakeDAO {
       } else {
         const redis_key = `stake_${stakeInfo.type}`;
         const field = `${stakeInfo.type}_${stakeInfo.holder}_${stakeInfo.source}`;
-        await self.redis.hset(redis_key, field, JSON.stringify(stakeInfo))
+        if (self.redisEnabled) {
+          await self.redis.hset(redis_key, field, JSON.stringify(stakeInfo))
+        }
         console.log('In stake upsert else.')
         callback(error, record);
       }
     });
   }
-
   async updateStakes(candidateList, type, callback) {
+    if (this.redisEnabled) {
+      await this.updateStakesWithRedis(candidateList, type, callback);
+    } else {
+      await this.removeRecords(type, () => { });
+      for (let candidate of candidateList) {
+        const holder = candidate.Holder;
+        const stakes = candidate.Stakes;
+        for (let stake of stakes) {
+          const id = `${type}_${holder}_${stake.source}`;
+          const stakeInfo = {
+            '_id': id,
+            'type': type,
+            'holder': holder,
+            'source': stake.source,
+            'amount': stake.amount,
+            'withdrawn': stake.withdrawn,
+            'return_height': stake.return_height
+          }
+          await this.insert(stakeInfo, () => { });
+        }
+      }
+      callback();
+    }
+  }
+  async updateStakesWithRedis(candidateList, type, callback) {
     console.log('In update stakes.')
     let updateStakeList = [];
     let existKeys = new Set();

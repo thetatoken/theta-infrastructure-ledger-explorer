@@ -5,14 +5,19 @@
 //  Require index: `db.transaction.createIndex({timestamp:-1})`
 //  Require index: `db.transaction.createIndex({number:1,status:1})`
 //  Require index: `db.transaction.createIndex({number:-1,status:1})`
+
+const { query } = require("./mongo-client");
+
 //------------------------------------------------------------------------------
 const redis_key = 'tx_id';
 module.exports = class TransactionDAO {
 
-  constructor(execDir, client, redis) {
+  constructor(execDir, client, redis, redisEnabled) {
     this.client = client;
     this.transactionInfoCollection = 'transaction';
     this.redis = redis;
+    this.redisEnabled = redisEnabled;
+
   }
 
   upsertTransaction(transactionInfo, callback) {
@@ -33,7 +38,9 @@ module.exports = class TransactionDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
+        if (self.redisEnabled) {
+          self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
+        }
         callback(error, record);
       }
     });
@@ -59,36 +66,46 @@ module.exports = class TransactionDAO {
   getTransactionByPk(pk, callback) {
     let self = this;
     const redis_field = pk;
-    this.redis.hget(redis_key, redis_field, (err, reply) => {
-      if (err) {
-        console.log('Redis get transaction by pk met error:', err);
-      } else if (reply) {
-        console.log('Redis get transaction by pk returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { '_id': pk };
-        this.client.findOne(this.transactionInfoCollection, queryObject, function (error, record) {
-          if (error) {
-            console.log('ERR - ', error, pk);
-            callback(error);
-          } else if (!record) {
-            callback(Error('NOT_FOUND - ' + pk));
-          } else {
-            var transactionInfo = {};
-            transactionInfo.hash = record.hash;
-            transactionInfo.type = record.type;
-            transactionInfo.data = record.data;
-            transactionInfo.number = record.number;
-            transactionInfo.block_height = record.block_height;
-            transactionInfo.timestamp = record.timestamp;
-            transactionInfo.status = record.status;
-            transactionInfo.receipt = record.receipt;
-            self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
-            callback(error, transactionInfo);
+    if (this.redisEnabled) {
+      this.redis.hget(redis_key, redis_field, (err, reply) => {
+        if (err) {
+          console.log('Redis get transaction by pk met error:', err);
+        } else if (reply) {
+          console.log('Redis get transaction by pk returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          query();
+        }
+      })
+    } else {
+      query();
+    }
+
+    function query() {
+      const queryObject = { '_id': pk };
+      self.client.findOne(self.transactionInfoCollection, queryObject, function (error, record) {
+        if (error) {
+          console.log('ERR - ', error, pk);
+          callback(error);
+        } else if (!record) {
+          callback(Error('NOT_FOUND - ' + pk));
+        } else {
+          var transactionInfo = {};
+          transactionInfo.hash = record.hash;
+          transactionInfo.type = record.type;
+          transactionInfo.data = record.data;
+          transactionInfo.number = record.number;
+          transactionInfo.block_height = record.block_height;
+          transactionInfo.timestamp = record.timestamp;
+          transactionInfo.status = record.status;
+          transactionInfo.receipt = record.receipt;
+          if (self.redisEnabled) {
+            self.redis.hset(redis_key, redis_field, JSON.stringify(transactionInfo))
           }
-        })
-      }
-    })
+          callback(error, transactionInfo);
+        }
+      })
+    }
   }
   getTotalNumberByHour(hour, callback) {
     let queryObject = null;
@@ -110,25 +127,35 @@ module.exports = class TransactionDAO {
     let self = this;
     const redis_key = 'tx_ids'
     const redis_field = pks.join('_');
-    this.redis.hget(redis_key, redis_field, (err, reply) => {
-      if (err) {
-        console.log('Redis get transactions by pks met error:', err);
-      } else if (reply) {
-        console.log('Redis get transactions by pks returns.');
-        callback(null, JSON.parse(reply));
-      } else {
-        const queryObject = { _id: { $in: pks } };
-        this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
-          if (error) {
-            console.log('ERR - ', error, pks);
-          } else if (!transactions) {
-            callback(Error('NOT_FOUND - ' + pks));
-          } else {
+    if (this.redisEnabled) {
+      this.redis.hget(redis_key, redis_field, (err, reply) => {
+        if (err) {
+          console.log('Redis get transactions by pks met error:', err);
+        } else if (reply) {
+          console.log('Redis get transactions by pks returns.');
+          callback(null, JSON.parse(reply));
+        } else {
+          query();
+        }
+      })
+    } else {
+      query();
+    }
+    function query() {
+      const queryObject = { _id: { $in: pks } };
+      self.client.getRecords(self.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
+        if (error) {
+          console.log('ERR - ', error, pks);
+        } else if (!transactions) {
+          callback(Error('NOT_FOUND - ' + pks));
+        } else {
+          if (self.redisEnabled) {
             self.redis.hset(redis_key, redis_field, JSON.stringify(transactions))
-            callback(error, transactions);
           }
-        })
-      }
-    })
+          callback(error, transactions);
+        }
+      })
+    }
   }
+
 }
