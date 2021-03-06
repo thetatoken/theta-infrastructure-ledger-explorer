@@ -5,11 +5,10 @@ const redis_key = 'price';
 
 module.exports = class priceDAO {
 
-  constructor(execDir, client, redis, redisEnabled) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.priceInfoCollection = 'price';
     this.redis = redis;
-    this.redisEnabled = redisEnabled;
   }
 
   upsertPrice(priceInfo, callback) {
@@ -30,7 +29,7 @@ module.exports = class priceDAO {
         console.log('ERR - ', error);
       } else {
         newObject._id = newObject.name;
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
         }
         callback(error, record);
@@ -40,7 +39,7 @@ module.exports = class priceDAO {
 
   async getPrice(callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       let list = [];
       try {
         list = await this.redis.hmget(redis_key, 'THETA', 'TFUEL');
@@ -67,7 +66,7 @@ module.exports = class priceDAO {
         } else if (!recordList || recordList.length === 0) {
           callback(Error('NOT_FOUND - Prices'));
         } else {
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.hmset(redis_key, 'THETA', JSON.stringify(recordList[0]), 'TFUEL', JSON.stringify(recordList[1]));
           }
           callback(error, recordList)

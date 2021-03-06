@@ -5,11 +5,10 @@
 
 module.exports = class stakeDAO {
 
-  constructor(execDir, client, redis, redisEnabled) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.stakeInfoCollection = 'stake';
     this.redis = redis;
-    this.redisEnabled = redisEnabled;
   }
 
   insert(stakeInfo, callback) {
@@ -22,7 +21,7 @@ module.exports = class stakeDAO {
       } else {
         const redis_key = `stake_${stakeInfo.type}`;
         const field = `${stakeInfo.type}_${stakeInfo.holder}_${stakeInfo.source}`;
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           await self.redis.hset(redis_key, field, JSON.stringify(stakeInfo))
         }
         console.log('In stake upsert else.')
@@ -31,7 +30,7 @@ module.exports = class stakeDAO {
     });
   }
   async updateStakes(candidateList, type, callback) {
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       await this.updateStakesWithRedis(candidateList, type, callback);
     } else {
       await this.removeRecords(type, () => { });

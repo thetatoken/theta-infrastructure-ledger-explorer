@@ -20,7 +20,6 @@ var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 var Redis = require("ioredis");
 var redis;
 var redisConfig = null;
-var redisEnabled = false;
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readPreFeeCronJob = require('./jobs/read-previous-fee.js');
@@ -64,8 +63,7 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   redisConfig = config.redis;
-  redisEnabled = redisConfig.enabled;
-  if (redisConfig && redisEnabled) {
+  if (redisConfig && redisConfig.enabled) {
     redis = new Redis();
     bluebird.promisifyAll(redis);
     redis.on("connect", () => {
@@ -121,13 +119,13 @@ function main() {
 
 function setupGetBlockCronJob(mongoClient, network_id) {
   // initialize DAOs
-  progressDao = new progressDaoLib(__dirname, mongoClient, redis, redisEnabled);
+  progressDao = new progressDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(progressDao);
 
-  blockDao = new blockDaoLib(__dirname, mongoClient, redis, redisEnabled);
+  blockDao = new blockDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(blockDao);
 
-  transactionDao = new transactionDaoLib(__dirname, mongoClient, redis, redisEnabled);
+  transactionDao = new transactionDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(transactionDao);
 
   accountDao = new accountDaoLib(__dirname, mongoClient);
@@ -136,7 +134,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(accountTxDao);
 
-  stakeDao = new stakeDaoLib(__dirname, mongoClient, redis, redisEnabled);
+  stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(stakeDao);
 
   txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);

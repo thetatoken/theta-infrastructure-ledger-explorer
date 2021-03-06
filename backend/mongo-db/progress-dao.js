@@ -4,11 +4,10 @@
 
 module.exports = class ProgressDAO {
 
-  constructor(execDir, client, redis, redisEnabled) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.progressInfoCollection = 'progress';
     this.redis = redis;
-    this.redisEnabled = redisEnabled;
   }
 
   upsertProgress(network, block_height, count, callback) {
@@ -27,7 +26,7 @@ module.exports = class ProgressDAO {
         var progressInfo = {};
         progressInfo.height = newObject.lst_blk_height;
         progressInfo.count = newObject.txs_count;
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(progressInfo))
         }
         callback(error, record);
@@ -36,7 +35,7 @@ module.exports = class ProgressDAO {
   }
   getProgress(network, callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       const redis_key = 'progress_network:' + network;
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
@@ -64,7 +63,7 @@ module.exports = class ProgressDAO {
           var progressInfo = {};
           progressInfo.height = record.lst_blk_height;
           progressInfo.count = record.txs_count;
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.set(redis_key, JSON.stringify(progressInfo));
           }
           callback(error, progressInfo);
@@ -85,7 +84,7 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject))
         }
         callback(error, record);
@@ -94,7 +93,7 @@ module.exports = class ProgressDAO {
   }
   getStakeProgress(callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       const redis_key = 'progress_stake';
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
@@ -121,7 +120,7 @@ module.exports = class ProgressDAO {
           var stakesInfo = {};
           stakesInfo.total_amount = record.total_amount;
           stakesInfo.holder_num = record.holder_num;
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.set(redis_key, JSON.stringify(stakesInfo));
           }
           callback(error, stakesInfo);
@@ -140,7 +139,7 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject));
         }
         callback(error, record);
@@ -149,7 +148,7 @@ module.exports = class ProgressDAO {
   }
   getFee(callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       const redis_key = 'progress_fee';
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
@@ -176,7 +175,7 @@ module.exports = class ProgressDAO {
         } else {
           var feeInfo = {};
           feeInfo.total_fee = record.total_fee;
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.set(redis_key, JSON.stringify(feeInfo))
           }
           callback(error, feeInfo);
@@ -196,7 +195,7 @@ module.exports = class ProgressDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject));
         }
         callback(error, record);
@@ -205,7 +204,7 @@ module.exports = class ProgressDAO {
   }
   getFeeProgress(callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       const redis_key = 'progress_fee_height';
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
@@ -215,13 +214,13 @@ module.exports = class ProgressDAO {
           callback(null, JSON.parse(reply));
         } else {
           console.log('Database get fee height progress.');
-          query(self.redisEnabled);
+          query();
         }
       })
     } else {
-      query(this.redisEnabled);
+      query();
     }
-    function query(redisEnabled) {
+    function query() {
       const queryObject = { '_id': 'fee_progress' };
       self.client.findOne(self.progressInfoCollection, queryObject, function (error, record) {
         if (error) {
@@ -232,7 +231,7 @@ module.exports = class ProgressDAO {
         } else {
           var feeProgressInfo = {};
           feeProgressInfo.block_height = record.block_height;
-          if (redisEnabled) {
+          if (self.redis !== null) {
             self.redis.set(redis_key, JSON.stringify(feeProgressInfo));
           }
           callback(error, feeProgressInfo);

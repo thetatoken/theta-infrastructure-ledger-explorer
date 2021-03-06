@@ -12,12 +12,10 @@ const { query } = require("./mongo-client");
 const redis_key = 'tx_id';
 module.exports = class TransactionDAO {
 
-  constructor(execDir, client, redis, redisEnabled) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.transactionInfoCollection = 'transaction';
     this.redis = redis;
-    this.redisEnabled = redisEnabled;
-
   }
 
   upsertTransaction(transactionInfo, callback) {
@@ -38,7 +36,7 @@ module.exports = class TransactionDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
         }
         callback(error, record);
@@ -66,7 +64,7 @@ module.exports = class TransactionDAO {
   getTransactionByPk(pk, callback) {
     let self = this;
     const redis_field = pk;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       this.redis.hget(redis_key, redis_field, (err, reply) => {
         if (err) {
           console.log('Redis get transaction by pk met error:', err);
@@ -99,7 +97,7 @@ module.exports = class TransactionDAO {
           transactionInfo.timestamp = record.timestamp;
           transactionInfo.status = record.status;
           transactionInfo.receipt = record.receipt;
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.hset(redis_key, redis_field, JSON.stringify(transactionInfo))
           }
           callback(error, transactionInfo);
@@ -127,7 +125,7 @@ module.exports = class TransactionDAO {
     let self = this;
     const redis_key = 'tx_ids'
     const redis_field = pks.join('_');
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       this.redis.hget(redis_key, redis_field, (err, reply) => {
         if (err) {
           console.log('Redis get transactions by pks met error:', err);
@@ -149,7 +147,7 @@ module.exports = class TransactionDAO {
         } else if (!transactions) {
           callback(Error('NOT_FOUND - ' + pks));
         } else {
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.hset(redis_key, redis_field, JSON.stringify(transactions))
           }
           callback(error, transactions);

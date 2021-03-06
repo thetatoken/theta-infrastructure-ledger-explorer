@@ -5,10 +5,9 @@
 const redis_key = 'block_id';
 module.exports = class BlockDAO {
 
-  constructor(execDir, client, redis, redisEnabled) {
+  constructor(execDir, client, redis) {
     this.client = client;
     this.redis = redis;
-    this.redisEnabled = redisEnabled;
     this.blockInfoCollection = 'block';
   }
 
@@ -36,7 +35,7 @@ module.exports = class BlockDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.hset(redis_key, height, JSON.stringify(newObject))
         }
         callback(error, record);
@@ -46,7 +45,7 @@ module.exports = class BlockDAO {
 
   getBlock(height, callback) {
     let self = this;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       this.redis.hget(redis_key, height, (err, reply) => {
         if (err) {
           console.log('Redis get block height met error:', err);
@@ -84,7 +83,7 @@ module.exports = class BlockDAO {
           blockInfo.num_txs = record.num_txs;
           blockInfo.txs = record.txs;
           blockInfo.guardian_votes = record.guardian_votes;
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.hset(redis_key, height, JSON.stringify(blockInfo));
           }
           callback(error, blockInfo);
@@ -97,7 +96,7 @@ module.exports = class BlockDAO {
     let self = this;
     const redis_key = 'block_range';
     const redis_field = max + '-' + min;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       this.redis.hget(redis_key, redis_field, (err, reply) => {
         if (err) {
           console.log('Redis get blocks by range met error:', err);
@@ -132,7 +131,7 @@ module.exports = class BlockDAO {
           blockInfo.guardian_votes = recordList[i].guardian_votes,
             blockInfoList.push(blockInfo);
         }
-        if (self.redisEnabled) {
+        if (self.redis !== null) {
           self.redis.hset(redis_key, redis_field, JSON.stringify(blockInfoList), 'EX', 60);
         }
         callback(error, blockInfoList)
@@ -144,7 +143,7 @@ module.exports = class BlockDAO {
     let self = this;
     const redis_key = 'block_time'
     const redis_field = start + '-' + end;
-    if (this.redisEnabled) {
+    if (this.redis !== null) {
       this.redis.hget(redis_key, redis_field, (err, reply) => {
         if (err) {
           console.log('Redis get blocks by range met error:', err);
@@ -164,7 +163,7 @@ module.exports = class BlockDAO {
       self.client.getRecords(self.blockInfoCollection, queryObject, {}, 0, 0, function (error, recordList) {
         if (error) callback(error);
         else {
-          if (self.redisEnabled) {
+          if (self.redis !== null) {
             self.redis.hset(redis_key, redis_field, JSON.stringify(recordList), 'EX', 60);
           }
           callback(error, recordList);
