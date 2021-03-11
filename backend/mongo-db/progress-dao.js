@@ -35,16 +35,15 @@ module.exports = class ProgressDAO {
   }
   getProgress(network, callback) {
     let self = this;
+    const redis_key = 'progress_network:' + network;
     if (this.redis !== null) {
-      const redis_key = 'progress_network:' + network;
       this.redis.get(redis_key, (err, reply) => {
-        if (err) {
-          console.log('Redis get progress met error:', err);
-        } else if (reply) {
+        if (reply) {
           console.log('Redis get progress returns.');
           callback(null, JSON.parse(reply));
         } else {
-          console.log('Database get progress.');
+          if (err) console.log('Redis get progress met error:', err);
+          else console.log('Database get progress.');
           query();
         }
       })
@@ -96,13 +95,12 @@ module.exports = class ProgressDAO {
     if (this.redis !== null) {
       const redis_key = 'progress_stake';
       this.redis.get(redis_key, (err, reply) => {
-        if (err) {
-          console.log('Redis get stake progress met error:', err);
-        } else if (reply) {
+        if (reply) {
           console.log('Redis get stake progress returns.');
           callback(null, JSON.parse(reply));
         } else {
-          console.log('Database get stake progress.');
+          if (err) console.log('Redis get stake progress met error:', err);
+          else console.log('Database get stake progress.');
           query();
         }
       })
@@ -148,16 +146,14 @@ module.exports = class ProgressDAO {
   }
   getFee(callback) {
     let self = this;
+    const redis_key = 'progress_fee';
     if (this.redis !== null) {
-      const redis_key = 'progress_fee';
       this.redis.get(redis_key, (err, reply) => {
-        if (err) {
-          console.log('Redis get fee progress met error:', err);
-        } else if (reply) {
-          console.log('Redis get fee progress returns.');
+        if (reply) {
           callback(null, JSON.parse(reply));
         } else {
-          console.log('Database get fee progress.');
+          if (err) console.log('Redis get fee progress met error:', err);
+          else console.log('Database get fee progress.');
           query();
         }
       })
@@ -204,16 +200,14 @@ module.exports = class ProgressDAO {
   }
   getFeeProgress(callback) {
     let self = this;
+    const redis_key = 'progress_fee_height';
     if (this.redis !== null) {
-      const redis_key = 'progress_fee_height';
       this.redis.get(redis_key, (err, reply) => {
-        if (err) {
-          console.log('Redis get fee height progress met error:', err);
-        } else if (reply) {
-          console.log('Redis get fee height progress returns.');
+        if (reply) {
           callback(null, JSON.parse(reply));
         } else {
-          console.log('Database get fee height progress.');
+          if (err) console.log('Redis get fee height progress met error:', err);
+          else console.log('Database get fee height progress.');
           query();
         }
       })

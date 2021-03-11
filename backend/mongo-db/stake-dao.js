@@ -33,7 +33,8 @@ module.exports = class stakeDAO {
     if (this.redis !== null) {
       await this.updateStakesWithRedis(candidateList, type, callback);
     } else {
-      await this.removeRecords(type, () => { });
+      console.log('type:', type)
+      await this.removeRecordsAsync(type);
       for (let candidate of candidateList) {
         const holder = candidate.Holder;
         const stakes = candidate.Stakes;
@@ -48,7 +49,7 @@ module.exports = class stakeDAO {
             'withdrawn': stake.withdrawn,
             'return_height': stake.return_height
           }
-          await this.insert(stakeInfo, () => { });
+          await this.insertAsync(stakeInfo);
         }
       }
       callback();
@@ -60,7 +61,6 @@ module.exports = class stakeDAO {
     let existKeys = new Set();
     try {
       const keys = await this.redis.hkeys(`stake_${type}`);
-      console.log('keys:', type, keys)
       console.log(`Redis get stakes by type:${type} returns.`);
       existKeys = new Set(keys);
     } catch (e) {
@@ -91,7 +91,8 @@ module.exports = class stakeDAO {
               updateStakeList.push(stakeInfo);
             }
           } catch (e) {
-            console.log(`Redis get stakes by ${type} ${id} met error:`, e)
+            console.log(`Redis get stakes by ${type} ${id} met error:`, e);
+            updateStakeList.push(stakeInfo);
           }
         } else {
           updateStakeList.push(stakeInfo);
@@ -156,6 +157,7 @@ module.exports = class stakeDAO {
       }
       const redis_key = `stake_${type}`;
       for (let id of ids) {
+        // TODO: del multiple at one time
         self.redis.hdel(redis_key, id);
       }
       callback(err, res);

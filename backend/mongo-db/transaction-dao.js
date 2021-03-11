@@ -9,7 +9,8 @@
 const { query } = require("./mongo-client");
 
 //------------------------------------------------------------------------------
-const redis_key = 'tx_id';
+const redis_expire_time = 60;
+
 module.exports = class TransactionDAO {
 
   constructor(execDir, client, redis) {
@@ -19,8 +20,8 @@ module.exports = class TransactionDAO {
   }
 
   upsertTransaction(transactionInfo, callback) {
+    const redis_key = `tx_id:${transactionInfo.hash}`;
     let self = this;
-    const redis_field = transactionInfo.hash;
     const newObject = {
       'hash': transactionInfo.hash,
       'type': transactionInfo.type,
@@ -37,7 +38,7 @@ module.exports = class TransactionDAO {
         console.log('ERR - ', error);
       } else {
         if (self.redis !== null) {
-          self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
+          self.redis.set(redis_key, JSON.stringify(newObject), 'EX', redis_expire_time)
         }
         callback(error, record);
       }
@@ -63,15 +64,15 @@ module.exports = class TransactionDAO {
   }
   getTransactionByPk(pk, callback) {
     let self = this;
-    const redis_field = pk;
+    const redis_key = `tx_id:${pk}`;
     if (this.redis !== null) {
-      this.redis.hget(redis_key, redis_field, (err, reply) => {
-        if (err) {
-          console.log('Redis get transaction by pk met error:', err);
-        } else if (reply) {
+      this.redis.get(redis_key, (err, reply) => {
+        if (reply) {
           console.log('Redis get transaction by pk returns.');
           callback(null, JSON.parse(reply));
         } else {
+          if (err) console.log('Redis get transaction by pk met error:', err);
+          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
           query();
         }
       })
@@ -98,7 +99,7 @@ module.exports = class TransactionDAO {
           transactionInfo.status = record.status;
           transactionInfo.receipt = record.receipt;
           if (self.redis !== null) {
-            self.redis.hset(redis_key, redis_field, JSON.stringify(transactionInfo))
+            self.redis.set(redis_key, JSON.stringify(transactionInfo), 'EX', redis_expire_time)
           }
           callback(error, transactionInfo);
         }
@@ -123,16 +124,15 @@ module.exports = class TransactionDAO {
   }
   getTransactionsByPk(pks, callback) {
     let self = this;
-    const redis_key = 'tx_ids'
-    const redis_field = pks.join('_');
+    const redis_key = `tx_ids:${pks.join('_')}`;
     if (this.redis !== null) {
-      this.redis.hget(redis_key, redis_field, (err, reply) => {
-        if (err) {
-          console.log('Redis get transactions by pks met error:', err);
-        } else if (reply) {
+      this.redis.get(redis_key, (err, reply) => {
+        if (reply) {
           console.log('Redis get transactions by pks returns.');
           callback(null, JSON.parse(reply));
         } else {
+          if (err) console.log('Redis get transactions by pks met error:', err);
+          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
           query();
         }
       })
@@ -148,12 +148,11 @@ module.exports = class TransactionDAO {
           callback(Error('NOT_FOUND - ' + pks));
         } else {
           if (self.redis !== null) {
-            self.redis.hset(redis_key, redis_field, JSON.stringify(transactions))
+            self.redis.set(redis_key, JSON.stringify(transactions), 'EX', redis_expire_time)
           }
           callback(error, transactions);
         }
       })
     }
   }
-
 }

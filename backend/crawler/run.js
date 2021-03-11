@@ -18,7 +18,7 @@ var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 
 var Redis = require("ioredis");
-var redis;
+var redis = null;
 var redisConfig = null;
 
 var readBlockCronJob = require('./jobs/read-block.js');
