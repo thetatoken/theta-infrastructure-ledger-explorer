@@ -29,7 +29,7 @@ module.exports = class priceDAO {
       if (error) {
         console.log('ERR - ', error);
       } else {
-        newObject._id = newObject.name;
+        newObject._id = priceInfo.name;
         if (self.redis !== null) {
           self.redis.hset(redis_key, redis_field, JSON.stringify(newObject))
         }
