@@ -38,7 +38,7 @@ module.exports = class TransactionDAO {
         console.log('ERR - ', error);
       } else {
         if (self.redis !== null) {
-          self.redis.set(redis_key, JSON.stringify(newObject), 'EX', redis_expire_time)
+          self.redis.set(redis_key, JSON.stringify(newObject), 'ex', redis_expire_time)
         }
         callback(error, record);
       }
@@ -99,7 +99,7 @@ module.exports = class TransactionDAO {
           transactionInfo.status = record.status;
           transactionInfo.receipt = record.receipt;
           if (self.redis !== null) {
-            self.redis.set(redis_key, JSON.stringify(transactionInfo), 'EX', redis_expire_time)
+            self.redis.set(redis_key, JSON.stringify(transactionInfo), 'ex', redis_expire_time)
           }
           callback(error, transactionInfo);
         }
@@ -148,7 +148,7 @@ module.exports = class TransactionDAO {
           callback(Error('NOT_FOUND - ' + pks));
         } else {
           if (self.redis !== null) {
-            self.redis.set(redis_key, JSON.stringify(transactions), 'EX', redis_expire_time)
+            self.redis.set(redis_key, JSON.stringify(transactions), 'ex', redis_expire_time)
           }
           callback(error, transactions);
         }

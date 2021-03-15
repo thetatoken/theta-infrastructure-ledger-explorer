@@ -24,7 +24,7 @@ module.exports = class stakeDAO {
         if (self.redis !== null) {
           await self.redis.hset(redis_key, field, JSON.stringify(stakeInfo))
         }
-        console.log('In stake upsert else.')
+        // console.log('In stake upsert else.')
         callback(error, record);
       }
     });
@@ -100,8 +100,8 @@ module.exports = class stakeDAO {
       };
     };
     let deleteKeys = [...existKeys];
-    console.log('updateStakeList:', updateStakeList);
-    console.log('deleteKeys:', deleteKeys);
+    console.log('updateStakeList length:', updateStakeList.length, type);
+    console.log('deleteKeys length:', deleteKeys.length, type);
 
     for (let stake of updateStakeList) {
       await this.insert(stake, () => { });

@@ -2,7 +2,7 @@
 //  DAO for block
 //  Require index: `db.block.createIndex({timestamp:-1})`
 //------------------------------------------------------------------------------
-const redis_expire_time = 6;
+const redis_expire_time = 60;
 module.exports = class BlockDAO {
 
   constructor(execDir, client, redis) {
@@ -37,7 +37,7 @@ module.exports = class BlockDAO {
         console.log('ERR - ', error);
       } else {
         if (self.redis !== null) {
-          self.redis.set(redis_key, JSON.stringify(newObject), 'ex', 6);
+          self.redis.set(redis_key, JSON.stringify(newObject), 'ex', redis_expire_time);
         }
         callback(error, record);
       }
