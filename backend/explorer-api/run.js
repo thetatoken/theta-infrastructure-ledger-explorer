@@ -82,7 +82,7 @@ function main() {
 
   redisConfig = config.redis;
   if (redisConfig && redisConfig.enabled) {
-    redis = new Redis();
+    redis = new Redis(redisConfig);
     bluebird.promisifyAll(redis);
     redis.on("connect", () => {
       console.log('connected to Redis');
