@@ -16,6 +16,7 @@ module.exports = class priceDAO {
     let self = this;
     const redis_field = priceInfo.name;
     const newObject = {
+      '_id': priceInfo.name,
       'price': priceInfo.price,
       'volume_24h': priceInfo.volume_24h,
       'market_cap': priceInfo.market_cap,

@@ -14,7 +14,7 @@ var priceRouter = (app, priceDao, progressDao, config) => {
         const time = new Date();
         priceListInfo.forEach(info => {
           const timestamp = new Date(info.last_updated).getTime()
-          isOutDated = isOutDated || time - timestamp > 1000 * 60 * 10;
+          isOutDated = isOutDated || time - timestamp > 1000 * 60 * 5;
         })
         if (isOutDated) {
           let tmp = await priceHelper.updatePrice(priceDao, config.coinmarketcap);
