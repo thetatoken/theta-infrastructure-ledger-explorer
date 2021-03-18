@@ -67,14 +67,18 @@ module.exports = class TransactionDAO {
     const redis_key = `tx_id:${pk}`;
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get transaction by pk met error:', err);
+          query();
+          return;
+        }
         if (reply) {
           // console.log('Redis get transaction by pk returns.');
           callback(null, JSON.parse(reply));
-        } else {
-          if (err) console.log('Redis get transaction by pk met error:', err);
-          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
-          query();
+          return;
         }
+        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        query();
       })
     } else {
       query();
@@ -127,14 +131,19 @@ module.exports = class TransactionDAO {
     const redis_key = `tx_ids:${pks.join('_')}`;
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get transactions by pks met error:', err);
+          query();
+          return;
+        }
+
         if (reply) {
           // console.log('Redis get transactions by pks returns.');
           callback(null, JSON.parse(reply));
-        } else {
-          if (err) console.log('Redis get transactions by pks met error:', err);
-          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
-          query();
+          return;
         }
+        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        query();
       })
     } else {
       query();

@@ -49,14 +49,18 @@ module.exports = class BlockDAO {
     const redis_key = `block_id:${height}`;
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get block height met error:', err);
+          query();
+          return;
+        }
         if (reply) {
           // console.log('Redis get block height returns.');
           callback(null, JSON.parse(reply));
-        } else {
-          if (err) console.log('Redis get block height met error:', err);
-          else console.log(`Redis doesnot contain the key ${redis_key} ${height}, query DB.`)
-          query();
+          return;
         }
+        console.log(`Redis doesnot contain the key ${redis_key} ${height}, query DB.`)
+        query();
       })
     } else {
       query();
@@ -98,14 +102,18 @@ module.exports = class BlockDAO {
     const redis_key = 'block_range' + max + '-' + min;
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get blocks by range met error:', err);
+          query();
+          return;
+        }
         if (reply) {
           // console.log('Redis get blocks by range returns.');
           callback(null, JSON.parse(reply));
-        } else {
-          if (err) console.log('Redis get blocks by range met error:', err);
-          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
-          query();
+          return;
         }
+        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        query();
       })
     } else {
       query();
@@ -131,7 +139,7 @@ module.exports = class BlockDAO {
             blockInfoList.push(blockInfo);
         }
         if (self.redis !== null) {
-          self.redis.set(redis_key, JSON.stringify(blockInfoList), 'ex', redis_expire_time);
+          self.redis.set(redis_key, JSON.stringify(blockInfoList), 'ex', 6);
         }
         callback(error, blockInfoList)
       })
@@ -143,14 +151,18 @@ module.exports = class BlockDAO {
     const redis_key = 'block_time' + start + '-' + end;
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
+        if (err) {
+          console.log('Redis get blocks by range met error:', err)
+          query();
+          return;
+        }
         if (reply) {
           // console.log('Redis get blocks by range returns.');
           callback(null, JSON.parse(reply));
-        } else {
-          if (err) console.log('Redis get blocks by range met error:', err);
-          else console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
-          query();
+          return;
         }
+        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        query();
       })
     } else {
       query();
