@@ -68,7 +68,7 @@ module.exports = class TransactionDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get transaction by pk returns.');
+          // console.log('Redis get transaction by pk returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get transaction by pk met error:', err);
@@ -128,7 +128,7 @@ module.exports = class TransactionDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get transactions by pks returns.');
+          // console.log('Redis get transactions by pks returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get transactions by pks met error:', err);

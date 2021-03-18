@@ -35,7 +35,7 @@ module.exports = class DailyAccountDAO {
   removeAll(callback) {
     this.client.remove(this.collection, function (err, res) {
       if (err) {
-        console.log('ERR - ', err, height);
+        console.log('ERR - ', err);
         callback(err);
       }
       callback(err, res);

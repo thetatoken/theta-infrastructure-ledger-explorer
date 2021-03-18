@@ -50,7 +50,7 @@ module.exports = class BlockDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get block height returns.');
+          // console.log('Redis get block height returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get block height met error:', err);
@@ -99,7 +99,7 @@ module.exports = class BlockDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get blocks by range returns.');
+          // console.log('Redis get blocks by range returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get blocks by range met error:', err);
@@ -144,7 +144,7 @@ module.exports = class BlockDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get blocks by range returns.');
+          // console.log('Redis get blocks by range returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get blocks by range met error:', err);

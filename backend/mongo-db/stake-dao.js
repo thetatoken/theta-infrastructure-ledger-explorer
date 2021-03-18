@@ -81,12 +81,9 @@ module.exports = class stakeDAO {
           'return_height': stake.return_height
         }
         if (existKeys.has(id)) {
-          // console.log(`In has id: ${id}`)
           try {
             let stakeStr = await this.redis.hget(`stake_${type}`, id);
-            // console.log('compare:', JSON.stringify(stakeInfo) === stakeStr);
             existKeys.delete(id);
-            // console.log('existKeys:', existKeys)
             if (stakeStr !== JSON.stringify(stakeInfo)) {
               updateStakeList.push(stakeInfo);
             }

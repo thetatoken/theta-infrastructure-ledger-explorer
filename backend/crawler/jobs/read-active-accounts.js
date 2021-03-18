@@ -10,7 +10,6 @@ exports.Execute = function () {
   let timestamp = (new Date().getTime() / 1000).toFixed();
   dailyAccountDao.getTotalNumberAsync()
     .then(async res => {
-      console.log(res)
       await activeActDao.insertAsync({ amount: res, timestamp });
       await dailyAccountDao.removeAllAsync();
     }).catch(async err => {

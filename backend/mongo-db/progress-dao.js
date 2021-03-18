@@ -39,7 +39,7 @@ module.exports = class ProgressDAO {
     if (this.redis !== null) {
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get progress returns.');
+          // console.log('Redis get progress returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get progress met error:', err);
@@ -97,7 +97,7 @@ module.exports = class ProgressDAO {
       const redis_key = 'progress_stake';
       this.redis.get(redis_key, (err, reply) => {
         if (reply) {
-          console.log('Redis get stake progress returns.');
+          // console.log('Redis get stake progress returns.');
           callback(null, JSON.parse(reply));
         } else {
           if (err) console.log('Redis get stake progress met error:', err);

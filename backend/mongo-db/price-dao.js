@@ -45,11 +45,11 @@ module.exports = class priceDAO {
       try {
         list = await this.redis.hmget(redis_key, 'THETA', 'TFUEL');
       } catch (e) {
-        console.log('Redis get price met error:', e);
+        // console.log('Redis get price met error:', e);
         query();
       }
       if (list[0] && list[1]) {
-        console.log('Redis get price returns.');
+        // console.log('Redis get price returns.');
         const records = list.map(obj_str => JSON.parse(obj_str))
         callback(null, records);
         return;
