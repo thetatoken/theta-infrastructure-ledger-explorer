@@ -17,13 +17,11 @@
     "blockchain": {
         "network_id": "test_chain"
     },
-    "accounting": {
-        "coinmarketcap_api_key": "COINMARKETCAP_API_KEY",
-        "wallet_addresses": [
-            "2416",
-            "3822"
-        ]
-    }
+    "coinmarketcap":{
+        "key": "COINMARKETCAP_API_KEY",
+        "theta_id": 2416,
+        "tfuel_id": 3822
+    },
     "cert":{
         "key": "",
         "crt": ""
