@@ -65,12 +65,16 @@ function main() {
   redisConfig = config.redis;
   console.log("redisConfig:", redisConfig)
   if (redisConfig && redisConfig.enabled) {
-    redis = new Redis.Cluster([
+    redis = redisConfig.isCluster ? new Redis.Cluster([
       {
         host: redisConfig.host,
         port: redisConfig.port,
       },
-    ]);
+    ], {
+      redisOptions: {
+        password: redisConfig.password,
+      }
+    }) : new Redis(redisConfig);
     bluebird.promisifyAll(redis);
     redis.on("connect", () => {
       console.log('connected to Redis');
