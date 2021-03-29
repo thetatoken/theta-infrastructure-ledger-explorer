@@ -185,7 +185,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // PST mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
-  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
+  schedule.scheduleJob('Record TFuel Earning', '0 0 16 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST 4:00PM
 
   activeActJob.Initialize(dailyAccountDao, activeAccountDao);
   activeAccountDao.getLatestRecordsAsync(1)
