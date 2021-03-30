@@ -19,7 +19,9 @@ exports.updateStake = async function (candidate, type, stakeDao) {
   await Promise.all(insertList);
 }
 exports.updateStakes = async function (candidateList, type, stakeDao) {
+  console.log('before update stakes:', type)
   await stakeDao.updateStakesAsync(candidateList, type);
+  console.log('after update stakes:', type)
 }
 exports.updateTotalStake = function (totalStake, progressDao) {
   let total = 0;

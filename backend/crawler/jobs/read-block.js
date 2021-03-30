@@ -29,6 +29,8 @@ var latest_block_height = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 
+// dec
+var startTime;
 //------------------------------------------------------------------------------
 //  All the implementation goes below
 //------------------------------------------------------------------------------
@@ -84,7 +86,7 @@ exports.Execute = async function (network_id) {
       Logger.log('Latest block height: ' + latest_block_height);
 
       Logger.log('DB block height progress: ' + crawled_block_height_progress.toString());
-
+      startTime = +new Date();
       if (latest_block_height >= crawled_block_height_progress) {
         // get target crawl height
         target_crawl_height = crawled_block_height_progress + max_block_per_crawl;
@@ -93,25 +95,32 @@ exports.Execute = async function (network_id) {
         }
 
         var getBlockAsyncList = [];
+        var getStakeAsyncList = [];
         var getVcpAsyncList = [];
         var getGcpAsyncList = [];
+        var getEenpAsyncList = [];
         for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
-          getVcpAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
-          getGcpAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
+          getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
+          getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
+          getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': i.toString() }]));
         }
-        return Promise.all(getBlockAsyncList.concat(getVcpAsyncList).concat(getGcpAsyncList))
+        return Promise.all(getBlockAsyncList.concat(getStakeAsyncList))
       } else {
         Logger.error('Block crawling is up to date.');
       }
     })
     .then(async function (blockDataList) {
+      let curTime = +new Date();
+      console.log(`Query block info takes: ${curTime - startTime} ms`)
       if (blockDataList) {
         var upsertBlockAsyncList = [];
         var upsertVcpAsyncList = [];
         var updateVcpAsyncList = [];
         var updateGcpAsyncList = [];
         var upsertGcpAsyncList = [];
+        var updateEenpAsyncList = [];
+        var upsertEenpAsyncList = [];
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
@@ -132,7 +141,7 @@ exports.Execute = async function (network_id) {
                 })
               })
               upsertVcpAsyncList.push(stakeHelper.updateStakes(updateVcpAsyncList, 'vcp', stakeDao));
-            } else if (result.result.BlockHashGcpPairs) {
+            } else if (result.result.BlockHashGcpPairs) { // handle GCP response
               if (upsertGcpAsyncList.length > 0) continue;
               stakes.gcp = result.result.BlockHashGcpPairs;
               // await stakeDao.removeRecordsAsync('gcp');
@@ -143,6 +152,18 @@ exports.Execute = async function (network_id) {
                 })
               })
               upsertGcpAsyncList.push(stakeHelper.updateStakes(updateGcpAsyncList, 'gcp', stakeDao));
+            } else if (result.result.BlockHashEenpPairs) {  // hanndle EENP response
+              if (upsertEenpAsyncList.length > 0) continue;
+              console.log('In Eenp, records:', result.result.BlockHashEenpPairs);
+              stakes.eenp = result.result.BlockHashEenpPairs;
+              result.result.BlockHashEenpPairs.forEach(eenpPair => {
+                console.log(`Length: ${eenpPair.Eenp.SortedEliteEdgeNodes.length}`)
+                eenpPair.Eenp.SortedEliteEdgeNodes.forEach(candidate => {
+                  updateEenpAsyncList.push(candidate);
+                })
+              })
+              console.log(`updateEenpAsyncList length: ${updateEenpAsyncList.length}`);
+              upsertEenpAsyncList.push(stakeHelper.updateStakes(updateEenpAsyncList, 'eenp', stakeDao));
             } else {  //handle block response
               var txs = result.result.transactions;
               const blockInfo = {
@@ -195,6 +216,7 @@ exports.Execute = async function (network_id) {
           }
         }
         if (stakes.vcp.length !== 0) {
+          // Update total stake info
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
         }
         if (checkpoint_hash)
@@ -214,13 +236,16 @@ exports.Execute = async function (network_id) {
         Logger.log(`Number of upsert BLOCKS: ${upsertBlockAsyncList.length}`);
         Logger.log(`Number of upsert VCP: ${upsertVcpAsyncList.length}`);
         Logger.log(`Number of upsert GCP: ${upsertGcpAsyncList.length}`);
+        Logger.log(`Number of upsert EENP: ${upsertEenpAsyncList.length}`);
         Logger.log(`Number of upsert check points: ${upsertCheckpointAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
-          upsertTransactionAsyncList, upsertCheckpointAsyncList, txHelper.updateFees(validTransactionList, progressDao))
+          upsertTransactionAsyncList, upsertCheckpointAsyncList, upsertEenpAsyncList,
+          txHelper.updateFees(validTransactionList, progressDao))
       }
     })
     .then(() => {
+      console.log('update account after handle all stakes')
       accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, dailyAccountDao, validTransactionList);
     })
     .then(async function () {

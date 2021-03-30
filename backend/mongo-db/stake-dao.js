@@ -31,7 +31,7 @@ module.exports = class stakeDAO {
   }
   async updateStakes(candidateList, type, callback) {
     if (this.redis !== null) {
-      await this.updateStakesWithRedis(candidateList, type, callback);
+      await this.updateStakesWithRedis(candidateList, type);
     } else {
       console.log('type:', type)
       await this.removeRecordsAsync(type);
@@ -55,8 +55,8 @@ module.exports = class stakeDAO {
       callback();
     }
   }
-  async updateStakesWithRedis(candidateList, type, callback) {
-    console.log('In update stakes.')
+  async updateStakesWithRedis(candidateList, type) {
+    console.log(`In update stakes. Type: ${type}`)
     let updateStakeList = [];
     let existKeys = new Set();
     try {
@@ -66,6 +66,7 @@ module.exports = class stakeDAO {
     } catch (e) {
       console.log(`Redis get stakes by type:${type} met error:`, e);
     }
+    console.log(`In update stakes type: ${type}, before for loop.`)
     for (let candidate of candidateList) {
       const holder = candidate.Holder;
       const stakes = candidate.Stakes;
@@ -101,10 +102,10 @@ module.exports = class stakeDAO {
     console.log('deleteKeys length:', deleteKeys.length, type);
 
     for (let stake of updateStakeList) {
-      await this.insert(stake, () => { });
+      await this.insertAsync(stake);
     }
-    await this.removeRecordsById(type, deleteKeys, () => { });
-    callback();
+    await this.removeRecordsByIdAsync(type, deleteKeys);
+    console.log('before redis callback');
   }
 
 
