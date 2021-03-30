@@ -74,7 +74,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
 
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
-    let { hasBalance = false } = req.query;
+    let { hasBalance = false, types = ['vcp', 'gcp'] } = req.query;
     const address = helper.normalize(req.params.id.toLowerCase());
     //TODO: Remove isChromeExt related after review
     const origin = req.headers.origin;
@@ -84,11 +84,11 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
       res.status(400).send({ type: 'invalid_address' })
       return;
     }
-    stakeDao.getStakeByAddressAsync(address)
+    stakeDao.getStakeByAddressAsync(address, types)
       .then(async stakeListInfo => {
         // TODO: Remove retry after fix the stake issue
         if (stakeListInfo.holderRecords.length === 0 && stakeListInfo.sourceRecords.length === 0) {
-          stakeListInfo = await stakeDao.getStakeByAddressAsync(address);
+          stakeListInfo = await stakeDao.getStakeByAddressAsync(address, types);
         }
         if (hasBalance === 'true') {
           for (let i = 0; i < stakeListInfo.holderRecords.length; i++) {

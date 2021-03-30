@@ -1,6 +1,8 @@
 //------------------------------------------------------------------------------
 //  DAO for stake
 //  Require index: `db.stake.createIndex({type:1})`
+//  Require index: `db.stake.createIndex({type:1, holder:1})`
+//  Require index: `db.stake.createIndex({type:1, source:1})`
 //------------------------------------------------------------------------------
 
 module.exports = class stakeDAO {
@@ -122,9 +124,9 @@ module.exports = class stakeDAO {
     })
   }
 
-  getStakeByAddress(address, callback) {
-    const queryHolder = { 'holder': address };
-    const querySource = { 'source': address };
+  getStakeByAddress(address, types = ['vcp', 'gcp'], callback) {
+    const queryHolder = { 'holder': address, 'type': { $in: types } };
+    const querySource = { 'source': address, 'type': { $in: types } };
     let holderRecords = [];
     let sourceRecords = [];
     const self = this;
