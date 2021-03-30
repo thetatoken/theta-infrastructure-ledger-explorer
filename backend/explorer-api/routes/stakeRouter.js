@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 let startTime = +new Date();
 const cachePeriod = 6 * 1000 // 6 seconds
-let cacheData;
+let cacheData = { theta: undefined, tfuel: undefined };
 var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -32,24 +32,30 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
   });
 
   router.get("/stake/totalAmount", (req, res) => {
-    console.log('Querying total staked tokens.');
+    let { type = 'theta' } = req.query;
+    console.log(`Querying total staked ${type} tokens.`);
+    if (type !== 'theta' && type !== 'tfuel') {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
     let cur = +new Date();
-    if (cur - startTime < cachePeriod && cacheData) {
-      if (cacheData.type === 'stakeTotalAmout') {
-        res.status(200).send(cacheData);
-      } else if (cacheData.type === 'error_not_found') {
-        res.status(404).send(cacheData);
+    if (cur - startTime < cachePeriod && cacheData && cacheData[type]) {
+      const data = cacheData[type];
+      if (data.type === 'stakeTotalAmout') {
+        res.status(200).send(data);
+      } else if (data.type === 'error_not_found') {
+        res.status(404).send(data);
       }
       return;
     }
     startTime = cur;
-    progressDao.getStakeProgressAsync()
+    progressDao.getStakeProgressAsync(type)
       .then(info => {
         const data = ({
           type: 'stakeTotalAmout',
-          body: { totalAmount: info.total_amount, totalNodes: info.holder_num },
+          body: { totalAmount: info.total_amount, totalNodes: info.holder_num, type: info.type },
         });
-        cacheData = data;
+        cacheData[type] = data;
         res.status(200).send(data);
       })
       .catch(error => {
@@ -58,7 +64,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
             type: 'error_not_found',
             error
           });
-          cacheData = err;
+          cacheData[type] = err;
           res.status(404).send(err);
         } else {
           console.log('ERR - ', error)

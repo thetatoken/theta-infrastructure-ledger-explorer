@@ -75,13 +75,14 @@ module.exports = class ProgressDAO {
     }
 
   }
-  upsertStakeProgress(total_amount, holder_num, callback) {
+  upsertStakeProgress(type, total_amount, holder_num, callback) {
     let self = this;
-    const redis_key = 'progress_stake';
-    const queryObject = { '_id': 'stake' };
+    const redis_key = `progress_${type}_stake`;
+    const queryObject = { '_id': `${type}_stake` };
     const newObject = {
       'total_amount': total_amount,
-      'holder_num': holder_num
+      'holder_num': holder_num,
+      'type': type
     }
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
@@ -94,11 +95,11 @@ module.exports = class ProgressDAO {
       }
     });
   }
-  getStakeProgress(callback) {
+  getStakeProgress(type, callback) {
     let self = this;
-    const queryObject = { '_id': 'stake' };
+    const queryObject = { '_id': `${type}_stake` };
     if (this.redis !== null) {
-      const redis_key = 'progress_stake';
+      const redis_key = `progress_${type}_stake`;
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
           console.log('Redis get stake progress met error:', err);
@@ -127,6 +128,7 @@ module.exports = class ProgressDAO {
           var stakesInfo = {};
           stakesInfo.total_amount = record.total_amount;
           stakesInfo.holder_num = record.holder_num;
+          stakesInfo.type = record.type;
           if (self.redis !== null) {
             self.redis.set(redis_key, JSON.stringify(stakesInfo));
           }

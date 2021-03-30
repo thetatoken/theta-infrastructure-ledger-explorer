@@ -24,23 +24,32 @@ exports.updateStakes = async function (candidateList, type, stakeDao) {
   console.log('after update stakes:', type)
 }
 exports.updateTotalStake = function (totalStake, progressDao) {
-  let total = 0;
-  let holders = new Set();
+  let totalTheta = 0, totalTfuel = 0;
+  let thetaHolders = new Set(), tfuelHolders = new Set();
   totalStake.vcp.forEach(vcpPair => {
     vcpPair.Vcp.SortedCandidates.forEach(candidate => {
-      holders.add(candidate.Holder)
+      thetaHolders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
-        total = helper.sumCoin(total, stake.withdrawn ? 0 : stake.amount)
+        totalTheta = helper.sumCoin(totalTheta, stake.withdrawn ? 0 : stake.amount)
       })
     })
   })
   totalStake.gcp.forEach(gcpPair => {
     gcpPair.Gcp.SortedGuardians.forEach(candidate => {
-      holders.add(candidate.Holder)
+      thetaHolders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
-        total = helper.sumCoin(total, stake.withdrawn ? 0 : stake.amount)
+        totalTheta = helper.sumCoin(totalTheta, stake.withdrawn ? 0 : stake.amount)
       })
     })
   })
-  progressDao.upsertStakeProgressAsync(total.toFixed(), holders.size);
+  totalStake.eenp.forEach(eenpPair => {
+    eenpPair.Eenp.SortedEliteEdgeNodes.forEach(candidate => {
+      tfuelHolders.add(candidate.Holder);
+      candidate.Stakes.forEach(stake => {
+        totalTfuel = helper.sumCoin(totalTfuel, stake.withdrawn ? 0 : stake.amount);
+      })
+    })
+  })
+  progressDao.upsertStakeProgressAsync('theta', totalTheta.toFixed(), thetaHolders.size);
+  progressDao.upsertStakeProgressAsync('tfuel', totalTfuel.toFixed(), tfuelHolders.size);
 }
