@@ -5,6 +5,8 @@ import _truncate from 'lodash/truncate'
 import cx from 'classnames';
 
 import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
+import { nodeTypes } from 'common/constants';
+
 const TRUNC = 2;
 
 
@@ -58,7 +60,7 @@ export default class StakeTxsTable extends React.PureComponent {
               const address = type === 'holder' ? record.source : record.holder;
               return (
                 <tr key={record._id}>
-                  <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>
+                  <td className={cx("node-type", record.type)}>{nodeTypes[record.type]}</td>
                   {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
                   <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}

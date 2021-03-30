@@ -79,6 +79,12 @@ export const TokenTypes = {
   THETA_FUEL: 'tfuel',
 };
 
+export const nodeTypes = {
+  vcp: 'Validator',
+  gcp: 'Guardian',
+  eenp: 'Elite Edge Node'
+}
+
 export const Networks = {
   __deprecated__ETHEREUM: 'ethereum',
   THETA_TESTNET: 'testnet',
