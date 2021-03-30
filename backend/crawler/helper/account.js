@@ -102,7 +102,16 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
         // Update holder account
         await _updateAccountByAddress(tx.data.holder.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.holder.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
-        break
+        break;
+      case 11:
+        // Update holder account
+        await _updateAccountByAddress(tx.data.holder.address, accountDao, tx.type);
+        await _updateAccountMaps(tx.data.holder.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+
+        // Update beneficiary account
+        await _updateAccountByAddress(tx.data.beneficiary.address, accountDao, tx.type);
+        await _updateAccountMaps(tx.data.beneficiary.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+        break;
       default:
         break;
     }
