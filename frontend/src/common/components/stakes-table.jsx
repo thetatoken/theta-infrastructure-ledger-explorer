@@ -48,6 +48,7 @@ export default class StakesTable extends React.Component {
     const { stakeList, isSliced } = this.state;
     let colSpan = type === 'node' ? 4 : 3;
     const titleKey = `${stakeCoinType}_${type}`;
+    const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
       <div className="stakes half">
         <div className="title">{TitleMap[`${titleKey}`]}</div>
@@ -67,7 +68,7 @@ export default class StakesTable extends React.Component {
                 <tr key={address}>
                   <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
-                  <td className="staked"><div className="currency thetawei">{formatCoin(record.amount, 0)}</div></td>
+                  <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
             })}
@@ -82,7 +83,7 @@ export default class StakesTable extends React.Component {
             <tr>
               <td></td>
               {type === 'node' && <td></td>}
-              <td className="staked"><div className="currency thetawei">{formatCoin(totalStaked, 0)}</div></td>
+              <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(totalStaked, 0)}</div></td>
               <td className="staked-prct">100%</td>
             </tr>
           </tbody>
