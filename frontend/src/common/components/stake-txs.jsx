@@ -8,7 +8,12 @@ import { formatCoin, sumCoin, priceCoin } from 'common/helpers/utils';
 import { nodeTypes } from 'common/constants';
 
 const TRUNC = 2;
-
+const TitleMap = {
+  'theta_source': 'THETA TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES',
+  'theta_holder': 'THETA TOKENS STAKED TO THIS NODE',
+  'tfuel_source': 'TFUEL TOKENS STAKED BY THIS ADDRESS TO ELITE EDGE NODES',
+  'tfuel_holder': 'TFUEL TOKENS STAKED TO THIS NODE'
+}
 
 export default class StakeTxsTable extends React.PureComponent {
   constructor(props) {
@@ -38,12 +43,15 @@ export default class StakeTxsTable extends React.PureComponent {
   }
 
   render() {
-    const { txs, type, className, truncate, price } = this.props;
+    const { txs, type, coinType, className, truncate, price } = this.props;
     const { transactions, isSliced } = this.state;
     let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.withdrawn ? 0 : tx.amount) }, 0);
+    const titleKey = `${coinType}_${type}`;
+    const currencyUnit = coinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
+    const currency = coinType === 'tfuel' ? 'TFuel' : 'Theta';
     return (
       <div className="stakes">
-        <div className="title">{type === 'source' ? 'TOKENS STAKED BY THIS ADDRESS TO VALIDATOR/GUARDIAN NODES' : 'TOKENS STAKED TO THIS NODE'}</div>
+        <div className="title">{TitleMap[titleKey]}</div>
         <table className={cx("data txn-table", className)}>
           <thead>
             <tr>
@@ -61,11 +69,11 @@ export default class StakeTxsTable extends React.PureComponent {
               return (
                 <tr key={record._id}>
                   <td className={cx("node-type", record.type)}>{nodeTypes[record.type]}</td>
-                  {type === 'source' && <td className="token left"><div className="currency thetawei left">{formatCoin(record.amount)} Theta</div></td>}
+                  {type === 'source' && <td className="token left"><div className={`currency ${currencyUnit} left`}>{`${formatCoin(record.amount)} ${currency}`}</div></td>}
                   <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
-                  {type !== 'source' && <td className="token"><div className="currency thetawei">{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : 'Theta'}</div></td>}
+                  {type !== 'source' && <td className="token"><div className={`currency ${currencyUnit}`}>{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : currency}</div></td>}
                 </tr>);
             })}
             {txs.length > TRUNC &&
@@ -79,8 +87,8 @@ export default class StakeTxsTable extends React.PureComponent {
             <tr>
               <td></td>
               <td className={cx("token", { 'left': type === 'source' })} colSpan='3'>
-                <div className={cx("currency thetawei", { 'left': type === 'source' })}>{formatCoin(sum)} Theta </div>
-                {type === 'source' && <div className='price'>&nbsp;{`[\$${priceCoin(sum, price['Theta'])} USD]`}</div>}
+                <div className={cx("currency", currencyUnit, { 'left': type === 'source' })}>{`${formatCoin(sum)} ${currency}`} </div>
+                {type === 'source' && <div className='price'>&nbsp;{`[\$${priceCoin(sum, price[`${currency}`])} USD]`}</div>}
               </td>
             </tr>
           </tbody>

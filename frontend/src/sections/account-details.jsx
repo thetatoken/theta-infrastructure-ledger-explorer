@@ -38,7 +38,8 @@ export default class AccountDetails extends React.Component {
       loading_txns: false,
       includeService: false,
       hasOtherTxs: true,
-      hasStakes: false,
+      hasThetaStakes: false,
+      hasTfuelStakes: false,
       hasDownloadTx: false,
       hasStartDateErr: false,
       hasEndDateErr: false,
@@ -113,10 +114,23 @@ export default class AccountDetails extends React.Component {
     stakeService.getStakeByAddress(address)
       .then(res => {
         const stakes = get(res, 'data.body');
+        let thetaHolderTxs = [], tfuelHolderTxs = [];
+        let thetaSourceTxs = [], tfuelSourceTxs = [];
+        stakes.holderRecords.forEach(tx => {
+          if (tx.type === 'eenp') tfuelHolderTxs.push(tx)
+          else thetaHolderTxs.push(tx);
+        })
+        stakes.sourceRecords.forEach(tx => {
+          if (tx.type === 'eenp') tfuelSourceTxs.push(tx)
+          else thetaSourceTxs.push(tx);
+        })
         this.setState({
-          holderTxs: stakes.holderRecords,
-          sourceTxs: stakes.sourceRecords,
-          hasStakes: stakes.holderRecords.length + stakes.sourceRecords.length > 0
+          thetaHolderTxs,
+          thetaSourceTxs,
+          tfuelHolderTxs,
+          tfuelSourceTxs,
+          hasThetaStakes: thetaHolderTxs.length + thetaSourceTxs.length > 0,
+          hasTfuelStakes: tfuelHolderTxs.length + tfuelSourceTxs.length > 0
         })
       })
       .catch(err => {
@@ -293,8 +307,9 @@ export default class AccountDetails extends React.Component {
   }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasStakes, holderTxs, hasDownloadTx, sourceTxs,
-      price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn, typeOptions } = this.state;
+      includeService, hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
+      tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
+      hasRefreshBtn, typeOptions } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -316,10 +331,16 @@ export default class AccountDetails extends React.Component {
               </tbody>
             </table>
           </React.Fragment>}
-        {hasStakes &&
+        {hasThetaStakes &&
           <div className="stake-container">
-            {sourceTxs.length > 0 && <StakeTxsTable type='source' txs={sourceTxs} price={price} />}
-            {holderTxs.length > 0 && <StakeTxsTable type='holder' txs={holderTxs} price={price} />}
+            {thetaSourceTxs.length > 0 && <StakeTxsTable type='source' coinType='theta' txs={thetaSourceTxs} price={price} />}
+            {thetaHolderTxs.length > 0 && <StakeTxsTable type='holder' coinType='theta' txs={thetaHolderTxs} price={price} />}
+          </div>
+        }
+        {hasTfuelStakes &&
+          <div className="stake-container">
+            {tfuelSourceTxs.length > 0 && <StakeTxsTable type='source' coinType='tfuel' txs={tfuelSourceTxs} price={price} />}
+            {tfuelHolderTxs.length > 0 && <StakeTxsTable type='holder' coinType='tfuel' txs={tfuelHolderTxs} price={price} />}
           </div>
         }
         {!transactions && loading_txns &&
