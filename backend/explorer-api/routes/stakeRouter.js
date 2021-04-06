@@ -10,7 +10,8 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
 
   router.get("/stake/all", (req, res) => {
     console.log('Querying all stake.');
-    stakeDao.getAllStakesAsync()
+    let { types = ['vcp', 'gcp'] } = req.query;
+    stakeDao.getAllStakesByTypesAsync(types)
       .then(stakeListInfo => {
         const data = ({
           type: 'stake',

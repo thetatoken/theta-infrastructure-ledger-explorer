@@ -1,8 +1,8 @@
 import { apiService } from './api';
 
 export const stakeService = {
-  getAllStake() {
-    return apiService.get(`stake/all`, {});
+  getAllStake(types) {
+    return apiService.get(`stake/all`, { params: { types } });
   },
   getTotalStake() {
     return apiService.get(`stake/totalAmount`, {})

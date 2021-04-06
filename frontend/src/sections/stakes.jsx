@@ -27,7 +27,8 @@ export default class Stakes extends React.Component {
   }
 
   getAllStakes() {
-    stakeService.getAllStake()
+    const types = this.props.stakeCoinType === 'tfuel' ? ['eenp'] : ['vcp', 'gcp'];
+    stakeService.getAllStake(types)
       .then(res => {
         const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.withdrawn ? 0 : info.amount) }, 0);
@@ -83,19 +84,24 @@ export default class Stakes extends React.Component {
   }
 
   render() {
+    const { stakeCoinType } = this.props;
     const { holders, percentage, sortedStakesByHolder, sortedStakesBySource, totalStaked } = this.state;
     let isTablet = window.screen.width <= 768;
     const truncate = isTablet ? 10 : 20;
+    const title = `TOTAL ${stakeCoinType === 'tfuel' ? 'TFUEL' : 'THETA'} STAKED`;
+    const legend = stakeCoinType === 'tfuel' ? 'TFUEL NODES' : 'THETA NODES';
     return (
       <div className="content stakes">
-        <div className="page-title stakes">TOTAL STAKED</div>
+        <div className="page-title stakes">{title}</div>
         <div className="chart-container">
           <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'account'} />
         </div>
-        <div className="legend">THETA NODES</div>
+        <div className="legend">{legend}</div>
         <div className="table-container">
-          <StakesTable type='wallet' stakes={sortedStakesBySource} totalStaked={totalStaked} truncate={truncate} />
-          <StakesTable type='node' stakes={sortedStakesByHolder} totalStaked={totalStaked} truncate={truncate} />
+          <StakesTable type='wallet' stakeCoinType={stakeCoinType} stakes={sortedStakesBySource}
+            totalStaked={totalStaked} truncate={truncate} />
+          <StakesTable type='node' stakeCoinType={stakeCoinType} stakes={sortedStakesByHolder}
+            totalStaked={totalStaked} truncate={truncate} />
         </div>
       </div>
     );

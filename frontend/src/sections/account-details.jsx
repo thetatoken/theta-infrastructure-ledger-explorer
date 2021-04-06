@@ -333,14 +333,14 @@ export default class AccountDetails extends React.Component {
           </React.Fragment>}
         {hasThetaStakes &&
           <div className="stake-container">
-            {thetaSourceTxs.length > 0 && <StakeTxsTable type='source' coinType='theta' txs={thetaSourceTxs} price={price} />}
-            {thetaHolderTxs.length > 0 && <StakeTxsTable type='holder' coinType='theta' txs={thetaHolderTxs} price={price} />}
+            {thetaSourceTxs.length > 0 && <StakeTxsTable type='source' stakeCoinType='theta' txs={thetaSourceTxs} price={price} />}
+            {thetaHolderTxs.length > 0 && <StakeTxsTable type='holder' stakeCoinType='theta' txs={thetaHolderTxs} price={price} />}
           </div>
         }
         {hasTfuelStakes &&
           <div className="stake-container">
-            {tfuelSourceTxs.length > 0 && <StakeTxsTable type='source' coinType='tfuel' txs={tfuelSourceTxs} price={price} />}
-            {tfuelHolderTxs.length > 0 && <StakeTxsTable type='holder' coinType='tfuel' txs={tfuelHolderTxs} price={price} />}
+            {tfuelSourceTxs.length > 0 && <StakeTxsTable type='source' stakeCoinType='tfuel' txs={tfuelSourceTxs} price={price} />}
+            {tfuelHolderTxs.length > 0 && <StakeTxsTable type='holder' stakeCoinType='tfuel' txs={tfuelHolderTxs} price={price} />}
           </div>
         }
         {!transactions && loading_txns &&

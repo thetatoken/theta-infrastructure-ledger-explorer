@@ -110,6 +110,19 @@ module.exports = class stakeDAO {
     console.log('before redis callback');
   }
 
+  getAllStakesByTypes(types, callback) {
+    const queryObject = { 'type': { $in: types } };
+    this.client.query(this.stakeInfoCollection, queryObject, function (error, recordList) {
+      if (error) {
+        console.log('ERR - ', error);
+        // callback(error);
+      } else if (!recordList) {
+        callback(Error('NOT_FOUND - All Stakes'));
+      } else {
+        callback(error, recordList)
+      }
+    })
+  }
 
   getAllStakes(callback) {
     this.client.findAll(this.stakeInfoCollection, function (error, recordList) {

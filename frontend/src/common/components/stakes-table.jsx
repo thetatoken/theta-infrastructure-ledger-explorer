@@ -6,7 +6,17 @@ import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
 
 const TRUNC = 20;
-
+const TitleMap = {
+  'theta_wallet': 'TOP THETA STAKING WALLETS',
+  'theta_node': 'TOP VALIDATOR / GUARDIAN NODES',
+  'tfuel_wallet': 'TOP TFUEL STAKING WALLETS',
+  'tfuel_node': 'TOP ELITE EDGE NODES'
+}
+const NodeMap = {
+  'vcp': 'Validator',
+  'gcp': 'Guardian',
+  'eenp': 'Elite Edge'
+}
 export default class StakesTable extends React.Component {
   constructor(props) {
     super(props);
@@ -34,12 +44,13 @@ export default class StakesTable extends React.Component {
   }
 
   render() {
-    const { className, type, truncate, totalStaked, stakes } = this.props;
+    const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
     const { stakeList, isSliced } = this.state;
     let colSpan = type === 'node' ? 4 : 3;
+    const titleKey = `${stakeCoinType}_${type}`;
     return (
       <div className="stakes half">
-        <div className="title">{type === 'node' ? 'TOP VALIDATOR / GUARDIAN NODES' : 'TOP STAKING WALLETS'}</div>
+        <div className="title">{TitleMap[`${titleKey}`]}</div>
         <table className={cx("data txn-table", className)}>
           <thead>
             <tr onClick={this.toggleList.bind(this)}>
@@ -55,7 +66,7 @@ export default class StakesTable extends React.Component {
               return (
                 <tr key={address}>
                   <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
-                  {type === 'node' && <td className={cx("node-type", record.type)}>{record.type === 'vcp' ? 'Validator' : 'Guardian'}</td>}
+                  {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   <td className="staked"><div className="currency thetawei">{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);

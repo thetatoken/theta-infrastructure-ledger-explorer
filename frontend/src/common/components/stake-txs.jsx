@@ -43,12 +43,12 @@ export default class StakeTxsTable extends React.PureComponent {
   }
 
   render() {
-    const { txs, type, coinType, className, truncate, price } = this.props;
+    const { txs, type, stakeCoinType, className, truncate, price } = this.props;
     const { transactions, isSliced } = this.state;
     let sum = txs.reduce((sum, tx) => { return sumCoin(sum, tx.withdrawn ? 0 : tx.amount) }, 0);
-    const titleKey = `${coinType}_${type}`;
-    const currencyUnit = coinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
-    const currency = coinType === 'tfuel' ? 'TFuel' : 'Theta';
+    const titleKey = `${stakeCoinType}_${type}`;
+    const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
+    const currency = stakeCoinType === 'tfuel' ? 'TFuel' : 'Theta';
     return (
       <div className="stakes">
         <div className="title">{TitleMap[titleKey]}</div>
