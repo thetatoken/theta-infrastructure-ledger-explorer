@@ -377,7 +377,6 @@ const DepositStake = ({ transaction, price }) => {
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
-
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
@@ -398,18 +397,20 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
       if (tokenId === undefined) return;
       if (!hasItems) setHasItems(true);
     })
+    // setFilteredLogs(tmpLogs);
   }, [logs, abi])
   return (
     <>
-      <div className="details-header item">
-        <div className="txn-type smart-contract items">Items</div>
-      </div>
-      <table className="details txn-details item">
-        <tbody>
-          {/* {hasItems && <DetailsRow label="Item" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />} */}
-          {hasItems && logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
-        </tbody>
-      </table>
+      {hasItems && <>
+        <div className="details-header item">
+          <div className="txn-type smart-contract items">Items</div>
+        </div>
+        <div className="details txn-details item">
+          {/* <Item log={logs[0]} abi={abi} /> */}
+          <Items abi={abi} logs={logs} />
+          {/* {logs.map((log, i) => <Item log={log} abi={abi} key={i} />)} */}
+        </div>
+      </>}
       <div className="details-header">
         <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
         <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
@@ -518,6 +519,27 @@ const LogData = ({ data, decode }) => {
     })}
   </div>)
 }
+const Items = props => {
+  const { logs, abi } = props;
+  const [filteredLogs, setFiltedLogs] = useState([]);
+  useEffect(() => {
+    let ids = new Set();
+    let tmpLogs = [];
+    logs.forEach(log => {
+      const tokenId = get(log, 'decode.result.tokenId');
+      if (tokenId === undefined) return;
+      if (!ids.has(tokenId)) {
+        ids.add(tokenId);
+        tmpLogs.push(log);
+      }
+    })
+    setFiltedLogs(tmpLogs);
+  }, [logs])
+
+  return <>
+    {filteredLogs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
+  </>
+}
 const Item = props => {
   const { log, abi } = props;
   const [item, setItem] = useState();
@@ -564,14 +586,19 @@ const Item = props => {
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
         const url = abiCoder.decode(outputTypes, outputValues)[0];
-        fetch(url)
-          .then(res => res.json())
-          .then(data => {
-            setItem(data);
-          }).catch(e => {
-            console.log('error occurs in fetch url:', e)
-            setItem('Error occurs')
-          })
+        const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
+        if (isImage) {
+          setItem({ image: url });
+        } else {
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              setItem(data);
+            }).catch(e => {
+              console.log('error occurs in fetch url:', e)
+              setItem('Error occurs')
+            })
+        }
       }
       catch (e) {
         console.log('error occurs:', e);
@@ -587,8 +614,11 @@ const Item = props => {
         <img className="sc-item__image" src={item.image}></img>
       </div>
       <div className="sc-item__column">
-        <div className="sc-item__text">Name</div>
-        <div className="sc-item__text name">{item.name}</div>
+        {item.name && item.name.length > 0 &&
+          <>
+            <div className="sc-item__text">Name</div>
+            <div className="sc-item__text name">{item.name}</div>
+          </>}
         {item.description && item.description.length > 0 &&
           <>
             <div className="sc-item__text">Description</div>
