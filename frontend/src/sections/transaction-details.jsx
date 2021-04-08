@@ -397,7 +397,6 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
       if (tokenId === undefined) return;
       if (!hasItems) setHasItems(true);
     })
-    // setFilteredLogs(tmpLogs);
   }, [logs, abi])
   return (
     <>
@@ -406,9 +405,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
           <div className="txn-type smart-contract items">Items</div>
         </div>
         <div className="details txn-details item">
-          {/* <Item log={logs[0]} abi={abi} /> */}
           <Items abi={abi} logs={logs} />
-          {/* {logs.map((log, i) => <Item log={log} abi={abi} key={i} />)} */}
         </div>
       </>}
       <div className="details-header">
