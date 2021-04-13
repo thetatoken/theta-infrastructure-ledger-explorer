@@ -22,7 +22,9 @@ export default class StakesTable extends React.Component {
     super(props);
     this.state = {
       isSliced: true,
-      stakeList: this.props.stakes.slice(0, TRUNC)
+      stakeList: this.props.stakes.slice(0, TRUNC),
+      totalStakeLength: this.props.stakes.length,
+      curStakeLength: TRUNC
     };
 
   }
@@ -37,15 +39,24 @@ export default class StakesTable extends React.Component {
       this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
     }
   }
+  loadMoreStakes() {
+    this.setState({ curStakeLength: this.state.curStakeLength + TRUNC })
+  }
+  loadLessStakes() {
+    this.setState({ curStakeLength: TRUNC })
+  }
+  loadAllStakes() {
+    this.setState({ curStakeLength: this.state.totalStakeLength })
+  }
   componentDidUpdate(preProps) {
     if (preProps.stakes.length !== this.props.stakes.length) {
-      this.setState({ stakeList: this.props.stakes.slice(0, TRUNC), isSliced: true })
+      this.setState({ totalStakeLength: this.props.stakes.length, curStakeLength: TRUNC })
     }
   }
 
   render() {
     const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
-    const { stakeList, isSliced } = this.state;
+    const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
     let colSpan = type === 'node' ? 4 : 3;
     const titleKey = `${stakeCoinType}_${type}`;
     const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
@@ -62,7 +73,7 @@ export default class StakesTable extends React.Component {
             </tr>
           </thead>
           <tbody className="stake-tb">
-            {map(stakeList, record => {
+            {map(stakes.slice(0, curStakeLength), record => {
               const address = type === 'node' ? record.holder : record.source;
               return (
                 <tr key={address}>
@@ -73,11 +84,23 @@ export default class StakesTable extends React.Component {
                 </tr>);
             })}
             {stakes.length > TRUNC &&
-              <tr>
-                <td className="arrow-container" colSpan={colSpan} onClick={this.toggleList.bind(this)}>
-                  View {isSliced ? 'More' : 'Less'}
-                </td>
-              </tr>
+              <>
+                {totalStakeLength > curStakeLength && <tr>
+                  <td className="arrow-container" colSpan={colSpan} onClick={this.loadMoreStakes.bind(this)}>
+                    View More
+                  </td>
+                </tr>}
+                {curStakeLength < totalStakeLength && <tr>
+                  <td className="arrow-container" colSpan={colSpan} onClick={this.loadAllStakes.bind(this)}>
+                    View All
+                  </td>
+                </tr>}
+                {curStakeLength > TRUNC && <tr>
+                  <td className="arrow-container" colSpan={colSpan} onClick={this.loadLessStakes.bind(this)}>
+                    View Less
+                  </td>
+                </tr>}
+              </>
             }
             <tr><td className="empty"></td></tr>
             <tr>
