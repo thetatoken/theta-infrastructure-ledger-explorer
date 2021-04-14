@@ -146,7 +146,7 @@ module.exports = class stakeDAO {
   }
   removeRecordsById(type, ids, callback) {
     let self = this;
-    const queryObject = { id: { $in: ids }, 'type': type };
+    const queryObject = { _id: { $in: ids }, 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, async function (err, res) {
       if (err) {
         console.log('ERR - Remove ids', err, type, ids);
