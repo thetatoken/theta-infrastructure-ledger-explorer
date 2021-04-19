@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
+import moment from 'moment';
 
 import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
@@ -12,6 +13,7 @@ import { formatCoin, priceCoin, getHex, validateHex, decodeLogs } from 'common/h
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
+import { stakeService } from 'common/services/stake';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
@@ -348,9 +350,19 @@ const Coinbase = ({ transaction, price }) => {
 
 const WithdrawStake = ({ transaction, price }) => {
   let { data } = transaction;
+  const [returnTime, setReturnTime] = useState(0);
+  useEffect(() => {
+    const returnHeight = Number(transaction.block_height) + 28800;
+    stakeService.getStakeReturnTime(returnHeight).then(res => {
+      let time = get(res, 'data.body.time');
+      if (!time) return;
+      setReturnTime(time);
+    })
+  }, [transaction])
   return (
     <table className="details txn-details">
       <tbody>
+        {returnTime > 0 && <DetailsRow label="Estimated Return" data={<ReturnTime returnTime={returnTime} />} />}
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
@@ -625,4 +637,19 @@ const Item = props => {
       </div>
     </div>
   ) : <div className="sc-item text-danger">{item}</div>
+}
+
+const ReturnTime = props => {
+  const { returnTime } = props;
+  const [str, setStr] = useState('')
+  useEffect(() => {
+    let days = ~~(returnTime / 60 / 60 / 24);
+    let hours = ~~(returnTime / 60 / 60 % 24);
+    let mins = ~~(returnTime / 60 % 60);
+    const dayStr = days > 0 ? days + ` day${days > 1 ? 's' : ''} : ` : '';
+    const hourStr = (hours < 10 ? '0' + hours : hours) + ' hour' + (hours > 1 ? 's' : '') + ' : ';
+    const minStr = (mins < 10 ? '0' + mins : mins) + ' min' + (mins > 1 ? 's' : '');
+    setStr('In ' + dayStr + hourStr + minStr)
+  }, [returnTime]);
+  return <div className="text-grey">{str}</div>
 }

@@ -4,7 +4,7 @@ export const stakeService = {
   getAllStake() {
     return apiService.get(`stake/all`, {});
   },
-  getTotalStake(){
+  getTotalStake() {
     return apiService.get(`stake/totalAmount`, {})
   },
   getStakeByAddress(address) {
@@ -12,5 +12,8 @@ export const stakeService = {
       throw Error('Missing argument');
     }
     return apiService.get(`stake/${address}`, {});
+  },
+  getStakeReturnTime(height) {
+    return apiService.get(`stake/returnTime`, { params: { return_height: height } })
   }
 };

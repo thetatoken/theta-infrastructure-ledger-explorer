@@ -5,7 +5,7 @@ var helper = require('../helper/utils');
 let startTime = +new Date();
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData;
-var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
+var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -35,7 +35,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     console.log('Querying total staked tokens.');
     let cur = +new Date();
     if (cur - startTime < cachePeriod && cacheData) {
-      if (cacheData.type === 'stakeTotalAmout') {
+      if (cacheData.type === 'stake_total_amount') {
         res.status(200).send(cacheData);
       } else if (cacheData.type === 'error_not_found') {
         res.status(404).send(cacheData);
@@ -46,7 +46,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
     progressDao.getStakeProgressAsync()
       .then(info => {
         const data = ({
-          type: 'stakeTotalAmout',
+          type: 'stake_total_amount',
           body: { totalAmount: info.total_amount, totalNodes: info.holder_num },
         });
         cacheData = data;
@@ -65,6 +65,29 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
         }
       });
   });
+
+  router.get("/stake/returnTime", async (req, res) => {
+    let { return_height = 0 } = req.query;
+    return_height = Number(return_height);
+    if (return_height === 0) res.status(400).send('invalid_parameter');
+    const network_id = config.blockchain.network_id;
+    try {
+      const progressInfo = await progressDao.getProgressAsync(network_id);
+      const cur_height = progressInfo.height;
+      let time = 0;
+      if (cur_height < return_height) {
+        const num_blocks_past_24_hours = await blockDao.getTotalNumberByHourAsync(24);
+        time = (86400 / num_blocks_past_24_hours) * (return_height - cur_height);
+      }
+      res.status(200).send({
+        type: 'stake_return_time',
+        body: { time }
+      })
+    } catch (e) {
+      console.log(e)
+      res.status(400).send('Error occurs:', e);
+    }
+  })
 
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
@@ -115,6 +138,8 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
         }
       });
   });
+
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
