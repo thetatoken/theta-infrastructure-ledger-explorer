@@ -51,7 +51,7 @@ exports.Execute = async function (network_id) {
   await progressDao.getProgressAsync(network_id)
     .then(function (progressInfo) {
       Logger.log('Start a new crawler progress');
-      console.log('progressInfo:', progressInfo);
+      Logger.log('progressInfo:', JSON.stringify(progressInfo));
       txs_count = progressInfo.count;
       crawled_block_height_progress = progressInfo.height;
       Logger.log('DB transaction count progress: ' + txs_count.toString());
@@ -112,7 +112,7 @@ exports.Execute = async function (network_id) {
     })
     .then(async function (blockDataList) {
       let curTime = +new Date();
-      console.log(`Query block info takes: ${curTime - startTime} ms`)
+      Logger.log(`Query block info takes: ${curTime - startTime} ms`)
       if (blockDataList) {
         var upsertBlockAsyncList = [];
         var upsertVcpAsyncList = [];
@@ -154,15 +154,13 @@ exports.Execute = async function (network_id) {
               upsertGcpAsyncList.push(stakeHelper.updateStakes(updateGcpAsyncList, 'gcp', stakeDao));
             } else if (result.result.BlockHashEenpPairs) {  // hanndle EENP response
               if (upsertEenpAsyncList.length > 0) continue;
-              console.log('In Eenp, records:', result.result.BlockHashEenpPairs);
               stakes.eenp = result.result.BlockHashEenpPairs;
               result.result.BlockHashEenpPairs.forEach(eenpPair => {
-                console.log(`Length: ${eenpPair.Eenp.SortedEliteEdgeNodes.length}`)
                 eenpPair.Eenp.SortedEliteEdgeNodes.forEach(candidate => {
                   updateEenpAsyncList.push(candidate);
                 })
               })
-              console.log(`updateEenpAsyncList length: ${updateEenpAsyncList.length}`);
+              Logger.log(`updateEenpAsyncList length: ${updateEenpAsyncList.length}`);
               upsertEenpAsyncList.push(stakeHelper.updateStakes(updateEenpAsyncList, 'eenp', stakeDao));
             } else {  //handle block response
               var txs = result.result.transactions;
@@ -245,7 +243,7 @@ exports.Execute = async function (network_id) {
       }
     })
     .then(() => {
-      console.log('update account after handle all stakes')
+      Logger.log('update account after handle all stakes')
       accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, dailyAccountDao, validTransactionList);
     })
     .then(async function () {
