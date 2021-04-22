@@ -11,7 +11,9 @@ const getLineOptions = (type, data, labels, clickType) => {
       datasets: [{
         data: data,
         backgroundColor: "transparent",
-        borderColor: '#29B3EB'
+        borderColor: '#25c4e4',
+        borderWidth: '1',
+        pointBackgroundColor: '#1b1f2a'
       }],
       labels: labels
     },
@@ -49,6 +51,17 @@ const getLineOptions = (type, data, labels, clickType) => {
           type: 'time',
           time: {
             unit: 'week'
+          },
+          gridLines: {
+            display: false
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            maxTicksLimit: 3
+          },
+          gridLines: {
+            display: false
           }
         }]
       }
@@ -76,6 +89,7 @@ export default class ThetaChart extends React.PureComponent {
     const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : this.getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
     Chart.defaults.global.defaultFontColor = '#8A8FB5';
+    Chart.defaults.global.defaultFontSize = '11';
     Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
   componentDidUpdate(preProps) {
