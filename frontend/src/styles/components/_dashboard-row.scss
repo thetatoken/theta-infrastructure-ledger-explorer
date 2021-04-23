@@ -101,6 +101,10 @@
         }
         .title {
           margin-left: 20px;
+
+          @include breakpoint('phablet', max) {
+            margin-left: 0;
+        }
         }
       }
       .title{

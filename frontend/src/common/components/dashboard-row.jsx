@@ -35,13 +35,13 @@ const DashboardRow = () => {
   return <div className="dashboard-row half">
     <div className="column"></div>
     <div className="column">
-      <Detail title={'TOTAL ONCHAIN WALLET ADDRESSES'} value={formatNumber(totalWallet)} />
+      <Detail title={'STAKED TO PRE-ELITE EN (TESTNET)'} value={<div className="currency tfuelwei sml">{formatNumber(totalStakedTfuel)}</div>} />
+    </div>
+    <div className="column">
+      <Detail title={'TOTAL ONCHAIN WALLETS'} value={formatNumber(totalWallet)} />
     </div>
     <div className="column">
       <Detail title={'DAILY ACTIVE WALLETS'} value={formatNumber(dailyActiveAccount)} />
-    </div>
-    <div className="column">
-      <Detail title={'STAKED TO PRE-ELITE EDGE NODES (TESTNET)'} value={<div className="currency tfuelwei sml">{formatNumber(totalStakedTfuel)}</div>} />
     </div>
   </div>
 }
