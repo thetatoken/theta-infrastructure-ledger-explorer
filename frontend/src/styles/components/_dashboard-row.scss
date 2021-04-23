@@ -20,7 +20,6 @@
     }
   }
   &.tfuel{
-    // border-bottom: 1px solid rgba($color-font-light, 0.2);
     .value.price{
       @include linearHorizontalGradient($color-red, $color-orange);
     }
@@ -116,6 +115,17 @@
   @include breakpoint('phablet', max) {
     margin: 0 5%;
     flex-wrap: wrap;
+    &.half {
+      &>:nth-child(2) {
+        width: 90%;
+      }
+      &>:nth-child(3) {
+        margin-left: 10%;
+      }
+      &>:nth-child(4) {
+        margin-left: 0;
+      }
+    }
     & .column{
       width: 40%;
       .chart-container.row {
@@ -143,15 +153,6 @@
       }
     }
     &.tfuel{
-      // .column{
-      //   width: 40%
-      // }
-      // >:first-child{
-      //   width: 10%
-      // }
-      // >:nth-child(4){
-      //   margin-left: 10% 
-      // }
       >:last-child{
         display: none
       }
