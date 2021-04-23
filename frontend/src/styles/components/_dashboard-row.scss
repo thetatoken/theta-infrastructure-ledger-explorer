@@ -14,14 +14,15 @@
   &.tfuel>:first-child{
     width: 4%;
   }
-  &.theta{
+  &.theta .detail{
     .value.price{
-      @include linearHorizontalGradient($color-blue, $color-green);
+      // @include linearHorizontalGradient($color-blue, $color-green);
+      color: $color-blue;
     }
   }
-  &.tfuel{
+  &.tfuel .detail{
     .value.price{
-      @include linearHorizontalGradient($color-red, $color-orange);
+      color: rgb(237,109,49);
     }
   }
   >:last-child{
@@ -74,8 +75,6 @@
         &.price{
           font-size: 28px;
           font-weight: 100;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           margin-left: 0;
         }
         .tps{
@@ -103,7 +102,7 @@
 
           @include breakpoint('phablet', max) {
             margin-left: 0;
-        }
+          }
         }
       }
       .title{
