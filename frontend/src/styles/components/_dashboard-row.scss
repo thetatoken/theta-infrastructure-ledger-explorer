@@ -16,13 +16,24 @@
   }
   &.theta .detail{
     .value.price{
-      // @include linearHorizontalGradient($color-blue, $color-green);
       color: $color-blue;
+      /* ----------- Laptops and Desktops ----------- */
+      @media only screen and (min-width : 1224px) {
+        @include linearHorizontalGradient($color-blue, $color-green);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
     }
   }
   &.tfuel .detail{
     .value.price{
       color: rgb(237,109,49);
+      /* ----------- Laptops and Desktops ----------- */
+      @media only screen and (min-width : 1224px) {
+        @include linearHorizontalGradient($color-red, $color-orange);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
     }
   }
   >:last-child{
