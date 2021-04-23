@@ -5,6 +5,7 @@ import cx from 'classnames';
 import Detail from 'common/components/dashboard-detail';
 import { formatNumber } from 'common/helpers/utils';
 import { accountService } from 'common/services/account';
+import { stakeService } from 'common/services/stake';
 
 const DashboardRow = () => {
   const [totalWallet, setTotalWallet] = useState(0);
@@ -22,10 +23,16 @@ const DashboardRow = () => {
         if (!flag) return;
         setDailyActiveAccount(get(res, 'data.body.amount') || 0);
       })
+    //TODO: change to other method after merge 3.0 branch
+    stakeService.getPreEdgeNodeTfuel()
+      .then(res => {
+        if (!flag) return;
+        setTotalStakedTfuel(Number(get(res, 'data.body.total_tfuel_staked')) || 0);
+      })
     return () => flag = false;
   }, [])
 
-return <div className="dashboard-row half">
+  return <div className="dashboard-row half">
     <div className="column"></div>
     <div className="column">
       <Detail title={'TOTAL ONCHAIN WALLET ADDRESSES'} value={formatNumber(totalWallet)} />
@@ -34,7 +41,7 @@ return <div className="dashboard-row half">
       <Detail title={'DAILY ACTIVE WALLETS'} value={formatNumber(dailyActiveAccount)} />
     </div>
     <div className="column">
-      <Detail title={'TOTAL TFUEL STAKED TO EDGE NODES'} value={formatNumber(totalStakedTfuel)} />
+      <Detail title={'STAKED TO PRE-ELITE EDGE NODES (TESTNET)'} value={<div className="currency tfuelwei sml">{formatNumber(totalStakedTfuel)}</div>} />
     </div>
   </div>
 }

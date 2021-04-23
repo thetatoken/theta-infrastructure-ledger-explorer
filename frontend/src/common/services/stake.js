@@ -15,5 +15,9 @@ export const stakeService = {
   },
   getStakeReturnTime(height) {
     return apiService.get(`stake/returnTime`, { params: { return_height: height } })
+  },
+  //TODO: remove after merge 3.0 brannch
+  getPreEdgeNodeTfuel() {
+    return apiService.get(`stake/totalAmount/tfuel`, {})
   }
 };

@@ -45,6 +45,12 @@
     }
     .currency{
       margin-top: 10px;
+      &.sml{
+        &::before {
+          width: 20px;
+          height: 20px;
+        }
+      }
       &::before{
         width: 24px;
         height: 24px;
