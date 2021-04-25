@@ -35,7 +35,7 @@ const DashboardRow = () => {
   return <div className="dashboard-row half">
     <div className="column"></div>
     <div className="column">
-      <Detail title={'STAKED TO PRE-ELITE EN (TESTNET)'} value={<div className="currency tfuelwei sml">{formatNumber(totalStakedTfuel)}</div>} />
+      <Detail title={'STAKED TO PRE-ELITE EN (TESTNET)'} value={<StakedTFuel totalStakedTfuel={totalStakedTfuel} />} />
     </div>
     <div className="column">
       <Detail title={'TOTAL ONCHAIN WALLETS'} value={formatNumber(totalWallet)} />
@@ -46,3 +46,7 @@ const DashboardRow = () => {
   </div>
 }
 export default React.memo(DashboardRow);
+
+const StakedTFuel = ({ totalStakedTfuel }) => {
+  return totalStakedTfuel > 0 ? <div className="currency tfuelwei sml">{formatNumber(totalStakedTfuel)}</div> : '-';
+}
