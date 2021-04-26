@@ -82,7 +82,7 @@ export default class TransactionTable extends React.Component {
         <tbody>
           {map(transactions, (txn, i) => {
             let source = null;
-            source = !account ? 'none' : account.address === from(txn, null, account) ? 'from' : 'to';
+            source = !account ? 'none' : account.address === from(txn, null, address) ? 'from' : 'to';
             return (
               <tr key={i} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
@@ -91,7 +91,9 @@ export default class TransactionTable extends React.Component {
                   <React.Fragment>
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
-                    <td className={cx({ 'dim': source === 'to' }, "from overflow")}><Link to={`/account/${from(txn)}`}>{from(txn, 20)}</Link></td>
+                    <td className={cx({ 'dim': source === 'to' }, "from overflow")}>
+                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, 20, address)}</Link>
+                    </td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
                       <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address)}</Link>
