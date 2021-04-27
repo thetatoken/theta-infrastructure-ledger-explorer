@@ -202,7 +202,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
         accountJob.Execute();
       }
     })
-  schedule.scheduleJob('Record active accounts', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
+  schedule.scheduleJob('Record active accounts', '0 0 0 * * *', 'America/Tijuana', accountJob.Execute); // PST mid-night
 }
 
 
