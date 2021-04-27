@@ -182,10 +182,10 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
 
   accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
-  schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelPrice); // PST mid-night
+  schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'Etc/GMT', accountingJob.RecordTFuelPrice); // GMT mid-night
 
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
-  schedule.scheduleJob('Record TFuel Earning', '0 0 16 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST 4:00PM
+  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night
 
   activeActJob.Initialize(dailyAccountDao, activeAccountDao);
   activeAccountDao.getLatestRecordsAsync(1)
@@ -194,7 +194,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
         activeActJob.Execute();
       }
     })
-  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
+  schedule.scheduleJob('Record active accounts', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
 }
 
 
