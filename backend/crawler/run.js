@@ -20,6 +20,8 @@ var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 var Redis = require("ioredis");
 var redis = null;
 var redisConfig = null;
+var cacheConfig = null; // node local cache configuration
+var cacheEnabled = false;
 
 var readBlockCronJob = require('./jobs/read-block.js');
 var readPreFeeCronJob = require('./jobs/read-previous-fee.js');
@@ -64,6 +66,8 @@ function main() {
 
   redisConfig = config.redis;
   console.log("redisConfig:", redisConfig)
+  cacheEnabled = config.nodeCache && config.nodeCache.enabled;
+  console.log('cacheEnabled:', cacheEnabled);
   if (redisConfig && redisConfig.enabled) {
     redis = redisConfig.isCluster ? new Redis.Cluster([
       {
@@ -172,7 +176,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
     await readPreFeeCronJob.Execute(network_id, readPreFeeTimer);
   }, 1000);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao, dailyAccountDao);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao, dailyAccountDao, cacheEnabled);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);

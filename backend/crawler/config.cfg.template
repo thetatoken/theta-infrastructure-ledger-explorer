@@ -30,5 +30,8 @@
         "password": "",
         "family": 4,
         "db": 0
+    },
+    "nodeCache": {
+        "enabled": false
     }
 }

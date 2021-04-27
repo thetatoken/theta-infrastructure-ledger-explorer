@@ -35,7 +35,6 @@ module.exports = class stakeDAO {
     if (this.redis !== null) {
       await this.updateStakesWithRedis(candidateList, type);
     } else {
-      console.log('type:', type)
       await this.removeRecordsAsync(type);
       for (let candidate of candidateList) {
         const holder = candidate.Holder;

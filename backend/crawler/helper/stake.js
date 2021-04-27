@@ -23,29 +23,7 @@ function shallowEqual(object1, object2) {
   }
   return true;
 }
-
-exports.updateStake = async function (candidate, type, stakeDao) {
-  const holder = candidate.Holder;
-  const stakes = candidate.Stakes;
-  let insertList = [];
-  stakes.forEach(stake => {
-    const stakeInfo = {
-      '_id': `${type}_${holder}_${stake.source}`,
-      'type': type,
-      'holder': holder,
-      'source': stake.source,
-      'amount': stake.amount,
-      'withdrawn': stake.withdrawn,
-      'return_height': stake.return_height
-    }
-    insertList.push(stakeDao.insertAsync(stakeInfo));
-  });
-  await Promise.all(insertList);
-}
-exports.updateStakes = async function (candidateList, type, stakeDao) {
-  // console.log('before update stakes:', type)
-  // await stakeDao.updateStakesAsync(candidateList, type);
-  // console.log('after update stakes:', type)
+async function updateStakeWithCache(candidateList, type, stakeDao) {
   let cacheKeyRef = stakeKeysCache[`${type}`];
   let cacheRef = stakesCache[`${type}`];
   if (cacheKeyRef.size === 0) {
@@ -89,6 +67,35 @@ exports.updateStakes = async function (candidateList, type, stakeDao) {
   for (let key of deleteKeys) {
     cacheRef.delete(key);
   }
+}
+
+exports.updateStake = async function (candidate, type, stakeDao) {
+  const holder = candidate.Holder;
+  const stakes = candidate.Stakes;
+  let insertList = [];
+  stakes.forEach(stake => {
+    const stakeInfo = {
+      '_id': `${type}_${holder}_${stake.source}`,
+      'type': type,
+      'holder': holder,
+      'source': stake.source,
+      'amount': stake.amount,
+      'withdrawn': stake.withdrawn,
+      'return_height': stake.return_height
+    }
+    insertList.push(stakeDao.insertAsync(stakeInfo));
+  });
+  await Promise.all(insertList);
+}
+exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabled) {
+  // console.log('before update stakes:', type)
+  // await stakeDao.updateStakesAsync(candidateList, type);
+  // console.log('after update stakes:', type)
+  if(cacheEnabled){
+    await updateStakeWithCache(candidateList, type, stakeDao);
+    return;
+  }
+  await stakeDao.updateStakesAsync(candidateList, type);
 }
 exports.updateTotalStake = function (totalStake, progressDao) {
   let totalTheta = 0, totalTfuel = 0;
