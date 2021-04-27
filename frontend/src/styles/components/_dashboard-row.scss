@@ -1,0 +1,171 @@
+.dashboard-wrap {
+  &>:last-child{
+    border-bottom: 1px solid rgba($color-font-light, 0.2);
+  }
+}
+.dashboard-row{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid rgba($color-font-light, 0.2);
+  &.theta>:first-child{
+    width: 4%;
+  }
+  &.tfuel>:first-child{
+    width: 4%;
+  }
+  &.theta .detail{
+    .value.price{
+      color: $color-blue;
+      /* ----------- Laptops and Desktops ----------- */
+      @media only screen and (min-width : 1224px) {
+        @include linearHorizontalGradient($color-blue, $color-green);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+  }
+  &.tfuel .detail{
+    .value.price{
+      color: rgb(237,109,49);
+      /* ----------- Laptops and Desktops ----------- */
+      @media only screen and (min-width : 1224px) {
+        @include linearHorizontalGradient($color-red, $color-orange);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+  }
+  >:last-child{
+    width: 36% !important;
+  }
+  &.half {
+    &>:first-child {
+      width: 4%;
+    }
+    .column {
+      height: 80px;
+    }
+  }
+  .column{
+    width: 20%;
+    height: 160px;
+    padding-top: 15px;
+    >:first-child{
+      margin-bottom: 25px;
+    }
+    .currency{
+      margin-top: 10px;
+      &.sml{
+        &::before {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      &::before{
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .detail{
+      height: 48px;
+      border-left: 1px solid rgba($color-font-light, 0.2);
+      padding-left: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .title{
+        color: $color-font-light;
+        font-size: 11px;
+      }
+      .value{
+        display: flex;
+        color: $color-white;
+        font-size: 18px;
+        &.price{
+          font-size: 28px;
+          font-weight: 100;
+          margin-left: 0;
+        }
+        .tps{
+          font-size: 12px;
+          align-self: flex-end;
+        }
+      }
+    }
+    .chart-container{
+      padding-left: 10px;
+      border-left: 1px solid rgba($color-font-light, 0.2);
+      text-align: center;
+      &.row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+        & .chart {
+          width: 60%;
+          margin: 0;
+          margin-left: -30px;
+        }
+        .title {
+          margin-left: 20px;
+
+          @include breakpoint('phablet', max) {
+            margin-left: 0;
+          }
+        }
+      }
+      .title{
+        color: $color-font-light;
+        font-size: 14px;
+      }
+    }
+  }
+  @include breakpoint('phablet', max) {
+    margin: 0 5%;
+    flex-wrap: wrap;
+    &.half {
+      &>:nth-child(2) {
+        width: 90%;
+      }
+      &>:nth-child(3) {
+        margin-left: 10%;
+      }
+      &>:nth-child(4) {
+        margin-left: 0;
+      }
+    }
+    & .column{
+      width: 40%;
+      .chart-container.row {
+        display: block;
+        .chart {
+          margin: 10px 0 0 -15%;
+        }
+      }
+      .detail{
+        .value.price {
+          font-size: 22px;
+        }
+      } 
+    }
+    &>:first-child{
+      width: 10% !important;
+    }
+    &>:nth-child(4){
+      margin-left: 10% 
+    }
+
+    &.theta {
+      >:last-child{
+        width: 40% !important;
+      }
+    }
+    &.tfuel{
+      >:last-child{
+        display: none
+      }
+    }
+  }
+}

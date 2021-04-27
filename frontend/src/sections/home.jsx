@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
 import TokenDashboard from "common/components/token-dashboard";
+import DashboardRow from "common/components/dashboard-row";
 import { priceService } from 'common/services/price';
 
 export default class Dashboard extends React.PureComponent {
@@ -44,8 +45,11 @@ export default class Dashboard extends React.PureComponent {
     const { backendAddress } = this.props;
     return (
       <div className="content home">
-        <TokenDashboard type='theta' tokenInfo={thetaInfo} />
-        <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
+        <div className="dashboard-wrap">
+          <TokenDashboard type='theta' tokenInfo={thetaInfo} />
+          <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
+          <DashboardRow />
+        </div>
         <div className="overview">
           <div>
             <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>

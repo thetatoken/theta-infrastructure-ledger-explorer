@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
+import moment from 'moment';
 
 import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
@@ -12,6 +13,7 @@ import { formatCoin, priceCoin, getHex, validateHex, decodeLogs } from 'common/h
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
+import { stakeService } from 'common/services/stake';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
@@ -315,7 +317,7 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={map(data.intputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
+        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={map(data.inputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
           : <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />}
         <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
@@ -348,9 +350,19 @@ const Coinbase = ({ transaction, price }) => {
 
 const WithdrawStake = ({ transaction, price }) => {
   let { data } = transaction;
+  const [returnTime, setReturnTime] = useState(0);
+  useEffect(() => {
+    const returnHeight = Number(transaction.block_height) + 28800;
+    stakeService.getStakeReturnTime(returnHeight).then(res => {
+      let time = get(res, 'data.body.time');
+      if (!time) return;
+      setReturnTime(time);
+    })
+  }, [transaction])
   return (
     <table className="details txn-details">
       <tbody>
+        {returnTime > 0 && <DetailsRow label="Estimated Return" data={<ReturnTime returnTime={returnTime} />} />}
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
@@ -377,7 +389,6 @@ const DepositStake = ({ transaction, price }) => {
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
-
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
@@ -401,15 +412,14 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
   }, [logs, abi])
   return (
     <>
-      <div className="details-header item">
-        <div className="txn-type smart-contract items">Items</div>
-      </div>
-      <table className="details txn-details item">
-        <tbody>
-          {/* {hasItems && <DetailsRow label="Item" data={<div className="sc-items">{logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}</div>} />} */}
-          {hasItems && logs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
-        </tbody>
-      </table>
+      {hasItems && <>
+        <div className="details-header item">
+          <div className="txn-type smart-contract items">Items</div>
+        </div>
+        <div className="details txn-details item">
+          <Items abi={abi} logs={logs} />
+        </div>
+      </>}
       <div className="details-header">
         <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
         <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
@@ -518,6 +528,27 @@ const LogData = ({ data, decode }) => {
     })}
   </div>)
 }
+const Items = props => {
+  const { logs, abi } = props;
+  const [filteredLogs, setFiltedLogs] = useState([]);
+  useEffect(() => {
+    let ids = new Set();
+    let tmpLogs = [];
+    logs.forEach(log => {
+      const tokenId = get(log, 'decode.result.tokenId');
+      if (tokenId === undefined) return;
+      if (!ids.has(tokenId)) {
+        ids.add(tokenId);
+        tmpLogs.push(log);
+      }
+    })
+    setFiltedLogs(tmpLogs);
+  }, [logs])
+
+  return <>
+    {filteredLogs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
+  </>
+}
 const Item = props => {
   const { log, abi } = props;
   const [item, setItem] = useState();
@@ -564,14 +595,19 @@ const Item = props => {
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
         const url = abiCoder.decode(outputTypes, outputValues)[0];
-        fetch(url)
-          .then(res => res.json())
-          .then(data => {
-            setItem(data);
-          }).catch(e => {
-            console.log('error occurs in fetch url:', e)
-            setItem('Error occurs')
-          })
+        const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
+        if (isImage) {
+          setItem({ image: url });
+        } else {
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              setItem(data);
+            }).catch(e => {
+              console.log('error occurs in fetch url:', e)
+              setItem('Error occurs')
+            })
+        }
       }
       catch (e) {
         console.log('error occurs:', e);
@@ -587,8 +623,11 @@ const Item = props => {
         <img className="sc-item__image" src={item.image}></img>
       </div>
       <div className="sc-item__column">
-        <div className="sc-item__text">Name</div>
-        <div className="sc-item__text name">{item.name}</div>
+        {item.name && item.name.length > 0 &&
+          <>
+            <div className="sc-item__text">Name</div>
+            <div className="sc-item__text name">{item.name}</div>
+          </>}
         {item.description && item.description.length > 0 &&
           <>
             <div className="sc-item__text">Description</div>
@@ -598,4 +637,19 @@ const Item = props => {
       </div>
     </div>
   ) : <div className="sc-item text-danger">{item}</div>
+}
+
+const ReturnTime = props => {
+  const { returnTime } = props;
+  const [str, setStr] = useState('')
+  useEffect(() => {
+    let days = ~~(returnTime / 60 / 60 / 24);
+    let hours = ~~(returnTime / 60 / 60 % 24);
+    let mins = ~~(returnTime / 60 % 60);
+    const dayStr = days > 0 ? days + ` day${days > 1 ? 's' : ''} : ` : '';
+    const hourStr = (hours < 10 ? '0' + hours : hours) + ' hour' + (hours > 1 ? 's' : '') + ' : ';
+    const minStr = (mins < 10 ? '0' + mins : mins) + ' min' + (mins > 1 ? 's' : '');
+    setStr('In ' + dayStr + hourStr + minStr)
+  }, [returnTime]);
+  return <div className="text-grey">{str}</div>
 }

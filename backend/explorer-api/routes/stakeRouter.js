@@ -2,10 +2,11 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
+var axios = require("axios").default;
 let startTime = +new Date();
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData = { theta: undefined, tfuel: undefined };
-var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
+var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -31,7 +32,24 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
         }
       });
   });
-
+  //TODO: remove after merge 3.0 branch
+  router.get("/stake/totalAmount/tfuel", async (req, res) => {
+    console.log('Querying total staked tfuel tokens.');
+    axios.get(`https://api.thetatoken.org/v1/pre-elite-edge-nodes/stats`)
+      .then(result => {
+        const data = ({
+          type: 'total_staked_tfuel',
+          body: {
+            total_tfuel_staked: result.data.total_tfuel_staked
+          }
+        })
+        res.status(200).send(data)
+      })
+      .catch(error => {
+        console.log('error:', error)
+        res.status(400).send(error);
+      })
+  })
   router.get("/stake/totalAmount", (req, res) => {
     let { type = 'theta' } = req.query;
     console.log(`Querying total staked ${type} tokens.`);
@@ -72,6 +90,29 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
         }
       });
   });
+
+  router.get("/stake/returnTime", async (req, res) => {
+    let { return_height = 0 } = req.query;
+    return_height = Number(return_height);
+    if (return_height === 0) res.status(400).send('invalid_parameter');
+    const network_id = config.blockchain.network_id;
+    try {
+      const progressInfo = await progressDao.getProgressAsync(network_id);
+      const cur_height = progressInfo.height;
+      let time = 0;
+      if (cur_height < return_height) {
+        const num_blocks_past_24_hours = await blockDao.getTotalNumberByHourAsync(24);
+        time = (86400 / num_blocks_past_24_hours) * (return_height - cur_height);
+      }
+      res.status(200).send({
+        type: 'stake_return_time',
+        body: { time }
+      })
+    } catch (e) {
+      console.log(e)
+      res.status(400).send('Error occurs:', e);
+    }
+  })
 
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
@@ -122,6 +163,7 @@ var stakeRouter = (app, stakeDao, accountDao, progressDao) => {
         }
       });
   });
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

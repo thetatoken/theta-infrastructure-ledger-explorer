@@ -34,7 +34,10 @@ body {
 
 #app-container {
   height: 100%;
-
+  min-width: 1024px;
+  @include breakpoint('tablet', max) {
+    min-width: 100%;
+  }
   &:before {
     content: '';
     position: absolute;

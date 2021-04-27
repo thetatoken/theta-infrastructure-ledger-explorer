@@ -98,8 +98,8 @@ module.exports = class ProgressDAO {
   getStakeProgress(type, callback) {
     let self = this;
     const queryObject = { '_id': `${type}_stake` };
+    const redis_key = `progress_${type}_stake`;
     if (this.redis !== null) {
-      const redis_key = `progress_${type}_stake`;
       this.redis.get(redis_key, (err, reply) => {
         if (err) {
           console.log('Redis get stake progress met error:', err);

@@ -7,7 +7,7 @@ import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { blocksService } from 'common/services/block';
 import ThetaChart from 'common/components/chart';
-
+import Detail from 'common/components/dashboard-detail';
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
 
@@ -122,7 +122,7 @@ export default class TokenDashboard extends React.PureComponent {
     const token = type.toUpperCase();
     return (
       <React.Fragment>
-        {tokenInfo && <div className={cx("token dashboard", type)}>
+        {tokenInfo && <div className={cx("dashboard-row", type)}>
           <div className="column">
             <div className={cx("currency", icon)}></div>
           </div>
@@ -149,7 +149,7 @@ export default class TokenDashboard extends React.PureComponent {
                 <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
                 <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
               </div> :
-              <div className="chart-container">
+              <div className="chart-container row">
                 <div className="title">THETA NODES</div>
                 <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'stake'} />
               </div>}
@@ -158,15 +158,6 @@ export default class TokenDashboard extends React.PureComponent {
       </React.Fragment>
     );
   }
-}
-
-const Detail = ({ title, value }) => {
-  return (
-    <div className="detail">
-      <div className="title">{title}</div>
-      <div className={cx("value", { price: title.includes('Price') })}>{value}</div>
-    </div>
-  );
 }
 
 const TxnNumber = ({ num }) => {

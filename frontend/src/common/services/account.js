@@ -12,5 +12,11 @@ export const accountService = {
       throw Error('Missing argument');
     }
     return apiService.get(`accountTx/history/${address}`, { params: { startDate, endDate } });
+  },
+  getTotalWallets() {
+    return apiService.get(`account/total/number`, {})
+  },
+  getDailyActiveWallets() {
+    return apiService.get(`activeAccount/latest`, {})
   }
 };

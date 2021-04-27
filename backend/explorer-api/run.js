@@ -176,7 +176,7 @@ function main() {
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
-      stakeRouter(app, stakeDao, accountDao, progressDao);
+      stakeRouter(app, stakeDao, blockDao, accountDao, progressDao, config);
       // supply router
       supplyRouter(app, progressDao, rpc, config);
       // price router

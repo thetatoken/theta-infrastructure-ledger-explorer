@@ -12,5 +12,12 @@ export const stakeService = {
       throw Error('Missing argument');
     }
     return apiService.get(`stake/${address}`, { params: { types } });
+  },
+  getStakeReturnTime(height) {
+    return apiService.get(`stake/returnTime`, { params: { return_height: height } })
+  },
+  //TODO: remove after merge 3.0 brannch
+  getPreEdgeNodeTfuel() {
+    return apiService.get(`stake/totalAmount/tfuel`, {})
   }
 };
