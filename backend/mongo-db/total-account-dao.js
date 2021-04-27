@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //  DAO for active account history
-//  Require index: `db.activeAct.createIndex({timestamp:-1})`
+//  Require index: `db.totalAct.createIndex({timestamp:-1})`
 //------------------------------------------------------------------------------
 
 module.exports = class TotalAccountDAO {

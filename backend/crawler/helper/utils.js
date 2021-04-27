@@ -26,12 +26,16 @@ exports.createIndexes = async function () {
     await createIndexAsync('account', { "balance.tfuelwei": -1 })
 
     await createIndexAsync('stake', { type: 1 })
+    await createIndexAsync('stake', { type:1, holder:1 })
+    await createIndexAsync('stake', { type:1, source:1 })
 
     await createIndexAsync('accounting', { addr: 1, date: 1 })
 
     await createIndexAsync('checkpoint', { height: -1 })
 
     await createIndexAsync('activeAct', { timestamp: -1 })
+
+    await createIndexAsync('totalAct', { timestamp: -1 })
 }
 function _createIndex(collectionName, object, callback) {
     createIndex(collectionName, object, callback);
