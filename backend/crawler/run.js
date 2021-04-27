@@ -15,6 +15,7 @@ var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao')
+var totalAccountDaoLib = require('../mongo-db/total-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 
 var Redis = require("ioredis");
@@ -27,7 +28,7 @@ var readBlockCronJob = require('./jobs/read-block.js');
 var readPreFeeCronJob = require('./jobs/read-previous-fee.js');
 var readTxHistoryJob = require('./jobs/read-tx-history.js');
 var accountingJob = require('./jobs/accounting.js');
-var activeActJob = require('./jobs/read-active-accounts.js');
+var accountJob = require('./jobs/read-accounts.js');
 var express = require('express');
 var app = express();
 var cors = require('cors')
@@ -166,6 +167,9 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   activeAccountDao = new activeAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(activeAccountDao);
 
+  totalAccountDao = new totalAccountDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(totalAccountDao);
+
   dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(dailyAccountDao);
 
@@ -191,14 +195,14 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night - need to adjust according to daylight saving changes
 
-  activeActJob.Initialize(dailyAccountDao, activeAccountDao);
+  accountJob.Initialize(dailyAccountDao, activeAccountDao, totalAccountDao, accountDao);
   activeAccountDao.getLatestRecordsAsync(1)
     .then(() => { }).catch(err => {
       if (err.message.includes('NO_RECORD')) {
-        activeActJob.Execute();
+        accountJob.Execute();
       }
     })
-  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', activeActJob.Execute); // PST mid-night
+  schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountJob.Execute); // PST mid-night
 }
 
 

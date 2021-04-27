@@ -91,6 +91,27 @@ var accountRouter = (app, accountDao, rpc) => {
   });
 
   router.get("/account/total/number", async (req, res) => {
+    const { startDate, endDate } = req.query;
+    if (startDate && endDate) {
+      console.log('Querying the total number of accounts with dates');
+      activeActDao.getInfoListByTimeAsync(startDate, endDate)
+        .then(infoList => {
+          infoList = infoList.map(info => ({
+            "total_number_account": info.amount,
+            "timestamp": info.timestamp
+          }))
+          const data = ({
+            type: 'active_accounts',
+            body: infoList
+          });
+          res.status(200).send(data);
+        })
+        .catch(error => {
+          console.log('ERR - ', error.message)
+          res.status(400).send(error.message);
+        });
+      return;
+    }
     console.log('Querying the total number of accounts');
     accountDao.getTotalNumberAsync()
       .then(number => {
