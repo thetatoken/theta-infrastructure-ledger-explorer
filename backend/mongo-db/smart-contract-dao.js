@@ -30,7 +30,7 @@ module.exports = class smartContractDAO {
     const queryObject = { '_id': address };
     this.client.findOne(this.collection, queryObject, function (error, record) {
       if (error) {
-        console.log('ERR - SmartContract:', error);
+        console.log('Smart Contract dao getSmartContractByAddress ERR - ', error);
         // callback(error);
       } else if (!record) {
         callback(Error('NOT_FOUND - SmartContract'));

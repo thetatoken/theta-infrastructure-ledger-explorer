@@ -35,7 +35,7 @@ module.exports = class TransactionDAO {
     const queryObject = { '_id': newObject.hash };
     this.client.upsert(this.transactionInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
-        console.log('ERR - ', error);
+        console.log('Transation dao upsertTransaction ERR - ', error);
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject), 'ex', redis_expire_time)
@@ -88,7 +88,7 @@ module.exports = class TransactionDAO {
       const queryObject = { '_id': pk };
       self.client.findOne(self.transactionInfoCollection, queryObject, function (error, record) {
         if (error) {
-          console.log('ERR - ', error, pk);
+          console.log('Transation dao getTransactionByPk ERR - ', error, pk);
           callback(error);
         } else if (!record) {
           callback(Error('NOT_FOUND - ' + pk));
@@ -119,7 +119,7 @@ module.exports = class TransactionDAO {
     }
     this.client.getTotal(this.transactionInfoCollection, queryObject, function (error, record) {
       if (error) {
-        console.log('ERR - ', error);
+        console.log('Transation dao getTotalNumberByHour ERR - ', error);
       } else {
         console.log('Calling get total number of txs, returns:', record)
         callback(error, record);
@@ -152,7 +152,7 @@ module.exports = class TransactionDAO {
       const queryObject = { _id: { $in: pks } };
       self.client.getRecords(self.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
         if (error) {
-          console.log('ERR - ', error, pks);
+          console.log('Transation dao getTransactionsByPk ERR - ', error, pks);
         } else if (!transactions) {
           callback(Error('NOT_FOUND - ' + pks));
         } else {
