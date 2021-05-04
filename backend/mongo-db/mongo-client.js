@@ -23,8 +23,14 @@ exports.connect = function (uri, callback) {
   if (_db) return callback();
   url = uri ? uri : url;
   console.log(`url is: `, url);
-  MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
-    if (err) return callback(err)
+  MongoClient.connect(url, {
+    useNewUrlParser: true,
+    autoReconnect: true,
+    reconnectTries: 20,
+    reconnectInterval: 1000,
+    bufferMaxEntries: 0
+  }, function (err, db) {
+    if (err) return callback(err);
     _db = db.db(dbName)
     callback();
   })
@@ -33,14 +39,14 @@ exports.getDB = function () {
   // client.close();
   return _db;
 }
-exports.close = function (callback) {
-  if (_db) {
-    _db.close(function (err, res) {
-      _db = null;
-      callback(err);
-    })
-  }
-}
+// exports.close = function (callback) {
+//   if (_db) {
+//     _db.close(function (err, res) {
+//       _db = null;
+//       callback(err);
+//     })
+//   }
+// }
 const MAX_CONCURRENCY = 150;
 
 exports.tryQuery = (function (maxConcurrency) {
