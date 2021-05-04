@@ -19,7 +19,7 @@ module.exports = class stakeDAO {
     this.client.upsert(this.stakeInfoCollection, queryObj, stakeInfo, async function (error, record) {
       if (error) {
         console.log('error happend in stake upsert')
-        // console.log('ERR - ', error);
+        // console.log('Stake dao ERR - ', error);
       } else {
         const redis_key = `stake_${stakeInfo.type}`;
         const field = `${stakeInfo.type}_${stakeInfo.holder}_${stakeInfo.source}`;
@@ -126,8 +126,8 @@ module.exports = class stakeDAO {
   getAllStakes(callback) {
     this.client.findAll(this.stakeInfoCollection, function (error, recordList) {
       if (error) {
-        console.log('ERR - ', error);
-        // callback(error);
+        console.log('Stake dao getAllStakes ERR - ', error);
+        callback(error);
       } else if (!recordList) {
         callback(Error('NOT_FOUND - All Stakes'));
       } else {
@@ -144,13 +144,15 @@ module.exports = class stakeDAO {
     const self = this;
     this.client.query(this.stakeInfoCollection, queryHolder, function (error, record) {
       if (error) {
-        console.log('ERR - ', error, address);
+        console.log('Stake dao getStakeByAddress holders ERR - ', error, address);
+        callback(error);
       } else if (record) {
         holderRecords = record;
       }
       self.client.query(self.stakeInfoCollection, querySource, function (error, record) {
         if (error) {
-          console.log('ERR - ', error, address);
+          console.log('Stake dao getStakeByAddress sources ERR - ', error, address);
+          callback(error);
         } else if (record) {
           sourceRecords = record;
         }
@@ -164,7 +166,7 @@ module.exports = class stakeDAO {
     const queryObject = { _id: { $in: ids }, 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, async function (err, res) {
       if (err) {
-        console.log('ERR - Remove ids', err, type, ids);
+        console.log('Stake dao removeRecordsById ERR - ', err, type, ids);
         callback(err);
       }
       const redis_key = `stake_${type}`;
@@ -179,7 +181,7 @@ module.exports = class stakeDAO {
     const queryObject = { 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, function (err, res) {
       if (err) {
-        console.log('ERR - Remove Type', err, type);
+        console.log('Stake dao removeRecords ERR - ', err, type);
         callback(err);
       }
       callback(err, res);

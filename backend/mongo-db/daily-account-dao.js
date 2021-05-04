@@ -26,7 +26,8 @@ module.exports = class DailyAccountDAO {
   getTotalNumber(callback) {
     this.client.getTotal(this.collection, null, function (error, record) {
       if (error) {
-        console.log('ERR - ', error);
+        console.log('Daily Account dao getTotalNumber ERR - ', error);
+        callback(error);
       } else {
         callback(error, record);
       }
@@ -35,7 +36,7 @@ module.exports = class DailyAccountDAO {
   removeAll(callback) {
     this.client.remove(this.collection, function (err, res) {
       if (err) {
-        console.log('ERR - ', err);
+        console.log('Daily Account dao removeAll ERR - ', err);
         callback(err);
       }
       callback(err, res);

@@ -27,7 +27,8 @@ module.exports = class priceDAO {
     const queryObject = { '_id': priceInfo.name };
     this.client.upsert(this.priceInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
-        console.log('ERR - ', error);
+        console.log('Price dao upsertPrice ERR - ', error);
+        callback(error);
       } else {
         newObject._id = priceInfo.name;
         if (self.redis !== null) {
@@ -63,7 +64,7 @@ module.exports = class priceDAO {
       const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
       self.client.query(self.priceInfoCollection, queryObject, function (error, recordList) {
         if (error) {
-          console.log('ERR - Prices:', error);
+          console.log('Price dao getPrice ERR -', error);
           callback(error);
         } else if (!recordList || recordList.length === 0) {
           callback(Error('NOT_FOUND - Prices'));
