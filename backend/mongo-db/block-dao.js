@@ -35,6 +35,7 @@ module.exports = class BlockDAO {
     this.client.upsert(this.blockInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Block dao upsertBlock ERR - ', error);
+        callback(error)
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject), 'ex', redis_expire_time);
@@ -70,7 +71,7 @@ module.exports = class BlockDAO {
       self.client.findOne(self.blockInfoCollection, queryObject, function (error, record) {
         if (error) {
           console.log('Block dao getBlock ERR - ', error, height);
-          // callback(error);
+          callback(error);
         } else if (!record) {
           callback(Error('NOT_FOUND - ' + height));
         } else {
@@ -191,6 +192,7 @@ module.exports = class BlockDAO {
     this.client.getTotal(this.blockInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('Block dao getTotalNumberByHour ERR - ', error);
+        callback(error);
       } else {
         console.log('Calling get total number of blocks, returns:', record)
         callback(error, record);

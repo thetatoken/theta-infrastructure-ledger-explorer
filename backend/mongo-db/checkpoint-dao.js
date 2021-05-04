@@ -19,7 +19,7 @@ module.exports = class checkpointDAO {
     this.client.findOne(this.checkpointInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('Checkpoint dao getCheckpointByHash ERR - ', error, hash);
-        // callback(error);
+        callback(error);
       } else if (!record) {
         callback(Error('NOT_FOUND - ' + hash));
       } else {

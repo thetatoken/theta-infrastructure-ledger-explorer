@@ -130,12 +130,14 @@ module.exports = class stakeDAO {
     this.client.query(this.stakeInfoCollection, queryHolder, function (error, record) {
       if (error) {
         console.log('Stake dao getStakeByAddress holders ERR - ', error, address);
+        callback(error);
       } else if (record) {
         holderRecords = record;
       }
       self.client.query(self.stakeInfoCollection, querySource, function (error, record) {
         if (error) {
           console.log('Stake dao getStakeByAddress sources ERR - ', error, address);
+          callback(error);
         } else if (record) {
           sourceRecords = record;
         }

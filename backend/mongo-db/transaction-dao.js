@@ -36,6 +36,7 @@ module.exports = class TransactionDAO {
     this.client.upsert(this.transactionInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Transation dao upsertTransaction ERR - ', error);
+        callback(error);
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject), 'ex', redis_expire_time)
@@ -120,6 +121,7 @@ module.exports = class TransactionDAO {
     this.client.getTotal(this.transactionInfoCollection, queryObject, function (error, record) {
       if (error) {
         console.log('Transation dao getTotalNumberByHour ERR - ', error);
+        callback(error);
       } else {
         console.log('Calling get total number of txs, returns:', record)
         callback(error, record);
@@ -153,6 +155,7 @@ module.exports = class TransactionDAO {
       self.client.getRecords(self.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
         if (error) {
           console.log('Transation dao getTransactionsByPk ERR - ', error, pks);
+          callback(error);
         } else if (!transactions) {
           callback(Error('NOT_FOUND - ' + pks));
         } else {

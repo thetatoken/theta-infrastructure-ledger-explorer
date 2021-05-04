@@ -28,6 +28,7 @@ module.exports = class priceDAO {
     this.client.upsert(this.priceInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Price dao upsertPrice ERR - ', error);
+        callback(error);
       } else {
         newObject._id = priceInfo.name;
         if (self.redis !== null) {

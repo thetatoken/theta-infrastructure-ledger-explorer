@@ -22,6 +22,7 @@ module.exports = class ProgressDAO {
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Progress dao upsertProgress ERR - ', error);
+        callback(error);
       } else {
         var progressInfo = {};
         progressInfo.height = newObject.lst_blk_height;
@@ -86,6 +87,7 @@ module.exports = class ProgressDAO {
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Progress dao upsertStakeProgress ERR - ', error);
+        callback(error);
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject))
@@ -145,6 +147,7 @@ module.exports = class ProgressDAO {
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Progress dao upsertFee ERR - ', error);
+        callback(error);
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject));
@@ -203,6 +206,7 @@ module.exports = class ProgressDAO {
     this.client.upsert(this.progressInfoCollection, queryObject, newObject, function (error, record) {
       if (error) {
         console.log('Progress dao upsertFeeProgress ERR - ', error);
+        callback(error);
       } else {
         if (self.redis !== null) {
           self.redis.set(redis_key, JSON.stringify(newObject));
