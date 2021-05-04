@@ -1,5 +1,6 @@
 {
     "mongo": {
+        "uri": "",
         "address": "localhost",
         "port": 27017,
         "dbName": "test"
