@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -240,17 +240,25 @@ const Fee = ({ transaction }) => {
   return (<span className="currency tfuel">{fee(transaction) + " TFuel"}</span>);
 }
 
-const CoinbaseOutput = ({ output, price }) => {
+const CoinbaseOutput = ({ output, price, isSingle }) => {
   const isPhone = window.screen.width <= 560;
   const isSmallPhone = window.screen.width <= 320;
   const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
   return (
-    <div className="coinbase-output">
+    <div className={cx("coinbase-output", { "single": isSingle })}>
       <div>
         <Amount coins={output.coins} price={price} />
       </div>
       <Address hash={output.address} truncate={truncate} />
     </div>);
+}
+
+const TotalAmount = ({ coins, price }) => {
+  return (
+    <div>
+      <Amount coins={coins} price={price} />
+    </div>
+  )
 }
 
 const ServicePayment = ({ transaction, price }) => {
@@ -313,13 +321,25 @@ const SplitContract = ({ transaction }) => {
 
 const Send = ({ transaction, price }) => {
   let { data } = transaction;
+  let totalCoins = { "thetawei": 0, "tfuelwei": 0 };
+  let hasTotalCoins = data.outputs.length > 1 && data.inputs.length > 1;
+  if (hasTotalCoins) {
+    totalCoins = getTotalCoins(data.outputs.length > data.inputs.length ? data.inputs : data.outputs);
+    function getTotalCoins(inputs) {
+      return inputs.reduce((sum, cur) => {
+        sum.thetawei = sumCoin(sum.thetawei, cur.coins.thetawei);
+        sum.tfuelwei = sumCoin(sum.tfuelwei, cur.coins.tfuelwei);
+        return sum;
+      }, totalCoins)
+    }
+  }
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        {data.inputs.length > 1 ? <DetailsRow label="From Address" data={map(data.inputs, (input, i) => <CoinbaseOutput key={i} output={input} price={price} />)} />
-          : <DetailsRow label="From Address" data={<Address hash={data.inputs[0].address} />} />}
-        <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        {hasTotalCoins ? <DetailsRow label="Total Amount" data={<TotalAmount coins={totalCoins} price={price} />} /> : <></>}
+        <DetailsRow label="From Address" data={map(data.inputs, (input, i, inputs) => <CoinbaseOutput key={i} output={input} price={price} isSingle={inputs.length === 1} />)} />
+        <DetailsRow label="To Address" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
 }
