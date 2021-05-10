@@ -35,11 +35,15 @@
     @include row($align: flex-start);
     border-bottom: 1px solid $color-line;
     padding: .5rem 0;
+    &.single {
+      padding: 0;
+    }
     &:first-child {
       padding-top: 0;
     }
     &:last-child {
       border-bottom: none;
+      padding-bottom: 0;
     }
     & > *:first-child {
       margin-right: 1rem;

@@ -3,6 +3,7 @@
 
 .currency {
   display: flex;
+  flex-wrap: wrap;
   &:before {
     content: '';
     display: inline-block;

@@ -89,7 +89,6 @@ export default class ThetaChart extends React.PureComponent {
     const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : this.getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
     Chart.defaults.global.defaultFontColor = '#8A8FB5';
-    Chart.defaults.global.defaultFontSize = '11';
     Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
   componentDidUpdate(preProps) {

@@ -17,7 +17,7 @@ module.exports = class ActiveAccountDAO {
     const queryObject = { timestamp: -1 };
     this.client.getTopRecords(this.collection, queryObject, limitNumber, function (error, recordList) {
       var activeActList = []
-      if (recordList.length === 0) {
+      if (!recordList || recordList.length === 0) {
         callback(Error('NO_RECORD'));
         return;
       }
