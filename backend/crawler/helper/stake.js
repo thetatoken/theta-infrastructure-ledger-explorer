@@ -117,7 +117,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
     })
   })
   totalStake.eenp.forEach(eenpPair => {
-    eenpPair.Eenp.SortedEliteEdgeNodes.forEach(candidate => {
+    eenpPair.EENs.forEach(candidate => {
       tfuelHolders.add(candidate.Holder);
       candidate.Stakes.forEach(stake => {
         totalTfuel = helper.sumCoin(totalTfuel, stake.withdrawn ? 0 : stake.amount);

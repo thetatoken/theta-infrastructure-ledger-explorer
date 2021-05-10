@@ -158,7 +158,7 @@ exports.Execute = async function (network_id) {
               if (upsertEenpAsyncList.length > 0) continue;
               stakes.eenp = result.result.BlockHashEenpPairs;
               result.result.BlockHashEenpPairs.forEach(eenpPair => {
-                eenpPair.Eenp.SortedEliteEdgeNodes.forEach(candidate => {
+                eenpPair.EENs.forEach(candidate => {
                   updateEenpAsyncList.push(candidate);
                 })
               })
