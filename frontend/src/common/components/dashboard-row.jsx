@@ -23,8 +23,7 @@ const DashboardRow = () => {
         if (!flag) return;
         setDailyActiveAccount(get(res, 'data.body.amount') || 0);
       })
-    //TODO: change to other method after merge 3.0 branch
-    stakeService.getPreEdgeNodeTfuel()
+    stakeService.getTotalTFuelStake()
       .then(res => {
         if (!flag) return;
         setTotalStakedTfuel(Number(get(res, 'data.body.total_tfuel_staked')) || 0);
@@ -35,7 +34,7 @@ const DashboardRow = () => {
   return <div className="dashboard-row half">
     <div className="column"></div>
     <div className="column">
-      <Detail title={'STAKED TO PRE-ELITE EN (TESTNET)'} value={<StakedTFuel totalStakedTfuel={totalStakedTfuel} />} />
+      <Detail title={'STAKED TO EEN'} value={<StakedTFuel totalStakedTfuel={totalStakedTfuel} />} />
     </div>
     <div className="column">
       <Detail title={'TOTAL ONCHAIN WALLETS'} value={formatNumber(totalWallet)} />
