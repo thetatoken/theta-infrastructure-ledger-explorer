@@ -7,7 +7,7 @@ import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
 import moment from 'moment';
 
-import { TxnTypes, TxnClasses, TxnPurpose, ZeroAddress } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
@@ -195,6 +195,9 @@ export default class TransactionExplorer extends React.Component {
 
             {transaction.type === TxnTypes.DEPOSIT_STAKE_TX_V2 &&
               <DepositStake transaction={transaction} price={price} />}
+
+            {transaction.type === TxnTypes.STAKE_REWARD_DISTRIBUTION &&
+              <StakeRewardDistribution transaction={transaction} price={price} />}
 
             {showRaw &&
               <JsonView
@@ -405,7 +408,19 @@ const DepositStake = ({ transaction, price }) => {
       </tbody>
     </table>);
 }
-
+const StakeRewardDistribution = ({ transaction, price }) => {
+  const { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
+        <DetailsRow label="Holder" data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Beneficiary" data={<Address hash={get(data, 'beneficiary.address')} />} />
+        <DetailsRow label="Purpose" data={TxnSplitPurpose[get(data, 'purpose')]} />
+        <DetailsRow label="Split PERCENTAGE" data={get(data, 'split_basis_point') / 100 + '%'} />
+      </tbody>
+    </table>);
+}
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);

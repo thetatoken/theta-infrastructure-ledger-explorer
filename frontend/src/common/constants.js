@@ -15,6 +15,7 @@ export const TxnTypes = {
   DEPOSIT_STAKE: 8,
   WITHDRAW_STAKE: 9,
   DEPOSIT_STAKE_TX_V2: 10,
+  STAKE_REWARD_DISTRIBUTION: 11
 }
 
 export const TxnTypeText = {
@@ -28,7 +29,8 @@ export const TxnTypeText = {
   '7': 'Smart Contract',
   '8': 'Deposit Stake',
   '9': 'Withdraw Stake',
-  '10': 'Deposit Stake'
+  '10': 'Deposit Stake',
+  '11': 'Stake Reward Distribution'
 }
 
 export const TypeOptions = Object.keys(TxnTypeText)
@@ -72,8 +74,12 @@ export const CurrencyLabels = {
 export const TxnPurpose = {
   0: 'Validator Staking',
   1: 'Guardian Staking',
+  2: 'Elite Edge Staking'
 }
-
+export const TxnSplitPurpose = {
+  1: 'Guardian Stake Reward Split',
+  2: 'Elite Edge Stake Reward Split'
+}
 export const TokenTypes = {
   THETA: 'theta',
   THETA_FUEL: 'tfuel',

@@ -29,10 +29,12 @@ export function from(txn, trunc = null, address = null) {
     path = 'data.holder.address'
   } else if (txn.type === TxnTypes.SMART_CONTRACT) {
     path = 'data.from.address'
+  } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
+    path = 'data.holder.address'
   } else {
     let inputs = get(txn, 'data.inputs');
-    isSelf = inputs.some(input => { 
-      return input.address === address 
+    isSelf = inputs.some(input => {
+      return input.address === address
     });
     path = 'data.inputs[0].address';
   }
@@ -62,6 +64,8 @@ export function to(txn, trunc = null, address = null) {
     path = 'data.splits[0].Address';
   } else if (txn.type === TxnTypes.SMART_CONTRACT) {
     path = 'data.to.address'
+  } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
+    path = 'data.beneficiary.address'
   } else {
     const outputs = get(txn, 'data.outputs');
     isSelf = outputs.some(output => {
