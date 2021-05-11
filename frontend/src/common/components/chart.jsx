@@ -131,16 +131,21 @@ export default class ThetaChart extends React.PureComponent {
           animateRotate: true
         },
         onClick: (e) => {
-          if (clickType === 'account') {
-            var activeElement = this.chart.getElementAtEvent(e);
-            if (activeElement.length > 0) {
-              const address = this.chart.config.data.labels[activeElement[0]._index];
-              if (address !== 'Rest Nodes') history.push(`/account/${address}`);
-              return;
-            }
-          }
-          if (clickType === 'stake') {
-            history.push(`/stakes`);
+          switch (clickType) {
+            case 'account':
+              var activeElement = this.chart.getElementAtEvent(e);
+              if (activeElement.length > 0) {
+                const address = this.chart.config.data.labels[activeElement[0]._index];
+                if (address !== 'Rest Nodes') history.push(`/account/${address}`);
+              }
+              break;
+            case 'stake':
+              history.push(`/stakes`);
+              break;
+            case 'tfuelStake':
+              history.push('stakes/tfuel')
+            default:
+              break;
           }
         },
         tooltips: {

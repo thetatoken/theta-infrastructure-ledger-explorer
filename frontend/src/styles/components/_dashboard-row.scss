@@ -94,10 +94,25 @@
         }
       }
     }
+    &.pie-charts {
+      display: flex;
+      border-left: 1px solid rgba($color-font-light, 0.2);
+    }
     .chart-container{
       padding-left: 10px;
-      border-left: 1px solid rgba($color-font-light, 0.2);
       text-align: center;
+      &.half {
+        width: 50%;
+        padding: 0;
+        margin-left: 5%;
+        &.tfuel {
+          margin-left: -5%;
+        }
+        .chart {
+          width: 100%;
+          margin: 5% 0 0 0;
+        }
+      }
       &.row {
         display: flex;
         justify-content: center;
@@ -139,7 +154,7 @@
     & .column{
       width: 40%;
       .chart-container.row {
-        display: block;
+        display: flex;
         .chart {
           margin: 10px 0 0 -15%;
         }

@@ -18,8 +18,8 @@ export default class TokenDashboard extends React.PureComponent {
       blockNum: 0,
       txnNum: 0,
       totalStaked: 0,
-      holders: [],
-      percentage: [],
+      holders: { theta: [], tfuel: [] },
+      percentage: { theta: [], tfuel: [] },
       txTs: [],
       txNumber: [],
       nodeNum: 0
@@ -53,32 +53,51 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   getAllStakes() {
-    stakeService.getAllStake()
+    stakeService.getAllStake(['eenp', 'vcp', 'gcp'])
       .then(res => {
         const stakeList = get(res, 'data.body')
-        let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.amount) }, 0);
+        let sum = stakeList.reduce((sum, info) => {
+          if (info.type === 'eenp') sum.tfuel = sumCoin(sum.tfuel, info.amount)
+          else sum.theta = sumCoin(sum.theta, info.amount)
+          return sum;
+        }, { theta: 0, tfuel: 0 });
         let newObj = stakeList.reduce((map, obj) => {
-          if (!map[obj.holder]) map[obj.holder] = 0;
-          map[obj.holder] = sumCoin(map[obj.holder], obj.amount).toFixed()
+          let tmpObj = obj.type === 'eenp' ? map.tfuel : map.theta;
+          if (!tmpObj[obj.holder]) tmpObj[obj.holder] = 0;
+          tmpObj[obj.holder] = sumCoin(tmpObj[obj.holder], obj.amount).toFixed()
           return map;
-        }, {});
-        let topStakes = Array.from(Object.keys(newObj), key => {
-          return { 'holder': key, 'amount': newObj[key] }
-        }).sort((a, b) => {
-          return b.amount - a.amount
-        }).slice(0, 8)
-        let sumPercent = 0;
-        let objList = topStakes.map(stake => {
-          let obj = {};
-          obj.holder = stake.holder;
-          obj.percentage = new BigNumber(stake.amount).dividedBy(sum / 100).toFixed(2);
-          sumPercent += obj.percentage - '0';
-          return obj;
-        }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
+        }, { theta: {}, tfuel: {} });
+        let thetaTopHolderList = getTopHolderList(newObj.theta, sum.theta);
+        let tfuelTopHolderList = getTopHolderList(newObj.tfuel, sum.tfuel);
         this.setState({
-          holders: objList.map(obj => { return obj.holder }),
-          percentage: objList.map(obj => { return (obj.percentage - '0') })
+          holders: {
+            theta: thetaTopHolderList.map(obj => { return obj.holder }),
+            tfuel: tfuelTopHolderList.map(obj => { return obj.holder }),
+          },
+          percentage: {
+            theta: thetaTopHolderList.map(obj => { return (obj.percentage - '0') }),
+            tfuel: tfuelTopHolderList.map(obj => { return (obj.percentage - '0') })
+          }
         });
+
+        function getTopHolderList(newObj, sum) {
+          let topStakes = Array.from(Object.keys(newObj), key => {
+            return { 'holder': key, 'amount': newObj[key] }
+          }).sort((a, b) => {
+            return b.amount - a.amount
+          }).slice(0, 8)
+          let sumPercent = 0;
+          let objList = topStakes.map(stake => {
+            let obj = {};
+            obj.holder = stake.holder;
+            obj.percentage = new BigNumber(stake.amount).dividedBy(sum / 100).toFixed(2);
+            sumPercent += obj.percentage - '0';
+            return obj;
+          }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
+          if (sumPercent === 0) objList = [{ holder: 'No Node', percentage: 100 }];
+          else objList = objList.concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
+          return objList;
+        }
       })
       .catch(err => {
         console.log(err);
@@ -143,16 +162,22 @@ export default class TokenDashboard extends React.PureComponent {
             <Detail title={'24 HR BLOCKS'} value={formatNumber(blockNum)} />
             <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />
           </div>}
-          <div className="column">
+          <div className="column pie-charts">
             {type === 'tfuel' ?
               <div className="chart-container">
                 <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
                 <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
               </div> :
-              <div className="chart-container row">
-                <div className="title">THETA NODES</div>
-                <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'stake'} />
-              </div>}
+              <>
+                <div className="chart-container half">
+                  <div className="title">THETA NODES</div>
+                  <ThetaChart chartType={'doughnut'} labels={holders.theta} data={percentage.theta} clickType={'stake'} />
+                </div>
+                <div className="chart-container half tfuel">
+                  <div className="title">ELITE EDGE NODES</div>
+                  <ThetaChart chartType={'doughnut'} labels={holders.tfuel} data={percentage.tfuel} clickType={'tfuelStake'} />
+                </div>
+              </>}
           </div>
         </div>}
       </React.Fragment>
