@@ -93,7 +93,7 @@ export default class TokenDashboard extends React.PureComponent {
             obj.percentage = new BigNumber(stake.amount).dividedBy(sum / 100).toFixed(2);
             sumPercent += obj.percentage - '0';
             return obj;
-          }).concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
+          })
           if (sumPercent === 0) objList = [{ holder: 'No Node', percentage: 100 }];
           else objList = objList.concat({ holder: 'Rest Nodes', 'percentage': (100 - sumPercent).toFixed(2) })
           return objList;
