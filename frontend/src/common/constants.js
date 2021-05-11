@@ -48,7 +48,8 @@ export const TxnClasses = {
   '7': 'smart-contract',
   '8': 'deposit-stake',
   '9': 'withdraw-stake',
-  '10': 'deposit-stake'
+  '10': 'deposit-stake',
+  '11': 'stake-reward-distribution'
 }
 
 export const TxnStatus = {

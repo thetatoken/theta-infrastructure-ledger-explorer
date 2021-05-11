@@ -36,6 +36,7 @@ table.data.txn-table {
   tr.deposit-stake .type:before{ background-image: url('/images/icons/icon_deposit-stake-transaction@2x.png'); }
   tr.withdraw-stake .type:before { background-image: url('/images/icons/icon_withdraw-stake-transaction@2x.png'); }
   tr.update-validators .type:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
+  tr.stake-reward-distribution .type:before { background-image: url('/images/icons/icon_distribute-stake@2x.png'); }
 
   td.age {
     color: $color-font-light;
