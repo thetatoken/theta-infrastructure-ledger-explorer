@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import get from 'lodash/get';
-import cx from 'classnames';
 
 import Detail from 'common/components/dashboard-detail';
 import { formatNumber } from 'common/helpers/utils';
 import { accountService } from 'common/services/account';
 import { stakeService } from 'common/services/stake';
+import BigNumber from 'bignumber.js';
+import { WEI } from 'common/constants';
 
 const DashboardRow = () => {
   const [totalWallet, setTotalWallet] = useState(0);
@@ -26,7 +27,7 @@ const DashboardRow = () => {
     stakeService.getTotalTFuelStake()
       .then(res => {
         if (!flag) return;
-        setTotalStakedTfuel(Number(get(res, 'data.body.total_tfuel_staked')) || 0);
+        setTotalStakedTfuel(new BigNumber(get(res, 'data.body.totalAmount')).dividedBy(WEI) || 0);
       })
     return () => flag = false;
   }, [])
