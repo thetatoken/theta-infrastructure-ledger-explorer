@@ -15,30 +15,37 @@ export function totalCoinValue(set, key = 'tfuelwei') {
   return reduce(set, (acc, v) => acc + parseInt(get(v, `coins.${key}`, 0)), 0)
 }
 
-export function from(txn, trunc = null, address = null) {
-  let path, isSelf = false;
-  if ([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
-    path = 'data.source.address';
-  } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
-    path = 'data.initiator.address';
-  } else if (txn.type === TxnTypes.COINBASE) {
-    path = 'data.proposer.address';
-  } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
-    path = 'data.source.address'
-  } else if (txn.type === TxnTypes.WITHDRAW_STAKE) {
-    path = 'data.holder.address'
-  } else if (txn.type === TxnTypes.SMART_CONTRACT) {
-    path = 'data.from.address'
-  } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
-    path = 'data.holder.address'
+export function from(txn, trunc = null, address = null, set = null) {
+  let addr;
+  if (set && set.has(txn.hash)) {
+    addr = address;
   } else {
-    let inputs = get(txn, 'data.inputs');
-    isSelf = inputs.some(input => {
-      return input.address === address
-    });
-    path = 'data.inputs[0].address';
+    if (set) set.add(txn.hash);
+    let path, isSelf = false;
+    if ([TxnTypes.RESERVE_FUND, TxnTypes.SERVICE_PAYMENT].includes(txn.type)) {
+      path = 'data.source.address';
+    } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
+      path = 'data.initiator.address';
+    } else if (txn.type === TxnTypes.COINBASE) {
+      path = 'data.proposer.address';
+    } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
+      path = 'data.source.address'
+    } else if (txn.type === TxnTypes.WITHDRAW_STAKE) {
+      path = 'data.holder.address'
+    } else if (txn.type === TxnTypes.SMART_CONTRACT) {
+      path = 'data.from.address'
+    } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
+      path = 'data.holder.address'
+    } else {
+      let inputs = get(txn, 'data.inputs');
+      isSelf = inputs.some(input => {
+        return input.address === address
+      });
+      path = 'data.inputs[0].address';
+    }
+    addr = isSelf ? address : get(txn, path);
   }
-  let addr = isSelf ? address : get(txn, path);
+
   if (trunc && trunc > 0) {
     addr = truncate(addr, { length: trunc });
   }

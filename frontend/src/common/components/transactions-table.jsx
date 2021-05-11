@@ -62,6 +62,7 @@ export default class TransactionTable extends React.Component {
     const { className, includeDetails, truncate, account, price } = this.props;
     const { transactions } = this.state;
     const address = account ? account.address : null;
+    const txSet = new Set();
     return (
       <table className={cx("data txn-table", className)}>
         <thead>
@@ -83,6 +84,7 @@ export default class TransactionTable extends React.Component {
           {map(transactions, (txn, i) => {
             let source = null;
             source = !account ? 'none' : account.address === from(txn, null, address) ? 'from' : 'to';
+            if (txSet.has(txn.hash)) source = 'to';
             return (
               <tr key={i} className={TxnClasses[txn.type]}>
                 <td className="type">{type(txn)}</td>
@@ -92,11 +94,11 @@ export default class TransactionTable extends React.Component {
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
                     <td className={cx({ 'dim': source === 'to' }, "from overflow")}>
-                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, 20, address)}</Link>
+                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, 20, address, txSet)}</Link>
                     </td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address)}</Link>
+                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address, txSet)}</Link>
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
