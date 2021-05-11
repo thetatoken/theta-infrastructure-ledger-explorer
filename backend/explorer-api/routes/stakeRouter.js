@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
-let startTime = +new Date();
+let startTime = { theta: +new Date(), tfuel: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData = { theta: undefined, tfuel: undefined };
 var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => {
@@ -58,7 +58,7 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
       return;
     }
     let cur = +new Date();
-    if (cur - startTime < cachePeriod && cacheData && cacheData[type]) {
+    if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
       const data = cacheData[type];
       if (data.type === 'stakeTotalAmout') {
         res.status(200).send(data);
@@ -67,7 +67,7 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
       }
       return;
     }
-    startTime = cur;
+    startTime[type] = cur;
     progressDao.getStakeProgressAsync(type)
       .then(info => {
         const data = ({
