@@ -74,7 +74,6 @@ function main() {
     console.log(err);
     process.exit(1);
   }
-  console.log(config);
 
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
@@ -132,12 +131,15 @@ function main() {
       activeActDao = new activeAccountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(activeActDao);
       //
-      var privateKey = fs.readFileSync(config.cert.key, 'utf8');
-      var certificate = fs.readFileSync(config.cert.crt, 'utf8');
-      var options = {
-        key: privateKey,
-        cert: certificate
-      };
+      var options = {}
+      if (config.cert && config.cert.enabled) {
+        var privateKey = fs.readFileSync(config.cert.key, 'utf8');
+        var certificate = fs.readFileSync(config.cert.crt, 'utf8');
+        options = {
+          key: privateKey,
+          cert: certificate
+        };
+      }
       app.use(compression());
 
       app.get('/ping', function (req, res) {
