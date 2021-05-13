@@ -164,10 +164,15 @@ function main() {
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
-      var h2 = require('spdy').createServer(options, app);
-      h2.listen(config.server.port, () => {
-        console.log("rest api running on port.", config.server.port);
+      // var h2 = require('spdy').createServer(options, app);
+      // h2.listen(config.server.port, () => {
+      //   console.log("rest api running on port.", config.server.port);
+      // });
+
+      app.listen(config.server.port, () => {
+        console.log("rest api running on port", config.server.port);
       });
+
       // REST services
       // blocks router
       blocksRouter(app, blockDao, progressDao, checkpointDao, config);
