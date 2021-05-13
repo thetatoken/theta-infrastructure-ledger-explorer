@@ -74,7 +74,6 @@ function main() {
     console.log(err);
     process.exit(1);
   }
-  console.log(config);
 
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);

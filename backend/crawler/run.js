@@ -57,7 +57,6 @@ function main() {
     Logger.log(err);
     process.exit(1);
   }
-  Logger.log(JSON.stringify(config));
   const network_id = config.blockchain.network_id;
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
