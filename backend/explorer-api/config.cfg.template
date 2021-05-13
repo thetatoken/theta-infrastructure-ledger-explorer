@@ -24,6 +24,7 @@
         "tfuel_id": 3822
     },
     "cert":{
+        "enabled": false,
         "key": "",
         "crt": ""
     },
