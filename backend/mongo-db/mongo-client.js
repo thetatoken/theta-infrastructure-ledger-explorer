@@ -22,7 +22,7 @@ exports.init = function (execDir, hostIp, hostPort, dbName) {
 exports.connect = function (uri, callback) {
   if (_db) return callback();
   url = uri ? uri : url;
-  console.log(`url is: `, url);
+//  console.log(`url is: `, url); # Removed line so it doesnt expose the the mongodb uri
   MongoClient.connect(url, {
     useNewUrlParser: true,
     autoReconnect: true,

@@ -174,8 +174,8 @@ function main() {
           console.log("HTTP rest API running on port ", config.server.port)
         })
       }
-
       
+
       // REST services
       // blocks router
       blocksRouter(app, blockDao, progressDao, checkpointDao, config);
