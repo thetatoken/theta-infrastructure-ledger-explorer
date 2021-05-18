@@ -142,18 +142,14 @@ function main() {
         res.write('OK');
         res.end();
       });
-      // start server program
-      var server = require('spdy').createServer(options, app);
-      io = require('socket.io')(server);
-
-      io.on('connection', onClientConnect);
-      // server.listen(config.server.port);
-      server.listen('3030');
 
       app.use(cors());
 
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
+
+      // start server program
+      let restServer, socketIOServer
 
       if (config.cert && config.cert.enabled) {
         const privateKey = fs.readFileSync(config.cert.key, 'utf8');
@@ -164,17 +160,24 @@ function main() {
           cert: certificate
         };
 
-        const h2 = require('spdy').createServer(options, app);
-
-        h2.listen(config.server.port, () => {
-          console.log("HTTPS rest api running on port.", config.server.port);
-        });
+        const spdy = require('spdy')
+        restServer = spdy.createServer(options, app);
+        socketIOServer = spdy.createServer(options, app)
       } else {
-        app.listen(config.server.port, () => {
-          console.log("HTTP rest API running on port ", config.server.port)
-        })
+        const http = require('http')
+        restServer = http.createServer(app)
+        socketIOServer = http.createServer(app)
       }
+
+      restServer.listen(config.server.port, () => {
+        console.log("rest api running on port.", config.server.port);
+      });
       
+      io = require('socket.io')(socketIOServer);
+
+      io.on('connection', onClientConnect);
+
+      socketIOServer.listen('3030');
 
       // REST services
       // blocks router
