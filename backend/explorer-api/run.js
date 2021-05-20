@@ -131,16 +131,9 @@ function main() {
       activeActDao = new activeAccountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(activeActDao);
       //
-      var options = {}
-      if (config.cert && config.cert.enabled) {
-        var privateKey = fs.readFileSync(config.cert.key, 'utf8');
-        var certificate = fs.readFileSync(config.cert.crt, 'utf8');
-        options = {
-          key: privateKey,
-          cert: certificate
-        };
-      }
+
       app.use(compression());
+      app.use(cors());
 
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -151,24 +144,40 @@ function main() {
         res.write('OK');
         res.end();
       });
+
+
+      var options = {};
+      var restServer, socketIOServer;
+
+      if (config.cert && config.cert.enabled) {
+        var privateKey = fs.readFileSync(config.cert.key, 'utf8');
+        var certificate = fs.readFileSync(config.cert.crt, 'utf8');
+        options = {
+          key: privateKey,
+          cert: certificate
+        };
+        var spdy = require('spdy');
+        restServer = spdy.createServer(options, app);
+        socketIOServer = spdy.createServer(options, app);
+      } else {
+        var http = require('http');
+        restServer = http.createServer(app);
+        socketIOServer = http.createServer(app);
+      }
+
       // start server program
-      var server = require('spdy').createServer(options, app);
-      io = require('socket.io')(server);
-
+      io = require('socket.io')(socketIOServer);
       io.on('connection', onClientConnect);
-      // server.listen(config.server.port);
-      server.listen('3030');
 
-      app.use(cors());
+      socketIOServer.listen('3030');
 
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
-      var h2 = require('spdy').createServer(options, app);
-      h2.listen(config.server.port, () => {
+      restServer.listen(config.server.port, () => {
         console.log("rest api running on port.", config.server.port);
       });
-      // REST services
+
       // blocks router
       blocksRouter(app, blockDao, progressDao, checkpointDao, config);
       // transactions router       
