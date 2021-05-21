@@ -21,11 +21,11 @@ var stakeDao = null;
 var checkpointDao = null;
 var smartContractDao = null;
 var dailyAccountDao = null;
-var max_block_per_crawl = 2;
-var target_crawl_height;
-var txs_count = 0;
-var crawled_block_height_progress = 0;
-var latest_block_height = 0;
+var maxBlockPerCrawl;
+var targetCrawlHeight;
+var txsCount = 0;
+var crawledBlockHeightProgress = 0;
+var latestBlockHeight = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 var cacheEnabled = false;
@@ -36,7 +36,8 @@ var startTime;
 //  All the implementation goes below
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance, cacheEnabledConfig) {
+  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance, 
+  cacheEnabledConfig, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -47,6 +48,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
   cacheEnabled = cacheEnabledConfig;
+  maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
+  maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
 }
 
 exports.Execute = async function (network_id) {
@@ -54,10 +57,10 @@ exports.Execute = async function (network_id) {
     .then(function (progressInfo) {
       Logger.log('Start a new crawler progress');
       Logger.log('progressInfo:', JSON.stringify(progressInfo));
-      txs_count = progressInfo.count;
-      crawled_block_height_progress = progressInfo.height;
-      Logger.log('DB transaction count progress: ' + txs_count.toString());
-      Logger.log('crawled_block_height_progress: ', crawled_block_height_progress);
+      txsCount = progressInfo.count;
+      crawledBlockHeightProgress = progressInfo.height;
+      Logger.log('DB transaction count progress: ' + txsCount.toString());
+      Logger.log('crawledBlockHeightProgress: ', crawledBlockHeightProgress);
       return rpc.getPendingTxsAsync([])
     })
     .then(async function (data) {
@@ -71,7 +74,7 @@ exports.Execute = async function (network_id) {
         }
         const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
         if (!isExisted) {
-          transaction.number = ++txs_count;
+          transaction.number = ++txsCount;
           validTransactionList.push(transaction);
           upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
         }
@@ -84,24 +87,21 @@ exports.Execute = async function (network_id) {
     })
     .then(function (data) {
       var result = JSON.parse(data);
-      latest_block_height = +result.result.latest_finalized_block_height;
-      Logger.log('Latest block height: ' + latest_block_height);
-
-      Logger.log('DB block height progress: ' + crawled_block_height_progress.toString());
+      latestBlockHeight = +result.result.latest_finalized_block_height;
+      Logger.log('Latest block height: ' + latestBlockHeight);
       startTime = +new Date();
-      if (latest_block_height >= crawled_block_height_progress) {
+      Logger.log('DB block height progress: ' + crawledBlockHeightProgress.toString());
+
+      if (latestBlockHeight >= crawledBlockHeightProgress) {
         // get target crawl height
-        target_crawl_height = crawled_block_height_progress + max_block_per_crawl;
-        if (latest_block_height < target_crawl_height) {
-          target_crawl_height = latest_block_height;
+        targetCrawlHeight = crawledBlockHeightProgress + maxBlockPerCrawl;
+        if (latestBlockHeight < targetCrawlHeight) {
+          targetCrawlHeight = latestBlockHeight;
         }
 
         var getBlockAsyncList = [];
         var getStakeAsyncList = [];
-        var getVcpAsyncList = [];
-        var getGcpAsyncList = [];
-        var getEenpAsyncList = [];
-        for (var i = crawled_block_height_progress + 1; i <= target_crawl_height; i++) {
+        for (var i = crawledBlockHeightProgress + 1; i <= targetCrawlHeight; i++) {
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
@@ -201,7 +201,7 @@ exports.Execute = async function (network_id) {
                   }
                   const isExisted = await transactionDao.checkTransactionAsync(transaction.hash);
                   if (!isExisted) {
-                    transaction.number = ++txs_count;
+                    transaction.number = ++txsCount;
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   } else {
@@ -250,9 +250,9 @@ exports.Execute = async function (network_id) {
     })
     .then(async function () {
       validTransactionList = [];
-      Logger.log('target_crawl_height: ', target_crawl_height, '. txs_count: ', txs_count)
-      await progressDao.upsertProgressAsync(network_id, target_crawl_height, txs_count);
-      Logger.log('Crawl progress updated to ' + target_crawl_height.toString());
+      Logger.log('targetCrawlHeight: ', targetCrawlHeight, '. txsCount: ', txsCount)
+      await progressDao.upsertProgressAsync(network_id, targetCrawlHeight, txsCount);
+      Logger.log('Crawl progress updated to ' + targetCrawlHeight.toString());
       Logger.log('The end of a new crawler progress');
     })
     .catch(async function (error) {

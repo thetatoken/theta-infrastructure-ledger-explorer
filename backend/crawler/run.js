@@ -179,7 +179,8 @@ function setupGetBlockCronJob(mongoClient, network_id) {
     await readPreFeeCronJob.Execute(network_id, readPreFeeTimer);
   }, 1000);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao, smartContractDao, dailyAccountDao, cacheEnabled);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao,
+    stakeDao, checkpointDao, smartContractDao, dailyAccountDao, cacheEnabled, config.maxBlockPerCrawl);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);

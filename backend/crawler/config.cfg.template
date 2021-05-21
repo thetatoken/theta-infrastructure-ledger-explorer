@@ -34,5 +34,6 @@
     },
     "nodeCache": {
         "enabled": false
-    }
+    },
+    "maxBlockPerCrawl": 2
 }
