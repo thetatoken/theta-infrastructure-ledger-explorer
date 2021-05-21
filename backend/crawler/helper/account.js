@@ -159,7 +159,6 @@ async function _updateAccountByAddress(address, accountDao, type) {
             });
             return;
           };
-          console.log('upsert new account:', address)
           await accountDao.upsertAccountAsync({
             address,
             'balance': { "thetawei": "0", "tfuelwei": "0" },

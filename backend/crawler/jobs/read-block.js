@@ -21,7 +21,7 @@ var stakeDao = null;
 var checkpointDao = null;
 var smartContractDao = null;
 var dailyAccountDao = null;
-var maxBlockPerCrawl = 2;
+var maxBlockPerCrawl;
 var targetCrawlHeight;
 var txsCount = 0;
 var crawledBlockHeightProgress = 0;
@@ -33,7 +33,7 @@ var validTransactionList = [];
 //  All the implementation goes below
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance) {
+  accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -43,6 +43,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   checkpointDao = checkpointDaoInstance;
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
+  maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
+  maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
 }
 
 exports.Execute = async function (network_id) {
