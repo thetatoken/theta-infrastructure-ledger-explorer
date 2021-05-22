@@ -13,7 +13,7 @@
         "level": "debug"
     },
     "server": {
-        "port": 9000
+        "port": 8443
     },
     "blockchain": {
         "network_id": "test_chain"
