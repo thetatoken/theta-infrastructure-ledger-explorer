@@ -31,5 +31,6 @@
         "password": "",
         "family": 4,
         "db": 0
-    }
+    },
+    "maxBlockPerCrawl": 2
 }

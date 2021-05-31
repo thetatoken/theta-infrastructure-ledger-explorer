@@ -92,7 +92,7 @@ Block status transitions:
 **Example**
 ```
 // Request
-curl https://explorer.thetatoken.org:9000/api/block/1
+curl https://explorer.thetatoken.org:8443/api/block/1
 
 // Result
 {  
@@ -203,7 +203,7 @@ In this example, we query the blocks with page number 0 and page size 10.
 
 ```
 // Request
-curl https://explorer.thetatoken.org:9000/api/blocks/top_blocks?pageNumber=1&limit=10
+curl https://explorer.thetatoken.org:8443/api/blocks/top_blocks?pageNumber=1&limit=10
 
 // Result
 {  
@@ -429,7 +429,7 @@ This API returns a list of block of given the page number and limit number.
 **Example**
 ```
 // Request
-curl https://explorer.thetatoken.org:9000/api/transactions/range?pageNumber=1&limit=10
+curl https://explorer.thetatoken.org:8443/api/transactions/range?pageNumber=1&limit=10
 
 // Result
 {  
@@ -474,7 +474,7 @@ This API returns the details of the account being queried with address.
 **Example**
 ```
 // Request
-curl https://explorer.thetatoken.org:9000/api/account/0x3c6D5ED0353c22c31c5F91688A9D10E7Af2DF636
+curl https://explorer.thetatoken.org:8443/api/account/0x3c6D5ED0353c22c31c5F91688A9D10E7Af2DF636
 
 // Result
 {
@@ -517,7 +517,7 @@ This API returns the details of the account being queried with address.
 **Example**
 ```
 // Request
-curl "https://explorer.thetatoken.org:9000/api/accounttx/0x3c6D5ED0353c22c31c5F91688A9D10E7Af2DF636?type=2&pageNumber=1&limitNumber=50&isEqualType=true"
+curl "https://explorer.thetatoken.org:8443/api/accounttx/0x3c6D5ED0353c22c31c5F91688A9D10E7Af2DF636?type=2&pageNumber=1&limitNumber=50&isEqualType=true"
 
 // Result
 {
@@ -547,7 +547,7 @@ This API returns the list of top token holders.
 **Example**
 ```
 // Request
-curl "https://explorer.thetatoken.org:9000/api/account/top/theta/5"
+curl "https://explorer.thetatoken.org:8443/api/account/top/theta/5"
 
 // Result
 {
@@ -582,7 +582,7 @@ This API returns all stake records.
 **Example**
 ```
 // Request 
-curl https://explorer.thetatoken.org:9000/api/stake/all
+curl https://explorer.thetatoken.org:8443/api/stake/all
 
 // Result
 {
@@ -631,7 +631,7 @@ This API returns the total amount of stakes.
 **Example**
 ```
 // Request 
-curl https://explorer.thetatoken.org:9000/api/stake/totalAmount
+curl https://explorer.thetatoken.org:8443/api/stake/totalAmount
 
 // Result
 {
@@ -653,7 +653,7 @@ This API returns the stakes being queried with address.
 **Example**
 ```
 // Request 
-curl https://explorer.thetatoken.org:9000/api/stake/totalAmount
+curl https://explorer.thetatoken.org:8443/api/stake/totalAmount
 
 // Result
 {
@@ -709,7 +709,7 @@ This API returns the total amount and circulation amount of Theta.
 **Example**
 ```
 // Request 
-curl https://explorer.thetatoken.org:9000/api/supply/theta
+curl https://explorer.thetatoken.org:8443/api/supply/theta
 
 // Result
 {
@@ -731,7 +731,7 @@ This API returns the circulation amount of TFuel.
 **Example**
 ```
 // Request 
-curl https://explorer.thetatoken.org:9000/api/supply/tfuel
+curl https://explorer.thetatoken.org:8443/api/supply/tfuel
 
 // Result
 {

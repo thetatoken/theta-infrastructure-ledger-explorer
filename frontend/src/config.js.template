@@ -3,11 +3,11 @@ const host = 'https://localhost';
 const config = {
     restApi: {
         host: host,
-        port: 9000
+        port: 8443
     },
     socketApi: {
         host: host,
-        port: 3030
+        port: 2096
     },
     defaultThetaChainID: NetworkUrlOfChainId[host]
 };

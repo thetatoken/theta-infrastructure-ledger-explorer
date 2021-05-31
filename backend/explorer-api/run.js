@@ -131,7 +131,9 @@ function main() {
       activeActDao = new activeAccountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(activeActDao);
       //
+
       app.use(compression());
+      app.use(cors());
 
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -143,43 +145,41 @@ function main() {
         res.end();
       });
 
-      app.use(cors());
+
+      var options = {};
+      var restServer, socketIOServer;
+
+      if (config.cert && config.cert.enabled) {
+        var privateKey = fs.readFileSync(config.cert.key, 'utf8');
+        var certificate = fs.readFileSync(config.cert.crt, 'utf8');
+        options = {
+          key: privateKey,
+          cert: certificate
+        };
+        var spdy = require('spdy');
+        restServer = spdy.createServer(options, app);
+        socketIOServer = spdy.createServer(options, app);
+      } else {
+        var http = require('http');
+        restServer = http.createServer(app);
+        socketIOServer = http.createServer(app);
+      }
+
+      // start server program
+      io = require('socket.io')(socketIOServer);
+      io.on('connection', onClientConnect);
+
+      socketIOServer.listen(config.server.socketIOPort || '2096', () => {
+        console.log("socket.IO api running on port.", config.server.socketIOPort || '2096');
+      });
 
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));
 
-      // start server program
-      let restServer, socketIOServer
-
-      if (config.cert && config.cert.enabled) {
-        const privateKey = fs.readFileSync(config.cert.key, 'utf8');
-        const certificate = fs.readFileSync(config.cert.crt, 'utf8');
-
-        const options = {
-          key: privateKey,
-          cert: certificate
-        };
-
-        const spdy = require('spdy')
-        restServer = spdy.createServer(options, app);
-        socketIOServer = spdy.createServer(options, app)
-      } else {
-        const http = require('http')
-        restServer = http.createServer(app)
-        socketIOServer = http.createServer(app)
-      }
-
       restServer.listen(config.server.port, () => {
         console.log("rest api running on port.", config.server.port);
       });
-      
-      io = require('socket.io')(socketIOServer);
 
-      io.on('connection', onClientConnect);
-
-      socketIOServer.listen('3030');
-
-      // REST services
       // blocks router
       blocksRouter(app, blockDao, progressDao, checkpointDao, config);
       // transactions router       
