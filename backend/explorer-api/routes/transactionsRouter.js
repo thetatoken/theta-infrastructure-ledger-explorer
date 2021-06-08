@@ -3,14 +3,18 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
+var startTime = 0;
+var txNumber = 0;
+var cachePeriod = 10 * 60 * 1000; // 10 mins
+
 var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/transaction/:hash", (req, res) => {
     let hash = helper.normalize(req.params.hash.toLowerCase());
     console.log('Querying one transaction by using uuid: ' + hash);
-    if(!helper.validateHex(hash, 64)){
-      res.status(400).send({type: 'invalid_hash'})
+    if (!helper.validateHex(hash, 64)) {
+      res.status(400).send({ type: 'invalid_hash' })
       return;
     }
     progressDao.getProgressAsync(config.blockchain.network_id)
@@ -72,17 +76,28 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
   })
 
   router.get("/transactions/number", (req, res) => {
-    transactionDao.getTotalNumberByHourAsync(null)
-      .then(number => {
-        var data = ({
-          type: 'transaction_number',
-          body: { total_num_tx: number }
+    var curTime = +new Date();
+    if (curTime - startTime > cachePeriod) {
+      transactionDao.getTotalNumberByHourAsync(null)
+        .then(number => {
+          txNumber = number;
+          startTime = curTime;
+          var data = ({
+            type: 'transaction_number',
+            body: { total_num_tx: number }
+          });
+          res.status(200).send(data);
+        })
+        .catch(err => {
+          console.log('Error - Push total number of transaction', err);
         });
-        res.status(200).send(data);
-      })
-      .catch(err => {
-        console.log('Error - Push total number of transaction', err);
+    } else {
+      res.status(200).send({
+        type: 'transaction_number',
+        body: { total_num_tx: txNumber }
       });
+    }
+
   });
 
   router.get("/transactions/number/:h", (req, res) => {
