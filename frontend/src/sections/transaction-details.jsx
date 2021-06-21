@@ -615,8 +615,8 @@ const Item = props => {
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
         let url = abiCoder.decode(outputTypes, outputValues)[0];
-        if(/^http:\/\/api.thetadrop.com.*\.json$/g.test(url) && typeof url === "string") {
-          url = url.replace("http://api.thetadrop.com", "https://api.thetadrop.com")
+        if(/^http:\/\/(.*)api.thetadrop.com.*\.json$/g.test(url) && typeof url === "string") {
+          url = url.replace("http://", "https://")
         }
         const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
         if (isImage) {
