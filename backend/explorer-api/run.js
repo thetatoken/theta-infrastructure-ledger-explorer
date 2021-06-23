@@ -169,7 +169,9 @@ function main() {
       io = require('socket.io')(socketIOServer);
       io.on('connection', onClientConnect);
 
-      socketIOServer.listen('3030');
+      socketIOServer.listen(config.server.socketIOPort || '2096', () => {
+        console.log("socket.IO api running on port.", config.server.socketIOPort || '2096');
+      });
 
       // app.use(bodyParser.json());
       // app.use(bodyParser.urlencoded({ extended: true }));

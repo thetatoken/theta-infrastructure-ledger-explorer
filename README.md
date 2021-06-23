@@ -40,7 +40,7 @@ npm install
 mv config.cfg.template config.cfg
 node run
 ```
-Now the explorer API application is running at https://localhost:9000
+Now the explorer API application is running at https://localhost:8443
 
 ## Frontend Web Application
 ### Setup
