@@ -91,7 +91,7 @@ exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabl
   // console.log('before update stakes:', type)
   // await stakeDao.updateStakesAsync(candidateList, type);
   // console.log('after update stakes:', type)
-  if(cacheEnabled){
+  if (cacheEnabled) {
     await updateStakeWithCache(candidateList, type, stakeDao);
     return;
   }
@@ -100,7 +100,7 @@ exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabl
 exports.updateTotalStake = function (totalStake, progressDao) {
   let totalTheta = 0, totalTfuel = 0;
   let thetaHolders = new Set(), tfuelHolders = new Set();
-  totalStake.vcp.forEach(vcpPair => {
+  totalStake.vcp && totalStake.vcp.forEach(vcpPair => {
     vcpPair.Vcp.SortedCandidates.forEach(candidate => {
       thetaHolders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
@@ -108,7 +108,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
       })
     })
   })
-  totalStake.gcp.forEach(gcpPair => {
+  totalStake.gcp && totalStake.gcp.forEach(gcpPair => {
     gcpPair.Gcp.SortedGuardians.forEach(candidate => {
       thetaHolders.add(candidate.Holder)
       candidate.Stakes.forEach(stake => {
@@ -116,7 +116,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
       })
     })
   })
-  totalStake.eenp.forEach(eenpPair => {
+  totalStake.eenp && totalStake.eenp.forEach(eenpPair => {
     eenpPair.EENs.forEach(candidate => {
       tfuelHolders.add(candidate.Holder);
       candidate.Stakes.forEach(stake => {
@@ -124,6 +124,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
       })
     })
   })
+
   progressDao.upsertStakeProgressAsync('theta', totalTheta.toFixed(), thetaHolders.size);
   progressDao.upsertStakeProgressAsync('tfuel', totalTfuel.toFixed(), tfuelHolders.size);
 }
