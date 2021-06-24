@@ -1,3 +1,5 @@
+var Logger = require('../helper/logger');
+
 var txHelper = require('../helper/transactions');
 
 var progressDao = null;
@@ -25,10 +27,10 @@ exports.Execute = async function (network_id, readPreFeeTimer) {
         height = 0;
       }
     } else {
-      console.log('Error occurs in get fee:', e)
+      Logger.log('Error occurs in get fee:', e)
     }
   }
-  console.log('height:', height);
+  Logger.log('height:', height);
   if (height === 0) {
     clearInterval(readPreFeeTimer);
     return;
@@ -44,6 +46,6 @@ exports.Execute = async function (network_id, readPreFeeTimer) {
     await txHelper.updateFees(txsInfoList, progressDao)
     await progressDao.upsertFeeProgressAsync(startHeight - 1);
   } catch (e) {
-    console.log('Error occurs while updating fee and fee progress:', e.message);
+    Logger.log('Error occurs while updating fee and fee progress:', e.message);
   }
 }

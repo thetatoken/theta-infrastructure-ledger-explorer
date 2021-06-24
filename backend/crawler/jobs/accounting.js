@@ -1,3 +1,5 @@
+var Logger = require('../helper/logger');
+
 const BigNumber = require('bignumber.js');
 const rp = require('request-promise');
 const COINBASE = 0;
@@ -91,6 +93,6 @@ function getCoinbasePrice() {
     return rp(requestOptions).then(res => {
         return res.data[TFUEL_ID].quote.USD.price
     }).catch((err) => {
-        console.log('Coinbase API call error:', err.message);
+        Logger.log('Coinbase API call error:', err.message);
     });
 }

@@ -1,3 +1,5 @@
+var Logger = require('../helper/logger');
+
 let transactionDao = null;
 let txHistoryDao = null;
 
@@ -18,7 +20,7 @@ exports.Execute = function () {
         txHistoryDao.insertAsync(data);
       })
     }).catch(async err => {
-      console.log('err:', err)
+      Logger.log('err:', err)
       if (err) {
         if (err.message.includes('NOT_FOUND')) {
           let records = []
@@ -29,7 +31,7 @@ exports.Execute = function () {
             // records.push({ timestamp: (new Date().getTime() / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp })
             tmp = num;
           }
-          console.log(records);
+          Logger.log(records);
         }
       }
     })

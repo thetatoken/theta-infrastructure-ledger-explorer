@@ -65,9 +65,9 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   redisConfig = config.redis;
-  console.log("redisConfig:", redisConfig)
+  Logger.log("redisConfig:", redisConfig)
   cacheEnabled = config.nodeCache && config.nodeCache.enabled;
-  console.log('cacheEnabled:', cacheEnabled);
+  Logger.log('cacheEnabled:', cacheEnabled);
   if (redisConfig && redisConfig.enabled) {
     redis = redisConfig.isCluster ? new Redis.Cluster([
       {
@@ -81,7 +81,7 @@ function main() {
     }) : new Redis(redisConfig);
     bluebird.promisifyAll(redis);
     redis.on("connect", () => {
-      console.log('connected to Redis');
+      Logger.log('connected to Redis');
     });
   }
 
@@ -99,7 +99,7 @@ function main() {
 
   app.use(cors());
   app.get('/ping', function (req, res) {
-    console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
+    Logger.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
     res.writeHead(200, {
       'Content-Type': 'text/plain',
       'Content-Length': 2
@@ -109,7 +109,7 @@ function main() {
   });
   var http = require('http').createServer(app);
   http.listen('8080', () => {
-    console.log("rest api running on port. 8080");
+    Logger.log("rest api running on port. 8080");
   });
 }
 

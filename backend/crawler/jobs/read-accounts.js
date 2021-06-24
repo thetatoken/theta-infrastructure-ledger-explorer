@@ -1,3 +1,5 @@
+var Logger = require('../helper/logger');
+
 let activeActDao = null;
 let dailyAccountDao = null;
 let totalActDao = null;
@@ -17,12 +19,12 @@ exports.Execute = function () {
       await activeActDao.insertAsync({ amount: res, timestamp });
       await dailyAccountDao.removeAllAsync();
     }).catch(err => {
-      console.log('error from daily account getTotalNumber:', err);
+      Logger.log('error from daily account getTotalNumber:', err);
     })
   accountDao.getTotalNumberAsync()
     .then(async res => {
       await totalActDao.insertAsync({ amount: res, timestamp });
     }).catch(err => {
-      console.log('error from account getTotalNumber:', err);
+      Logger.log('error from account getTotalNumber:', err);
     })
 }

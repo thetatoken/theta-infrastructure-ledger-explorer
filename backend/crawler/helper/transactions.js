@@ -1,4 +1,5 @@
 var helper = require('./utils');
+var Logger = require('./logger');
 
 exports.getBriefTxs = function (txs) {
   const res = []
@@ -35,7 +36,7 @@ exports.updateFees = async function (transactions, progressDao) {
     if (e.message === 'No fee record') {
       fee = 0;
     } else {
-      console.log('Error occurs while updating fees:', e.message);
+      Logger.log('Error occurs while updating fees:', e.message);
     }
   }
   let updatedFee = transactions.reduce((pre, tx) => {

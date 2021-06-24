@@ -1,4 +1,6 @@
 var helper = require('./utils');
+var Logger = require('./logger');
+
 var stakesCache = {
   vcp: new Map(),
   gcp: new Map(),
@@ -61,8 +63,8 @@ async function updateStakeWithCache(candidateList, type, stakeDao) {
   for (let stake of updateStakeList) {
     await stakeDao.insertAsync(stake);
   }
-  console.log('updateStakeList length:', updateStakeList.length, 'type:', type)
-  console.log('delete keys length:', deleteKeys.length, 'type:', type);
+  Logger.log('updateStakeList length:', updateStakeList.length, 'type:', type)
+  Logger.log('delete keys length:', deleteKeys.length, 'type:', type);
   await stakeDao.removeRecordsByIdAsync(type, deleteKeys);
   for (let key of deleteKeys) {
     cacheRef.delete(key);
@@ -88,9 +90,9 @@ exports.updateStake = async function (candidate, type, stakeDao) {
   await Promise.all(insertList);
 }
 exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabled) {
-  // console.log('before update stakes:', type)
+  // Logger.log('before update stakes:', type)
   // await stakeDao.updateStakesAsync(candidateList, type);
-  // console.log('after update stakes:', type)
+  // Logger.log('after update stakes:', type)
   if (cacheEnabled) {
     await updateStakeWithCache(candidateList, type, stakeDao);
     return;
