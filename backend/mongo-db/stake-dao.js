@@ -105,7 +105,7 @@ module.exports = class stakeDAO {
     for (let stake of updateStakeList) {
       await this.insertAsync(stake);
     }
-    await this.removeRecordsByIdAsync(type, deleteKeys);
+    await this.removeRecordsByIdAsync(type, deleteKeys, true);
     console.log('before redis callback');
   }
 
@@ -161,7 +161,7 @@ module.exports = class stakeDAO {
       })
     })
   }
-  removeRecordsById(type, ids, callback) {
+  removeRecordsById(type, ids, hasRedis, callback) {
     let self = this;
     const queryObject = { _id: { $in: ids }, 'type': type };
     this.client.remove(this.stakeInfoCollection, queryObject, async function (err, res) {
@@ -169,10 +169,12 @@ module.exports = class stakeDAO {
         console.log('Stake dao removeRecordsById ERR - ', err, type, ids);
         callback(err);
       }
-      const redis_key = `stake_${type}`;
-      for (let id of ids) {
-        // TODO: del multiple at one time
-        self.redis.hdel(redis_key, id);
+      if (hasRedis) {
+        const redis_key = `stake_${type}`;
+        for (let id of ids) {
+          // TODO: del multiple at one time
+          self.redis.hdel(redis_key, id);
+        }
       }
       callback(err, res);
     })
