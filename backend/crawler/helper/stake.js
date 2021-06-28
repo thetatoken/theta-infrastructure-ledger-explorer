@@ -127,6 +127,10 @@ exports.updateTotalStake = function (totalStake, progressDao) {
     })
   })
 
-  progressDao.upsertStakeProgressAsync('theta', totalTheta.toFixed(), thetaHolders.size);
-  progressDao.upsertStakeProgressAsync('tfuel', totalTfuel.toFixed(), tfuelHolders.size);
+  if (totalTheta.toFixed() != 0) {
+    progressDao.upsertStakeProgressAsync('theta', totalTheta.toFixed(), thetaHolders.size);
+  }
+  if (totalTfuel.toFixed() != 0) {
+    progressDao.upsertStakeProgressAsync('tfuel', totalTfuel.toFixed(), tfuelHolders.size);
+  }
 }

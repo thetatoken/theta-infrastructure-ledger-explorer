@@ -126,7 +126,7 @@ exports.Execute = async function (network_id) {
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
-        var stakes = { vcp: [], gcp: [] };
+        var stakes = { vcp: [], gcp: [], eenp: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
