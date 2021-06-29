@@ -4,7 +4,7 @@ import reduce from 'lodash/reduce';
 import get from 'lodash/get';
 import truncate from 'lodash/truncate';
 
-import { GWEI } from 'common/constants';
+import { GWEI, WEI } from 'common/constants';
 
 export function averageFee(block) {
   BigNumber.set({ DECIMAL_PLACES: 2 });
@@ -14,6 +14,12 @@ export function averageFee(block) {
     .toString(10);
 }
 
+export function totalTfuelBurnt(block) {
+  BigNumber.set({ DECIMAL_PLACES: 2 });
+  return reduce(block.txs, (bn, t) => bn.plus(new BigNumber(get(t, 'raw.fee.tfuelwei', 0))), new BigNumber(0))
+    .dividedBy(WEI)
+    .toString(10);
+}
 
 export function hash(block, trunc = null) {
   let a = get(block, 'hash')
