@@ -7,9 +7,10 @@ import map from 'lodash/map';
 import { blocksService } from 'common/services/block';
 import NotExist from 'common/components/not-exist';
 import { BlockStatus, TxnTypeText, TxnClasses } from 'common/constants';
-import { date, hash, prevBlock } from 'common/helpers/blocks';
+import { date, hash, prevBlock, totalTfuelBurnt } from 'common/helpers/blocks';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
+import BigNumber from "bignumber.js";
 
 export default class BlocksExplorer extends React.PureComponent {
   constructor(props) {
@@ -105,6 +106,7 @@ export default class BlocksExplorer extends React.PureComponent {
     const hasNext = totalBlocksNumber > height;
     const hasPrev = height > 1;
     const isCheckPoint = block && (block.total_voted_guardian_stakes != undefined);
+    const tfuelBurnt = block ? totalTfuelBurnt(block) : new BigNumber(0);
     return (
       <div className="content block-details">
         <div className="page-title blocks">Block Details</div>
@@ -135,6 +137,10 @@ export default class BlocksExplorer extends React.PureComponent {
                 <tr>
                   <th># Transactions</th>
                   <td>{block.num_txs}</td>
+                </tr>
+                <tr>
+                  <th>Tfuel Burnt</th>
+                  <td><div className="currency tfuelwei">{tfuelBurnt.toString(10)}</div></td>
                 </tr>
                 {isCheckPoint && <tr>
                   <th className="cp"># Voted Guardian Stakes</th>
