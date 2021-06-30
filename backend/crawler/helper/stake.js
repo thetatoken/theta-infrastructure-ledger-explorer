@@ -68,6 +68,7 @@ async function updateStakeWithCache(candidateList, type, stakeDao) {
   await stakeDao.removeRecordsByIdAsync(type, deleteKeys, false);
   for (let key of deleteKeys) {
     cacheRef.delete(key);
+    cacheKeyRef.delete(key);
   }
 }
 
