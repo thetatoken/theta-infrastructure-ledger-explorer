@@ -37,7 +37,7 @@ var supplyRouter = (app, progressDao, rpc, config) => {
           const addressZeroBalance = account ? account.coins.tfuelwei : 0;
           const feeInfo = await progressDao.getFeeAsync()
           const burntAmount = helper.sumCoin(addressZeroBalance, feeInfo.total_fee).toFixed();
-          const supply = 5000000000 + ~~((10968061 - 4164982) / 100) * 4800 + ~~((height - 10968061) / 100) * 8600 - burntAmount;
+          const supply = 5000000000 + ~~((10968061 - 4164982) / 100) * 4800 + ~~((height - 10968061) / 100) * 8600 - helper.formatCoin(burntAmount).toFixed(0);
           const data = ({
             "total_supply": supply,
             "circulation_supply": supply
