@@ -29,14 +29,24 @@ var supplyRouter = (app, progressDao, rpc, config) => {
       return;
     }
     progressDao.getProgressAsync(config.blockchain.network_id)
-      .then(progressInfo => {
-        const height = progressInfo.height;
-        const supply = 5000000000 + ~~((height - 4164982) / 100) * 4800;
-        const data = ({
-          "total_supply": supply,
-          "circulation_supply": supply
-        })
-        res.status(200).send(data);
+      .then(async progressInfo => {
+        try {
+          const height = progressInfo.height;
+          let response = await rpc.getAccountAsync([{ 'address': '0x0' }]);
+          let account = JSON.parse(response).result;
+          const addressZeroBalance = account ? account.coins.tfuelwei : 0;
+          const feeInfo = await progressDao.getFeeAsync()
+          const burntAmount = helper.sumCoin(addressZeroBalance, feeInfo.total_fee).toFixed();
+          const supply = 5000000000 + ~~((10968061 - 4164982) / 100) * 4800 + ~~((height - 10968061) / 100) * 8600 - burntAmount;
+          const data = ({
+            "total_supply": supply,
+            "circulation_supply": supply
+          })
+          res.status(200).send(data);
+        } catch (err) {
+          res.status(400).send(err.message);
+          return;
+        }
       }).catch(err => {
         res.status(400).send(err.message);
       })
