@@ -21,14 +21,20 @@ export default class Dashboard extends React.PureComponent {
   }
   getPrices(counter = 0) {
     priceService.getAllprices()
-      .then(res => {
+      .then(async res => {
         const prices = get(res, 'data.body');
         let thetaInfo, tfuelInfo;
         prices.forEach(info => {
           if (info._id === 'THETA') thetaInfo = info;
           else if (info._id === 'TFUEL') tfuelInfo = info;
         })
-        this.setState({ thetaInfo, tfuelInfo })
+        try {
+          let res = await priceService.getTfuelSupply();
+          tfuelInfo.circulating_supply = get(res, 'data.circulation_supply')
+          this.setState({ thetaInfo, tfuelInfo })
+        } catch (err) {
+          console.log(err);
+        }
       })
       .catch(err => {
         console.log(err);
