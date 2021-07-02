@@ -46,6 +46,9 @@
     .column {
       height: 80px;
     }
+    &>:last-child {
+      width: auto !important;
+    }
   }
   .column{
     width: 20%;
@@ -67,7 +70,18 @@
         height: 24px;
       }
     }
-
+    // &.last {
+    //   .detail {
+    //     .title {
+    //       display: flex;
+    //       justify-content: center;
+    //     }
+    //     .value {
+    //       display: flex;
+    //       justify-content: center;
+    //     }
+    //   }
+    // }
     .detail{
       height: 48px;
       border-left: 1px solid rgba($color-font-light, 0.2);

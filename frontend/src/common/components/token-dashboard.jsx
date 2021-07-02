@@ -15,8 +15,6 @@ export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      blockNum: 0,
-      txnNum: 0,
       totalStaked: 0,
       holders: { theta: [], tfuel: [] },
       percentage: { theta: [], tfuel: [] },
@@ -26,13 +24,11 @@ export default class TokenDashboard extends React.PureComponent {
     };
   }
   componentDidMount() {
+    this.getTotalStaked();
     if (this.props.type === 'theta') {
-      this.getTotalStaked();
       this.getAllStakes();
     }
     if (this.props.type === 'tfuel') {
-      this.getTransactionNumber();
-      this.getBlockNumber();
       this.getTransactionHistory();
     }
   }
@@ -103,31 +99,12 @@ export default class TokenDashboard extends React.PureComponent {
         console.log(err);
       });
   }
-  getTransactionNumber() {
-    transactionsService.getTotalTransactionNumber(24)
-      .then(res => {
-        const txnNum = get(res, 'data.body.total_num_tx');
-        this.setState({ txnNum })
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
-  getBlockNumber() {
-    blocksService.getTotalBlockNumber(24)
-      .then(res => {
-        const blockNum = get(res, 'data.body.total_num_block');
-        this.setState({ blockNum })
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }
   getTotalStaked() {
     const { type } = this.props;
-    stakeService.getTotalStake()
+    stakeService.getTotalStake(type)
       .then(res => {
         const stake = get(res, 'data.body')
+        console.log('stake:', stake, 'type:', type)
         this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
       })
       .catch(err => {
@@ -135,7 +112,7 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   render() {
-    const { blockNum, txnNum, totalStaked, holders, percentage, txTs, txNumber, nodeNum } = this.state;
+    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -153,15 +130,11 @@ export default class TokenDashboard extends React.PureComponent {
             <Detail title={'24 HR VOLUME (USD)'} value={formatCurrency(tokenInfo.volume_24h, 0)} />
             <Detail title={'CIRCULATING SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
-          {type === 'theta' &&
-            <div className="column">
-              <Detail title={'TOTAL STAKED NODES'} value={nodeNum} />
-              <Detail title={'TOTAL STAKED (%)'} value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
-            </div>}
-          {type === 'tfuel' && <div className="column">
-            <Detail title={'24 HR BLOCKS'} value={formatNumber(blockNum)} />
-            <Detail title={'24 HR TRANSACTIONS'} value={<TxnNumber num={txnNum} />} />
-          </div>}
+          <div className="column">
+            <Detail title={type === 'theta' ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
+            <Detail title={type === 'theta' ? 'TOTAL STAKED (%)' : 'TFUEL STAKED (%)'}
+              value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
+          </div>
           <div className="column pie-charts">
             {type === 'tfuel' ?
               <div className="chart-container">
