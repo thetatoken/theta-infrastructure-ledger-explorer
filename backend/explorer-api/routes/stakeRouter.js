@@ -34,21 +34,40 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
   });
   //TODO: remove after merge 3.0 branch
   router.get("/stake/totalAmount/tfuel", async (req, res) => {
-    console.log('Querying total staked tfuel tokens.');
-    axios.get(`https://api.thetatoken.org/v1/pre-elite-edge-nodes/stats`)
-      .then(result => {
+    console.log(`Querying total staked ${type} tokens.`);
+    let type = 'tfuel';
+    let cur = +new Date();
+    if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
+      const data = cacheData[type];
+      if (data.type === 'stakeTotalAmout') {
+        res.status(200).send(data);
+      } else if (data.type === 'error_not_found') {
+        res.status(404).send(data);
+      }
+      return;
+    }
+    startTime[type] = cur;
+    progressDao.getStakeProgressAsync(type)
+      .then(info => {
         const data = ({
-          type: 'total_staked_tfuel',
-          body: {
-            total_tfuel_staked: result.data.total_tfuel_staked
-          }
-        })
-        res.status(200).send(data)
+          type: 'stakeTotalAmout',
+          body: { totalAmount: info.total_amount, totalNodes: info.holder_num, type: info.type },
+        });
+        cacheData[type] = data;
+        res.status(200).send(data);
       })
       .catch(error => {
-        console.log('error:', error)
-        res.status(400).send(error);
-      })
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          cacheData[type] = err;
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
   })
   router.get("/stake/totalAmount", (req, res) => {
     let { type = 'theta' } = req.query;
