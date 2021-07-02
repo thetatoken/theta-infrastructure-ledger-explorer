@@ -4,7 +4,7 @@ var app = express();
 var compression = require('compression')
 
 var bluebird = require("bluebird");
-var rpc = require('../crawler/api/rpc.js');
+var rpc = require('./api/rpc');
 var mongoClient = require('../mongo-db/mongo-client.js')
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
@@ -185,7 +185,7 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, progressDao, txHistoryDao, config);
       // account router
-      accountRouter(app, accountDao, rpc);
+      accountRouter(app, accountDao, progressDao, rpc, config);
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
