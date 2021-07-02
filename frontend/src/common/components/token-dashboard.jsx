@@ -132,7 +132,7 @@ export default class TokenDashboard extends React.PureComponent {
           </div>
           <div className="column">
             <Detail title={type === 'theta' ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
-            <Detail title={type === 'theta' ? 'TOTAL STAKED (%)' : 'TFUEL STAKED (%)'}
+            <Detail title={type === 'theta' ? 'THETA STAKED (%)' : 'TFUEL STAKED (%)'}
               value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
           </div>
           <div className="column pie-charts">
