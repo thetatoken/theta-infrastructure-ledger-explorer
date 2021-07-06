@@ -1,6 +1,7 @@
 import React from "react";
 import get from 'lodash/get';
 
+import { Link } from 'react-router-dom';
 import { stakeService } from 'common/services/stake';
 import ThetaChart from 'common/components/chart';
 import { sumCoin } from 'common/helpers/utils';
@@ -26,6 +27,7 @@ export default class Stakes extends React.Component {
     this.getAllStakes();
   }
 
+  
   getAllStakes() {
     const types = this.props.stakeCoinType === 'tfuel' ? ['eenp'] : ['vcp', 'gcp'];
     stakeService.getAllStake(types)
@@ -96,7 +98,18 @@ export default class Stakes extends React.Component {
         <div className="chart-container">
           <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'account'} />
         </div>
-        <div className="legend">{legend}</div>
+        <div className="legend">
+          {legend}
+          <div className="stake-switch-container">
+            STAKED TOKEN
+            <Link to={stakeCoinType === 'theta' ? "/stakes/tfuel" : "/stakes/theta"}>
+            <label className="stake-switch">
+              <input type="checkbox" className="checkbox" defaultChecked={stakeCoinType === 'tfuel'} />
+              <span className="slider"></span>
+            </label>
+            </Link>
+          </div>
+        </div>
         <div className="table-container">
           <StakesTable type='wallet' stakeCoinType={stakeCoinType} stakes={sortedStakesBySource}
             totalStaked={totalStaked} truncate={truncate} />

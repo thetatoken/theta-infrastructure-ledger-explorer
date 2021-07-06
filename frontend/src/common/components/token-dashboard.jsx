@@ -104,7 +104,6 @@ export default class TokenDashboard extends React.PureComponent {
     stakeService.getTotalStake(type)
       .then(res => {
         const stake = get(res, 'data.body')
-        console.log('stake:', stake, 'type:', type)
         this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
       })
       .catch(err => {

@@ -34,7 +34,7 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
   });
   //TODO: remove after merge 3.0 branch
   router.get("/stake/totalAmount/tfuel", async (req, res) => {
-    console.log(`Querying total staked ${type} tokens.`);
+    console.log(`Querying total staked tfuel tokens.`);
     let type = 'tfuel';
     let cur = +new Date();
     if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
