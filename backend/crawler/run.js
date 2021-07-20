@@ -17,6 +17,7 @@ var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 var totalAccountDaoLib = require('../mongo-db/total-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
+var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
 
 var Redis = require("ioredis");
 var redis = null;
@@ -172,6 +173,8 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(dailyAccountDao);
 
+  dailyTfuelBurntDao = new dailyTfuelBurntDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(dailyTfuelBurntDao);
 
   readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
   let readPreFeeTimer;
@@ -195,7 +198,7 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night
 
-  accountJob.Initialize(dailyAccountDao, activeAccountDao, totalAccountDao, accountDao);
+  accountJob.Initialize(dailyAccountDao, activeAccountDao, totalAccountDao, accountDao, dailyTfuelBurntDao);
   activeAccountDao.getLatestRecordsAsync(1)
     .then(() => { }).catch(err => {
       if (err.message.includes('NO_RECORD')) {
