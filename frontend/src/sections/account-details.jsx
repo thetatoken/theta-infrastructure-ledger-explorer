@@ -13,6 +13,7 @@ import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { priceService } from 'common/services/price';
+import { rewardDistributionService } from 'common/services/rewardDistribution';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
 import NotExist from 'common/components/not-exist';
@@ -47,7 +48,8 @@ export default class AccountDetails extends React.Component {
       isDownloading: false,
       hasRefreshBtn: false,
       selectedTypes: TypeOptions.filter(obj => obj.value !== '5'),
-      typeOptions: null
+      typeOptions: null,
+      splitPercent: 0
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -68,7 +70,7 @@ export default class AccountDetails extends React.Component {
   }
   componentDidUpdate(preProps) {
     if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
-      this.setState({ hasOtherTxs: true, includeService: false })
+      this.setState({ hasOtherTxs: true, includeService: false, splitPercent: 0 })
       this.fetchData(this.props.match.params.accountAddress);
     }
   }
@@ -84,6 +86,17 @@ export default class AccountDetails extends React.Component {
     } else {
       this.setState({ errorType: 'invalid_address' })
     }
+  }
+  getSplitPercent(address) {
+    rewardDistributionService.getRewardDistributionByAddress(address)
+      .then(res => {
+        console.log('res:', res)
+        let splitPercent = get(res, 'data.body.splitBasisPoint');
+        console.log('splitPercent:', splitPercent)
+        this.setState({ splitPercent })
+      }).catch(err => {
+        console.log(err)
+      })
   }
   getPrices(counter = 0) {
     priceService.getAllprices()
@@ -124,6 +137,9 @@ export default class AccountDetails extends React.Component {
           if (tx.type === 'eenp') tfuelSourceTxs.push(tx)
           else thetaSourceTxs.push(tx);
         })
+        if(thetaHolderTxs.length > 0 || tfuelHolderTxs.length > 0) {
+          this.getSplitPercent(address);
+        }
         this.setState({
           thetaHolderTxs,
           thetaSourceTxs,
@@ -309,7 +325,7 @@ export default class AccountDetails extends React.Component {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
-      hasRefreshBtn, typeOptions } = this.state;
+      hasRefreshBtn, typeOptions, splitPercent } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -328,6 +344,8 @@ export default class AccountDetails extends React.Component {
               <tbody>
                 <DetailsRow label="Balance" data={<Balance balance={account.balance} price={price} />} />
                 <DetailsRow label="Sequence" data={account.sequence} />
+                {((hasThetaStakes && thetaHolderTxs.length > 0) || (hasTfuelStakes && tfuelHolderTxs.length > 0)) &&
+                  <DetailsRow label="Split PERCENT" data={splitPercent / 100 + '%'} />}
               </tbody>
             </table>
           </React.Fragment>}
