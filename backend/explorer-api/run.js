@@ -19,6 +19,7 @@ var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
 var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao.js')
+var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -30,6 +31,7 @@ var accountingRouter = require("./routes/accountingRouter");
 var supplyRouter = require("./routes/supplyRouter");
 var smartContractRouter = require("./routes/smartContractRouter");
 var activeActRouter = require("./routes/activeActRouter");
+var rewardDistributionRouter = require("./routes/rewardDistributionRouter");
 var cors = require('cors');
 var io;
 //------------------------------------------------------------------------------
@@ -130,6 +132,8 @@ function main() {
       bluebird.promisifyAll(smartContractDao);
       activeActDao = new activeAccountDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(activeActDao);
+      rewardDistributionDao = new rewardDistributionDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(rewardDistributionDao);
       //
 
       app.use(compression());
@@ -200,6 +204,8 @@ function main() {
       smartContractRouter(app, smartContractDao)
       // active account router
       activeActRouter(app, activeActDao);
+      // reward distribution router
+      rewardDistributionRouter(app, rewardDistributionDao);
       // keep push block data
       // pushTopBlocks();
     }
