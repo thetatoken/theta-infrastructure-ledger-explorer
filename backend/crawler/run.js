@@ -17,6 +17,7 @@ var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao')
 var totalAccountDaoLib = require('../mongo-db/total-account-dao')
 var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
+var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 
 var Redis = require("ioredis");
 var redis = null;
@@ -31,7 +32,7 @@ var accountingJob = require('./jobs/accounting.js');
 var accountJob = require('./jobs/read-accounts.js');
 var express = require('express');
 var app = express();
-var cors = require('cors')
+var cors = require('cors');
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -39,6 +40,7 @@ var cors = require('cors')
 var config = null;
 var configFileName = 'config.cfg'
 var blockDao = null;
+var rewardDistributionDao = null;
 
 //------------------------------------------------------------------------------
 //  Start from here
@@ -172,6 +174,8 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(dailyAccountDao);
 
+  rewardDistributionDao = new rewardDistributionDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(rewardDistributionDao);
 
   readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
   let readPreFeeTimer;
@@ -179,8 +183,8 @@ function setupGetBlockCronJob(mongoClient, network_id) {
     await readPreFeeCronJob.Execute(network_id, readPreFeeTimer);
   }, 1000);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao,
-    stakeDao, checkpointDao, smartContractDao, dailyAccountDao, cacheEnabled, config.maxBlockPerCrawl);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao,
+    checkpointDao, smartContractDao, dailyAccountDao, rewardDistributionDao, cacheEnabled, config.maxBlockPerCrawl);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(network_id);
     setTimeout(run, 1000);
