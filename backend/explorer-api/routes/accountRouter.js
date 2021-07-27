@@ -34,32 +34,6 @@ var accountRouter = (app, accountDao, progressDao, rpc, config) => {
       });
   });
 
-  router.get("/account/rewardDistribution/:address", async (req, res) => {
-    let address = helper.normalize(req.params.address.toLowerCase());
-    if (!helper.validateHex(address, 40)) {
-      res.status(400).send({ type: 'invalid_address' })
-      return;
-    }
-    try {
-      const progressInfo = await progressDao.getProgressAsync(config.blockchain.network_id);
-      let height = progressInfo.height;
-      rpc.getStakeRewardDistributionAsync({ 'address': address, 'height:': height })
-        .then(result => {
-          result = JSON.parse(result);
-          let blockHashStakeRewardDistributionRuleSetPairs = result.result.BlockHashStakeRewardDistributionRuleSetPairs;
-          const info = {
-            rewardDistribution: blockHashStakeRewardDistributionRuleSetPairs[0].StakeRewardDistributionRuleSet[0] || 0
-          }
-          const data = ({
-            type: 'stake_reward_distribution',
-            data: info
-          })
-          res.status(200).send(data);
-        })
-    } catch (error) {
-      res.status(400).send({ error: error.message })
-    }
-  })
   router.get("/account/update/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     // console.log('Updating one account by Id:', address);
