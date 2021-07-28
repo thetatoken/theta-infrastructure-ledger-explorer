@@ -23,6 +23,7 @@ render(
       <Switch>
         <Route path='/blocks/:blockHeight' component={BlockDetails} />
         <Route path='/blocks' component={Blocks} />
+        <Route path='/block/:blockHeight' component={BlockDetails} />
         <Route path='/txs/:transactionHash' component={TransactionDetails} />
         <Route path='/tx/:transactionHash' component={TransactionDetails} />
         <Route path='/txs' component={Transactions} />
