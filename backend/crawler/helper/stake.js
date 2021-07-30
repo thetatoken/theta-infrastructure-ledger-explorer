@@ -1,5 +1,6 @@
 var helper = require('./utils');
 var Logger = require('./logger');
+var { get } = require('lodash');
 
 var stakesCache = {
   vcp: new Map(),
@@ -88,6 +89,7 @@ exports.updateStake = async function (candidate, type, stakeDao) {
     }
     insertList.push(stakeDao.insertAsync(stakeInfo));
   });
+  console.log('update stake list', type, 'length:', insertList.length)
   await Promise.all(insertList);
 }
 exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabled) {
@@ -134,4 +136,34 @@ exports.updateTotalStake = function (totalStake, progressDao) {
   if (totalTfuel.toFixed() != 0) {
     progressDao.upsertStakeProgressAsync('tfuel', totalTfuel.toFixed(), tfuelHolders.size);
   }
+}
+
+exports.insertStakePairs = async function (paris, type, blockHeight, timestamp, dailyStakeDao) {
+  console.log('In sert stake pairs', type)
+  const insertList = []
+  paris.forEach(pair => {
+    get(pair, pathMap[type]).forEach(candidate => {
+      const holder = candidate.Holder;
+      candidate.Stakes.forEach(stake => {
+        insertList.push(dailyStakeDao.insertAsync({
+          'type': type,
+          'holder': holder,
+          'source': stake.source,
+          'amount': stake.amount,
+          'withdrawn': stake.withdrawn,
+          'return_height': stake.return_height,
+          'height': blockHeight,
+          'timestamp': timestamp
+        }))
+      })
+    })
+  })
+  console.log('insertList', type, 'length:', insertList.length)
+  await Promise.all(insertList);
+}
+
+const pathMap = {
+  'vcp': 'Vcp.SortedCandidates',
+  'gcp': 'Gcp.SortedGuardians',
+  'eenp': 'EENs'
 }
