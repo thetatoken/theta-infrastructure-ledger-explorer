@@ -6,7 +6,7 @@ var axios = require("axios").default;
 let startTime = { theta: +new Date(), tfuel: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData = { theta: undefined, tfuel: undefined };
-var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => {
+var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, dailyStakeDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -181,6 +181,22 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
           console.log('ERR - ', error)
         }
       });
+  });
+
+  router.get("/dailyStake/type", (req, res) => {
+    console.log('Querying all stake.');
+    let { type = 'vcp', height = 0 } = req.query;
+    height = +height;
+    dailyStakeDao.getRecordByTypeAndHeightAsync(type, height)
+      .then(infoList => {
+        const data = {
+          type: 'daily_stake_list',
+          body: infoList
+        }
+        res.status(200).send(data);
+      }).catch(error => {
+        res.status(404).send(error)
+      })
   });
 
   //the / route of router will get mapped to /api
