@@ -183,20 +183,41 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, dailyStakeD
       });
   });
 
-  router.get("/dailyStake/type", (req, res) => {
+  router.get("/stakeHistory", (req, res) => {
     console.log('Querying all stake.');
-    let { type = 'vcp', height = 0 } = req.query;
+    let { type = 'vcp', height = 0, timestamp } = req.query;
     height = +height;
-    dailyStakeDao.getRecordByTypeAndHeightAsync(type, height)
-      .then(infoList => {
-        const data = {
-          type: 'daily_stake_list',
-          body: infoList
-        }
-        res.status(200).send(data);
-      }).catch(error => {
-        res.status(404).send(error)
-      })
+    timestamp = +timestamp;
+    if ((Number.isNaN(height) || height === 0) && (Number.isNaN(timestamp) || timestamp === 0)) {
+      res.status(400).send("Wrong parameter")
+    } else if (!Number.isNaN(height) && height !== 0) {
+      dailyStakeDao.getRecordByTypeAndHeightAsync(type, height)
+        .then(infoList => {
+          const data = {
+            type: 'daily_stake_list',
+            body: infoList
+          }
+          res.status(200).send(data);
+        }).catch(error => {
+          res.status(404).send(error)
+        })
+    } else {
+      dailyStakeDao.getLatestTimestampAsync(timestamp)
+        .then(ts => {
+          dailyStakeDao.getRecordByTypeAndTimestampAsync(type, ts)
+            .then(infoList => {
+              const data = {
+                type: 'daily_stake_list',
+                body: infoList
+              }
+              res.status(200).send(data);
+            }).catch(error => {
+              res.status(404).send(error.message)
+            })
+        }).catch(error => {
+          res.status(404).send(error.message)
+        })
+    }
   });
 
   //the / route of router will get mapped to /api
