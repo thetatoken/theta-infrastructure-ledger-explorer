@@ -39,7 +39,7 @@ var startTime;
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
-  dailyStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  stakeHistoryDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -49,7 +49,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   checkpointDao = checkpointDaoInstance;
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
-  dailyStakeDao = dailyStakeDaoInstance;
+  stakeHistoryDao = stakeHistoryDaoInstance;
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
@@ -131,7 +131,7 @@ exports.Execute = async function (network_id) {
         var upsertGcpAsyncList = [];
         var updateEenpAsyncList = [];
         var upsertEenpAsyncList = [];
-        var insertDailyStakeList = [];
+        var insertStakeHistoryList = [];
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
@@ -143,8 +143,8 @@ exports.Execute = async function (network_id) {
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
               if (stakeBlockHeight !== 0 && upsertVcpAsyncList.length === 0) {
-                insertDailyStakeList.push(stakeHelper.insertStakePairs(result.result.BlockHashVcpPairs,
-                  'vcp', stakeBlockHeight, stakeTimestamp, dailyStakeDao))
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashVcpPairs,
+                  'vcp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
               }
               if (upsertVcpAsyncList.length > 0) continue;
               stakes.vcp = result.result.BlockHashVcpPairs;
@@ -158,8 +158,8 @@ exports.Execute = async function (network_id) {
               upsertVcpAsyncList.push(stakeHelper.updateStakes(updateVcpAsyncList, 'vcp', stakeDao, cacheEnabled));
             } else if (result.result.BlockHashGcpPairs) { // handle GCP response
               if (stakeBlockHeight !== 0 && upsertGcpAsyncList.length === 0) {
-                insertDailyStakeList.push(stakeHelper.insertStakePairs(result.result.BlockHashGcpPairs,
-                  'gcp', stakeBlockHeight, stakeTimestamp, dailyStakeDao))
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashGcpPairs,
+                  'gcp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
               }
               if (upsertGcpAsyncList.length > 0) continue;
               stakes.gcp = result.result.BlockHashGcpPairs;
@@ -173,8 +173,8 @@ exports.Execute = async function (network_id) {
               upsertGcpAsyncList.push(stakeHelper.updateStakes(updateGcpAsyncList, 'gcp', stakeDao, cacheEnabled));
             } else if (result.result.BlockHashEenpPairs) {  // hanndle EENP response
               if (stakeBlockHeight !== 0 && upsertEenpAsyncList.length === 0) {
-                insertDailyStakeList.push(stakeHelper.insertStakePairs(result.result.BlockHashEenpPairs,
-                  'eenp', stakeBlockHeight, stakeTimestamp, dailyStakeDao))
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashEenpPairs,
+                  'eenp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
               }
               if (upsertEenpAsyncList.length > 0) continue;
               stakes.eenp = result.result.BlockHashEenpPairs;

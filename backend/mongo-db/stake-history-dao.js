@@ -1,14 +1,14 @@
 //------------------------------------------------------------------------------
 //  DAO for daily stake
-//  Require index: `db.dailyStake.createIndex({type:1, timestamp:-1})`
-//  Require index: `db.dailyStake.createIndex({type:1, height:-1})`
+//  Require index: `db.stakeHistory.createIndex({type:1, timestamp:-1})`
+//  Require index: `db.stakeHistory.createIndex({type:1, height:-1})`
 //------------------------------------------------------------------------------
 
-module.exports = class DailyStakeDAO {
+module.exports = class StakeHistoryDAO {
 
   constructor(execDir, client) {
     this.client = client;
-    this.collection = 'dailyStake';
+    this.collection = 'stakeHistory';
   }
 
   insert(info, callback) {

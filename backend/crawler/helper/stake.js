@@ -138,14 +138,14 @@ exports.updateTotalStake = function (totalStake, progressDao) {
   }
 }
 
-exports.insertStakePairs = async function (paris, type, blockHeight, timestamp, dailyStakeDao) {
+exports.insertStakePairs = async function (paris, type, blockHeight, timestamp, stakeHistoryDao) {
   console.log('In sert stake pairs', type)
   const insertList = []
   paris.forEach(pair => {
     get(pair, pathMap[type]).forEach(candidate => {
       const holder = candidate.Holder;
       candidate.Stakes.forEach(stake => {
-        insertList.push(dailyStakeDao.insertAsync({
+        insertList.push(stakeHistoryDao.insertAsync({
           'type': type,
           'holder': holder,
           'source': stake.source,
