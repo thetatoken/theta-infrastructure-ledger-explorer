@@ -421,7 +421,7 @@ const StakeRewardDistribution = ({ transaction, price }) => {
       </tbody>
     </table>);
 }
-const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
+const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
   let { data, receipt } = transaction;
@@ -476,6 +476,10 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick }) => {
               {err ? <DetailsRow label="Error Message" data={<span className="text-danger">
                 {Buffer.from(get(transaction, 'receipt.EvmRet'), 'base64').toString() || err}
               </span>} /> : null}
+              <DetailsRow label="Value" data={<div className="currency tfuel">
+                {formatCoin(get(data, 'from.coins.tfuelwei'))} TFuel
+                <div className='price'>{`[\$${priceCoin(get(data, 'from.coins.tfuelwei'), price['TFuel'])} USD]`}</div>
+              </div>} />
               <DetailsRow label="Data" data={getHex(data.data)} />
             </tbody>
           </table>
@@ -630,7 +634,7 @@ const Item = props => {
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
         let url = abiCoder.decode(outputTypes, outputValues)[0];
-        if(/^http:\/\/(.*)api.thetadrop.com.*\.json$/g.test(url) && typeof url === "string") {
+        if (/^http:\/\/(.*)api.thetadrop.com.*\.json$/g.test(url) && typeof url === "string") {
           url = url.replace("http://", "https://")
         }
         const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);

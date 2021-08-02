@@ -182,15 +182,17 @@ export function coins(txn, account = null) {
     case TxnTypes.SLASH:
     case TxnTypes.RELEASE_FUND:
     case TxnTypes.SPLIT_CONTRACT:
+      break;
     case TxnTypes.SMART_CONTRACT:
-      break
+      coins = txn.data.from.coins;
+      break;
     case TxnTypes.RESERVE_FUND:
     case TxnTypes.SERVICE_PAYMENT:
     case TxnTypes.DEPOSIT_STAKE:
     case TxnTypes.WITHDRAW_STAKE:
     case TxnTypes.DEPOSIT_STAKE_TX_V2:
       coins = txn.data.source.coins;
-      break
+      break;
     default:
       break;
   }

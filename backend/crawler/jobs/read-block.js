@@ -33,6 +33,8 @@ var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 var cacheEnabled = false;
 
+var stakeBlockHeight = 0;
+var stakeTimestamp = 0;
 // dec
 var startTime;
 //------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ var startTime;
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
-  rewardDistributionDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  rewardDistributionDaoInstance, stakeHistoryDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -51,6 +53,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
   rewardDistributionDao = rewardDistributionDaoInstance;
+  stakeHistoryDao = stakeHistoryDaoInstance;
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
@@ -94,6 +97,7 @@ exports.Execute = async function (network_id) {
       latestBlockHeight = +result.result.latest_finalized_block_height;
       Logger.log('Latest block height: ' + latestBlockHeight);
       startTime = +new Date();
+      stakeBlockHeight = 0;
       Logger.log('DB block height progress: ' + crawledBlockHeightProgress.toString());
 
       if (latestBlockHeight >= crawledBlockHeightProgress) {
@@ -107,6 +111,10 @@ exports.Execute = async function (network_id) {
         var getStakeAsyncList = [];
         var getRewardAsyncList = [];
         for (var i = crawledBlockHeightProgress + 1; i <= targetCrawlHeight; i++) {
+          if (i % 10000 === 0) {
+            stakeBlockHeight = i;
+            stakeTimestamp = +new Date()
+          }
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
@@ -131,6 +139,7 @@ exports.Execute = async function (network_id) {
         var upsertEenpAsyncList = [];
         var updateRewardAsyncList = [];
         var upsertRewardAsyncList = [];
+        var insertStakeHistoryList = [];
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
@@ -141,6 +150,10 @@ exports.Execute = async function (network_id) {
 
           if (result.result !== undefined) {
             if (result.result.BlockHashVcpPairs) {  // handle vcp response
+              if (stakeBlockHeight !== 0 && upsertVcpAsyncList.length === 0) {
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashVcpPairs,
+                  'vcp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
+              }
               if (upsertVcpAsyncList.length > 0) continue;
               stakes.vcp = result.result.BlockHashVcpPairs;
               // await stakeDao.removeRecordsAsync('vcp');
@@ -152,6 +165,10 @@ exports.Execute = async function (network_id) {
               })
               upsertVcpAsyncList.push(stakeHelper.updateStakes(updateVcpAsyncList, 'vcp', stakeDao, cacheEnabled));
             } else if (result.result.BlockHashGcpPairs) { // handle GCP response
+              if (stakeBlockHeight !== 0 && upsertGcpAsyncList.length === 0) {
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashGcpPairs,
+                  'gcp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
+              }
               if (upsertGcpAsyncList.length > 0) continue;
               stakes.gcp = result.result.BlockHashGcpPairs;
               // await stakeDao.removeRecordsAsync('gcp');
@@ -163,6 +180,10 @@ exports.Execute = async function (network_id) {
               })
               upsertGcpAsyncList.push(stakeHelper.updateStakes(updateGcpAsyncList, 'gcp', stakeDao, cacheEnabled));
             } else if (result.result.BlockHashEenpPairs) {  // hanndle EENP response
+              if (stakeBlockHeight !== 0 && upsertEenpAsyncList.length === 0) {
+                insertStakeHistoryList.push(stakeHelper.insertStakePairs(result.result.BlockHashEenpPairs,
+                  'eenp', stakeBlockHeight, stakeTimestamp, stakeHistoryDao))
+              }
               if (upsertEenpAsyncList.length > 0) continue;
               stakes.eenp = result.result.BlockHashEenpPairs;
               result.result.BlockHashEenpPairs.forEach(eenpPair => {

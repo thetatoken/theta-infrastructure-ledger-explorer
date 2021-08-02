@@ -21,6 +21,7 @@ var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var activeAccountDaoLib = require('../mongo-db/active-account-dao.js')
 var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
+var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -137,6 +138,8 @@ function main() {
       bluebird.promisifyAll(rewardDistributionDao);
       dailyTfuelBurntDao = new dailyTfuelBurntDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(dailyTfuelBurntDao);
+      stakeHistoryDao = new stakeHistoryDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(stakeHistoryDao);
       //
 
       app.use(compression());
@@ -196,7 +199,7 @@ function main() {
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
-      stakeRouter(app, stakeDao, blockDao, accountDao, progressDao, config);
+      stakeRouter(app, stakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config);
       // supply router
       supplyRouter(app, progressDao, dailyTfuelBurntDao, rpc, config);
       // price router

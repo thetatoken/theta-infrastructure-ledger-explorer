@@ -6,7 +6,7 @@ var axios = require("axios").default;
 let startTime = { theta: +new Date(), tfuel: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData = { theta: undefined, tfuel: undefined };
-var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => {
+var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -181,6 +181,43 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, config) => 
           console.log('ERR - ', error)
         }
       });
+  });
+
+  router.get("/stakeHistory", (req, res) => {
+    console.log('Querying all stake.');
+    let { type = 'vcp', height = 0, timestamp } = req.query;
+    height = +height;
+    timestamp = +timestamp;
+    if ((Number.isNaN(height) || height === 0) && (Number.isNaN(timestamp) || timestamp === 0)) {
+      res.status(400).send("Wrong parameter")
+    } else if (!Number.isNaN(height) && height !== 0) {
+      stakeHistoryDao.getRecordByTypeAndHeightAsync(type, height)
+        .then(infoList => {
+          const data = {
+            type: 'daily_stake_list',
+            body: infoList
+          }
+          res.status(200).send(data);
+        }).catch(error => {
+          res.status(404).send(error)
+        })
+    } else {
+      stakeHistoryDao.getLatestTimestampAsync(timestamp)
+        .then(ts => {
+          stakeHistoryDao.getRecordByTypeAndTimestampAsync(type, ts)
+            .then(infoList => {
+              const data = {
+                type: 'daily_stake_list',
+                body: infoList
+              }
+              res.status(200).send(data);
+            }).catch(error => {
+              res.status(404).send(error.message)
+            })
+        }).catch(error => {
+          res.status(404).send(error.message)
+        })
+    }
   });
 
   //the / route of router will get mapped to /api

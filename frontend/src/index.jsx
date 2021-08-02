@@ -23,9 +23,12 @@ render(
       <Switch>
         <Route path='/blocks/:blockHeight' component={BlockDetails} />
         <Route path='/blocks' component={Blocks} />
+        <Route path='/block/:blockHeight' component={BlockDetails} />
         <Route path='/txs/:transactionHash' component={TransactionDetails} />
+        <Route path='/tx/:transactionHash' component={TransactionDetails} />
         <Route path='/txs' component={Transactions} />
         <Route path='/account/:accountAddress' component={AccountDetails} />
+        <Route path='/address/:accountAddress' component={AccountDetails} />
         <Route path='/stakes/tfuel' component={() => <Stakes stakeCoinType='tfuel'/>} />
         <Route path='/stakes' component={() => <Stakes stakeCoinType='theta'/>} />
         {/* <Route path='/tmp-internal-check' component={Check} />*/}
