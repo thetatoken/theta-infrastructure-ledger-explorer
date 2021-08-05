@@ -31,7 +31,7 @@ exports.updatePrice = function (priceDao, config) {
         'market_cap': info.quote['USD'].market_cap,
         'total_supply': info.total_supply,
         'circulating_supply': info.circulating_supply,
-        'last_updated': info.last_updated
+        'last_updated': new Date().toISOString()
       }
       priceDao.upsertPriceAsync(price);
       res.push(price);
