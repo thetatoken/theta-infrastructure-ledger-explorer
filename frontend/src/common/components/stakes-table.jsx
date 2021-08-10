@@ -68,7 +68,7 @@ export default class StakesTable extends React.Component {
             <tr onClick={this.toggleList.bind(this)}>
               <th className="address">ADDRESS</th>
               {type === 'node' && <th className="node-type">TYPE</th>}
-              {type === 'node' && <th className="reward-prct">%RWD</th>}
+              {type === 'node' && <th className="reward-prct">SPLIT</th>}
               <th className="staked">TOKENS STAKED</th>
               <th className="staked-prct">%STAKED</th>
             </tr>
