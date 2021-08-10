@@ -12,35 +12,6 @@ exports.setConfig = function (cfg) {
   config = cfg;
 }
 
-exports.getBlock = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetBlock',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
-
-exports.getBlockByHeight = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetBlockByHeight',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
-
-exports.getStatus = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetStatus',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
 exports.getAccount = function (params, callback) {
   body = {
     jsonrpc: '2.0',
@@ -50,52 +21,7 @@ exports.getAccount = function (params, callback) {
   }
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
-exports.getVcpByHeight = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetVcpByHeight',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
-exports.getGcpByHeight = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetGcpByHeight',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
-exports.getEenpByHeight = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetEenpByHeight',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
-exports.getPendingTxs = function (params, callback){
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetPendingTransactions',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
 
-exports.getStakeRewardDistribution = function (params, callback) {
-  body = {
-    jsonrpc: '2.0',
-    method: 'theta.GetStakeRewardDistributionByHeight',
-    params: params,
-    id: RandomIdGenerator()
-  }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
-}
 //------------------------------------------------------------------------------
 //  Utils
 //------------------------------------------------------------------------------

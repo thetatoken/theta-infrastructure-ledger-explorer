@@ -57,7 +57,7 @@ export default class StakesTable extends React.Component {
   render() {
     const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
     const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
-    let colSpan = type === 'node' ? 4 : 3;
+    let colSpan = type === 'node' ? 5 : 3;
     const titleKey = `${stakeCoinType}_${type}`;
     const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
@@ -68,6 +68,7 @@ export default class StakesTable extends React.Component {
             <tr onClick={this.toggleList.bind(this)}>
               <th className="address">ADDRESS</th>
               {type === 'node' && <th className="node-type">TYPE</th>}
+              {type === 'node' && <th className="reward-prct">SPLIT</th>}
               <th className="staked">TOKENS STAKED</th>
               <th className="staked-prct">%STAKED</th>
             </tr>
@@ -79,6 +80,7 @@ export default class StakesTable extends React.Component {
                 <tr key={address}>
                   <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
+                  {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
                   <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount, 0)}</div></td>
                   <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
@@ -102,9 +104,10 @@ export default class StakesTable extends React.Component {
                 </tr>}
               </>
             }
-            <tr><td className="empty"></td></tr>
+            {/* <tr><td className="empty"></td></tr> */}
             <tr>
               <td></td>
+              {type === 'node' && <td></td>}
               {type === 'node' && <td></td>}
               <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(totalStaked, 0)}</div></td>
               <td className="staked-prct">100%</td>

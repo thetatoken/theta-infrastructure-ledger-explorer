@@ -4,7 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
 
-var supplyRouter = (app, progressDao, rpc, config) => {
+var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to get total amount of Theta
@@ -70,6 +70,41 @@ var supplyRouter = (app, progressDao, rpc, config) => {
       res.status(400).send(err.message);
     }
   })
+
+  router.get("/supply/dailyTfuelBurnt", async (req, res) => {
+    let { timestamp = 0 } = req.query;
+    if (Number.isNaN(timestamp)) {
+      res.status(400).send("Wrong parameter")
+    } else if (timestamp === 0) {
+      dailyTfuelBurntDao.getLatestRecordAsync()
+        .then(info => {
+          const data = {
+            type: 'daily_stake_list',
+            body: info
+          }
+          res.status(200).send(data);
+        }).catch(error => {
+          res.status(404).send(error)
+        })
+    } else {
+      dailyTfuelBurntDao.getLatestTimestampAsync(timestamp)
+        .then(ts => {
+          dailyTfuelBurntDao.getRecordByTimestampAsync(ts)
+            .then(infoList => {
+              const data = {
+                type: 'daily_stake_list',
+                body: infoList
+              }
+              res.status(200).send(data);
+            }).catch(error => {
+              res.status(404).send(error.message)
+            })
+        }).catch(error => {
+          res.status(404).send(error.message)
+        })
+    }
+  })
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
