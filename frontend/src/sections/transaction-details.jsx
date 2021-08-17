@@ -7,7 +7,7 @@ import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
 import moment from 'moment';
 
-import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
@@ -24,7 +24,6 @@ import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
-
 
 export default class TransactionExplorer extends React.Component {
   constructor(props) {
@@ -139,6 +138,10 @@ export default class TransactionExplorer extends React.Component {
                 </tr>
               </thead>
               <tbody>
+                {transaction.eth_tx_hash !== zeroTxAddress && transaction.eth_tx_hash !== null && <tr>
+                  <th>Eth Hash</th>
+                  <td><Link to={`/txs/${transaction.eth_tx_hash}`}>{transaction.eth_tx_hash}</Link></td>
+                </tr>}
                 <tr>
                   <th>Type</th>
                   <td>{type(transaction)}</td>

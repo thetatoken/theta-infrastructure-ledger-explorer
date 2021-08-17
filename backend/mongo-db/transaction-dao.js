@@ -24,6 +24,7 @@ module.exports = class TransactionDAO {
     let self = this;
     const newObject = {
       'hash': transactionInfo.hash,
+      'eth_tx_hash': transactionInfo.eth_tx_hash,
       'type': transactionInfo.type,
       'data': transactionInfo.data,
       'number': transactionInfo.number,
@@ -85,17 +86,24 @@ module.exports = class TransactionDAO {
       query();
     }
 
-    function query() {
-      const queryObject = { '_id': pk };
+    function query(type) {
+      const queryObject = type == undefined ? { '_id': pk } : { 'eth_tx_hash': pk };
+      console.log('type:',type, type == undefined);
+      console.log('queryObject:',queryObject);
       self.client.findOne(self.transactionInfoCollection, queryObject, function (error, record) {
         if (error) {
           console.log('Transation dao getTransactionByPk ERR - ', error, pk);
           callback(error);
         } else if (!record) {
+          if (type == undefined && pk !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+            query('eth_hash');
+            return;
+          }
           callback(Error('NOT_FOUND - ' + pk));
         } else {
           var transactionInfo = {};
           transactionInfo.hash = record.hash;
+          transactionInfo.eth_tx_hash = record.eth_tx_hash;
           transactionInfo.type = record.type;
           transactionInfo.data = record.data;
           transactionInfo.number = record.number;

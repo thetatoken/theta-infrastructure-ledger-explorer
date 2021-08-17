@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------
 //  DAO for Reward Distribution
-//  Require index: `db.rewardDistribution.createIndex({address:1})`
 //------------------------------------------------------------------------------
 
 module.exports = class rewardDistributionDAO {

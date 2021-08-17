@@ -115,7 +115,7 @@ exports.Execute = async function (network_id) {
             stakeBlockHeight = i;
             stakeTimestamp = +new Date()
           }
-          getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString() }]));
+          getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString(), 'include_eth_tx_hashes': true }]));
           getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
           getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': i.toString() }]));
@@ -229,6 +229,7 @@ exports.Execute = async function (network_id) {
                 for (var j = 0; j < txs.length; j++) {
                   const transaction = {
                     hash: txs[j].hash,
+                    eth_tx_hash: txs[j].eth_tx_hash,
                     type: txs[j].type,
                     data: txs[j].raw,
                     block_height: blockInfo.height,
