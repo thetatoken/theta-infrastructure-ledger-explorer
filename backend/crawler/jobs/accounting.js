@@ -11,12 +11,12 @@ BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 let txDao = null;
 let acctTxDao = null;
 let accountingDao = null;
-let coinbaseApiKey = null;
+let coinmarketcapApiKey = null;
 let walletAddrs = null;
 
 exports.InitializeForTFuelPrice = function (accountingDaoInstance, coinbaseApiKeyStr, walletAddresses) {
     accountingDao = accountingDaoInstance;
-    coinbaseApiKey = coinbaseApiKeyStr;
+    coinmarketcapApiKey = coinbaseApiKeyStr;
     walletAddrs = walletAddresses;
 }
 
@@ -84,7 +84,7 @@ function getCoinbasePrice() {
             'id': TFUEL_ID
         },
         headers: {
-            'X-CMC_PRO_API_KEY': coinbaseApiKey
+            'X-CMC_PRO_API_KEY': coinmarketcapApiKey
         },
         json: true,
         gzip: true

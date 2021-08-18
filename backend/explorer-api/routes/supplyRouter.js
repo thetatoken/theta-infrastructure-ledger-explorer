@@ -20,7 +20,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
   // The api to get total amount of TFuel
   router.get("/supply/tfuel", (req, res) => {
     console.log('Querying the total amount of Tfuel.');
-    if (config.blockchain.network_id !== 'main_net_chain') {
+    if (config.blockchain.networkId !== 'main_net_chain') {
       const data = ({
         "total_supply": 5000000000,
         "circulation_supply": 5000000000
@@ -28,7 +28,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
       res.status(200).send(data);
       return;
     }
-    progressDao.getProgressAsync(config.blockchain.network_id)
+    progressDao.getProgressAsync(config.blockchain.networkId)
       .then(async progressInfo => {
         try {
           const height = progressInfo.height;

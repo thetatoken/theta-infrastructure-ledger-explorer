@@ -25,7 +25,7 @@ cd backend/crawler
 npm install
 mv config.cfg.template config.cfg
 ```
-Now the config.cfg file is created, change `blockchain.start_height` in config file to the snapshot height on the theta node. After setting the config file and start height, we can run crawler using this command.
+Now the config.cfg file is created, change `blockchain.startHeight` in config file to the snapshot height on the theta node. After setting the config file and start height, we can run crawler using this command.
 ```
 node run.js
 ```

@@ -17,12 +17,12 @@
         "socketIOPort": 2096
     },
     "blockchain": {
-        "network_id": "test_chain"
+        "networkId": "test_chain"
     },
     "coinmarketcap":{
         "key": "COINMARKETCAP_API_KEY",
-        "theta_id": 2416,
-        "tfuel_id": 3822
+        "thetaId": 2416,
+        "tfuelId": 3822
     },
     "cert":{
         "enabled": false,

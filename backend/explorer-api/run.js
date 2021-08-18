@@ -232,7 +232,7 @@ function onClientConnect(client) {
 function pushTopBlocks() {
   const numberOfBlocks = 5;
 
-  progressDao.getProgressAsync(config.blockchain.network_id)
+  progressDao.getProgressAsync(config.blockchain.networkId)
     .then(function (progressInfo) {
       latest_block_height = progressInfo.height;
       // console.log('Latest block height: ' + latest_block_height.toString());

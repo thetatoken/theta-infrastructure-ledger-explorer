@@ -12,7 +12,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   transactionDao = transactionDaoInstance;
 }
 
-exports.Execute = async function (network_id, readPreFeeTimer) {
+exports.Execute = async function (networkId, readPreFeeTimer) {
   let height;
   const blockNum = 50;
   try {
@@ -21,7 +21,7 @@ exports.Execute = async function (network_id, readPreFeeTimer) {
   } catch (e) {
     if (e.message === 'No fee progress record') {
       try {
-        const progressInfo = await progressDao.getProgressAsync(network_id);
+        const progressInfo = await progressDao.getProgressAsync(networkId);
         height = progressInfo.height;
       } catch (e) {
         height = 0;

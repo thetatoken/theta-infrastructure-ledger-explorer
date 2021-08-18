@@ -17,7 +17,7 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
       res.status(400).send({ type: 'invalid_hash' })
       return;
     }
-    progressDao.getProgressAsync(config.blockchain.network_id)
+    progressDao.getProgressAsync(config.blockchain.networkId)
       .then((progressInfo) => {
         latest_transaction_count = progressInfo.count;
         return transactionDao.getTransactionByPkAsync(hash)
@@ -46,7 +46,7 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
   router.get("/transactions/range", (req, res) => {
     let totalPageNumber = 0;
     let { pageNumber = 1, limit = 10 } = req.query;
-    progressDao.getProgressAsync(config.blockchain.network_id)
+    progressDao.getProgressAsync(config.blockchain.networkId)
       .then((progressInfo) => {
         totalNumber = progressInfo.count;
         let diff = null;
