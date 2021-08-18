@@ -157,7 +157,7 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
         body += dataBlock;
       });
       res.on('end', function () {
-        if (config.log.log_level == 'debug') {
+        if (config.log.level == 'debug') {
           console.log('[Debug]' + body);
           console.log('[Debug] ____');
         }
