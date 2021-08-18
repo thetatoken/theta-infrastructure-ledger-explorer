@@ -166,7 +166,8 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
       });
     });
 
-    req.setTimeout(10000, function () {
+    const timeout = config.request_timeout_ms || 10000
+    req.setTimeout(timeout, function () {
       req.abort();
       callback('Request Timeout: ' + path, null);
       callback = null;
