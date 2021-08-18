@@ -5,6 +5,7 @@
 //  Require index: `db.transaction.createIndex({timestamp:-1})`
 //  Require index: `db.transaction.createIndex({number:1,status:1})`
 //  Require index: `db.transaction.createIndex({number:-1,status:1})`
+//  Require index: `db.transaction.createIndex({eth_tx_hash: 1})`
 
 const { query } = require("./mongo-client");
 

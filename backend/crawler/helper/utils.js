@@ -17,6 +17,7 @@ exports.createIndexes = async function () {
     await createIndexAsync('transaction', { timestamp: -1 })
     await createIndexAsync('transaction', { number: 1, status: 1 })
     await createIndexAsync('transaction', { number: -1, status: 1 })
+    await createIndexAsync('transaction', { eth_tx_hash: 1 })
 
     await createIndexAsync('acctTx', { acct: 1, hash: 1 })
     await createIndexAsync('acctTx', { acct: 1, ts: 1 })
