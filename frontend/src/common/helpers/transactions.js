@@ -7,6 +7,7 @@ import capitalize from 'lodash/capitalize';
 import chain from 'lodash/chain';
 // import 
 import moment from 'moment';
+import { timeCoin } from './utils';
 import { TxnTypes, TxnTypeText, TxnStatus, WEI } from 'common/constants';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
@@ -114,6 +115,18 @@ export function gasPrice(txn) {
   let f = get(txn, 'data.gas_price');
   f = BigNumber(f).dividedBy(WEI);
   return f.toString();
+}
+
+export function getTfuelBurnt(txn) {
+  let tfuelwei = 0;
+  if (txn.type === 7) {
+    const gasUsed = txn.receipt.GasUsed;
+    const gasPrice = txn.data.gas_price;
+    tfuelwei = timeCoin(gasUsed, gasPrice);
+  } else {
+    tfuelwei = txn.data && txn.data.fee ? txn.data.fee.tfuelwei : 0;
+  }
+  return BigNumber(tfuelwei).dividedBy(WEI).toString();
 }
 
 export function value(txn) {
