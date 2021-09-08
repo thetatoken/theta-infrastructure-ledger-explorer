@@ -52,10 +52,10 @@ var priceRouter = (app, priceDao, progressDao, config) => {
 module.exports = priceRouter;
 
 async function updateSupply(priceListInfo, progressDao, config) {
-  if (config.blockchain.network_id !== 'main_net_chain') return;
+  if (config.blockchain.networkId !== 'main_net_chain') return;
   for (let info of priceListInfo) {
     if (info._id === 'TFUEL') {
-      let progressInfo = await progressDao.getProgressAsync(config.blockchain.network_id);
+      let progressInfo = await progressDao.getProgressAsync(config.blockchain.networkId);
       const height = progressInfo.height;
       const supply = 5000000000 + ~~((height - 4164982) / 100) * 4800;
       info.total_supply = supply;

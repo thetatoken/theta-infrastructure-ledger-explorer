@@ -13,12 +13,12 @@
         "level": "debug"
     },
     "blockchain": {
-        "network_id": "test_chain",
-        "start_height": 1
+        "networkId": "test_chain",
+        "startHeight": 1
     },
     "accounting": {
-        "coinmarketcap_api_key": "COINMARKETCAP_API_KEY",
-        "wallet_addresses": [
+        "coinmarketcapApiKey": "COINMARKETCAP_API_KEY",
+        "walletAddresses": [
             "2416",
             "3822"
         ]

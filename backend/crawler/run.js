@@ -64,7 +64,7 @@ function main() {
     Logger.log(err);
     process.exit(1);
   }
-  const network_id = config.blockchain.network_id;
+  const networkId = config.blockchain.networkId;
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
@@ -97,7 +97,7 @@ function main() {
       process.exit();
     } else {
       Logger.log('Mongo DB connection succeeded');
-      setupGetBlockCronJob(mongoClient, network_id);
+      setupGetBlockCronJob(mongoClient, networkId);
     }
   });
 
@@ -135,7 +135,7 @@ function main() {
 //   schedule.scheduleJob('* * * * * *', readBlockCronJob.Execute);
 // }
 
-function setupGetBlockCronJob(mongoClient, network_id) {
+function setupGetBlockCronJob(mongoClient, networkId) {
   // initialize DAOs
   progressDao = new progressDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(progressDao);
@@ -188,23 +188,23 @@ function setupGetBlockCronJob(mongoClient, network_id) {
   readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
   let readPreFeeTimer;
   readPreFeeTimer = setInterval(async function () {
-    await readPreFeeCronJob.Execute(network_id, readPreFeeTimer);
+    await readPreFeeCronJob.Execute(networkId, readPreFeeTimer);
   }, 1000);
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao,
     smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, cacheEnabled, config.maxBlockPerCrawl);
   setTimeout(async function run() {
-    await readBlockCronJob.Execute(network_id);
+    await readBlockCronJob.Execute(networkId);
     setTimeout(run, 1000);
   }, 1000);
 
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
   schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
 
-  accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinbase_api_key, config.accounting.wallet_addresses);
+  accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinmarketcapApiKey, config.accounting.walletAddresses);
   schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'Etc/GMT', accountingJob.RecordTFuelPrice); // GMT mid-night
 
-  accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.wallet_addresses);
+  accountingJob.InitializeForTFuelEarning(transactionDao, accountTxDao, accountingDao, config.accounting.walletAddresses);
   schedule.scheduleJob('Record TFuel Earning', '0 0 0 * * *', 'America/Tijuana', accountingJob.RecordTFuelEarning); // PST mid-night
 
   accountJob.Initialize(dailyAccountDao, activeAccountDao, totalAccountDao, accountDao, dailyTfuelBurntDao);

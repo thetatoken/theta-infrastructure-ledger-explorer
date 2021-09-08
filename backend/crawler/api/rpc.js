@@ -157,7 +157,7 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
         body += dataBlock;
       });
       res.on('end', function () {
-        if (config.log.log_level == 'debug') {
+        if (config.log.level == 'debug') {
           console.log('[Debug]' + body);
           console.log('[Debug] ____');
         }
@@ -166,7 +166,8 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
       });
     });
 
-    req.setTimeout(10000, function () {
+    const timeout = config.requestTimeoutMs || 10000
+    req.setTimeout(timeout, function () {
       req.abort();
       callback('Request Timeout: ' + path, null);
       callback = null;

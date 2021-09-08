@@ -114,9 +114,9 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistor
     let { return_height = 0 } = req.query;
     return_height = Number(return_height);
     if (return_height === 0) res.status(400).send('invalid_parameter');
-    const network_id = config.blockchain.network_id;
+    const networkId = config.blockchain.networkId;
     try {
-      const progressInfo = await progressDao.getProgressAsync(network_id);
+      const progressInfo = await progressDao.getProgressAsync(networkId);
       const cur_height = progressInfo.height;
       let time = 0;
       if (cur_height < return_height) {

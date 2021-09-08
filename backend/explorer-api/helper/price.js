@@ -2,9 +2,9 @@
 
 exports.updatePrice = function (priceDao, config) {
   const rp = require('request-promise');
-  const { key, theta_id, tfuel_id } = config;
-  const ids = theta_id + ',' + tfuel_id;
-  console.log(`key, ids:`, key, theta_id, tfuel_id, ids);
+  const { key, thetaId, tfuelId } = config;
+  const ids = thetaId + ',' + tfuelId;
+  console.log(`key, ids:`, key, thetaId, tfuelId, ids);
 
   const requestOptions = {
     method: 'GET',

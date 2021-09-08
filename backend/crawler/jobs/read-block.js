@@ -59,8 +59,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
 }
 
-exports.Execute = async function (network_id) {
-  await progressDao.getProgressAsync(network_id)
+exports.Execute = async function (networkId) {
+  await progressDao.getProgressAsync(networkId)
     .then(function (progressInfo) {
       Logger.log('Start a new crawler progress');
       Logger.log('progressInfo:', JSON.stringify(progressInfo));
@@ -290,7 +290,7 @@ exports.Execute = async function (network_id) {
     .then(async function () {
       validTransactionList = [];
       Logger.log('targetCrawlHeight: ', targetCrawlHeight, '. txsCount: ', txsCount)
-      await progressDao.upsertProgressAsync(network_id, targetCrawlHeight, txsCount);
+      await progressDao.upsertProgressAsync(networkId, targetCrawlHeight, txsCount);
       Logger.log('Crawl progress updated to ' + targetCrawlHeight.toString());
       Logger.log('The end of a new crawler progress');
     })
@@ -308,9 +308,9 @@ exports.Execute = async function (network_id) {
           }
           Logger.log('Creating indexes...')
           await createIndexes();
-          const start_height = Number(config.blockchain.start_height) - 1 || 0;
-          Logger.log(`start_height: ${start_height}, type: ${typeof start_height}`);
-          progressDao.upsertProgressAsync(network_id, start_height, 0);
+          const startHeight = Number(config.blockchain.startHeight) - 1 || 0;
+          Logger.log(`startHeight: ${startHeight}, type: ${typeof startHeight}`);
+          progressDao.upsertProgressAsync(networkId, startHeight, 0);
           Logger.log('Loading initial accounts file: ' + accountFileName)
           try {
             initialAccounts = JSON.parse(fs.readFileSync(accountFileName));
