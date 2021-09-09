@@ -138,7 +138,7 @@ export default class TransactionExplorer extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {transaction.eth_tx_hash !== zeroTxAddress && transaction.eth_tx_hash !== null && <tr>
+                {transaction.eth_tx_hash !== zeroTxAddress && transaction.eth_tx_hash != null && <tr>
                   <th>Eth Hash</th>
                   <td><Link to={`/txs/${transaction.eth_tx_hash}`}>{transaction.eth_tx_hash}</Link></td>
                 </tr>}
