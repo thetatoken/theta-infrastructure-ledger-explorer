@@ -434,6 +434,7 @@ const StakeRewardDistribution = ({ transaction, price }) => {
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
+  const [tokens, setTokens] = useState({});
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
@@ -448,13 +449,22 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   useEffect(() => {
     if (!abi) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    const tokenArr = [];
     if (arr.length === 0) return;
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
       if (tokenId === undefined) return;
-      if (!hasItems) setHasItems(true);
+      tokenArr.push({
+        from: get(log, 'decode.result.from'),
+        to: get(log, 'decode.result.to'),
+        tokenId: get(log, 'decode.result.tokenId'),
+      })
+      setTokens(tokenArr);
+      if (!hasItems) {
+        setHasItems(true);
+      }
     })
-  }, [logs, abi])
+  }, [transaction, abi])
   return (
     <>
       {hasItems && <>
@@ -480,6 +490,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+              {hasItems && <DetailsRow label="Tokens Transferred" data={<TokenTransferred from={tokens[0].from} to={tokens[0].to} tokenId={tokens[0].tokenId} />} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
@@ -518,7 +529,7 @@ const Log = ({ log, abi }) => {
       <tbody>
         <DetailsRow label="Address" data={<Address hash={get(log, 'address')} />} />
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
-        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
+        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} decode={log.decode} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
         {/* {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />} */}
       </tbody>
@@ -541,17 +552,38 @@ const EventName = ({ event }) => {
     </span>
   )
 }
-const Topics = ({ topics }) => {
+const Topics = ({ topics, decode }) => {
   return (
     <>
       {topics.map((topic, i) => {
-        return <p key={i}>{topic}</p>
+        return <Topic key={i} topic={topic} decode={decode} i={i} />
       })}
     </>
   )
 }
-const LogData = ({ data, decode }) => {
+
+const Topic = ({ topic, decode, i }) => {
+  const index = i - 1;
   const isDisabled = typeof decode !== 'object';
+  const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
+
+  const handleOnChange = e => setModel(e.target.value);
+
+  return <div className="sc-topic">
+    <div className="sc-topic__index">{i}</div>
+    {i !== 0 &&
+      <>
+        <select className="sc-topic__select" onChange={handleOnChange} value={model}>
+          <option value="decode">Dec</option>
+          <option value="hex">Hex</option>
+        </select>
+        <div className="sc-topic__arrow"></div>
+      </>}
+    {model === 'hex' || i === 0 ? topic : get(decode, `result.${index}`)}
+  </div>
+}
+const LogData = ({ data, decode }) => {
+  const isDisabled = typeof decode !== 'object' || data === '0x';
   const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
   const [decodeData, setDecodeData] = useState({});
   useEffect(() => {
@@ -564,12 +596,13 @@ const LogData = ({ data, decode }) => {
     setDecodeData(_data);
   }, [decode]);
   return (<div className="sc-log__data">
-    <div className="sc-log__data--buttons">
-      <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
-        onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
-      <div className={cx("sc-log__data--button", { active: model === 'hex' })}
-        onClick={() => setModel('hex')}>Hex</div>
-    </div>
+    {!isDisabled &&
+      <div className="sc-log__data--buttons">
+        <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
+          onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
+        <div className={cx("sc-log__data--button", { active: model === 'hex' })}
+          onClick={() => setModel('hex')}>Hex</div>
+      </div>}
     {model === 'hex' ? data : Object.keys(decodeData).map((k, i) => {
       return (<div key={i}>
         <span className="text-grey">{k}: </span>
@@ -692,6 +725,17 @@ const Item = props => {
   ) : <div className="sc-item text-danger">{item}</div>
 }
 
+const TokenTransferred = ({ from, to, tokenId }) => {
+  const truncate = 15;
+  return <div className="token-transaffered-row">
+    from:
+    <Address hash={from} truncate={truncate} />
+    to:
+    <Address hash={to} truncate={truncate} />
+    for TNT-721 TokenID [<span className="text-white">{tokenId}</span>]
+
+  </div>
+}
 const ReturnTime = props => {
   const { returnTime } = props;
   const [str, setStr] = useState('')

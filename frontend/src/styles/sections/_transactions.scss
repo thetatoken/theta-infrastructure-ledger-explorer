@@ -181,3 +181,43 @@
     }
   }
 }
+
+.sc-topic {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+  &:last-child{
+    margin-bottom: 0;
+  }
+
+  &__index {
+    height: 20px;
+    width: 20px;
+    border-radius: 5px;
+    background-color: rgba($color-font-light, 0.2);
+    color: rgba($color-font-light, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    margin-right: 5px;
+  }
+
+  &__select {
+    width: 44px;
+  }
+  &__arrow {
+    width: 20px;
+    margin-left: 5px;
+    &::before {
+      content: '\2794';
+    }
+  }
+}
+
+.token-transaffered-row {
+  color: $color-font-light;
+  & a{
+    margin: 0 10px;
+  }
+}
