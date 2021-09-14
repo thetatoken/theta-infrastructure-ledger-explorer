@@ -490,7 +490,9 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-              {hasItems && <DetailsRow label="Tokens Transferred" data={<TokenTransferred from={tokens[0].from} to={tokens[0].to} tokenId={tokens[0].tokenId} />} />}
+              {hasItems && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
+                return <TokenTransferred from={token.from} to={token.to} tokenId={token.tokenId} key={i} />
+              })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
@@ -730,12 +732,11 @@ const Item = props => {
 const TokenTransferred = ({ from, to, tokenId }) => {
   const truncate = 15;
   return <div className="token-transaffered-row">
-    from:
+    From:
     <Address hash={from} truncate={truncate} />
-    to:
+    To:
     <Address hash={to} truncate={truncate} />
-    for TNT-721 TokenID [<span className="text-white">{tokenId}</span>]
-
+    For TNT-721 TokenID [<span className="text-white">{tokenId}</span>]
   </div>
 }
 const ReturnTime = props => {
