@@ -579,7 +579,9 @@ const Topic = ({ topic, decode, i }) => {
         </select>
         <div className="sc-topic__arrow"></div>
       </>}
-    {model === 'hex' || i === 0 ? topic : get(decode, `result.${index}`)}
+    {model === 'hex' || i === 0 ?
+      topic : get(decode, `event.inputs.${index}.type`) === 'address' ?
+        <Address hash={get(decode, `result.${index}`)} /> : get(decode, `result.${index}`)}
   </div>
 }
 const LogData = ({ data, decode }) => {
