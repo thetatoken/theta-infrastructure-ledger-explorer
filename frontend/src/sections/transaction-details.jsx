@@ -650,7 +650,7 @@ const Topic = ({ topic, decode, i }) => {
     {i !== 0 &&
       <>
         <select className="sc-topic__select" onChange={handleOnChange} value={model}>
-          <option value="decode">Dec</option>
+          <option value="decode" disabled={isDisabled}>Dec</option>
           <option value="hex">Hex</option>
         </select>
         <div className="sc-topic__arrow"></div>
