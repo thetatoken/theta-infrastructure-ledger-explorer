@@ -226,6 +226,14 @@
 
   &__select {
     margin-top: 15px;
+    display: flex;
+    align-items: center;
+
+    &--title {
+      color: $color-font-light;
+      font-size: 14px;
+      margin-right: 5px;
+    }
   }
 }
 .token-transaffered-row {

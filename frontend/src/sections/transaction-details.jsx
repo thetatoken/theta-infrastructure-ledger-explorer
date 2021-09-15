@@ -554,6 +554,7 @@ const SmartContractData = React.memo(({ data, logs, hasItems }) => {
 
     <div>
       <div className="sc-data__select">
+        <div className="sc-data__select--title">View Data As:</div>
         <select value={model} onChange={handleOnChange}>
           <option value='original'>Original</option>
           <option value='default' disabled={!hasItems}>Default View</option>
