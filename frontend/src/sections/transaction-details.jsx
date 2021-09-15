@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
@@ -504,7 +504,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
                 {formatCoin(get(data, 'from.coins.tfuelwei'))} TFuel
                 <div className='price'>{`[\$${priceCoin(get(data, 'from.coins.tfuelwei'), price['TFuel'])} USD]`}</div>
               </div>} />
-              <DetailsRow label="Data" data={getHex(data.data)} />
+              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasItems={hasItems} />} />
             </tbody>
           </table>
         </TabPanel>
@@ -514,6 +514,79 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       </Tabs>
     </>
   );
+}
+
+const SmartContractData = React.memo(({ data, logs, hasItems }) => {
+  const inputRef = useRef();
+  const defaultModel = hasItems ? 'default' : 'original';
+  const [defaultStr, setDefaultStr] = useState('');
+  const [model, setModel] = useState(defaultModel)
+  const handleOnChange = e => setModel(e.target.value);
+
+  useEffect(() => {
+    setModel(hasItems ? 'default' : 'original')
+  }, [hasItems])
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    inputRef.current.value = model === 'original' ? data : defaultStr;
+    inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+  }, [model, inputRef.current])
+
+  useEffect(() => {
+    let defualtStrTmp = '';
+    for (let log of logs) {
+      if (typeof log.decode !== 'object') continue;
+      const evt = log.decode.event;
+      defualtStrTmp += `${evt.name}(${evt.inputs.map((input, i) => `${i !== 0 ? ' ' : ''}${input.type} ${input.name}`)})\n\n`
+      for (let i = 1; i < log.topics.length; i++) {
+        defualtStrTmp += `[${i - 1}] ${log.topics[i]}\n`
+      }
+    }
+    setDefaultStr(defualtStrTmp);
+  }, [logs, data])
+
+  return <div className="sc-data">
+    {model === 'decode' ?
+      <SmartContractInputTable logs={logs} /> :
+      <textarea className="sc-data__textarea" defaultValue={data} ref={inputRef} readOnly></textarea>
+    }
+
+    <div>
+      <div className="sc-data__select">
+        <select value={model} onChange={handleOnChange}>
+          <option value='original'>Original</option>
+          <option value='default' disabled={!hasItems}>Default View</option>
+          <option value='decode' disabled={!hasItems}>Decode Data</option>
+        </select>
+      </div>
+    </div>
+  </div>
+})
+
+const SmartContractInputTable = ({ logs }) => {
+  return logs.map((log, i) => {
+    return <table key={i} className="sc-input-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        {log.decode.event.inputs.map((input, j) => {
+          return <tr key={j}>
+            <td>{j}</td>
+            <td>{input.name}</td>
+            <td>{input.type}</td>
+            <td>{input.type === 'address' ? <Address hash={log.decode.result[input.name]} /> : log.decode.result[input.name]}</td>
+          </tr>
+        })}
+      </tbody>
+    </table>
+  })
 }
 
 const Log = ({ log, abi }) => {

@@ -215,9 +215,43 @@
   }
 }
 
+.sc-data {
+  width: 100%;
+
+  &__textarea {
+    width: 100%;
+    resize: none;
+    border-radius: 5px;
+  }
+
+  &__select {
+    margin-top: 15px;
+  }
+}
 .token-transaffered-row {
   color: $color-font-light;
   & a{
     margin: 0 10px;
+  }
+}
+
+table.sc-input-table {
+  border-spacing: 0;
+  border-radius: 5px;
+  background-color: rgba($color-font-light, 0.2);
+
+  & thead tr th:first-child {
+    width: auto;
+    border-bottom: 1px solid $color-line;
+  }
+
+  & tbody tr:last-child td {
+    width: auto;
+  }
+
+  & tbody tr td {
+    width: auto;
+    padding-left: 1rem;
+    border-top: 1px solid $color-line;
   }
 }
