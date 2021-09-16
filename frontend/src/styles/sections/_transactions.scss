@@ -238,19 +238,28 @@
 }
 .token-transaffered-row {
   color: $color-font-light;
+  display: flex;
   & a{
     margin: 0 10px;
+  }
+  & .currency {
+    margin-left: 10px;
+    color: white
   }
 }
 
 table.sc-input-table {
+  width: 100%;
   border-spacing: 0;
   border-radius: 5px;
   background-color: rgba($color-font-light, 0.2);
 
   & thead tr th:first-child {
-    width: auto;
     border-bottom: 1px solid $color-line;
+  }
+
+  & thead tr th:last-child {
+    width: 60%;
   }
 
   & tbody tr:last-child td {

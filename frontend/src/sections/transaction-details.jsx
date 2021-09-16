@@ -433,7 +433,8 @@ const StakeRewardDistribution = ({ transaction, price }) => {
 }
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [hasItems, setHasItems] = useState(false);
+  const [isTnt721, setIsTnt721] = useState(false);
+  const [isTnt20, setIsTnt20] = useState(false);
   const [tokens, setTokens] = useState({});
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
@@ -448,26 +449,32 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   const logLength = (logs || []).length;
   useEffect(() => {
     if (!abi) return;
-    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    const arr = abi.filter(obj => (obj.name == "tokenURI" && obj.type === 'function')
+      || (obj.name === 'Transfer' && obj.type === 'event'));
     const tokenArr = [];
     if (arr.length === 0) return;
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
-      if (tokenId === undefined) return;
+      const eventName = get(log, 'decode.eventName');
+      if (tokenId === undefined && eventName !== 'Transfer') return;
       tokenArr.push({
         from: get(log, 'decode.result.from'),
         to: get(log, 'decode.result.to'),
         tokenId: get(log, 'decode.result.tokenId'),
+        value: get(log, 'decode.result.value')
       })
       setTokens(tokenArr);
-      if (!hasItems) {
-        setHasItems(true);
+      if (!isTnt721 && tokenId !== undefined) {
+        setIsTnt721(true);
+      } else if (!isTnt20 && eventName === 'Transfer') {
+        setIsTnt20(true);
       }
     })
   }, [transaction, abi])
+
   return (
     <>
-      {hasItems && <>
+      {isTnt721 && <>
         <div className="details-header item">
           <div className="txn-type smart-contract items">Items</div>
         </div>
@@ -490,8 +497,8 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-              {hasItems && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
-                return <TokenTransferred from={token.from} to={token.to} tokenId={token.tokenId} key={i} />
+              {(isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
+                return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} />
               })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
@@ -504,28 +511,28 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
                 {formatCoin(get(data, 'from.coins.tfuelwei'))} TFuel
                 <div className='price'>{`[\$${priceCoin(get(data, 'from.coins.tfuelwei'), price['TFuel'])} USD]`}</div>
               </div>} />
-              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasItems={hasItems} />} />
+              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasDetails={isTnt721 || isTnt20} />} />
             </tbody>
           </table>
         </TabPanel>
         <TabPanel>
-          {logs.map((log, i) => <Log log={log} key={i} abi={abi} />)}
+          {logs.map((log, i) => <Log log={log} key={i} />)}
         </TabPanel>
       </Tabs>
     </>
   );
 }
 
-const SmartContractData = React.memo(({ data, logs, hasItems }) => {
+const SmartContractData = React.memo(({ data, logs, hasDetails }) => {
   const inputRef = useRef();
-  const defaultModel = hasItems ? 'default' : 'original';
+  const defaultModel = hasDetails ? 'default' : 'original';
   const [defaultStr, setDefaultStr] = useState('');
   const [model, setModel] = useState(defaultModel)
   const handleOnChange = e => setModel(e.target.value);
 
   useEffect(() => {
-    setModel(hasItems ? 'default' : 'original')
-  }, [hasItems])
+    setModel(hasDetails ? 'default' : 'original')
+  }, [hasDetails])
 
   useEffect(() => {
     if (!inputRef.current) return;
@@ -539,8 +546,9 @@ const SmartContractData = React.memo(({ data, logs, hasItems }) => {
       if (typeof log.decode !== 'object') continue;
       const evt = log.decode.event;
       defualtStrTmp += `${evt.name}(${evt.inputs.map((input, i) => `${i !== 0 ? ' ' : ''}${input.type} ${input.name}`)})\n\n`
-      for (let i = 1; i < log.topics.length; i++) {
-        defualtStrTmp += `[${i - 1}] ${log.topics[i]}\n`
+      defualtStrTmp += `MethodID: ${data.slice(0, 9)}\n`;
+      for (let i = 0; i < ~~(data.length / 64); i++) {
+        defualtStrTmp += `[${i}] ${data.slice(i * 64 + 10, (i + 1) * 64 + 10)}\n`
       }
     }
     setDefaultStr(defualtStrTmp);
@@ -557,8 +565,8 @@ const SmartContractData = React.memo(({ data, logs, hasItems }) => {
         <div className="sc-data__select--title">View Data As:</div>
         <select value={model} onChange={handleOnChange}>
           <option value='original'>Original</option>
-          <option value='default' disabled={!hasItems}>Default View</option>
-          <option value='decode' disabled={!hasItems}>Decode Data</option>
+          <option value='default' disabled={!hasDetails}>Default View</option>
+          <option value='decode' disabled={!hasDetails}>Decode Data</option>
         </select>
       </div>
     </div>
@@ -590,16 +598,7 @@ const SmartContractInputTable = ({ logs }) => {
   })
 }
 
-const Log = ({ log, abi }) => {
-  const [hasItem, setHasItem] = useState(false);
-  useEffect(() => {
-    if (!abi) return;
-    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
-    if (arr.length === 0) return;
-    const tokenId = get(log, 'decode.result.tokenId');
-    if (tokenId === undefined) return;
-    if (!hasItem) setHasItem(true);
-  }, [log, abi])
+const Log = ({ log }) => {
   return (
     <table className="details txn-details">
       <tbody>
@@ -607,7 +606,6 @@ const Log = ({ log, abi }) => {
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
         <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} decode={log.decode} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
-        {/* {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />} */}
       </tbody>
     </table>
   )
@@ -803,14 +801,16 @@ const Item = props => {
   ) : <div className="sc-item text-danger">{item}</div>
 }
 
-const TokenTransferred = ({ from, to, tokenId }) => {
+const TokenTransferred = ({ token, isTnt20, isTnt721 }) => {
   const truncate = 15;
   return <div className="token-transaffered-row">
     From:
-    <Address hash={from} truncate={truncate} />
+    <Address hash={token.from} truncate={truncate} />
     To:
-    <Address hash={to} truncate={truncate} />
-    For TNT-721 TokenID [<span className="text-white">{tokenId}</span>]
+    <Address hash={token.to} truncate={truncate} />
+    For
+    {isTnt721 && <>  TNT-721 TokenID [<span className="text-white">{token.tokenId}</span>]</>}
+    {isTnt20 && <><span className="currency tfuel">{formatCoin(token.value) + " TFuel"}</span></>}
   </div>
 }
 const ReturnTime = props => {
