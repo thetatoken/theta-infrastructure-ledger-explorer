@@ -9,7 +9,7 @@ import moment from 'moment';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, checkTnt721, checkTnt20 } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -464,12 +464,14 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
         value: get(log, 'decode.result.value')
       })
       setTokens(tokenArr);
-      if (!isTnt721 && tokenId !== undefined) {
-        setIsTnt721(true);
-      } else if (!isTnt20 && eventName === 'Transfer') {
-        setIsTnt20(true);
-      }
+      // if (!isTnt721 && tokenId !== undefined) {
+      //   setIsTnt721(true);
+      // } else if (!isTnt20 && eventName === 'Transfer') {
+      //   setIsTnt20(true);
+      // }
     })
+    setIsTnt721(checkTnt721(abi));
+    setIsTnt20(checkTnt20(abi));
   }, [transaction, abi])
 
   return (
