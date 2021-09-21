@@ -438,7 +438,8 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   const [tokens, setTokens] = useState({});
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
-  let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
+  const contractAddress = get(receipt, 'ContractAddress');
+  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
   let logs = get(transaction, 'receipt.Logs');
   logs = JSON.parse(JSON.stringify(logs));
   logs = logs.map(obj => {
@@ -464,11 +465,6 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
         value: get(log, 'decode.result.value')
       })
       setTokens(tokenArr);
-      // if (!isTnt721 && tokenId !== undefined) {
-      //   setIsTnt721(true);
-      // } else if (!isTnt20 && eventName === 'Transfer') {
-      //   setIsTnt20(true);
-      // }
     })
     setIsTnt721(checkTnt721(abi));
     setIsTnt20(checkTnt20(abi));
@@ -500,7 +496,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
               {(isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
-                return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} />
+                return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} />
               })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
@@ -803,8 +799,62 @@ const Item = props => {
   ) : <div className="sc-item text-danger">{item}</div>
 }
 
-const TokenTransferred = ({ token, isTnt20, isTnt721 }) => {
+const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address }) => {
   const truncate = 15;
+  const [name, setName] = useState('');
+  const [symbol, setSymbol] = useState('');
+  useEffect(() => {
+    if (!isTnt20) return;
+    let nameFunctionData, symbolFunctionData;
+    abi.forEach(obj => {
+      if (obj.name === 'name') nameFunctionData = obj;
+      else if (obj.name === 'symbol') symbolFunctionData = obj;
+    })
+    const inputValues = [];
+    fetchData(nameFunctionData, 'name');
+    fetchData(symbolFunctionData, 'symbol');
+
+    async function fetchData(functionData, key) {
+      const iface = new ethers.utils.Interface(abi || []);
+      const senderSequence = 1;
+      const functionInputs = get(functionData, ['inputs'], []);
+      const functionOutputs = get(functionData, ['outputs'], []);
+      const functionSignature = iface.getSighash(functionData.name)
+
+      const inputTypes = map(functionInputs, ({ name, type }) => {
+        return type;
+      });
+      try {
+        var abiCoder = new ethers.utils.AbiCoder();
+        var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+        const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+        const gasLimit = 2000000;
+        const data = functionSignature + encodedParameters;
+        const tx = Theta.unsignedSmartContractTx({
+          from: address,
+          to: address,
+          data: data,
+          value: 0,
+          transactionFee: gasPrice,
+          gasLimit: gasLimit
+        }, senderSequence);
+        const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponseJSON = await callResponse.json();
+        const result = get(callResponseJSON, 'result');
+        let outputValues = get(result, 'vm_return');
+        const outputTypes = map(functionOutputs, ({ name, type }) => {
+          return type;
+        });
+        outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+        let res = abiCoder.decode(outputTypes, outputValues)[0];
+        if (key === 'name') setName(res);
+        if (key === 'symbol') setSymbol(res);
+      } catch (e) {
+        console.log('error occurs:', e);
+      }
+    }
+  }, [isTnt20, abi])
   return <div className="token-transaffered-row">
     From:
     <Address hash={token.from} truncate={truncate} />
@@ -812,7 +862,7 @@ const TokenTransferred = ({ token, isTnt20, isTnt721 }) => {
     <Address hash={token.to} truncate={truncate} />
     For
     {isTnt721 && <>  TNT-721 TokenID [<span className="text-white">{token.tokenId}</span>]</>}
-    {isTnt20 && <><span className="currency tfuel">{formatCoin(token.value) + " TFuel"}</span></>}
+    {isTnt20 && <span className="text-white text-tnt-20">{formatCoin(token.value)}<Link to={`/account/${address}`}>{`${name}(${symbol})`}</Link></span>}
   </div>
 }
 const ReturnTime = props => {

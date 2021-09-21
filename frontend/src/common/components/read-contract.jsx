@@ -66,7 +66,7 @@ const FunctionUnit = (props) => {
     }
     catch (e) {
       console.log('error occurs:', e)
-      //Stop loading and put the error message in the vm_error like it came fromm the blockchain.
+      //Stop loading and put the error message in the vm_error like it came from the blockchain.
       setCallResult({ vm_error: e.message })
     }
   }
