@@ -856,13 +856,13 @@ const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address }) => {
     }
   }, [isTnt20, abi])
   return <div className="token-transaffered-row">
-    From:
+    <b>From:</b>
     <Address hash={token.from} truncate={truncate} />
-    To:
+    <b>To:</b>
     <Address hash={token.to} truncate={truncate} />
-    For
+    <b>For</b>
     {isTnt721 && <>  TNT-721 TokenID [<span className="text-white">{token.tokenId}</span>]</>}
-    {isTnt20 && <span className="text-white text-tnt-20">{formatCoin(token.value)}<Link to={`/account/${address}`}>{`${name}(${symbol})`}</Link></span>}
+    {isTnt20 && <span className="text-tnt-20">{formatCoin(token.value)}<Link to={`/account/${address}`}>{`${name}(${symbol})`}</Link></span>}
   </div>
 }
 const ReturnTime = props => {
