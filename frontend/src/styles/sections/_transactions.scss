@@ -246,8 +246,11 @@
     margin-left: 10px;
     color: white
   }
-  & .text-tnt-20{
+  & .text-container{
     margin-left: 10px;
+    & .token-link{
+      margin: 0;
+    }
   }
 }
 
