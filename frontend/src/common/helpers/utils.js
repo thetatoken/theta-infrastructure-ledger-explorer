@@ -114,7 +114,6 @@ export function decodeLogs(logs, abi) {
 }
 
 export function checkTnt721(abi) {
-  console.log(abi)
   const obj = {
     'balanceOf': { contains: false, type: 'function' },
     'ownerOf': { contains: false, type: 'function' },

@@ -254,6 +254,23 @@
   }
 }
 
+.transaction-action-row {
+  color: $color-font-light;
+  & a {
+    margin: 0 10px;
+  }
+  &__token {
+    margin: 5px 0 0 10px;
+    &::before {
+      content: '\25CF';
+      padding-right: 10px;
+    }
+    & a {
+      margin: 0;
+    }
+  }
+}
+
 table.sc-input-table {
   width: 100%;
   border-spacing: 0;

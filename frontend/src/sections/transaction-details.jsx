@@ -7,7 +7,7 @@ import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
 import moment from 'moment';
 
-import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, checkTnt721, checkTnt20 } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
@@ -495,6 +495,9 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+              {isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
+                return <TransactionAction key={i} abi={abi} address={contractAddress} token={token} />
+              })} />}
               {(isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
                 return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} />
               })} />}
@@ -797,6 +800,27 @@ const Item = props => {
       </div>
     </div>
   ) : <div className="sc-item text-danger">{item}</div>
+}
+
+const TransactionAction = ({ token, abi, address }) => {
+  const isZeroFrom = ZeroAddress === token.from;
+  const truncate = isZeroFrom ? 0 : 15;
+  return <div className="transaction-action-row">
+    <div className="transaction-action-row__info">
+      {isZeroFrom ? <>
+        Mint&nbsp;&nbsp;
+      </> : <>
+        Trannsfer From
+        <Address hash={token.from} truncate={truncate} />
+      </>
+      }
+      To
+      <Address hash={token.to} truncate={truncate} />
+    </div>
+    <div className="transaction-action-row__token">
+      1 of TokenID[<Link className="token-link" to={`/account/${address}`}>{token.tokenId}</Link>]
+    </div>
+  </div>
 }
 
 const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address }) => {
