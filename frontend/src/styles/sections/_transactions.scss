@@ -246,10 +246,13 @@
     margin-left: 10px;
     color: white
   }
-  & .text-container{
+  & .text-container {
     margin-left: 10px;
-    & .token-link{
-      margin: 0;
+    & .token-link {
+      // margin: 0;
+      &__token-id {
+        margin: 0;
+      }
     }
   }
 }
