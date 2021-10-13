@@ -1,7 +1,7 @@
 var isString = require('lodash/isString');
 var isNumber = require('lodash/isNumber');
 var BigNumber = require('bignumber.js');
-var Btyes = require('eth-lib/lib/bytes');
+var Bytes = require('eth-lib/lib/bytes');
 var RLP = require('eth-lib/lib/rlp');
 var Hash = require('eth-lib/lib/hash');
 

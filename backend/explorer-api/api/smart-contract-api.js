@@ -1,38 +1,40 @@
+var axios = require("axios").default;
+
 const BASE_URL = "https://api-wallet.thetatoken.org";
 
 const DEFAULT_HEADERS = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
 };
 
 //
 //Helpers
 //
 
-exports.isResponseSuccessful = function(response){
-    let { status } = response;
+exports.isResponseSuccessful = function (response) {
+  let { status } = response;
 
-    return (status === 200 || status === 201 || status === 202 || status === 204);
+  return (status === 200 || status === 201 || status === 202 || status === 204);
 }
 
 function objectToQueryString(object) {
-    if(!object){
-        return "";
-    }
+  if (!object) {
+    return "";
+  }
 
-    let queryString = Object.keys(object).map(function(key) {
-        let val = object[key];
-        if(val){
-            return encodeURIComponent(key) + '=' + encodeURIComponent(object[key]);
-        }
-    }).join('&');
+  let queryString = Object.keys(object).map(function (key) {
+    let val = object[key];
+    if (val) {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(object[key]);
+    }
+  }).join('&');
 
-    if(queryString.length > 0){
-        return "?" + queryString;
-    }
-    else{
-        return "";
-    }
+  if (queryString.length > 0) {
+    return "?" + queryString;
+  }
+  else {
+    return "";
+  }
 }
 
 //
@@ -62,13 +64,14 @@ function sendRequest(path, method, additionalHeaders, queryParams, body) {
   let opts = {
     method: method,
     headers: headers,
+    url: url
   };
 
   if (body) {
     opts['body'] = JSON.stringify(body);
   }
 
-  return fetch(url, opts);
+  return axios.request(opts);
 }
 //
 //Convenience requests

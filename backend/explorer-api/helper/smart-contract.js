@@ -2,8 +2,9 @@ var { getHex } = require('./utils');
 var { ethers } = require("ethers");
 var Theta = require('../libs/Theta');
 var ThetaJS = require('../libs/thetajs.esm');
-var smartContractApi = require('../api/smart-contract-api').default;
-const { get } = require('request');
+var smartContractApi = require('../api/smart-contract-api');
+var get = require('lodash/get');
+var map = require('lodash/map');
 
 exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao) {
   const abi = tx.abi;
@@ -18,7 +19,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
   }
 
   try {
-    const type = 7, isEqualType = true, pageNum = 0, limitNumber = 0, reverse = false;
+    const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
     const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse)
     const txHashes = txList.map(tx => tx.hash);
     const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
@@ -41,7 +42,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         const eventName = get(log, 'decode.eventName');
         if (tokenId === undefined && eventName !== 'Transfer') return;
         if (tokenName === "") {
-          tokenName = await _getName(log, abi);
+          tokenName = isTnt721 ? await _getTNT721Name(log, abi) : await _getTNT20Name(log, abi);
         }
         tokenArr.push({
           from: get(log, 'decode.result.from'),
@@ -159,8 +160,55 @@ function decodeLogs(logs, abi) {
     }
   })
 }
+async function _getTNT20Name(log, abi) {
+  const arr = abi.filter(obj => obj.name == "name" && obj.type === 'function');
+  if (arr.length === 0) return "";
+  const functionData = arr[0];
+  const address = get(log, 'address');
+  const inputValues = []
 
-async function _getName(log, abi) {
+  const iface = new ethers.utils.Interface(abi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+    let url = abiCoder.decode(outputTypes, outputValues)[0];
+    console.log('url:', url);
+    return url;
+  } catch (e) {
+    console.log('error occurs:', e);
+    return "";
+  }
+}
+
+async function _getTNT721Name(log, abi) {
   const tokenId = get(log, 'decode.result.tokenId');
   if (tokenId === undefined) return "";
   const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');

@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
-var { updateTokenHistoryByAddress } = require('../helper/smart-contract');
+var { updateTokenHistoryByTx } = require('../helper/smart-contract');
 
 var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao) => {
   router.use(bodyParser.json({ limit: '1mb' }));
