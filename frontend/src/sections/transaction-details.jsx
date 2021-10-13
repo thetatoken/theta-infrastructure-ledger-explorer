@@ -435,7 +435,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   const [tabIndex, setTabIndex] = useState(0);
   const [isTnt721, setIsTnt721] = useState(false);
   const [isTnt20, setIsTnt20] = useState(false);
-  const [tokens, setTokens] = useState({});
+  const [tokens, setTokens] = useState([]);
   let { data, receipt } = transaction;
   // getFunctionNameById(abi, getHex(data.data).slice(0, 9))
 
