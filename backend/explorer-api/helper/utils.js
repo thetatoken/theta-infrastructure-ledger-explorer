@@ -18,3 +18,9 @@ exports.validateHex = function (hash, limit = 64) {
     const reg = new RegExp("^(0x){0,1}[0-9a-f]{" + limit + "}$");
     return reg.test(hash);
 }
+
+exports.getHex = function (str) {
+    const buffer = Buffer.from(str, 'base64');
+    const bufString = buffer.toString('hex');
+    return '0x' + bufString;
+}

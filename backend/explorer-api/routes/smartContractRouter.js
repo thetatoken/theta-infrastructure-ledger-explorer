@@ -3,9 +3,10 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
+var { updateTokenHistoryByAddress } = require('../helper/smart-contract');
 
-var smartContractRouter = (app, smartContractDao) => {
-  router.use(bodyParser.json({limit: '1mb'}));
+var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao) => {
+  router.use(bodyParser.json({ limit: '1mb' }));
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to verify the source and bytecode
@@ -23,6 +24,7 @@ var smartContractRouter = (app, smartContractDao) => {
       if (result.data.result.verified === true) {
         let newSc = { ...result.data.smart_contract, bytecode: byteCode }
         await smartContractDao.upsertSmartContractAsync(newSc);
+        await updateTokenHistoryByAddress(newSc, transactionDao, accountTxDao, tokenDao);
       }
       const data = {
         result: result.data.result,
