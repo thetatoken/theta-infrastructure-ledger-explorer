@@ -5,6 +5,9 @@ var rewardHelper = require('../helper/reward-distribution');
 var txHelper = require('../helper/transactions');
 var fs = require('fs');
 var Logger = require('../helper/logger');
+var { TxnTypes } = require('../helper/constants');
+var scHelper = require('../helper/smart-contract');
+
 const { createIndexes } = require('../helper/utils');
 const { updateRewardDistributions } = require('../helper/reward-distribution.js');
 
@@ -24,6 +27,7 @@ var checkpointDao = null;
 var smartContractDao = null;
 var dailyAccountDao = null;
 var rewardDistributionDao = null;
+var tokenDao = null;
 var maxBlockPerCrawl;
 var targetCrawlHeight;
 var txsCount = 0;
@@ -42,7 +46,7 @@ var startTime;
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
-  rewardDistributionDaoInstance, stakeHistoryDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -54,6 +58,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   dailyAccountDao = dailyAccountDaoInstance;
   rewardDistributionDao = rewardDistributionDaoInstance;
   stakeHistoryDao = stakeHistoryDaoInstance;
+  tokenDao = tokenDaoInstance;
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
@@ -143,6 +148,7 @@ exports.Execute = async function (networkId) {
         var upsertTransactionAsyncList = [];
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
+        var updateTokenList = [];
         var stakes = { vcp: [], gcp: [], eenp: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
@@ -248,6 +254,9 @@ exports.Execute = async function (networkId) {
                     validTransactionList.push(transaction);
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
+                  if (transaction.type === TxnTypes.SMART_CONTRACT) {
+                    updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao));
+                  }
                 }
               }
             }
@@ -278,9 +287,10 @@ exports.Execute = async function (networkId) {
         Logger.log(`Number of upsert Reward split distribution: ${upsertRewardAsyncList.length}`);
         Logger.log(`Number of upsert check points: ${upsertCheckpointAsyncList.length}`);
         Logger.log(`Number of upsert TRANSACTIONS: ${upsertTransactionAsyncList.length}`);
+        Logger.log(`Number of upsert TOKEN txs: ${updateTokenList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
           upsertTransactionAsyncList, upsertCheckpointAsyncList, upsertEenpAsyncList, upsertRewardAsyncList,
-          txHelper.updateFees(validTransactionList, progressDao))
+          txHelper.updateFees(validTransactionList, progressDao), updateTokenList)
       }
     })
     .then(() => {

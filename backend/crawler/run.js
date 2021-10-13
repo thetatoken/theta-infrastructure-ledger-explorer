@@ -20,6 +20,7 @@ var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
 var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
+var tokenDaoLib = require('../mongo-db/token-dao.js')
 
 var Redis = require("ioredis");
 var redis = null;
@@ -185,6 +186,9 @@ function setupGetBlockCronJob(mongoClient, networkId) {
   stakeHistoryDao = new stakeHistoryDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(stakeHistoryDao);
 
+  tokenDao = new tokenDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(tokenDao);
+
   readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
   let readPreFeeTimer;
   readPreFeeTimer = setInterval(async function () {
@@ -192,7 +196,7 @@ function setupGetBlockCronJob(mongoClient, networkId) {
   }, 1000);
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao,
-    smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, cacheEnabled, config.maxBlockPerCrawl);
+    smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, tokenDao, cacheEnabled, config.maxBlockPerCrawl);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(networkId);
     setTimeout(run, 1000);
