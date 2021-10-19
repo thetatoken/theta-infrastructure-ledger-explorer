@@ -28,6 +28,7 @@ var smartContractDao = null;
 var dailyAccountDao = null;
 var rewardDistributionDao = null;
 var tokenDao = null;
+var tokenSummaryDao = null;
 var maxBlockPerCrawl;
 var targetCrawlHeight;
 var txsCount = 0;
@@ -46,7 +47,8 @@ var startTime;
 //------------------------------------------------------------------------------
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
-  rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, tokenSummaryDaoInstance,
+  cacheEnabledConfig, maxBlockPerCrawlConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -59,6 +61,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   rewardDistributionDao = rewardDistributionDaoInstance;
   stakeHistoryDao = stakeHistoryDaoInstance;
   tokenDao = tokenDaoInstance;
+  tokenSummaryDao = tokenSummaryDaoInstance;
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
@@ -255,7 +258,7 @@ exports.Execute = async function (networkId) {
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
                   if (transaction.type === TxnTypes.SMART_CONTRACT) {
-                    updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao));
+                    updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao, tokenSummaryDao));
                   }
                 }
               }

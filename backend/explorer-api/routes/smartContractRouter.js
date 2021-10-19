@@ -5,7 +5,7 @@ var helper = require('../helper/utils');
 var axios = require("axios").default;
 var { updateTokenHistoryByTx } = require('../helper/smart-contract');
 
-var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao) => {
+var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao) => {
   router.use(bodyParser.json({ limit: '1mb' }));
   router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -24,7 +24,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       if (result.data.result.verified === true) {
         let newSc = { ...result.data.smart_contract, bytecode: byteCode }
         await smartContractDao.upsertSmartContractAsync(newSc);
-        await updateTokenHistoryByTx(newSc, transactionDao, accountTxDao, tokenDao);
+        await updateTokenHistoryByTx(newSc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
       }
       const data = {
         result: result.data.result,
@@ -72,7 +72,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
     console.log('Updating smart contract tx history for address:', address);
     smartContractDao.getSmartContractByAddressAsync(address)
       .then(async info => {
-        await updateTokenHistoryByTx(info, transactionDao, accountTxDao, tokenDao);
+        await updateTokenHistoryByTx(info, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
         const data = ({
           type: 'smart_contract_update_history',
           body: "done",

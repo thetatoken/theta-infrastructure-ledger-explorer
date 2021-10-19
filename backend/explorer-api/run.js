@@ -23,6 +23,7 @@ var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
 var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
 var tokenDaoLib = require('../mongo-db/token-dao.js')
+var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -143,6 +144,8 @@ function main() {
       bluebird.promisifyAll(stakeHistoryDao);
       tokenDao = new tokenDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(tokenDao);
+      tokenSummaryDao = new tokenSummaryDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(tokenSummaryDao);
       //
 
       app.use(compression());
@@ -210,7 +213,7 @@ function main() {
       // accounting router
       accountingRouter(app, accountingDao)
       // smart contract router
-      smartContractRouter(app, smartContractDao, transactionDao, accountTxDao, tokenDao)
+      smartContractRouter(app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao)
       // active account router
       activeActRouter(app, activeActDao);
       // reward distribution router

@@ -6,6 +6,8 @@ var smartContractApi = require('../api/smart-contract-api');
 var get = require('lodash/get');
 var map = require('lodash/map');
 
+const ZeroAddress = '0x0000000000000000000000000000000000000000';
+
 exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao) {
   const abi = tx.abi;
   if (!abi) {
@@ -20,10 +22,11 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
 
   try {
     const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
+    const address = tx.address;
     const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse)
     const txHashes = txList.map(tx => tx.hash);
     const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-    let upsertList = [];
+    let insertList = [];
     let tokenName = "";
     for (let tx of txs) {
       let logs = get(tx, 'receipt.Logs');
@@ -37,7 +40,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         || (obj.name === 'Transfer' && obj.type === 'event'));
       const tokenArr = [];
       if (arr.length === 0) return;
-      for (let log of logs) {
+      for (let [i, log] of logs) {
         const tokenId = get(log, 'decode.result.tokenId');
         const eventName = get(log, 'decode.eventName');
         if (tokenId === undefined && eventName !== 'Transfer') return;
@@ -45,6 +48,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
           tokenName = isTnt721 ? await _getTNT721Name(log, abi) : await _getTNT20Name(log, abi);
         }
         tokenArr.push({
+          id: tx.hash + i,
           from: get(log, 'decode.result.from'),
           to: get(log, 'decode.result.to'),
           tokenId: get(log, 'decode.result.tokenId'),
@@ -52,23 +56,24 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         })
       }
 
-      const upsertList = [];
       tokenArr.forEach(token => {
         const newToken = {
+          _id: token.id,
           hash: tx.hash,
-          token_name: tokenName,
-          token_type: isTnt20 ? 'TNT-20' : 'TNT-721',
+          name: tokenName,
+          type: isTnt20 ? 'TNT-20' : 'TNT-721',
           token_id: token.tokenId,
           from: token.from,
           to: token.to,
           value: token.value,
-          timestamp: tx.timestamp
+          timestamp: tx.timestamp,
+          comtract_address: address
           //TODOs: add method field from decoded data
         }
-        upsertList.push(tokenDao.insertAsync(newToken))
+        insertList.push(tokenDao.insertAsync(newToken), updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao))
       })
     }
-    return Promise.all(upsertList);
+    return Promise.all(insertList);
   } catch (e) {
     console.log('Something wrong happened during the updateTokenHistoryByAddress process:', e)
   }
@@ -270,4 +275,41 @@ async function _getTNT721Name(log, abi) {
     console.log('error occurs:', e);
     return "";
   }
+}
+
+async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao) {
+  console.log('In updateTokenSummary')
+  let tokenInfo = {
+    _id: address,
+    holders: {},
+    max_total_supply: 0,
+    total_transfers: 0,
+    name: tokenName
+  };
+  try {
+    tokenInfo = await tokenSummaryDao.getInfoByAddressAsync(address)
+    console.log(tokenInfo)
+  } catch (e) {
+    console.log('error:', e);
+  }
+  let holders = tokenInfo.holders;
+  tokenArr.forEach(token => {
+    let from = token.from;
+    let to = token.to;
+    const key = token.tokenId != null ? address + token.tokenId : address;
+    if (from !== ZeroAddress) {
+      holders[from][key] -= token.value;
+      if (holders[from][key] === 0) delete holders[from][key];
+      if (Object.keys(holders[from]).length === 0) delete holders[from]
+    }
+    if (holders[to] === undefined) {
+      holders[to] = { [key]: token.value }
+    } else if (holders[to][key] === undefined) {
+      holders[to][key] = token.value;
+    } else {
+      holders[to][key] += token.value;
+    }
+  })
+  tokenInfo.total_transfers++;
+  await tokenSummaryDao.upsertAsync(tokenInfo);
 }
