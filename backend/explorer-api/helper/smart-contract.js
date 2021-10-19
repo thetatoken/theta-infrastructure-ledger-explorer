@@ -281,7 +281,7 @@ async function _getTNT721Name(log, abi) {
 async function checkAndInsertToken(token, tokenDao) {
   let hasToken = await tokenDao.checkTokenAsync(token._id);
   console.log('hasToken:', hasToken)
-  if(hasToken) return;
+  if (hasToken) return;
   await tokenDao.insertAsync(token);
 }
 
@@ -304,26 +304,29 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
   tokenArr.forEach(token => {
     let from = token.from;
     let to = token.to;
+    const value = token.value || 1;
     const key = token.tokenId != null ? address + token.tokenId : address;
     if (from !== ZeroAddress) {
-      // holders[from][key] -= token.value;
+      // holders[from][key] -= value;
       if (holders[from] === undefined) {
-        holders[from] = { [key]: -token.value }
+        holders[from] = { [key]: -value }
       } else if (holders[from][key] === undefined) {
-        holders[from][key] = -token.value;
+        holders[from][key] = -value;
       } else {
-        holders[from][key] -= token.value;
+        holders[from][key] -= value;
       }
       if (holders[from][key] === 0) delete holders[from][key];
-      if (Object.keys(holders[from]).length === 0) delete holders[from]
+      if (Object.keys(holders[from]).length === 0) delete holders[from];
     }
     if (holders[to] === undefined) {
-      holders[to] = { [key]: token.value }
+      holders[to] = { [key]: value }
     } else if (holders[to][key] === undefined) {
-      holders[to][key] = token.value;
+      holders[to][key] = value;
     } else {
-      holders[to][key] += token.value;
+      holders[to][key] += value;
     }
+    if (holders[to][key] === 0) delete holders[to][key];
+    if (Object.keys(holders[to]).length === 0) delete holders[to];
   })
   tokenInfo.total_transfers++;
   await tokenSummaryDao.upsertAsync(tokenInfo);
