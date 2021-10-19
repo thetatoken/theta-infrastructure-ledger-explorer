@@ -7,15 +7,15 @@ var helper = require('../helper/utils');
 var tokenRouter = (app, tokenDao, tokenSumDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
-  // The api to get token info
-  router.get("/tokenInfo/:address", (req, res) => {
+  // The api to get token summary
+  router.get("/tokenSummary/:address", (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     if (!helper.validateHex(address, 40)) {
       res.status(400).send({ type: 'invalid_address' })
       return;
     }
     const { tokenId } = req.query;
-    console.log('Querying the token info.');
+    console.log('Querying the token summary.');
     if (tokenId !== undefined) {
       tokenDao.getRecordsNumberByAddressAndTokenIdAsync(address, tokenId)
         .then(num => {
@@ -40,6 +40,25 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
           res.status(200).send(data);
         })
     }
+  });
+
+  // The api to get token info
+  router.get("/token/:address", (req, res) => {
+    let address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    const { tokenId } = req.query;
+    console.log('Querying the token info.');
+    tokenDao.getInfoListByAddressAndTokenIdAsync(address, tokenId, 0, 0)
+      .then(info => {
+        const data = ({
+          "type": "token_info",
+          body: info,
+        })
+        res.status(200).send(data);
+      })
   });
 
   //the / route of router will get mapped to /api

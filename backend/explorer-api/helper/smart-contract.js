@@ -67,7 +67,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
           to: token.to,
           value: token.value,
           timestamp: tx.timestamp,
-          comtract_address: address
+          contract_address: address
           //TODOs: add method field from decoded data
         }
         insertList.push(checkAndInsertToken(newToken, tokenDao))
