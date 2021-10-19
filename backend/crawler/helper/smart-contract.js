@@ -65,9 +65,10 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
       contract_address: contractAddress
       //TODOs: add method field from decoded data
     }
-    insertList.push(tokenDao.insertAsync(newToken))
+    insertList.push(checkAndInsertToken(newToken, tokenDao))
   })
-  return Promise.all(insertList, updateTokenSummary(contractAddress, tokenArr, tokenName, tokenSummaryDao));
+  await updateTokenSummary(contractAddress, tokenArr, tokenName, tokenSummaryDao);
+  return Promise.all(insertList);
 }
 
 
@@ -201,7 +202,7 @@ async function _getTNT20Name(log, abi) {
     console.log('url:', url);
     return url;
   } catch (e) {
-    console.log('error occurs:', e);
+    console.log('error occurs:', e.message);
     return "";
   }
 }
@@ -265,9 +266,15 @@ async function _getTNT721Name(log, abi) {
         })
     }
   } catch (e) {
-    console.log('error occurs:', e);
+    console.log('error occurs:', e.message);
     return "";
   }
+}
+
+async function checkAndInsertToken(token, tokenDao) {
+  let hasToken = await tokenDao.checkTokenAsync(token._id)
+  if(hasToken) return;
+  await tokenDao.insertAsync(token);
 }
 
 async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao) {
@@ -291,7 +298,14 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
     let to = token.to;
     const key = token.tokenId != null ? address + token.tokenId : address;
     if (from !== ZeroAddress) {
-      holders[from][key] -= token.value;
+      // holders[from][key] -= token.value;
+      if (holders[from] === undefined) {
+        holders[from] = { [key]: -token.value }
+      } else if (holders[from][key] === undefined) {
+        holders[from][key] = -token.value;
+      } else {
+        holders[from][key] -= token.value;
+      }
       if (holders[from][key] === 0) delete holders[from][key];
       if (Object.keys(holders[from]).length === 0) delete holders[from]
     }

@@ -9,8 +9,8 @@ module.exports = class TokenSummaryDAO {
     this.collection = 'tokenSummary';
   }
 
-  upsert(address, updateObj, callback) {
-    const queryObject = { _id: address };
+  upsert(updateObj, callback) {
+    const queryObject = { _id: updateObj._id };
     this.client.upsert(this.collection, queryObject, updateObj, callback);
   }
 

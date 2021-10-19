@@ -36,6 +36,7 @@ var supplyRouter = require("./routes/supplyRouter");
 var smartContractRouter = require("./routes/smartContractRouter");
 var activeActRouter = require("./routes/activeActRouter");
 var rewardDistributionRouter = require("./routes/rewardDistributionRouter");
+var tokenRouter = require("./routes/tokenRouter");
 var cors = require('cors');
 var io;
 //------------------------------------------------------------------------------
@@ -218,6 +219,8 @@ function main() {
       activeActRouter(app, activeActDao);
       // reward distribution router
       rewardDistributionRouter(app, rewardDistributionDao);
+      // token router
+      tokenRouter(app, tokenDao, tokenSummaryDao);
       // keep push block data
       // pushTopBlocks();
     }

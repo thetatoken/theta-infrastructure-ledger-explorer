@@ -40,7 +40,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         || (obj.name === 'Transfer' && obj.type === 'event'));
       const tokenArr = [];
       if (arr.length === 0) return;
-      for (let [i, log] of logs) {
+      for (let [i, log] of logs.entries()) {
         const tokenId = get(log, 'decode.result.tokenId');
         const eventName = get(log, 'decode.eventName');
         if (tokenId === undefined && eventName !== 'Transfer') return;
@@ -70,8 +70,9 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
           comtract_address: address
           //TODOs: add method field from decoded data
         }
-        insertList.push(tokenDao.insertAsync(newToken), updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao))
+        insertList.push(checkAndInsertToken(newToken, tokenDao))
       })
+      await updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao);
     }
     return Promise.all(insertList);
   } catch (e) {
@@ -208,7 +209,7 @@ async function _getTNT20Name(log, abi) {
     console.log('url:', url);
     return url;
   } catch (e) {
-    console.log('error occurs:', e);
+    console.log('error occurs:', e.message);
     return "";
   }
 }
@@ -272,9 +273,16 @@ async function _getTNT721Name(log, abi) {
         })
     }
   } catch (e) {
-    console.log('error occurs:', e);
+    console.log('error occurs:', e.message);
     return "";
   }
+}
+
+async function checkAndInsertToken(token, tokenDao) {
+  let hasToken = await tokenDao.checkTokenAsync(token._id);
+  console.log('hasToken:', hasToken)
+  if(hasToken) return;
+  await tokenDao.insertAsync(token);
 }
 
 async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao) {
@@ -298,7 +306,14 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
     let to = token.to;
     const key = token.tokenId != null ? address + token.tokenId : address;
     if (from !== ZeroAddress) {
-      holders[from][key] -= token.value;
+      // holders[from][key] -= token.value;
+      if (holders[from] === undefined) {
+        holders[from] = { [key]: -token.value }
+      } else if (holders[from][key] === undefined) {
+        holders[from][key] = -token.value;
+      } else {
+        holders[from][key] -= token.value;
+      }
       if (holders[from][key] === 0) delete holders[from][key];
       if (Object.keys(holders[from]).length === 0) delete holders[from]
     }

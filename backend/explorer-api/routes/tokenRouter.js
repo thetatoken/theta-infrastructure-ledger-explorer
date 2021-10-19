@@ -23,21 +23,21 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
             "type": "token_number",
             body: { "total_transfers": num },
           })
-          res.status.send(data);
+          res.status(200).send(data);
         })
     } else {
       tokenSumDao.getInfoByAddressAsync(address)
-        .then(res => {
+        .then(result => {
           const data = ({
             "type": "token_info",
             body: {
-              "name": res.name,
-              "holders": Object.keys(res.holders).length,
-              "max_total_supply": res.max_total_supply,
-              "total_transfers": res.total_transfers,
+              "name": result.name,
+              "holders": Object.keys(result.holders).length,
+              "max_total_supply": result.max_total_supply,
+              "total_transfers": result.total_transfers,
             }
           })
-          res.status.send(data);
+          res.status(200).send(data);
         })
     }
   });
