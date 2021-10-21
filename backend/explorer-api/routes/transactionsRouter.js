@@ -46,20 +46,17 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
   router.get("/transactions/range", (req, res) => {
     let totalPageNumber = 0;
     let { pageNumber = 1, limit = 10 } = req.query;
+    console.log(`Querying transaction range pageNumber: ${pageNumber}, limit: ${limit}`);
     progressDao.getProgressAsync(config.blockchain.networkId)
       .then((progressInfo) => {
         totalNumber = progressInfo.count;
-        let diff = null;
         pageNumber = parseInt(pageNumber);
         limit = parseInt(limit);
         totalPageNumber = Math.ceil(totalNumber / limit);
-        let searchPage = pageNumber;
         if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > 0 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
-          if (pageNumber > totalPageNumber / 2) {
-            diff = limit;
-            searchPage = totalPageNumber - pageNumber + 1;
-          }
-          return transactionDao.getTransactionsAsync(searchPage - 1, limit, diff)
+          const min = (pageNumber - 1) * limit;
+          const max = pageNumber * limit - 1;
+          return transactionDao.getTransactionsByRangeAsync(min, max)
         } else {
           res.status(400).send('Wrong parameter.');
         }

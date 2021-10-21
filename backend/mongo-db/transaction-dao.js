@@ -65,6 +65,12 @@ module.exports = class TransactionDAO {
     limitNumber = limitNumber;
     this.client.getRecords(this.transactionInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
+
+  getTransactionsByRange(min, max, callback) {
+    const queryObject = { 'number': { $gte: min, $lte: max }, 'status': 'finalized' };
+    this.client.query(this.transactionInfoCollection, queryObject, callback);
+  }
+  
   getTransactionByPk(pk, callback) {
     let self = this;
     const redis_key = `tx_id:${pk}`;
@@ -89,8 +95,8 @@ module.exports = class TransactionDAO {
 
     function query(type) {
       const queryObject = type == undefined ? { '_id': pk } : { 'eth_tx_hash': pk };
-      console.log('type:',type, type == undefined);
-      console.log('queryObject:',queryObject);
+      console.log('type:', type, type == undefined);
+      console.log('queryObject:', queryObject);
       self.client.findOne(self.transactionInfoCollection, queryObject, function (error, record) {
         if (error) {
           console.log('Transation dao getTransactionByPk ERR - ', error, pk);

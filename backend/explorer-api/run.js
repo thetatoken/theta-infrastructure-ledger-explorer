@@ -252,7 +252,7 @@ function pushTopBlocks() {
 }
 function pushTopTransactions() {
   const numberOfTransactions = 5;
-  transactionDao.getTransactionsAsync(0, numberOfTransactions, null)
+  transactionDao.getTransactionsByRangeAsync(0, numberOfTransactions)
     .then(function (transactionInfoList) {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });
