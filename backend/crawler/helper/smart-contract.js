@@ -1,6 +1,4 @@
-var helper = require('./utils');
-var Logger = require('./logger');
-var { get } = require('lodash');
+var get = require('lodash/get');
 var { ZeroAddress, ZeroTxAddress } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
@@ -11,7 +9,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
     return;
   }
 
-  const abi = await smartContractDao.getAbi(contractAddress);
+  const abi = await smartContractDao.getAbiAsync(contractAddress);
   if (!abi) {
     return;
   }
@@ -25,7 +23,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   let logs = get(tx, 'receipt.Logs');
   logs = JSON.parse(JSON.stringify(logs));
   logs = logs.map(obj => {
-    obj.data = getHex(obj.data)
+    obj.data = getHex(obj.data);
     return obj;
   })
   logs = decodeLogs(logs, abi);
@@ -34,10 +32,12 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   const tokenArr = [];
   if (arr.length === 0) return;
   let tokenName = "";
-  logs.forEach((log, i) => {
+  logs.forEach(async (log, i) => {
     const tokenId = get(log, 'decode.result.tokenId');
     const eventName = get(log, 'decode.eventName');
-    if (tokenId === undefined && eventName !== 'Transfer') return;
+    if (tokenId === undefined && eventName !== 'Transfer') {
+      return;
+    }
     if (tokenName === "") {
       tokenName = isTnt721 ? await _getTNT721Name(log, abi) : await _getTNT20Name(log, abi);
     }
