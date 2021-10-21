@@ -116,6 +116,14 @@ table.details {
       border-bottom: none;
     }
   }
+  &.token-info {
+    thead tr th:first-child {
+      width: 10rem;
+    }
+    // tbody tr td {
+    //   // width: 70%;
+    // }
+  }
   @include breakpoint('phablet', max) {
     tbody tr th {
       width: 125px;
