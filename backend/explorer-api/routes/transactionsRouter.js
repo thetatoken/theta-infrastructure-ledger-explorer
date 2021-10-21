@@ -54,8 +54,8 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
         limit = parseInt(limit);
         totalPageNumber = Math.ceil(totalNumber / limit);
         if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > 0 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
-          const min = (pageNumber - 1) * limit;
-          const max = pageNumber * limit - 1;
+          const max = totalNumber - (pageNumber - 1) * limit;
+          const min = totalNumber - (pageNumber * limit - 1);
           return transactionDao.getTransactionsByRangeAsync(min, max)
         } else {
           res.status(400).send('Wrong parameter.');
