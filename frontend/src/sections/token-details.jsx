@@ -40,7 +40,7 @@ const TokenDetails = ({ match, location }) => {
           if (res.status === 200 && res.data.type === 'token_info') {
             console.log('setting', res.data.body)
             let txs = res.data.body;
-            txs = txs.sort((a, b) => a.timestamp - b.timestamp);
+            txs = txs.sort((a, b) => b.timestamp - a.timestamp);
             setTransactions(res.data.body)
           }
         })

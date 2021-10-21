@@ -5,6 +5,7 @@ var ThetaJS = require('../libs/thetajs.esm');
 var smartContractApi = require('../api/smart-contract-api');
 var get = require('lodash/get');
 var map = require('lodash/map');
+const { default: axios } = require('axios');
 
 const ZeroAddress = '0x0000000000000000000000000000000000000000';
 
@@ -198,8 +199,7 @@ async function _getTNT20Name(log, abi) {
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
     const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
-    const callResponseJSON = await callResponse.json();
-    const result = get(callResponseJSON, 'result');
+    const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
       return type;
@@ -248,8 +248,7 @@ async function _getTNT721Name(log, abi) {
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
     const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
-    const callResponseJSON = await callResponse.json();
-    const result = get(callResponseJSON, 'result');
+    const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
       return type;
@@ -263,10 +262,9 @@ async function _getTNT721Name(log, abi) {
     if (isImage) {
       return "";
     } else {
-      fetch(url)
-        .then(res => res.json())
-        .then(data => {
-          return get(data, 'name')
+      return axios.get(url)
+        .then(res => {
+          return get(res, 'data.name')
         }).catch(e => {
           console.log('error occurs in fetch url:', e)
           return "";
