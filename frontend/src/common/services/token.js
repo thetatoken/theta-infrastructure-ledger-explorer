@@ -7,7 +7,7 @@ export const tokenService = {
   },
 
   getTokenInfoByAddressAndTokenId(address, tokenId) {
-    const uri = `tokenInfo/${address}${tokenId == null ? `` : `?tokenId=${tokenId}`}`
+    const uri = `tokenSummary/${address}${tokenId == null ? `` : `?tokenId=${tokenId}`}`
     return apiService.get(uri);
   }
 };

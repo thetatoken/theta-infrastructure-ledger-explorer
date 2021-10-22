@@ -285,7 +285,10 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
     name: tokenName
   };
   try {
-    tokenInfo = await tokenSummaryDao.getInfoByAddressAsync(address)
+    let info = await tokenSummaryDao.getInfoByAddressAsync(address)
+    if (info !== null) {
+      tokenInfo = info;
+    }
     console.log(tokenInfo)
   } catch (e) {
     console.log('error:', e);

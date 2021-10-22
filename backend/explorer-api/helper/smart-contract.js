@@ -278,7 +278,6 @@ async function _getTNT721Name(log, abi) {
 
 async function checkAndInsertToken(token, tokenDao) {
   let hasToken = await tokenDao.checkTokenAsync(token._id);
-  console.log('hasToken:', hasToken)
   if (hasToken) return;
   await tokenDao.insertAsync(token);
 }
@@ -293,8 +292,10 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
     name: tokenName
   };
   try {
-    tokenInfo = await tokenSummaryDao.getInfoByAddressAsync(address)
-    console.log(tokenInfo)
+    let info = await tokenSummaryDao.getInfoByAddressAsync(address)
+    if (info !== null) {
+      tokenInfo = info;
+    }
   } catch (e) {
     console.log('error:', e);
   }
