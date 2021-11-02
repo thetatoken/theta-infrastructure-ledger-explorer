@@ -73,7 +73,7 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         }
         insertList.push(checkAndInsertToken(newToken, tokenDao))
       })
-      await updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao);
+      await updateTokenSummary(address, tokenArr, tokenName, abi, tokenSummaryDao);
     }
     return Promise.all(insertList);
   } catch (e) {
@@ -282,7 +282,7 @@ async function checkAndInsertToken(token, tokenDao) {
   await tokenDao.insertAsync(token);
 }
 
-async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao) {
+async function updateTokenSummary(address, tokenArr, tokenName, abi, tokenSummaryDao) {
   console.log('In updateTokenSummary')
   let tokenInfo = {
     _id: address,
@@ -295,6 +295,8 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
     let info = await tokenSummaryDao.getInfoByAddressAsync(address)
     if (info !== null) {
       tokenInfo = info;
+    } else {
+      tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi)
     }
   } catch (e) {
     console.log('error:', e);
@@ -329,4 +331,50 @@ async function updateTokenSummary(address, tokenArr, tokenName, tokenSummaryDao)
   })
   tokenInfo.total_transfers++;
   await tokenSummaryDao.upsertAsync(tokenInfo);
+}
+
+async function getMaxTotalSupply(address, abi) {
+  const arr = abi.filter(obj => obj.name == "totalSupply" && obj.type === 'function');
+  if (arr.length === 0) return 0;
+  const functionData = arr[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(abi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const result = get(callResponse, 'data.result');
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+    let max = abiCoder.decode(outputTypes, outputValues)[0];
+    console.log('max:', max);
+    return max;
+  } catch (e) {
+    console.log('error occurs:', e.message);
+    return 0;
+  }
 }
