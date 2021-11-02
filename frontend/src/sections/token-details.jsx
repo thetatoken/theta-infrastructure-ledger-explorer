@@ -8,8 +8,6 @@ import TokenTxsTable from "common/components/token-txs-table";
 import Pagination from "common/components/pagination";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import ReadContract from 'common/components/read-contract';
-const NUM_TRANSACTIONS = 20;
-const today = new Date().toISOString().split("T")[0];
 
 const TokenDetails = ({ match, location }) => {
   const [tabIndex, setTabIndex] = useState(0);

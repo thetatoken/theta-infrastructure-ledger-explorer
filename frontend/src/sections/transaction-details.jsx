@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
-import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
-import moment from 'moment';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
@@ -468,7 +466,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       })
       setTokens(tokenArr);
     })
-    setIsTnt721(checkTnt721(abi));
+    setIsTnt721(checkTnt721(abi) && logs.length > 0);
     setIsTnt20(checkTnt20(abi));
   }, [transaction, abi])
 
@@ -514,7 +512,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
                 {formatCoin(get(data, 'from.coins.tfuelwei'))} TFuel
                 <div className='price'>{`[\$${priceCoin(get(data, 'from.coins.tfuelwei'), price['TFuel'])} USD]`}</div>
               </div>} />
-              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasDetails={isTnt721 || isTnt20} />} />
+              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasDetails={isTnt721 || (isTnt20 && tokens.reduce((pre, t) => pre && (t.from !== ZeroAddress), true))} />} />
             </tbody>
           </table>
         </TabPanel>
