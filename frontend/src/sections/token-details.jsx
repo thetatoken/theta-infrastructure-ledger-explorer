@@ -6,11 +6,13 @@ import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import TokenTxsTable from "common/components/token-txs-table";
 import Pagination from "common/components/pagination";
-
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import ReadContract from 'common/components/read-contract';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 
 const TokenDetails = ({ match, location }) => {
+  const [tabIndex, setTabIndex] = useState(0);
   const [tokenInfo, setTokenInfo] = useState({});
   const [tokenId, setTokenId] = useState();
   const [errorType, setErrorType] = useState();
@@ -64,6 +66,7 @@ const TokenDetails = ({ match, location }) => {
   const handlePageChange = () => {
     console.log('handle')
   }
+
   console.log('txs:', transactions)
   return (
     <div className="content account">
@@ -102,20 +105,33 @@ const TokenDetails = ({ match, location }) => {
         <LoadingPanel />}
       {transactions && transactions.length > 0 &&
         <React.Fragment>
-          <div className="actions">
-            <div className="title">Transactions</div>
-          </div>
-          <div>
-            {loadingTxns &&
-              <LoadingPanel className="fill" />}
-            <TokenTxsTable transactions={transactions} type={type} />
-          </div>
-          <Pagination
-            size={'lg'}
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-            disabled={loadingTxns} />
+          <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+            <TabList>
+              <Tab>Transactions</Tab>
+              <Tab>Read Contract</Tab>
+              <Tab disabled>Write Contract</Tab>
+            </TabList>
+
+            <TabPanel>
+              <div>
+                {loadingTxns &&
+                  <LoadingPanel className="fill" />}
+                <TokenTxsTable transactions={transactions} type={type} />
+              </div>
+              <Pagination
+                size={'lg'}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                disabled={loadingTxns} />
+            </TabPanel>
+            <TabPanel>
+              <ReadContract address={match.params.contractAddress} />
+            </TabPanel>
+            <TabPanel>
+              <h2>Write Contract</h2>
+            </TabPanel>
+          </Tabs>
         </React.Fragment>}
 
     </div>
