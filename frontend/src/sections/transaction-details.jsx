@@ -820,7 +820,7 @@ const TransactionAction = ({ token, abi, address }) => {
       <Address hash={token.to} truncate={truncate} />
     </div>
     <div className="transaction-action-row__token">
-      1 of TokenID[<Link className="token-link" to={`/account/${address}`}>{token.tokenId}</Link>]
+      1 of TokenID[<Link className="token-link" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
     </div>
   </div>
 }
@@ -955,10 +955,10 @@ const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
     <Address hash={token.to} truncate={truncate} />
     <b>For</b>
     {isTnt721 && <span className="text-container">
-      TNT-721 TokenID [<Link className="token-link__token-id" to={`/account/${address}`}>{token.tokenId}</Link>]
-      <Link className="token-link" to={`/account/${address}`}>{name}</Link>
+      TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
+      <Link className="token-link" to={`/token/${address}`}>{name}</Link>
     </span>}
-    {isTnt20 && <span className="text-container">{formatCoin(token.value)}<Link to={`/account/${address}`}>{`${name}(${symbol})`}</Link></span>}
+    {isTnt20 && <span className="text-container">{formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name}(${symbol})`}</Link></span>}
   </div>
 }
 const ReturnTime = props => {
