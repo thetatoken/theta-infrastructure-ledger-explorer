@@ -84,12 +84,14 @@ const TokenDetails = ({ match, location }) => {
             </thead>
             <tbody>
               {tokenId == null && <>
+                <DetailsRow label="Name" data={tokenInfo.name} />
                 <DetailsRow label="Type" data={type} />
                 <DetailsRow label="Max Total Supply" data={tokenInfo.max_total_supply} />
                 <DetailsRow label="Holders" data={tokenInfo.holders} />
                 <DetailsRow label="Transfers" data={tokenInfo.total_transfers} />
               </>}
               {tokenId != null && <>
+                {transactions && transactions.length > 0 && <DetailsRow label="Name" data={transactions[0].name} />}
                 <DetailsRow label="Token Id" data={tokenId} />
                 <DetailsRow label="Transfers" data={transactions.length} />
               </>}
