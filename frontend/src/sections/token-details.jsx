@@ -25,7 +25,8 @@ const TokenDetails = ({ match, location }) => {
     console.log(location.search)
     const search = location.search; // could be '?foo=bar'
     const params = new URLSearchParams(search);
-    setTokenId(params.get('a'))
+    const tId = params.get('a');
+    setTokenId(tId)
     console.log(contractAddress)
     fetchInfo();
     fetchTransactions();
@@ -34,7 +35,7 @@ const TokenDetails = ({ match, location }) => {
       setType('TNT-20')
     }
     function fetchTransactions() {
-      tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tokenId)
+      tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId)
         .then(res => {
           console.log(res)
           if (res.status === 200 && res.data.type === 'token_info') {
@@ -48,7 +49,7 @@ const TokenDetails = ({ match, location }) => {
     }
 
     function fetchInfo() {
-      tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tokenId)
+      tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
           console.log(res)
           if (res.status === 200 && res.data.type === 'token_info') {
