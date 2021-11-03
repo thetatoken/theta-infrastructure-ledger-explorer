@@ -28,6 +28,12 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
     } else {
       tokenSumDao.getInfoByAddressAsync(address)
         .then(result => {
+          if (result === null) {
+            res.status(404).send({
+              type: 'error_not_found',
+            });
+            return;
+          }
           const data = ({
             "type": "token_info",
             body: {

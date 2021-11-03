@@ -67,9 +67,17 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   });
 
   // The api to update smart contract tx history by address
-  router.get("/smartContract/updateHistory/:address", (req, res) => {
+  router.get("/smartContract/updateHistory/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     console.log('Updating smart contract tx history for address:', address);
+    const info = await tokenSummaryDao.getInfoByAddressAsync(address);
+    if (info) {
+      res.status(200).send({
+        type: 'smart_contract_update_history',
+        body: "done",
+      });
+      return;
+    }
     smartContractDao.getSmartContractByAddressAsync(address)
       .then(async info => {
         await updateTokenHistoryByTx(info, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);

@@ -9,7 +9,7 @@ const { default: axios } = require('axios');
 
 const ZeroAddress = '0x0000000000000000000000000000000000000000';
 
-exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao) {
+exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao, tokenSummaryDao) {
   const abi = tx.abi;
   if (!abi) {
     return;
@@ -288,7 +288,7 @@ async function updateTokenSummary(address, tokenArr, tokenName, abi, tokenSummar
     _id: address,
     holders: {},
     max_total_supply: 0,
-    total_transfers: 0,
+    total_transfers: -1,
     name: tokenName
   };
   try {
@@ -372,7 +372,7 @@ async function getMaxTotalSupply(address, abi) {
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let max = abiCoder.decode(outputTypes, outputValues)[0];
     console.log('max:', max);
-    return max;
+    return max.toString();
   } catch (e) {
     console.log('error occurs:', e.message);
     return 0;
