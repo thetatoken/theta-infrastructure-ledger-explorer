@@ -22,12 +22,10 @@ const TokenDetails = ({ match, location }) => {
 
   useEffect(() => {
     const { contractAddress } = match.params;
-    console.log(location.search)
     const search = location.search; // could be '?foo=bar'
     const params = new URLSearchParams(search);
     const tId = params.get('a');
     setTokenId(tId)
-    console.log(contractAddress)
     fetchInfo();
     fetchTransactions();
     //TODO: Add type field in token info
@@ -37,9 +35,7 @@ const TokenDetails = ({ match, location }) => {
     function fetchTransactions() {
       tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId)
         .then(res => {
-          console.log(res)
           if (res.status === 200 && res.data.type === 'token_info') {
-            console.log('setting', res.data.body)
             let txs = res.data.body;
             txs = txs.sort((a, b) => b.timestamp - a.timestamp);
             setTransactions(res.data.body)
@@ -51,9 +47,7 @@ const TokenDetails = ({ match, location }) => {
     function fetchInfo() {
       tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
-          console.log(res)
           if (res.status === 200 && res.data.type === 'token_info') {
-            console.log('setting', res.data.body)
             setTokenInfo(res.data.body)
           }
         })
@@ -65,7 +59,6 @@ const TokenDetails = ({ match, location }) => {
     console.log('handle')
   }
 
-  console.log('txs:', transactions)
   return (
     <div className="content account">
       <div className="page-title account">Token Detail</div>
