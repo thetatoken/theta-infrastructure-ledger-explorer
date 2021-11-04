@@ -1,0 +1,19 @@
+.content.token {
+  .details-header.item {
+    .txn-type.items {
+      font-family: $font-title;
+      font-weight: $weight-bold;
+      font-size: 1.125rem;
+      color: $color-font-main;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      &:before {
+        top: 3px;
+        margin-right: .75rem;
+      }
+    }
+  }
+  .details.item {
+    margin: 30px 0 70px 0;
+  }
+}

@@ -7,7 +7,9 @@ import LoadingPanel from 'common/components/loading-panel';
 import TokenTxsTable from "common/components/token-txs-table";
 import Pagination from "common/components/pagination";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { smartContractService } from 'common/services/smartContract';
 import ReadContract from 'common/components/read-contract';
+import Item from 'common/components/tnt721-item';
 
 const TokenDetails = ({ match, location }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -19,6 +21,7 @@ const TokenDetails = ({ match, location }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [type, setType] = useState('TNT-721');
+  const [abi, setAbi] = useState([]);
 
   useEffect(() => {
     const { contractAddress } = match.params;
@@ -28,6 +31,14 @@ const TokenDetails = ({ match, location }) => {
     setTokenId(tId)
     fetchInfo();
     fetchTransactions();
+    if (tId != null) {
+      smartContractService.getAbiByAddress(contractAddress.toLowerCase())
+        .then(result => {
+          if (result.data.type === 'smart_contract_abi') {
+            setAbi(result.data.body.abi);
+          }
+        })
+    }
     //TODO: Add type field in token info
     if (contractAddress === '0x34514a670022f7c8fc2beed94a92db7defc60974' && type === 'TNT-721') {
       setType('TNT-20')
@@ -60,7 +71,7 @@ const TokenDetails = ({ match, location }) => {
   }
 
   return (
-    <div className="content account">
+    <div className="content token">
       <div className="page-title account">Token Detail</div>
       {errorType === 'invalid_address' &&
         // <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />
@@ -94,8 +105,16 @@ const TokenDetails = ({ match, location }) => {
         </>}
       {!transactions && loadingTxns &&
         <LoadingPanel />}
+      {transactions && transactions.length > 0 && tokenId != null && <div className="wrap">
+        <div className="details-header item">
+          <div className="txn-type items">Item</div>
+        </div>
+        <div className="details item">
+          <Item tokenId={tokenId} abi={abi} address={match.params.contractAddress} />
+        </div>
+      </div>}
       {transactions && transactions.length > 0 &&
-        <React.Fragment>
+        <div className="wrap">
           <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList>
               <Tab>Transactions</Tab>
@@ -123,7 +142,7 @@ const TokenDetails = ({ match, location }) => {
               <h2>Write Contract</h2>
             </TabPanel>
           </Tabs>
-        </React.Fragment>}
+        </div>}
 
     </div>
   );
