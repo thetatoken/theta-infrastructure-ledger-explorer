@@ -37,7 +37,13 @@ exports.createIndexes = async function () {
     await createIndexAsync('activeAct', { timestamp: -1 })
 
     await createIndexAsync('totalAct', { timestamp: -1 })
+
+    await createIndexAsync('token', { contract_address: 1, timestamp: -1 })
+    await createIndexAsync('token', { contract_address: 1, tokenId: 1, timestamp: -1 })
+    await createIndexAsync('token', { from: 1, type: 1, timestamp: -1 })
+    await createIndexAsync('token', { to: 1, type: 1, timestamp: -1 })
 }
+
 function _createIndex(collectionName, object, callback) {
     createIndex(collectionName, object, callback);
 }
