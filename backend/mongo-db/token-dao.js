@@ -1,5 +1,9 @@
 //------------------------------------------------------------------------------
 //  DAO for token
+//  Require index: `db.token.createIndex({contract_address:1, timestamp:-1})`
+//  Require index: `db.token.createIndex({contract_address:1, tokenId:1, timestamp:-1})`
+//  Require index: `db.token.createIndex({from:1, type:1, timestamp:-1})`
+//  Require index: `db.token.createIndex({to:1, type:1, timestamp:-1})`
 //------------------------------------------------------------------------------
 
 module.exports = class TotalAccountDAO {
@@ -34,6 +38,27 @@ module.exports = class TotalAccountDAO {
   getRecordsNumberByAddressAndTokenId(address, tokenId, callback) {
     const queryObject = { contract_address: address };
     if (tokenId != null) queryObject.token_id = tokenId;
+    this.client.getTotal(this.collection, queryObject, callback);
+  }
+
+  getInfoListByAccountAndType(address, type, page = 0, limit = 0, callback) {
+    const queryObject = {
+      $or: [
+        { from: address, type: type },
+        { to: address, type: type }
+      ]
+    };
+    const sortObject = { timestamp: -1 };
+    this.client.getRecords(this.collection, queryObject, sortObject, page, limit, callback);
+  }
+
+  getRecordsNumberByAccountAndType(address, type, callback) {
+    const queryObject = {
+      $or: [
+        { from: address, type: type },
+        { to: address, type: type }
+      ]
+    };
     this.client.getTotal(this.collection, queryObject, callback);
   }
 }

@@ -62,6 +62,7 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
           return transactionDao.getTransactionsAsync(searchPage - 1, limit, diff)
         } else {
           res.status(400).send('Wrong parameter.');
+          return;
         }
       })
       .then(transactionInfoList => {

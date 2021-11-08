@@ -9,5 +9,10 @@ export const tokenService = {
   getTokenInfoByAddressAndTokenId(address, tokenId) {
     const uri = `tokenSummary/${address}${tokenId == null ? `` : `?tokenId=${tokenId}`}`;
     return apiService.get(uri);
+  },
+
+  getTokenInfoByAccountAndType(address, type, page, limit) {
+    const uri = `account/${address}?type=${type}&page=${page}&limit=${limit}`;
+    return apiService.get(uri);
   }
 };

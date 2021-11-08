@@ -202,7 +202,7 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, progressDao, txHistoryDao, config);
       // account router
-      accountRouter(app, accountDao, progressDao, rpc, config);
+      accountRouter(app, accountDao, tokenDao, rpc, config);
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router

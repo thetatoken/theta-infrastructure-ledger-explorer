@@ -68,6 +68,7 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
           return tokenDao.getInfoListByAddressAndTokenIdAsync(address, tokenId, pageNumber - 1, limit)
         } else {
           res.status(400).send('Wrong parameter.');
+          return;
         }
       })
       .then(info => {
