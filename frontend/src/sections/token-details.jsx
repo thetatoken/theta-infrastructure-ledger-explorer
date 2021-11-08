@@ -11,6 +11,8 @@ import { smartContractService } from 'common/services/smartContract';
 import ReadContract from 'common/components/read-contract';
 import Item from 'common/components/tnt721-item';
 
+const NUM_TRANSACTIONS = 20;
+
 const TokenDetails = ({ match, location }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [tokenInfo, setTokenInfo] = useState({});
@@ -30,7 +32,7 @@ const TokenDetails = ({ match, location }) => {
     const tId = params.get('a');
     setTokenId(tId)
     fetchInfo();
-    fetchTransactions();
+    fetchTransactions(contractAddress, tId, currentPage);
     if (tId != null) {
       smartContractService.getAbiByAddress(contractAddress.toLowerCase())
         .then(result => {
@@ -42,17 +44,6 @@ const TokenDetails = ({ match, location }) => {
     //TODO: Add type field in token info
     if (contractAddress === '0x34514a670022f7c8fc2beed94a92db7defc60974' && type === 'TNT-721') {
       setType('TNT-20')
-    }
-    function fetchTransactions() {
-      tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId)
-        .then(res => {
-          if (res.status === 200 && res.data.type === 'token_info') {
-            let txs = res.data.body;
-            txs = txs.sort((a, b) => b.timestamp - a.timestamp);
-            setTransactions(res.data.body)
-          }
-        })
-        .catch(e => console.log('e:', e))
     }
 
     function fetchInfo() {
@@ -66,8 +57,28 @@ const TokenDetails = ({ match, location }) => {
     }
   }, [match.params.contractAddress, location.search])
 
-  const handlePageChange = () => {
-    console.log('handle')
+  const handlePageChange = (pageNumber) => {
+    let { contractAddress } = match.params;
+    fetchTransactions(contractAddress, tokenId, pageNumber);
+  }
+
+  function fetchTransactions(contractAddress, tId, page = 1) {
+    setLoadingTxns(true);
+    tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId, page, NUM_TRANSACTIONS)
+      .then(res => {
+        if (res.status === 200 && res.data.type === 'token_info') {
+          let txs = res.data.body;
+          txs = txs.sort((a, b) => b.timestamp - a.timestamp);
+          setTransactions(txs);
+          setTotalPages(res.data.totalPageNumber);
+          setCurrentPage(res.data.currentPageNumber);
+          setLoadingTxns(false);
+        }
+      })
+      .catch(e => {
+        setLoadingTxns(false);
+        console.log('e:', e)
+      })
   }
 
   return (
