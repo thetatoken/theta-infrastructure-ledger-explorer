@@ -77,36 +77,31 @@ export default class SmartContract extends React.PureComponent {
     return (stateMutability === "view" || stateMutability === "pure" || constant === true);
   }
   setTabIndex = index => {
-    this.setState({tabIndex: index})
+    this.setState({ tabIndex: index })
   }
   render() {
     const { address } = this.props;
     const { smartContract, isVerified, isLoading, isReleasesReady, tabIndex } = this.state;
     const abi = get(smartContract, 'abi');
     return (
-      <React.Fragment>
-        <div className='actions'>
-          <div className="title">Contract</div>
-        </div>
-        <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
-          <TabList>
-            <Tab>Code</Tab>
-            <Tab disabled={!isVerified}>Read Contract</Tab>
-            <Tab disabled>Write Contract</Tab>
-          </TabList>
+      <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
+        <TabList>
+          <Tab>Code</Tab>
+          <Tab disabled={!isVerified}>Read Contract</Tab>
+          <Tab disabled>Write Contract</Tab>
+        </TabList>
 
-          <TabPanel>
-            <SmartContractCode address={address} smartContract={smartContract} isVerified={isVerified}
-              isLoading={isLoading} isReleasesReady={isReleasesReady} fetchSmartContract={this.fetchSmartContract} />
-          </TabPanel>
-          <TabPanel>
-            {abi && <ReadContract abi={abi.filter(this.isReadFunction)} address={address}/>}
-          </TabPanel>
-          <TabPanel>
-            <h2>Write Contract</h2>
-          </TabPanel>
-        </Tabs>
-      </React.Fragment>
+        <TabPanel>
+          <SmartContractCode address={address} smartContract={smartContract} isVerified={isVerified}
+            isLoading={isLoading} isReleasesReady={isReleasesReady} fetchSmartContract={this.fetchSmartContract} />
+        </TabPanel>
+        <TabPanel>
+          {abi && <ReadContract abi={abi.filter(this.isReadFunction)} address={address} />}
+        </TabPanel>
+        <TabPanel>
+          <h2>Write Contract</h2>
+        </TabPanel>
+      </Tabs>
     );
   }
 }
