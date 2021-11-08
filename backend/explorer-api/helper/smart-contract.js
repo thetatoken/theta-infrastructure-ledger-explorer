@@ -65,8 +65,8 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
           name: tokenName,
           type: type,
           token_id: token.tokenId,
-          from: token.from,
-          to: token.to,
+          from: token.from.toLowerCase(),
+          to: token.to.toLowerCase(),
           value: token.value,
           timestamp: tx.timestamp,
           contract_address: address
