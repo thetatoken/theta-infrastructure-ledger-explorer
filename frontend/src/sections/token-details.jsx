@@ -19,7 +19,7 @@ const TokenDetails = ({ match, location }) => {
   const [tokenId, setTokenId] = useState();
   const [errorType, setErrorType] = useState();
   const [transactions, setTransactions] = useState([]);
-  const [loadingTxns, setLoadingTxns] = useState(false);
+  const [loadingTxns, setLoadingTxns] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [abi, setAbi] = useState([]);
@@ -45,11 +45,9 @@ const TokenDetails = ({ match, location }) => {
     function fetchInfo() {
       tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
-          if (res.status === 200 && res.data.type === 'token_info') {
-            setTokenInfo(res.data.body)
-          }
+          setTokenInfo(res.data.body);
         })
-        .catch(e => console.log('e:', e))
+        .catch(console.log)
     }
 
   }, [match.params.contractAddress, location.search])
@@ -63,18 +61,15 @@ const TokenDetails = ({ match, location }) => {
     setLoadingTxns(true);
     tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId, page, NUM_TRANSACTIONS)
       .then(res => {
-        if (res.status === 200 && res.data.type === 'token_info') {
-          let txs = res.data.body;
-          txs = txs.sort((a, b) => b.timestamp - a.timestamp);
-          setTransactions(txs);
-          setTotalPages(res.data.totalPageNumber);
-          setCurrentPage(res.data.currentPageNumber);
-          setLoadingTxns(false);
-        }
+        let txs = res.data.body;
+        txs = txs.sort((a, b) => b.timestamp - a.timestamp);
+        setTransactions(txs);
+        setTotalPages(res.data.totalPageNumber);
+        setCurrentPage(res.data.currentPageNumber);
+        setLoadingTxns(false);
       })
       .catch(e => {
         setLoadingTxns(false);
-        console.log('e:', e)
       })
   }
 

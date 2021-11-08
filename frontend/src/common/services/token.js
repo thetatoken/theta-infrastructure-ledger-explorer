@@ -11,8 +11,13 @@ export const tokenService = {
     return apiService.get(uri);
   },
 
-  getTokenInfoByAccountAndType(address, type, page, limit) {
-    const uri = `account/${address}?type=${type}&page=${page}&limit=${limit}`;
+  getTokenTxsByAccountAndType(address, type, page, limit) {
+    const uri = `account/tokenTx/${address}?type=${type}&pageNumber=${page}&limit=${limit}`;
+    return apiService.get(uri);
+  },
+
+  getTokenTxsNumByAccountAndType(address, type) {
+    const uri = `account/tokenTxNum/${address}?type=${type}`;
     return apiService.get(uri);
   }
 };

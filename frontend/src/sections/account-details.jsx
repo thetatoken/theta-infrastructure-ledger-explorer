@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
 import map from 'lodash/map';
-import compact from 'lodash/compact';
-// import 
 import cx from 'classnames';
 
 import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
@@ -13,6 +11,7 @@ import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { priceService } from 'common/services/price';
+import { tokenService } from "../common/services/token";
 import { rewardDistributionService } from 'common/services/rewardDistribution';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
@@ -21,6 +20,7 @@ import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 import SmartContract from 'common/components/smart-contract';
+import TokenTxsTable from "common/components/token-txs-table";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
@@ -52,7 +52,9 @@ export default class AccountDetails extends React.Component {
       typeOptions: null,
       rewardSplit: 0,
       beneficiary: "",
-      tabIndex: 0
+      tabIndex: 0,
+      hasTNT721: false,
+      hasTNT20: false
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -185,6 +187,23 @@ export default class AccountDetails extends React.Component {
       });
   }
 
+  getTokenTransactionsNumber(address) {
+    const tokenList = ["TNT-721", "TNT-20"];
+    const { hasTNT20, hasTNT721 } = this.state;
+    for (let name of tokenList) {
+      tokenService.getTokenTxsNumByAccountAndType(address, name)
+        .then(res => {
+          const num = get(res, 'data.body.total_number');
+          if (num > 0) {
+            if (name === 'TNT-721' && !hasTNT721) {
+              this.setState({ hasTNT721: true });
+            } else if (name === 'TNT-20' && !hasTNT20) {
+              this.setState({ hasTNT20: true });
+            }
+          }
+        })
+    }
+  }
   getOneAccountByAddress(address) {
     if (!address) {
       return;
@@ -217,6 +236,7 @@ export default class AccountDetails extends React.Component {
         });
         let types = this.state.selectedTypes.map(o => o.value);
         this.getTransactionsByAddress(address, types, 1);
+        this.getTokenTransactionsNumber(address);
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -330,7 +350,7 @@ export default class AccountDetails extends React.Component {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
-      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex } = this.state;
+      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721 } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -373,10 +393,9 @@ export default class AccountDetails extends React.Component {
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
-            <Tab>TNT20 Token Txns</Tab>
-            <Tab>TNT721 Token Txns</Tab>
+            {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
+            {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
           </TabList>
-
           <TabPanel>
             {!transactions && loading_txns &&
               <LoadingPanel />}
@@ -449,12 +468,12 @@ export default class AccountDetails extends React.Component {
               <SmartContract address={account.address} />
             </TabPanel>
           }
-          <TabPanel>
-            <h2>20 template</h2>
-          </TabPanel>
-          <TabPanel>
-            <h2>721 template</h2>
-          </TabPanel>
+          {hasTNT20 && <TabPanel>
+            <TokenTab type="TNT-20" address={account.address} />
+          </TabPanel>}
+          {hasTNT721 && <TabPanel>
+            <TokenTab type="TNT-721" address={account.address} />
+          </TabPanel>}
         </Tabs>
       </div>);
   }
@@ -474,11 +493,49 @@ const Address = ({ hash }) => {
   return (<Link to={`/account/${hash}`}>{hash}</Link>)
 }
 
-const HashList = ({ hashes }) => {
-  return (
-    <React.Fragment>
-      {map(compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
-    </React.Fragment>
-  )
+const TokenTab = props => {
+  const { type, address } = props;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingTxns, setLoadingTxns] = useState(true);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    fetchTokenTransactions(address, type, currentPage);
+  }, [type, address])
+
+  const handlePageChange = pageNumber => {
+    console.log('handle')
+    fetchTokenTransactions(address, type, pageNumber);
+  }
+
+  const fetchTokenTransactions = (address, type, page) => {
+    tokenService.getTokenTxsByAccountAndType(address, type, page, NUM_TRANSACTIONS)
+      .then(res => {
+        let txs = res.data.body;
+        txs = txs.sort((a, b) => b.timestamp - a.timestamp);
+        setTransactions(txs);
+        setTotalPages(res.data.totalPageNumber);
+        setCurrentPage(res.data.currentPageNumber);
+        setLoadingTxns(false);
+      })
+      .catch(e => {
+        setLoadingTxns(false);
+      })
+  }
+
+  return <>
+    <div>
+      {loadingTxns &&
+        <LoadingPanel className="fill" />}
+      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} />}
+    </div>
+    <Pagination
+      size={'lg'}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={handlePageChange}
+      disabled={loadingTxns} />
+  </>
 }
 
