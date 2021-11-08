@@ -81,6 +81,32 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
       })
   });
 
+  // The API to get token holders
+  router.get("/tokenHolder/:address", (req, res) => {
+    console.log('Querying the token holders.');
+    let address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    tokenSumDao.getInfoByAddressAsync(address)
+      .then(result => {
+        if (result === null) {
+          res.status(404).send({
+            type: 'error_not_found',
+          });
+          return;
+        }
+        const data = ({
+          "type": "token_holders",
+          body: {
+            "holders": result.holders
+          }
+        })
+        res.status(200).send(data);
+      })
+  })
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }

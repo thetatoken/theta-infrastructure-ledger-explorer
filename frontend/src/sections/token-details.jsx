@@ -23,6 +23,7 @@ const TokenDetails = ({ match, location }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [abi, setAbi] = useState([]);
+  const [holders, setHolders] = useState([]);
 
   useEffect(() => {
     const { contractAddress } = match.params;
@@ -50,6 +51,7 @@ const TokenDetails = ({ match, location }) => {
         })
         .catch(e => console.log('e:', e))
     }
+
   }, [match.params.contractAddress, location.search])
 
   const handlePageChange = (pageNumber) => {
@@ -124,6 +126,7 @@ const TokenDetails = ({ match, location }) => {
           <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList>
               <Tab>Transactions</Tab>
+              <Tab disabled>Holders</Tab>
               <Tab>Read Contract</Tab>
               <Tab disabled>Write Contract</Tab>
             </TabList>
@@ -142,6 +145,9 @@ const TokenDetails = ({ match, location }) => {
                 disabled={loadingTxns} />
             </TabPanel>
             <TabPanel>
+              <Holders holders={holders} />
+            </TabPanel>
+            <TabPanel>
               <ReadContract address={match.params.contractAddress} />
             </TabPanel>
             <TabPanel>
@@ -152,6 +158,11 @@ const TokenDetails = ({ match, location }) => {
 
     </div>
   );
+}
+
+const Holders = (props) => {
+  const { holders } = props;
+  return <div>Holders template</div>
 }
 
 export default TokenDetails;
