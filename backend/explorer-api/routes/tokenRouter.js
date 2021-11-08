@@ -50,18 +50,31 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
 
   // The api to get token info
   router.get("/token/:address", (req, res) => {
+    console.log('Querying the token info.');
     let address = helper.normalize(req.params.address.toLowerCase());
     if (!helper.validateHex(address, 40)) {
       res.status(400).send({ type: 'invalid_address' })
       return;
     }
-    const { tokenId } = req.query;
-    console.log('Querying the token info.');
-    tokenDao.getInfoListByAddressAndTokenIdAsync(address, tokenId, 0, 0)
+    let totalPageNumber = 0;
+    let { tokenId, pageNumber = 1, limit = 10 } = req.query;
+    tokenDao.getRecordsNumberByAddressAndTokenIdAsync(address, tokenId)
+      .then(totalNumber => {
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+        totalPageNumber = Math.ceil(totalNumber / limit);
+        if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > 0 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
+          return tokenDao.getInfoListByAddressAndTokenIdAsync(address, tokenId, pageNumber - 1, limit)
+        } else {
+          res.status(400).send('Wrong parameter.');
+        }
+      })
       .then(info => {
         const data = ({
           "type": "token_info",
           body: info,
+          totalPageNumber,
+          currentPageNumber: pageNumber
         })
         res.status(200).send(data);
       })

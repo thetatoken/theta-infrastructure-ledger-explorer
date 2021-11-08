@@ -26,8 +26,9 @@ module.exports = class TotalAccountDAO {
 
   getInfoListByAddressAndTokenId(address, tokenId, page = 0, limit = 0, callback) {
     const queryObject = { contract_address: address };
+    const sortObject = { timestamp: -1 };
     if (tokenId != null) queryObject.token_id = tokenId;
-    this.client.getRecords(this.collection, queryObject, {}, page, limit, callback);
+    this.client.getRecords(this.collection, queryObject, sortObject, page, limit, callback);
   }
 
   getRecordsNumberByAddressAndTokenId(address, tokenId, callback) {
