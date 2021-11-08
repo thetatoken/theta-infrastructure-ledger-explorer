@@ -305,26 +305,25 @@ async function updateTokenSummary(address, tokenArr, tokenName, type, abi, token
     const key = token.tokenId != null ? address + token.tokenId : address;
     let value = token.value || 1;
     if (from !== ZeroAddress) {
-      // holders[from][key] -= value;
       if (holders[from] === undefined) {
-        holders[from] = { [key]: -value }
+        holders[from] = { [key]: new BigNumber(0).minus(value).toFixed() }
       } else if (holders[from][key] === undefined) {
-        holders[from][key] = -value;
+        holders[from][key] = new BigNumber(0).minus(value).toFixed();
       } else {
-        holders[from][key] -= value;
+        holders[from][key] = new BigNumber(holders[from][key]).minus(value).toFixed();
       }
-      if (holders[from][key] === 0) delete holders[from][key];
-      if (Object.keys(holders[from]).length === 0) delete holders[from]
+      if (holders[from][key] == 0) delete holders[from][key];
+      if (Object.keys(holders[from]).length == 0) delete holders[from];
     }
     if (holders[to] === undefined) {
-      holders[to] = { [key]: value }
+      holders[to] = { [key]: new BigNumber(value).toFixed() }
     } else if (holders[to][key] === undefined) {
-      holders[to][key] = value;
+      holders[to][key] = new BigNumber(value).toFixed();
     } else {
-      holders[to][key] += value;
+      holders[to][key] = new BigNumber(holders[to][key]).plus(value).toFixed();
     }
-    if (holders[to][key] === 0) delete holders[to][key];
-    if (Object.keys(holders[to]).length === 0) delete holders[to];
+    if (holders[to][key] == 0) delete holders[to][key];
+    if (Object.keys(holders[to]).length == 0) delete holders[to];
   })
   tokenInfo.total_transfers++;
   await tokenSummaryDao.upsertAsync(tokenInfo);
