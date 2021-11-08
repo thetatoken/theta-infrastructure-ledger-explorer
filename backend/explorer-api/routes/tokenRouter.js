@@ -18,7 +18,7 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
     console.log('Querying the token summary.');
     if (tokenId !== undefined) {
       tokenDao.getRecordsNumberByAddressAndTokenIdAsync(address, tokenId)
-        .then(num => {
+        .then(async num => {
           const data = ({
             "type": "token_number",
             body: { "total_transfers": num },
@@ -41,6 +41,7 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
               "holders": Object.keys(result.holders).length,
               "max_total_supply": result.max_total_supply,
               "total_transfers": result.total_transfers,
+              "type": result.type
             }
           })
           res.status(200).send(data);

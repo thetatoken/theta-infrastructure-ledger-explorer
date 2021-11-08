@@ -52,12 +52,13 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   })
 
   const insertList = [];
+  const type = isTnt20 ? 'TNT-20' : 'TNT-721';
   tokenArr.forEach(token => {
     const newToken = {
       _id: token.id,
       hash: tx.hash,
       name: tokenName,
-      type: isTnt20 ? 'TNT-20' : 'TNT-721',
+      type: type,
       token_id: token.tokenId,
       from: token.from,
       to: token.to,
@@ -68,7 +69,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
     }
     insertList.push(checkAndInsertToken(newToken, tokenDao))
   })
-  await updateTokenSummary(contractAddress, tokenArr, tokenName, abi, tokenSummaryDao);
+  await updateTokenSummary(contractAddress, tokenArr, tokenName, type, abi, tokenSummaryDao);
   return Promise.all(insertList);
 }
 
@@ -275,14 +276,15 @@ async function checkAndInsertToken(token, tokenDao) {
   await tokenDao.insertAsync(token);
 }
 
-async function updateTokenSummary(address, tokenArr, tokenName, abi, tokenSummaryDao) {
+async function updateTokenSummary(address, tokenArr, tokenName, type, abi, tokenSummaryDao) {
   console.log('In updateTokenSummary')
   let tokenInfo = {
     _id: address,
     holders: {},
     max_total_supply: 0,
     total_transfers: -1,
-    name: tokenName
+    name: tokenName,
+    type: type
   };
   try {
     let info = await tokenSummaryDao.getInfoByAddressAsync(address)

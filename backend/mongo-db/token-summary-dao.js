@@ -17,14 +17,5 @@ module.exports = class TokenSummaryDAO {
   getInfoByAddress(address, callback) {
     const queryObject = { _id: address };
     this.client.findOne(this.collection, queryObject, callback);
-    // TODOs: Remove the template after implement upsert function
-    // this.client.findOne(this.collection, queryObject, function (error, record) {
-    //   callback(error, {
-    //     "_id": address,
-    //     "holders_number": 1000,
-    //     "max_total_supply": 1000000,
-    //     "total_transfers": 60,
-    //   })
-    // });
   }
 }

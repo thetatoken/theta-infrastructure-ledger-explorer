@@ -22,7 +22,6 @@ const TokenDetails = ({ match, location }) => {
   const [loadingTxns, setLoadingTxns] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [type, setType] = useState('TNT-721');
   const [abi, setAbi] = useState([]);
 
   useEffect(() => {
@@ -40,10 +39,6 @@ const TokenDetails = ({ match, location }) => {
             setAbi(result.data.body.abi);
           }
         })
-    }
-    //TODO: Add type field in token info
-    if (contractAddress === '0x34514a670022f7c8fc2beed94a92db7defc60974' && type === 'TNT-721') {
-      setType('TNT-20')
     }
 
     function fetchInfo() {
@@ -101,7 +96,7 @@ const TokenDetails = ({ match, location }) => {
             <tbody>
               {tokenId == null && <>
                 <DetailsRow label="Name" data={tokenInfo.name} />
-                <DetailsRow label="Type" data={type} />
+                <DetailsRow label="Type" data={tokenInfo.type} />
                 <DetailsRow label="Max Total Supply" data={tokenInfo.max_total_supply} />
                 <DetailsRow label="Holders" data={tokenInfo.holders} />
                 <DetailsRow label="Transfers" data={tokenInfo.total_transfers} />
@@ -137,7 +132,7 @@ const TokenDetails = ({ match, location }) => {
               <div>
                 {loadingTxns &&
                   <LoadingPanel className="fill" />}
-                <TokenTxsTable transactions={transactions} type={type} />
+                <TokenTxsTable transactions={transactions} type={tokenInfo.type} />
               </div>
               <Pagination
                 size={'lg'}
