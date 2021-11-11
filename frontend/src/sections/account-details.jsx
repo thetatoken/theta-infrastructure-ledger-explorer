@@ -528,7 +528,7 @@ const TokenTab = props => {
     <div>
       {loadingTxns &&
         <LoadingPanel className="fill" />}
-      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} />}
+      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} />}
     </div>
     <Pagination
       size={'lg'}
