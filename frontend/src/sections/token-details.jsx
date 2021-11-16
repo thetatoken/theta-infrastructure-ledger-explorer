@@ -130,7 +130,7 @@ const TokenDetails = ({ match, location }) => {
               <div>
                 {loadingTxns &&
                   <LoadingPanel className="fill" />}
-                <TokenTxsTable transactions={transactions} type={tokenInfo.type} />
+                <TokenTxsTable transactions={transactions} type={tokenInfo.type} tabType="token" />
               </div>
               <Pagination
                 size={'lg'}

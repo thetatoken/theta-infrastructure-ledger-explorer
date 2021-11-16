@@ -7,7 +7,7 @@ import truncate from 'lodash/truncate';
 
 const NUM_TRANSACTIONS = 30;
 
-const TokenTxsTable = ({ transactions, type, className, address }) => {
+const TokenTxsTable = ({ transactions, type, className, address, tabType }) => {
   return (
     <table className={cx("data txn-table", className)}>
       <thead>
@@ -15,7 +15,7 @@ const TokenTxsTable = ({ transactions, type, className, address }) => {
           <th className="hash">Txn Hash</th>
           <th className="age">Age</th>
           <th className="from">From</th>
-          <th></th>
+          {tabType !== "token" && <th></th>}
           <th className="to">To</th>
           {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
           {type === 'TNT-20' && <th className="Quantity">Quantity</th>}
@@ -29,11 +29,11 @@ const TokenTxsTable = ({ transactions, type, className, address }) => {
               <td className="hash overflow"><Link to={`/txs/${txn.hash}`}>{hash(txn, 30)}</Link></td>
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
-                <td className={cx({ 'dim': source === 'from' }, "from")}>
+                <td className={cx({ 'dim': source === 'to' }, "from")}>
                   <Link to={`/account/${txn.from}`}>{truncate(txn.from, { length: NUM_TRANSACTIONS })}</Link>
                 </td>
-                <td className={cx(source, "icon")}></td>
-                <td className={cx({ 'dim': source === 'to' }, "to")}>
+                {tabType !== "token" && <td className={cx(source, "icon")}></td>}
+                <td className={cx({ 'dim': source === 'from' }, "to")}>
                   <Link to={`/account/${txn.to}`}>{truncate(txn.to, { length: NUM_TRANSACTIONS })}</Link>
                 </td>
                 {type === 'TNT-721' && <td className="tokenId">
