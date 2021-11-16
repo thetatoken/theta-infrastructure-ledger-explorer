@@ -18,4 +18,5 @@ module.exports = class TokenSummaryDAO {
     const queryObject = { _id: address };
     this.client.findOne(this.collection, queryObject, callback);
   }
+
 }

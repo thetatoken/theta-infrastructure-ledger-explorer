@@ -10,6 +10,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { smartContractService } from 'common/services/smartContract';
 import ReadContract from 'common/components/read-contract';
 import Item from 'common/components/tnt721-item';
+import HolderTable from 'common/components/holder-table';
+import get from 'lodash/get';
 
 const NUM_TRANSACTIONS = 20;
 
@@ -73,6 +75,14 @@ const TokenDetails = ({ match, location }) => {
       })
   }
 
+  function fetchHolders(address, tokenId) {
+    tokenService.getHoldersByAccountAndTokenId(address, tokenId)
+      .then(res => {
+        let h = get(res, 'data.body.holders').sort((a, b) => b.value - a.value);
+        setHolders(h)
+      })
+  }
+
   return (
     <div className="content token">
       <div className="page-title account">Token Detail</div>
@@ -121,7 +131,7 @@ const TokenDetails = ({ match, location }) => {
           <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList>
               <Tab>Transactions</Tab>
-              <Tab disabled>Holders</Tab>
+              <Tab>Holders</Tab>
               <Tab>Read Contract</Tab>
               <Tab disabled>Write Contract</Tab>
             </TabList>
@@ -140,7 +150,8 @@ const TokenDetails = ({ match, location }) => {
                 disabled={loadingTxns} />
             </TabPanel>
             <TabPanel>
-              <Holders holders={holders} />
+              <Holders holders={holders} fetchHolders={fetchHolders} tokenId={tokenId} totalSupply={tokenInfo.max_total_supply}
+                address={match.params.contractAddress} />
             </TabPanel>
             <TabPanel>
               <ReadContract address={match.params.contractAddress} />
@@ -156,8 +167,11 @@ const TokenDetails = ({ match, location }) => {
 }
 
 const Holders = (props) => {
-  const { holders } = props;
-  return <div>Holders template</div>
+  const { holders, fetchHolders, tokenId, address, totalSupply } = props;
+  useEffect(() => {
+    fetchHolders(address, tokenId);
+  }, [tokenId, address])
+  return <HolderTable holders={holders} totalSupply={totalSupply} />
 }
 
 export default TokenDetails;

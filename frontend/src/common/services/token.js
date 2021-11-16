@@ -19,5 +19,10 @@ export const tokenService = {
   getTokenTxsNumByAccountAndType(address, type) {
     const uri = `account/tokenTxNum/${address}?type=${type}`;
     return apiService.get(uri);
+  },
+
+  getHoldersByAccountAndTokenId(address, tokenId) {
+    const uri = `tokenHolder/${address}${tokenId == null ? `` : `?tokenId=${tokenId}`}`;
+    return apiService.get(uri);
   }
 };

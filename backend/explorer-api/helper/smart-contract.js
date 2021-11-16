@@ -307,28 +307,28 @@ async function updateTokenSummary(address, tokenArr, tokenName, type, abi, token
   tokenArr.forEach(token => {
     let from = token.from;
     let to = token.to;
-    const value = token.value || 1;
     const key = token.tokenId != null ? address + token.tokenId : address;
+    let value = token.value || 1;
     if (from !== ZeroAddress) {
-      if (holders[from] === undefined) {
-        holders[from] = { [key]: new BigNumber(0).minus(value).toFixed() }
-      } else if (holders[from][key] === undefined) {
-        holders[from][key] = new BigNumber(0).minus(value).toFixed();
+      if (holders[key] === undefined) {
+        holders[key] = { [from]: new BigNumber(0).minus(value).toFixed() }
+      } else if (holders[key][from] === undefined) {
+        holders[key][from] = new BigNumber(0).minus(value).toFixed();
       } else {
-        holders[from][key] = new BigNumber(holders[from][key]).minus(value).toFixed();
+        holders[key][from] = new BigNumber(holders[key][from]).minus(value).toFixed();
       }
-      if (holders[from][key] == 0) delete holders[from][key];
-      if (Object.keys(holders[from]).length == 0) delete holders[from];
+      if (holders[key][from] == 0) delete holders[key][from];
+      if (Object.keys(holders[key]).length == 0) delete holders[key];
     }
-    if (holders[to] === undefined) {
-      holders[to] = { [key]: new BigNumber(value).toFixed() }
-    } else if (holders[to][key] === undefined) {
-      holders[to][key] = new BigNumber(value).toFixed();
+    if (holders[key] === undefined) {
+      holders[key] = { [to]: new BigNumber(value).toFixed() }
+    } else if (holders[key][to] === undefined) {
+      holders[key][to] = new BigNumber(value).toFixed();
     } else {
-      holders[to][key] = new BigNumber(holders[to][key]).plus(value).toFixed();
+      holders[key][to] = new BigNumber(holders[key][to]).plus(value).toFixed();
     }
-    if (holders[to][key] == 0) delete holders[to][key];
-    if (Object.keys(holders[to]).length == 0) delete holders[to];
+    if (holders[key][to] == 0) delete holders[key][to];
+    if (Object.keys(holders[key]).length == 0) delete holders[key];
   })
   tokenInfo.total_transfers++;
   await tokenSummaryDao.upsertAsync(tokenInfo);
