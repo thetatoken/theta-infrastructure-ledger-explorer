@@ -45,7 +45,7 @@ var tokenRouter = (app, tokenDao, tokenSumDao) => {
             "type": "token_info",
             body: {
               "name": result.name,
-              "holders": accountSet.length,
+              "holders": accountSet.size,
               "max_total_supply": result.max_total_supply,
               "total_transfers": result.total_transfers,
               "type": result.type

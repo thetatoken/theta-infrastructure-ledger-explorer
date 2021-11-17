@@ -35,6 +35,7 @@ const TokenDetails = ({ match, location }) => {
     setTokenId(tId)
     fetchInfo();
     fetchTransactions(contractAddress, tId, currentPage);
+    fetchHolders(contractAddress, tId);
     if (tId != null) {
       smartContractService.getAbiByAddress(contractAddress.toLowerCase())
         .then(result => {
@@ -150,8 +151,7 @@ const TokenDetails = ({ match, location }) => {
                 disabled={loadingTxns} />
             </TabPanel>
             <TabPanel>
-              <Holders holders={holders} fetchHolders={fetchHolders} tokenId={tokenId} totalSupply={tokenInfo.max_total_supply}
-                address={match.params.contractAddress} />
+              <HolderTable holders={holders} totalSupply={tokenInfo.max_total_supply} />
             </TabPanel>
             <TabPanel>
               <ReadContract address={match.params.contractAddress} />
@@ -164,14 +164,6 @@ const TokenDetails = ({ match, location }) => {
 
     </div>
   );
-}
-
-const Holders = (props) => {
-  const { holders, fetchHolders, tokenId, address, totalSupply } = props;
-  useEffect(() => {
-    fetchHolders(address, tokenId);
-  }, [tokenId, address])
-  return <HolderTable holders={holders} totalSupply={totalSupply} />
 }
 
 export default TokenDetails;
