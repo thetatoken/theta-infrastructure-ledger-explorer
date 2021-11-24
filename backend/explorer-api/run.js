@@ -151,6 +151,7 @@ function main() {
 
       app.use(compression());
       app.use(cors());
+      app.use(setApiToken);
 
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
@@ -260,7 +261,7 @@ function pushTopBlocks() {
 }
 function pushTopTransactions() {
   const numberOfTransactions = 5;
-  transactionDao.getTransactionsAsync(0, numberOfTransactions, null)
+  transactionDao.getTransactionsByRangeAsync(0, numberOfTransactions)
     .then(function (transactionInfoList) {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });
@@ -281,4 +282,12 @@ function pushTotalTxsNum() {
 function onClientDisconnect() {
   isPushingData = false;
   console.log('client disconnect');
+}
+
+function setApiToken(req, res, next) {
+  const apiToken = req.header('x-api-token');
+  if (apiToken !== undefined) {
+    res.setHeader('x-api-token', apiToken);
+  }
+  next();
 }
