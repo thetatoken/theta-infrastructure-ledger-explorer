@@ -252,10 +252,14 @@ function pushTopBlocks() {
 }
 function pushTopTransactions() {
   const numberOfTransactions = 5;
-  transactionDao.getTransactionsByRangeAsync(0, numberOfTransactions)
-    .then(function (transactionInfoList) {
-      io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
-    });
+  progressDao.getProgressAsync(config.blockchain.networkId)
+    .then((progressInfo) => {
+      totalNumber = progressInfo.count;
+      transactionDao.getTransactionsByRangeAsync(totalNumber - numberOfTransactions + 1, totalNumber)
+        .then(function (transactionInfoList) {
+          io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
+        });
+    })
 
   if (isPushingData) setTimeout(pushTopTransactions, 1000);
 }
