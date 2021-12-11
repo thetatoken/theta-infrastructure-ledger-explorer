@@ -24,7 +24,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       if (result.data.result.verified === true) {
         let newSc = { ...result.data.smart_contract, bytecode: byteCode }
         await smartContractDao.upsertSmartContractAsync(newSc);
-        await updateTokenHistoryByTx(newSc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
+        updateTokenHistoryByTx(newSc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
       }
       const data = {
         result: result.data.result,

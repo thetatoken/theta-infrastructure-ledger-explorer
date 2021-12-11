@@ -260,7 +260,7 @@ async function _getTNT721Name(log, abi) {
         .then(res => {
           return get(res, 'data.name')
         }).catch(e => {
-          console.log('error occurs in fetch url:', e)
+          console.log('error occurs in fetch url:', e.message)
           return "";
         })
     }
