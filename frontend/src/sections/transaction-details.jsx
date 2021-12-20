@@ -434,6 +434,8 @@ const StakeRewardDistribution = ({ transaction, price }) => {
 const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasItems, setHasItems] = useState(false);
+  const [feeSplit, setFeeSplit] = useState(null);
+
   let { data, receipt } = transaction;
   let err = get(receipt, 'EvmErr');
   let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
@@ -453,6 +455,17 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       const tokenId = get(log, 'decode.result.tokenId');
       if (tokenId === undefined) return;
       if (!hasItems) setHasItems(true);
+    })
+  }, [logs, abi])
+  useEffect(() => {
+    if (!abi) return;
+    const arr = abi.filter(obj => obj.name == "FeeSplit" && obj.type === 'event');
+    if (arr.length === 0) return;
+    logs.forEach(log => {
+      const eventName = get(log, 'decode.eventName');
+      if (eventName !== 'FeeSplit') return;
+      const result = get(log, 'decode.result');
+      if (feeSplit === null) setFeeSplit(result);
     })
   }, [logs, abi])
   return (
@@ -487,10 +500,8 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               {err ? <DetailsRow label="Error Message" data={<span className="text-danger">
                 {Buffer.from(get(transaction, 'receipt.EvmRet'), 'base64').toString() || err}
               </span>} /> : null}
-              <DetailsRow label="Value" data={<div className="currency tfuel">
-                {formatCoin(get(data, 'from.coins.tfuelwei'))} TFuel
-                <div className='price'>{`[\$${priceCoin(get(data, 'from.coins.tfuelwei'), price['TFuel'])} USD]`}</div>
-              </div>} />
+              <DetailsRow label="Value" data={<SmartContractValue value={get(data, 'from.coins.tfuelwei')}
+                price={price} feeSplit={feeSplit} />} />
               <DetailsRow label="Data" data={getHex(data.data)} />
             </tbody>
           </table>
@@ -524,6 +535,41 @@ const Log = ({ log, abi }) => {
       </tbody>
     </table>
   )
+}
+
+const SmartContractValue = ({ value, price, feeSplit }) => {
+  const isMobile = window.screen.width <= 560;
+  const truncate = 20;
+  return <div className="sc-value">
+    <div className="currency tfuel">
+      {formatCoin(value)} TFuel
+      <div className='price'>{`[\$${priceCoin(value, price['TFuel'])} USD]`}</div>
+    </div>
+    {feeSplit && <>
+      <div className="sc-value__row">
+        <div className="sc-value__arrow"></div>
+        <div className="currency tfuel">
+          {formatCoin(feeSplit.userPayout)} TFuel
+          <div className='price'>{`[\$${priceCoin(feeSplit.userPayout, price['TFuel'])} USD]`}</div>
+        </div>
+        <div className="sc-value__address">
+          <div className="sc-value__text">To</div>
+          <Address hash={feeSplit.userAddress} truncate={isMobile ? truncate : 0} />
+        </div>
+      </div>
+      <div className="sc-value__row">
+        <div className="sc-value__arrow"></div>
+        <div className="currency tfuel">
+          {formatCoin(feeSplit.ownerPayout)} TFuel
+          <div className='price'>{`[\$${priceCoin(feeSplit.ownerPayout, price['TFuel'])} USD]`}</div>
+        </div>
+        <div className="sc-value__address">
+          <div className="sc-value__text">To</div>
+          <Address hash={feeSplit.ownerAddress} truncate={isMobile ? truncate : 0} />
+        </div>
+      </div>
+    </>}
+  </div>
 }
 const EventName = ({ event }) => {
   let index = 1;

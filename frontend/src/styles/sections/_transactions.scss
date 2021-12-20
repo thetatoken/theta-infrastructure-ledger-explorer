@@ -181,3 +181,36 @@
     }
   }
 }
+.sc-value {
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 15px;
+  }
+  &__arrow {
+    color: $color-font-light;
+    margin: 0 5px;
+    &::before {
+      content: "\21B3";
+      font-size: 1.5rem;
+    }
+  }
+  &__address {
+    display: flex;
+    align-items: center;
+  }
+  &__text {
+    display: flex;
+    align-items: center;
+    color: $color-font-light;
+    margin-left: 5px;
+  }
+  & a {
+    margin: 0 5px;
+    width: 365px;
+    @media only screen and (max-width : 560px) {
+      width: auto;
+    }
+  }
+}
