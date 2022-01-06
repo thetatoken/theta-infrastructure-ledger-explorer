@@ -11,6 +11,7 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
 	- [Transaction APIs](#transaction-apis)
 		- [GetTransaction](#gettransaction)
 		- [GetTransactionsByRange](#gettransactionsbyrange)
+      - [GetTransactionsByBlockRange](#gettransactionsbyblockrange)
 	- [Account APIs](#account-apis)
 		- [GetAccount](#getaccount)
       - [GetAccountTxHistory](#getaccounttxhistory)
@@ -448,6 +449,44 @@ curl https://explorer.thetatoken.org:8443/api/transactions/range?pageNumber=1&li
    ],
    "totalPageNumber":20354,
    "currentPageNumber":"1"
+}
+```
+
+### GetTransactionsByBlockRange
+
+This API returns a list of block of given the page number and limit number. 
+
+**REST Uri**: /trancastions/blockRange
+
+**Query Parameters**
+
+- blockStart: the lowest block height wants to query
+- blockEnd: the heighest block height wants to query
+
+**Returns**
+
+- For each transaction it is similar to the returns of the GetTransaction API. Please [see above](#gettransaction).
+
+**Example**
+```
+// Request
+curl https://explorer.thetatoken.org:8443/api/transactions/blockRange?blockStart=1&blockEnd=10
+
+// Result
+{  
+   "type":"transaction_list",
+   "body":[  
+      {...},
+      {...},
+      {...},
+      {...},
+      {...},
+      {...},
+      {...},
+      {...},
+      {...},
+      {...}
+   ]
 }
 ```
 

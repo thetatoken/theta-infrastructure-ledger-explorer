@@ -194,7 +194,7 @@ function main() {
       // blocks router
       blocksRouter(app, blockDao, progressDao, checkpointDao, config);
       // transactions router       
-      transactionsRouter(app, transactionDao, progressDao, txHistoryDao, config);
+      transactionsRouter(app, transactionDao, blockDao, progressDao, txHistoryDao, config);
       // account router
       accountRouter(app, accountDao, progressDao, rpc, config);
       // account transaction mapping router

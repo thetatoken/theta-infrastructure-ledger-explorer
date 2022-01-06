@@ -6,8 +6,9 @@ var helper = require('../helper/utils');
 var startTime = 0;
 var txNumber = 0;
 var cachePeriod = 10 * 60 * 1000; // 10 mins
+var RANGE_LIMIT = 5000; // Limit for get transactions by block range
 
-var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config) => {
+var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/transaction/:hash", (req, res) => {
@@ -128,6 +129,34 @@ var transactionRouter = (app, transactionDao, progressDao, txHistoryDao, config)
       })
       .catch(err => {
         console.log('Error - Push total number of transaction', err);
+      });
+  })
+
+  router.get("/transactions/blockRange", (req, res) => {
+    let { blockStart, blockEnd } = req.query;
+    blockStart = Number(blockStart);
+    blockEnd = Number(blockEnd);
+    if (blockEnd - blockStart >= RANGE_LIMIT) {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    blockDao.getBlocksByRangeAsync(blockStart, blockEnd)
+      .then(infoList => {
+        let txIds = [];
+        infoList.forEach(info => {
+          txIds = txIds.concat(info.txs.map(tx => tx.hash));
+        })
+        return transactionDao.getTransactionsByPkAsync(txIds)
+      })
+      .then(txList => {
+        var data = ({
+          type: 'transaction_list',
+          body: { data: txList }
+        });
+        res.status(200).send(data);
+      })
+      .catch(err => {
+        console.log('Error - Get transactions by block range:', err);
       });
   })
   //the / route of router will get mapped to /api
