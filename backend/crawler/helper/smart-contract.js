@@ -1,7 +1,11 @@
 var get = require('lodash/get');
+var map = require('lodash/map');
+var BigNumber = require('bignumber.js');
 var { ZeroAddress, ZeroTxAddress } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
+var Theta = require('../libs/Theta');
+var ThetaJS = require('../libs/thetajs.esm');
 var smartContractApi = require('../api/smart-contract-api');
 
 exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSummaryDao) {
@@ -10,7 +14,8 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
     return;
   }
 
-  const abi = await smartContractDao.getAbiAsync(contractAddress);
+  const abiRes = await smartContractDao.getAbiAsync(contractAddress);
+  const abi = get(abiRes[0], 'abi');
   if (!abi) {
     return;
   }
@@ -33,7 +38,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   const tokenArr = [];
   if (arr.length === 0) return;
   let tokenName = "";
-  logs.forEach(async (log, i) => {
+  for (let [i, log] of logs.entries()) {
     const tokenId = get(log, 'decode.result.tokenId');
     const eventName = get(log, 'decode.eventName');
     if (tokenId === undefined && eventName !== 'Transfer') {
@@ -49,7 +54,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
       tokenId: get(log, 'decode.result.tokenId'),
       value: get(log, 'decode.result.value'),
     })
-  })
+  }
 
   const insertList = [];
   const type = isTnt20 ? 'TNT-20' : 'TNT-721';
@@ -200,7 +205,6 @@ async function _getTNT20Name(log, abi) {
     });
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let url = abiCoder.decode(outputTypes, outputValues)[0];
-    console.log('url:', url);
     return url;
   } catch (e) {
     console.log('error occurs:', e.message);
@@ -294,14 +298,13 @@ async function updateTokenSummary(address, tokenArr, tokenName, type, abi, token
       //fetch max total supply
       tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi)
     }
-    console.log(tokenInfo)
   } catch (e) {
     console.log('error:', e);
   }
   let holders = tokenInfo.holders;
   tokenArr.forEach(token => {
-    let from = token.from;
-    let to = token.to;
+    let from = token.from.toLowerCase();
+    let to = token.to.toLowerCase();
     const key = token.tokenId != null ? address + token.tokenId : address;
     let value = token.value || 1;
     if (from !== ZeroAddress) {
@@ -368,7 +371,6 @@ async function getMaxTotalSupply(address, abi) {
     });
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let max = abiCoder.decode(outputTypes, outputValues)[0];
-    console.log('max:', max);
     return max.toString();
   } catch (e) {
     console.log('error occurs:', e.message);

@@ -305,8 +305,8 @@ async function updateTokenSummary(address, tokenArr, tokenName, type, abi, token
   }
   let holders = tokenInfo.holders;
   tokenArr.forEach(token => {
-    let from = token.from;
-    let to = token.to;
+    let from = token.from.toLowerCase();
+    let to = token.to.toLowerCase();
     const key = token.tokenId != null ? address + token.tokenId : address;
     let value = token.value || 1;
     if (from !== ZeroAddress) {
