@@ -1,15 +1,14 @@
 var BigNumber = require('bignumber.js');
 var ThetaJS = require('./thetajs.esm');
+var _chainId = "testnet";
 
 class Theta {
 
-  static _chainId = "testnet";
-
   static set chainId(chainId) {
-    this._chainId = chainId;
+    _chainId = chainId;
   }
   static get chainId() {
-    return this._chainId;
+    return _chainId;
   }
 
   static getTransactionFee() {
