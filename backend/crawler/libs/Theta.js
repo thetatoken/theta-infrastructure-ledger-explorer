@@ -1,13 +1,16 @@
 var BigNumber = require('bignumber.js');
 var ThetaJS = require('./thetajs.esm');
-// import Config from '../config';
-const _chainId = "testnet";  // TODOs: read chainId from config file
 
 class Theta {
-  // static _chainId = Config.defaultThetaChainID; 
+
+  static _chainId = "testnet";
+
+  static set chainId(chainId) {
+    this._chainId = chainId;
+  }
 
   static get chainId() {
-    return _chainId;
+    return this._chainId;
   }
 
   static getTransactionFee() {

@@ -25,6 +25,8 @@ var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
 var tokenDaoLib = require('../mongo-db/token-dao.js')
 var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
 
+var Theta = require('./libs/Theta');
+
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
 var accountRouter = require("./routes/accountRouter");
@@ -85,6 +87,8 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
+  Theta.chainId = config.defaultThetaChainID;
+  console.log('Theta.chainId:', Theta.chainId);
 
   redisConfig = config.redis;
   if (redisConfig && redisConfig.enabled) {
