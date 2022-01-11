@@ -1,6 +1,6 @@
 var helper = require('./utils');
 var Logger = require('./logger');
-var { get } = require('lodash');
+var get = require('lodash/get');
 
 var stakesCache = {
   vcp: new Map(),

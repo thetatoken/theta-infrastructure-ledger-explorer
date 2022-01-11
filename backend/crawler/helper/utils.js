@@ -5,7 +5,7 @@ var { createIndex } = require('../../mongo-db/mongo-client.js');
 exports.sumCoin = function (weiAmountA, weiAmountB) {
     return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB))
 }
-exports.timeCoin = function(amountA, amountB) {
+exports.timeCoin = function (amountA, amountB) {
     return new BigNumber(amountA).times(amountB);
 }
 exports.createIndexes = async function () {
@@ -27,8 +27,8 @@ exports.createIndexes = async function () {
     await createIndexAsync('account', { "balance.tfuelwei": -1 })
 
     await createIndexAsync('stake', { type: 1 })
-    await createIndexAsync('stake', { type:1, holder:1 })
-    await createIndexAsync('stake', { type:1, source:1 })
+    await createIndexAsync('stake', { type: 1, holder: 1 })
+    await createIndexAsync('stake', { type: 1, source: 1 })
 
     await createIndexAsync('accounting', { addr: 1, date: 1 })
 
@@ -37,7 +37,19 @@ exports.createIndexes = async function () {
     await createIndexAsync('activeAct', { timestamp: -1 })
 
     await createIndexAsync('totalAct', { timestamp: -1 })
+
+    await createIndexAsync('token', { contract_address: 1, timestamp: -1 })
+    await createIndexAsync('token', { contract_address: 1, tokenId: 1, timestamp: -1 })
+    await createIndexAsync('token', { from: 1, type: 1, timestamp: -1 })
+    await createIndexAsync('token', { to: 1, type: 1, timestamp: -1 })
 }
+
 function _createIndex(collectionName, object, callback) {
     createIndex(collectionName, object, callback);
+}
+
+exports.getHex = function (str) {
+    const buffer = Buffer.from(str, 'base64');
+    const bufString = buffer.toString('hex');
+    return '0x' + bufString;
 }

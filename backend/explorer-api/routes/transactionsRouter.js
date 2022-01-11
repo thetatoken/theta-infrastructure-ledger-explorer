@@ -60,6 +60,7 @@ var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDa
           return transactionDao.getTransactionsByRangeAsync(min, max)
         } else {
           res.status(400).send('Wrong parameter.');
+          return;
         }
       })
       .then(transactionInfoList => {

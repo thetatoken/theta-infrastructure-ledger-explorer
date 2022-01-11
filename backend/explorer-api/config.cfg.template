@@ -37,5 +37,6 @@
         "password": "",
         "family": 4,
         "db": 0
-    }
+    },
+    "defaultThetaChainID": "testnet"
 }

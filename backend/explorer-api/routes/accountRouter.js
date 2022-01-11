@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 
-var accountRouter = (app, accountDao, progressDao, rpc, config) => {
+var accountRouter = (app, accountDao, tokenDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/account/:address", async (req, res) => {
@@ -160,6 +160,58 @@ var accountRouter = (app, accountDao, progressDao, rpc, config) => {
     } else {
       res.status(400).send('Wrong parameter.');
     }
+  });
+
+  router.get("/account/tokenTxNum/:address", (req, res) => {
+    let address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    const { type } = req.query;
+    tokenDao.getRecordsNumberByAccountAndTypeAsync(address, type)
+      .then(totalNumber => {
+        res.status(200).send({
+          type: "token_tx_number",
+          body: { total_number: totalNumber }
+        });
+      })
+  })
+
+  router.get("/account/tokenTx/:address", (req, res) => {
+    let address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    let totalPageNumber = 0;
+    let { type, pageNumber = 1, limit = 10 } = req.query;
+    tokenDao.getRecordsNumberByAccountAndTypeAsync(address, type)
+      .then(totalNumber => {
+        if (totalNumber === 0) {
+          res.status(400).send('No Related Record.');
+          return;
+        }
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+        totalPageNumber = Math.ceil(totalNumber / limit);
+        if (!isNaN(pageNumber) && !isNaN(limit) && pageNumber > 0 && pageNumber <= totalPageNumber && limit > 0 && limit < 101) {
+          return tokenDao.getInfoListByAccountAndTypeAsync(address, type, pageNumber - 1, limit)
+        } else {
+          res.status(400).send('Wrong parameter.');
+          return;
+        }
+      })
+      .then(info => {
+        if (!info) return;
+        const data = ({
+          "type": "token_txs",
+          body: info,
+          totalPageNumber,
+          currentPageNumber: pageNumber
+        })
+        res.status(200).send(data);
+      })
   });
   //the / route of router will get mapped to /api
   app.use('/api', router);

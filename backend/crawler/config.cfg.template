@@ -35,5 +35,6 @@
     "nodeCache": {
         "enabled": false
     },
-    "maxBlockPerCrawl": 2
+    "maxBlockPerCrawl": 2,
+    "defaultThetaChainID": "testnet"
 }

@@ -22,6 +22,10 @@ var activeAccountDaoLib = require('../mongo-db/active-account-dao.js')
 var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
 var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
+var tokenDaoLib = require('../mongo-db/token-dao.js')
+var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
+
+var Theta = require('./libs/Theta');
 
 var blocksRouter = require("./routes/blocksRouter");
 var transactionsRouter = require("./routes/transactionsRouter");
@@ -34,6 +38,7 @@ var supplyRouter = require("./routes/supplyRouter");
 var smartContractRouter = require("./routes/smartContractRouter");
 var activeActRouter = require("./routes/activeActRouter");
 var rewardDistributionRouter = require("./routes/rewardDistributionRouter");
+var tokenRouter = require("./routes/tokenRouter");
 var cors = require('cors');
 var io;
 //------------------------------------------------------------------------------
@@ -82,6 +87,8 @@ function main() {
   rpc.setConfig(config);
   bluebird.promisifyAll(rpc);
 
+  Theta.chainId = config.defaultThetaChainID;
+  console.log('Theta.chainId:', Theta.chainId);
 
   redisConfig = config.redis;
   if (redisConfig && redisConfig.enabled) {
@@ -140,6 +147,10 @@ function main() {
       bluebird.promisifyAll(dailyTfuelBurntDao);
       stakeHistoryDao = new stakeHistoryDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(stakeHistoryDao);
+      tokenDao = new tokenDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(tokenDao);
+      tokenSummaryDao = new tokenSummaryDaoLib(__dirname, mongoClient);
+      bluebird.promisifyAll(tokenSummaryDao);
       //
 
       app.use(compression());
@@ -196,7 +207,7 @@ function main() {
       // transactions router       
       transactionsRouter(app, transactionDao, blockDao, progressDao, txHistoryDao, config);
       // account router
-      accountRouter(app, accountDao, progressDao, rpc, config);
+      accountRouter(app, accountDao, tokenDao, rpc, config);
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
@@ -208,11 +219,13 @@ function main() {
       // accounting router
       accountingRouter(app, accountingDao)
       // smart contract router
-      smartContractRouter(app, smartContractDao)
+      smartContractRouter(app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao)
       // active account router
       activeActRouter(app, activeActDao);
       // reward distribution router
       rewardDistributionRouter(app, rewardDistributionDao);
+      // token router
+      tokenRouter(app, tokenDao, tokenSummaryDao);
       // keep push block data
       // pushTopBlocks();
     }

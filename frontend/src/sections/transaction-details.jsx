@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
-import merge from 'lodash/merge';
 import _truncate from 'lodash/truncate';
-import moment from 'moment';
 
-import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress } from 'common/constants';
 import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, checkTnt721, checkTnt20, getFunctionNameById } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -19,6 +17,7 @@ import DetailsRow from 'common/components/details-row';
 import JsonView from 'common/components/json-view';
 import BodyTag from 'common/components/body-tag';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Item from 'common/components/tnt721-item';
 
 import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
@@ -436,9 +435,15 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   const [hasItems, setHasItems] = useState(false);
   const [feeSplit, setFeeSplit] = useState(null);
 
+  const [isTnt721, setIsTnt721] = useState(false);
+  const [isTnt20, setIsTnt20] = useState(false);
+  const [tokens, setTokens] = useState([]);
   let { data, receipt } = transaction;
+  // getFunctionNameById(abi, getHex(data.data).slice(0, 9))
+
   let err = get(receipt, 'EvmErr');
-  let receiptAddress = err ? <span className="text-disabled">{get(receipt, 'ContractAddress')}</span> : <Address hash={get(receipt, 'ContractAddress')} />;
+  const contractAddress = get(receipt, 'ContractAddress');
+  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
   let logs = get(transaction, 'receipt.Logs');
   logs = JSON.parse(JSON.stringify(logs));
   logs = logs.map(obj => {
@@ -449,14 +454,24 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
   const logLength = (logs || []).length;
   useEffect(() => {
     if (!abi) return;
-    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    const arr = abi.filter(obj => (obj.name == "tokenURI" && obj.type === 'function')
+      || (obj.name === 'Transfer' && obj.type === 'event'));
+    const tokenArr = [];
     if (arr.length === 0) return;
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
-      if (tokenId === undefined) return;
-      if (!hasItems) setHasItems(true);
+      const eventName = get(log, 'decode.eventName');
+      if (tokenId === undefined && eventName !== 'Transfer') return;
+      tokenArr.push({
+        from: get(log, 'decode.result.from'),
+        to: get(log, 'decode.result.to'),
+        tokenId: get(log, 'decode.result.tokenId'),
+        value: get(log, 'decode.result.value')
+      })
+      setTokens(tokenArr);
     })
-  }, [logs, abi])
+  }, [logs, abi]);
+
   useEffect(() => {
     if (!abi) return;
     const arr = abi.filter(obj => obj.name == "FeeSplit" && obj.type === 'event');
@@ -468,9 +483,15 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       if (feeSplit === null) setFeeSplit(result);
     })
   }, [logs, abi])
+  
+  useEffect(() => {
+    setIsTnt721(checkTnt721(abi) && logs.length > 0);
+    setIsTnt20(checkTnt20(abi));
+  }, [transaction, abi])
+
   return (
     <>
-      {hasItems && <>
+      {isTnt721 && <>
         <div className="details-header item">
           <div className="txn-type smart-contract items">Items</div>
         </div>
@@ -493,6 +514,12 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
+              {isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
+                return <TransactionAction key={i} abi={abi} address={contractAddress} token={token} />
+              })} />}
+              {(isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
+                return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} log={logs[0]} />
+              })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
@@ -502,36 +529,101 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               </span>} /> : null}
               <DetailsRow label="Value" data={<SmartContractValue value={get(data, 'from.coins.tfuelwei')}
                 price={price} feeSplit={feeSplit} />} />
-              <DetailsRow label="Data" data={getHex(data.data)} />
+              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasDetails={isTnt721 || (isTnt20 && tokens.reduce((pre, t) => pre && (t.from !== ZeroAddress), true))} />} />
             </tbody>
           </table>
         </TabPanel>
         <TabPanel>
-          {logs.map((log, i) => <Log log={log} key={i} abi={abi} />)}
+          {logs.map((log, i) => <Log log={log} key={i} />)}
         </TabPanel>
       </Tabs>
     </>
   );
 }
 
-const Log = ({ log, abi }) => {
-  const [hasItem, setHasItem] = useState(false);
+const SmartContractData = React.memo(({ data, logs, hasDetails }) => {
+  const inputRef = useRef();
+  const defaultModel = hasDetails ? 'default' : 'original';
+  const [defaultStr, setDefaultStr] = useState('');
+  const [model, setModel] = useState(defaultModel)
+  const handleOnChange = e => setModel(e.target.value);
+
   useEffect(() => {
-    if (!abi) return;
-    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
-    if (arr.length === 0) return;
-    const tokenId = get(log, 'decode.result.tokenId');
-    if (tokenId === undefined) return;
-    if (!hasItem) setHasItem(true);
-  }, [log, abi])
+    setModel(hasDetails ? 'default' : 'original')
+  }, [hasDetails])
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    inputRef.current.value = model === 'original' ? data : defaultStr;
+    inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+  }, [model, inputRef.current])
+
+  useEffect(() => {
+    let defualtStrTmp = '';
+    for (let log of logs) {
+      if (typeof log.decode !== 'object') continue;
+      const evt = log.decode.event;
+      defualtStrTmp += `${evt.name}(${evt.inputs.map((input, i) => `${i !== 0 ? ' ' : ''}${input.type} ${input.name}`)})\n\n`
+      defualtStrTmp += `MethodID: ${data.slice(0, 9)}\n`;
+      for (let i = 0; i < ~~(data.length / 64); i++) {
+        defualtStrTmp += `[${i}] ${data.slice(i * 64 + 10, (i + 1) * 64 + 10)}\n`
+      }
+    }
+    setDefaultStr(defualtStrTmp);
+  }, [logs, data])
+
+  return <div className="sc-data">
+    {model === 'decode' ?
+      <SmartContractInputTable logs={logs} /> :
+      <textarea className="sc-data__textarea" defaultValue={data} ref={inputRef} readOnly></textarea>
+    }
+
+    <div>
+      <div className="sc-data__select">
+        <div className="sc-data__select--title">View Data As:</div>
+        <select value={model} onChange={handleOnChange}>
+          <option value='original'>Original</option>
+          <option value='default' disabled={!hasDetails}>Default View</option>
+          <option value='decode' disabled={!hasDetails}>Decode Data</option>
+        </select>
+      </div>
+    </div>
+  </div>
+})
+
+const SmartContractInputTable = ({ logs }) => {
+  return logs.map((log, i) => {
+    return <table key={i} className="sc-input-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        {log.decode.event.inputs.map((input, j) => {
+          return <tr key={j}>
+            <td>{j}</td>
+            <td>{input.name}</td>
+            <td>{input.type}</td>
+            <td>{input.type === 'address' ? <Address hash={log.decode.result[input.name]} /> : log.decode.result[input.name]}</td>
+          </tr>
+        })}
+      </tbody>
+    </table>
+  })
+}
+
+const Log = ({ log }) => {
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Address" data={<Address hash={get(log, 'address')} />} />
         <DetailsRow label="Name" data={typeof log.decode === 'object' ? <EventName event={log.decode.event} /> : log.decode} />
-        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} />} />
+        <DetailsRow label="Topics" data={<Topics topics={get(log, 'topics')} decode={log.decode} />} />
         <DetailsRow label="Data" data={<LogData data={get(log, 'data')} decode={log.decode} />} />
-        {/* {hasItem && <DetailsRow label="Item" data={<Item log={log} abi={abi} />} />} */}
       </tbody>
     </table>
   )
@@ -587,17 +679,40 @@ const EventName = ({ event }) => {
     </span>
   )
 }
-const Topics = ({ topics }) => {
+const Topics = ({ topics, decode }) => {
   return (
     <>
       {topics.map((topic, i) => {
-        return <p key={i}>{topic}</p>
+        return <Topic key={i} topic={topic} decode={decode} i={i} />
       })}
     </>
   )
 }
-const LogData = ({ data, decode }) => {
+
+const Topic = ({ topic, decode, i }) => {
+  const index = i - 1;
   const isDisabled = typeof decode !== 'object';
+  const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
+
+  const handleOnChange = e => setModel(e.target.value);
+
+  return <div className="sc-topic">
+    <div className="sc-topic__index">{i}</div>
+    {i !== 0 &&
+      <>
+        <select className="sc-topic__select" onChange={handleOnChange} value={model}>
+          <option value="decode" disabled={isDisabled}>Dec</option>
+          <option value="hex">Hex</option>
+        </select>
+        <div className="sc-topic__arrow"></div>
+      </>}
+    {model === 'hex' || i === 0 ?
+      topic : get(decode, `event.inputs.${index}.type`) === 'address' ?
+        <Address hash={get(decode, `result.${index}`)} /> : get(decode, `result.${index}`)}
+  </div>
+}
+const LogData = ({ data, decode }) => {
+  const isDisabled = typeof decode !== 'object' || data === '0x';
   const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
   const [decodeData, setDecodeData] = useState({});
   useEffect(() => {
@@ -610,12 +725,13 @@ const LogData = ({ data, decode }) => {
     setDecodeData(_data);
   }, [decode]);
   return (<div className="sc-log__data">
-    <div className="sc-log__data--buttons">
-      <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
-        onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
-      <div className={cx("sc-log__data--button", { active: model === 'hex' })}
-        onClick={() => setModel('hex')}>Hex</div>
-    </div>
+    {!isDisabled &&
+      <div className="sc-log__data--buttons">
+        <div className={cx("sc-log__data--button", { active: model === 'decode', disabled: isDisabled })}
+          onClick={() => isDisabled ? {} : setModel('decode')}> Dec</div>
+        <div className={cx("sc-log__data--button", { active: model === 'hex' })}
+          onClick={() => setModel('hex')}>Hex</div>
+      </div>}
     {model === 'hex' ? data : Object.keys(decodeData).map((k, i) => {
       return (<div key={i}>
         <span className="text-grey">{k}: </span>
@@ -624,6 +740,7 @@ const LogData = ({ data, decode }) => {
     })}
   </div>)
 }
+
 const Items = props => {
   const { logs, abi } = props;
   const [filteredLogs, setFiltedLogs] = useState([]);
@@ -642,13 +759,41 @@ const Items = props => {
   }, [logs])
 
   return <>
-    {filteredLogs.map((log, i) => <Item log={log} abi={abi} key={i} />)}
+    {filteredLogs.map((log, i) => {
+      const tokenId = get(log, 'decode.result.tokenId');
+      const address = get(log, 'address');
+      return <Item tokenId={tokenId} abi={abi} address={address} key={i} />
+    })}
   </>
 }
-const Item = props => {
-  const { log, abi } = props;
-  const [item, setItem] = useState();
+
+const TransactionAction = ({ token, abi, address }) => {
+  const isZeroFrom = ZeroAddress === token.from;
+  const truncate = isZeroFrom ? 0 : 15;
+  return <div className="transaction-action-row">
+    <div className="transaction-action-row__info">
+      {isZeroFrom ? <>
+        Mint&nbsp;&nbsp;
+      </> : <>
+        Trannsfer From
+        <Address hash={token.from} truncate={truncate} />
+      </>
+      }
+      To
+      <Address hash={token.to} truncate={truncate} />
+    </div>
+    <div className="transaction-action-row__token">
+      1 of TokenID[<Link className="token-link" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
+    </div>
+  </div>
+}
+
+const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
+  const truncate = 15;
+  const [name, setName] = useState('');
+  const [symbol, setSymbol] = useState('');
   useEffect(() => {
+    if (!isTnt721) return;
     const tokenId = get(log, 'decode.result.tokenId');
     if (tokenId === undefined) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
@@ -691,53 +836,94 @@ const Item = props => {
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
         let url = abiCoder.decode(outputTypes, outputValues)[0];
-        if (/^http:\/\/(.*)api.thetadrop.com.*\.json$/g.test(url) && typeof url === "string") {
+        if (/^http:\/\/(.*)api.thetadrop.com.*\.json(\?[-a-zA-Z0-9@:%._\\+~#&//=]*){0,1}$/g.test(url) && typeof url === "string") {
           url = url.replace("http://", "https://")
         }
         const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
-        if (isImage) {
-          setItem({ image: url });
-        } else {
+        if (!isImage) {
           fetch(url)
             .then(res => res.json())
             .then(data => {
-              setItem(data);
+              console.log('data:', data)
+              setName(get(data, 'name'))
             }).catch(e => {
               console.log('error occurs in fetch url:', e)
-              setItem('Error occurs')
+              setName('')
             })
         }
       }
       catch (e) {
         console.log('error occurs:', e);
-        setItem('Error occurs')
+        setName('')
       }
     }
     fetchUrl();
-  }, [log, abi])
+  }, [log, abi, isTnt721])
+  useEffect(() => {
+    if (!isTnt20) return;
+    let nameFunctionData, symbolFunctionData;
+    abi.forEach(obj => {
+      if (obj.name === 'name') nameFunctionData = obj;
+      else if (obj.name === 'symbol') symbolFunctionData = obj;
+    })
+    const inputValues = [];
+    fetchData(nameFunctionData, 'name');
+    fetchData(symbolFunctionData, 'symbol');
 
-  return typeof item === 'object' ? (
-    <div className="sc-item">
-      <div className="sc-item__column">
-        <img className="sc-item__image" src={item.image}></img>
-      </div>
-      <div className="sc-item__column">
-        {item.name && item.name.length > 0 &&
-          <>
-            <div className="sc-item__text">Name</div>
-            <div className="sc-item__text name">{item.name}</div>
-          </>}
-        {item.description && item.description.length > 0 &&
-          <>
-            <div className="sc-item__text">Description</div>
-            <div className="sc-item__text">{item.description}</div>
-          </>
-        }
-      </div>
-    </div>
-  ) : <div className="sc-item text-danger">{item}</div>
+    async function fetchData(functionData, key) {
+      const iface = new ethers.utils.Interface(abi || []);
+      const senderSequence = 1;
+      const functionInputs = get(functionData, ['inputs'], []);
+      const functionOutputs = get(functionData, ['outputs'], []);
+      const functionSignature = iface.getSighash(functionData.name)
+
+      const inputTypes = map(functionInputs, ({ name, type }) => {
+        return type;
+      });
+      try {
+        var abiCoder = new ethers.utils.AbiCoder();
+        var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+        const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+        const gasLimit = 2000000;
+        const data = functionSignature + encodedParameters;
+        const tx = Theta.unsignedSmartContractTx({
+          from: address,
+          to: address,
+          data: data,
+          value: 0,
+          transactionFee: gasPrice,
+          gasLimit: gasLimit
+        }, senderSequence);
+        const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponseJSON = await callResponse.json();
+        const result = get(callResponseJSON, 'result');
+        let outputValues = get(result, 'vm_return');
+        const outputTypes = map(functionOutputs, ({ name, type }) => {
+          return type;
+        });
+        outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+        let res = abiCoder.decode(outputTypes, outputValues)[0];
+        if (key === 'name') setName(res);
+        if (key === 'symbol') setSymbol(res);
+      } catch (e) {
+        console.log('error occurs:', e);
+      }
+    }
+  }, [isTnt20, abi])
+  return <div className="token-transaffered-row">
+    <b>From:</b>
+    <Address hash={token.from} truncate={truncate} />
+    <b>To:</b>
+    <Address hash={token.to} truncate={truncate} />
+    <b>For</b>
+    {isTnt721 && <span className="text-container">
+      TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
+      <Link className="token-link" to={`/token/${address}`}>{name}</Link>
+    </span>}
+    {isTnt20 && <span className="text-container">{formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name}(${symbol})`}</Link></span>}
+  </div>
 }
-
 const ReturnTime = props => {
   const { returnTime } = props;
   const [str, setStr] = useState('')

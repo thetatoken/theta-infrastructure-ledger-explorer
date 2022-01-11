@@ -112,3 +112,54 @@ export function decodeLogs(logs, abi) {
     }
   })
 }
+
+export function checkTnt721(abi) {
+  const obj = {
+    'balanceOf': { contains: false, type: 'function' },
+    'ownerOf': { contains: false, type: 'function' },
+    'safeTransferFrom': { contains: false, type: 'function' },
+    'transferFrom': { contains: false, type: 'function' },
+    'approve': { contains: false, type: 'function' },
+    'setApprovalForAll': { contains: false, type: 'function' },
+    'getApproved': { contains: false, type: 'function' },
+    'isApprovedForAll': { contains: false, type: 'function' },
+    'Transfer': { contains: false, type: 'event' },
+    'Approval': { contains: false, type: 'event' },
+    'ApprovalForAll': { contains: false, type: 'event' },
+  }
+
+  return _check(obj, abi);
+}
+
+export function checkTnt20(abi) {
+  const obj = {
+    'name': { contains: false, type: 'function' },
+    'symbol': { contains: false, type: 'function' },
+    'decimals': { contains: false, type: 'function' },
+    'totalSupply': { contains: false, type: 'function' },
+    'balanceOf': { contains: false, type: 'function' },
+    'transfer': { contains: false, type: 'function' },
+    'transferFrom': { contains: false, type: 'function' },
+    'approve': { contains: false, type: 'function' },
+    'allowance': { contains: false, type: 'function' },
+    'Transfer': { contains: false, type: 'event' },
+    'Approval': { contains: false, type: 'event' },
+  }
+
+  return _check(obj, abi);
+}
+
+function _check(obj, abi) {
+  abi.forEach(o => {
+    if (obj[o.name] !== undefined) {
+      if (obj[o.name].type === o.type) {
+        obj[o.name].contains = true
+      }
+    }
+  })
+  let res = true;
+  for (let key in obj) {
+    res = res && obj[key].contains
+  }
+  return res;
+}

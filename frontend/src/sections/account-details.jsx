@@ -1,10 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
 import map from 'lodash/map';
-import compact from 'lodash/compact';
-// import 
 import cx from 'classnames';
 
 import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
@@ -13,6 +11,7 @@ import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { priceService } from 'common/services/price';
+import { tokenService } from "../common/services/token";
 import { rewardDistributionService } from 'common/services/rewardDistribution';
 import TransactionTable from "common/components/transactions-table";
 import Pagination from "common/components/pagination";
@@ -21,7 +20,9 @@ import DetailsRow from 'common/components/details-row';
 import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 import SmartContract from 'common/components/smart-contract';
+import TokenTxsTable from "common/components/token-txs-table";
 
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
 
 const NUM_TRANSACTIONS = 20;
@@ -50,7 +51,10 @@ export default class AccountDetails extends React.Component {
       selectedTypes: TypeOptions.filter(obj => obj.value !== '5'),
       typeOptions: null,
       rewardSplit: 0,
-      beneficiary: ""
+      beneficiary: "",
+      tabIndex: 0,
+      hasTNT721: false,
+      hasTNT20: false
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -183,6 +187,23 @@ export default class AccountDetails extends React.Component {
       });
   }
 
+  getTokenTransactionsNumber(address) {
+    const tokenList = ["TNT-721", "TNT-20"];
+    const { hasTNT20, hasTNT721 } = this.state;
+    for (let name of tokenList) {
+      tokenService.getTokenTxsNumByAccountAndType(address, name)
+        .then(res => {
+          const num = get(res, 'data.body.total_number');
+          if (num > 0) {
+            if (name === 'TNT-721' && !hasTNT721) {
+              this.setState({ hasTNT721: true });
+            } else if (name === 'TNT-20' && !hasTNT20) {
+              this.setState({ hasTNT20: true });
+            }
+          }
+        })
+    }
+  }
   getOneAccountByAddress(address) {
     if (!address) {
       return;
@@ -215,6 +236,7 @@ export default class AccountDetails extends React.Component {
         });
         let types = this.state.selectedTypes.map(o => o.value);
         this.getTransactionsByAddress(address, types, 1);
+        this.getTokenTransactionsNumber(address);
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -321,11 +343,14 @@ export default class AccountDetails extends React.Component {
     this.getTransactionsByAddress(accountAddress, types, 1);
     this.setState({ hasRefreshBtn: false });
   }
+  setTabIndex = index => {
+    this.setState({ tabIndex: index })
+  }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns,
       includeService, hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
-      hasRefreshBtn, typeOptions, rewardSplit, beneficiary } = this.state;
+      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721 } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -362,74 +387,94 @@ export default class AccountDetails extends React.Component {
             {tfuelHolderTxs.length > 0 && <StakeTxsTable type='holder' stakeCoinType='tfuel' txs={tfuelHolderTxs} price={price} />}
           </div>
         }
-        {!transactions && loading_txns &&
-          <LoadingPanel />}
-        {transactions && transactions.length > 0 &&
-          <React.Fragment>
-            <div className="actions">
-              {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
-                <React.Fragment>
-                  <div className="popup-row header">Choose the time period. Must within 7 days.</div>
-                  <div className="popup-row">
-                    <div className="popup-label">Start Date:</div>
-                    <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
-                  </div>
-                  <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
-                  <div className="popup-row">
-                    <div className="popup-label">End Date: </div>
-                    <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
-                  </div>
-                  <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
-                  <div className="popup-row buttons">
-                    <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
-                    <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
-                    <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
-                  </div>
-                </React.Fragment>
-              </Popup>}
-              <a ref={this.download}></a>
-              <div className="title">Transactions</div>
-              {hasOtherTxs &&
-                <div className="filter">
-                  {hasRefreshBtn && <span className="refresh" onClick={this.handleTxsRefresh}>&#x21bb;</span>}
-                  Display
-                  <Multiselect
-                    options={typeOptions || TypeOptions} // Options to display in the dropdown
-                    displayValue="label" // Property name to display in the dropdown options
-                    style={{
-                      multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
-                      searchBox: { maxHeight: '35px', overflow: 'hidden', padding: 0 },
-                      optionContainer: { background: '#1b1f2a' },
-                      inputField: { margin: 0, height: '100%', width: '100%' },
-                      chips: { display: 'none' }
-                    }}
-                    onSelect={this.handleSelect}
-                    onRemove={this.handleSelect}
-                    closeOnSelect={false}
-                    showCheckbox={true}
-                    avoidHighlightFirstOption={true}
-                    placeholder={`${this.state.selectedTypes.length} selected types`}
-                    selectedValues={this.state.selectedTypes}
-                  />
-                  Txs
-                </div>
-              }
+        <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
+          <TabList>
+            <Tab>Transactions</Tab>
+            {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
+              <Tab>Contract</Tab>
+            }
+            {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
+            {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
+          </TabList>
+          <TabPanel>
+            {!transactions && loading_txns &&
+              <LoadingPanel />}
+            {transactions && transactions.length > 0 &&
+              <>
+                <div className="actions">
+                  {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
+                    <>
+                      <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                      <div className="popup-row">
+                        <div className="popup-label">Start Date:</div>
+                        <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
+                      </div>
+                      <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
+                      <div className="popup-row">
+                        <div className="popup-label">End Date: </div>
+                        <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
+                      </div>
+                      <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
+                      <div className="popup-row buttons">
+                        <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
+                        <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
+                        <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
+                      </div>
+                    </>
+                  </Popup>}
+                  <a ref={this.download}></a>
+                  {hasOtherTxs &&
+                    <div className="filter">
+                      {hasRefreshBtn && <span className="refresh" onClick={this.handleTxsRefresh}>&#x21bb;</span>}
+                      Display
+                      <Multiselect
+                        options={typeOptions || TypeOptions} // Options to display in the dropdown
+                        displayValue="label" // Property name to display in the dropdown options
+                        style={{
+                          multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
+                          searchBox: { maxHeight: '35px', overflow: 'hidden', padding: 0 },
+                          optionContainer: { background: '#1b1f2a' },
+                          inputField: { margin: 0, height: '100%', width: '100%' },
+                          chips: { display: 'none' }
+                        }}
+                        onSelect={this.handleSelect}
+                        onRemove={this.handleSelect}
+                        closeOnSelect={false}
+                        showCheckbox={true}
+                        avoidHighlightFirstOption={true}
+                        placeholder={`${this.state.selectedTypes.length} selected types`}
+                        selectedValues={this.state.selectedTypes}
+                      />
+                      Txs
+                    </div>
+                  }
 
-            </div>
-            <div>
-              {loading_txns &&
-                <LoadingPanel className="fill" />}
-              <TransactionTable transactions={transactions} account={account} price={price} />
-            </div>
-            <Pagination
-              size={'lg'}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={this.handlePageChange}
-              disabled={loading_txns} />
-          </React.Fragment>}
-        {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
-          <SmartContract address={account.address} />}
+                </div>
+                <div>
+                  {loading_txns &&
+                    <LoadingPanel className="fill" />}
+                  <TransactionTable transactions={transactions} account={account} price={price} />
+                </div>
+                <Pagination
+                  size={'lg'}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={this.handlePageChange}
+                  disabled={loading_txns} />
+              </>}
+          </TabPanel>
+          {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
+            <TabPanel>
+              <SmartContract address={account.address} />
+            </TabPanel>
+          }
+          {hasTNT20 && <TabPanel>
+            <TokenTab type="TNT-20" address={account.address} />
+          </TabPanel>}
+          {hasTNT721 && <TabPanel>
+            <TokenTab type="TNT-721" address={account.address} />
+          </TabPanel>}
+        </Tabs>
       </div>);
   }
 }
@@ -448,11 +493,49 @@ const Address = ({ hash }) => {
   return (<Link to={`/account/${hash}`}>{hash}</Link>)
 }
 
-const HashList = ({ hashes }) => {
-  return (
-    <React.Fragment>
-      {map(compact(hashes), (hash, i) => <div key={i}><Link key={hash} to={`/txs/${hash.toLowerCase()}`}>{hash.toLowerCase()}</Link></div>)}
-    </React.Fragment>
-  )
+const TokenTab = props => {
+  const { type, address } = props;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingTxns, setLoadingTxns] = useState(true);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    fetchTokenTransactions(address, type, currentPage);
+  }, [type, address])
+
+  const handlePageChange = pageNumber => {
+    console.log('handle')
+    fetchTokenTransactions(address, type, pageNumber);
+  }
+
+  const fetchTokenTransactions = (address, type, page) => {
+    tokenService.getTokenTxsByAccountAndType(address, type, page, NUM_TRANSACTIONS)
+      .then(res => {
+        let txs = res.data.body;
+        txs = txs.sort((a, b) => b.timestamp - a.timestamp);
+        setTransactions(txs);
+        setTotalPages(res.data.totalPageNumber);
+        setCurrentPage(res.data.currentPageNumber);
+        setLoadingTxns(false);
+      })
+      .catch(e => {
+        setLoadingTxns(false);
+      })
+  }
+
+  return <>
+    <div>
+      {loadingTxns &&
+        <LoadingPanel className="fill" />}
+      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} />}
+    </div>
+    <Pagination
+      size={'lg'}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      onPageChange={handlePageChange}
+      disabled={loadingTxns} />
+  </>
 }
 

@@ -1,4 +1,6 @@
 .theta-tabs {
+  width: 100%;
+  
   .react-tabs{
     &__tab{
       border-bottom: 1px solid transparent;
@@ -33,6 +35,11 @@
       .abi-area{
         height: 100px;
       }
+    }
+  }
+  .read-contract{
+    &__wrapper{
+      margin-left: 0;
     }
   }
 }

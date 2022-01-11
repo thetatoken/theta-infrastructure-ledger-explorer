@@ -4,13 +4,30 @@ import map from 'lodash/map';
 import merge from 'lodash/merge';
 import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
+import { smartContractService } from 'common/services/smartContract';
 import Theta from '../../libs/Theta';
 import ThetaJS from '../../libs/thetajs.esm'
 
 export default function ReadContract(props) {
-  const { abi, address } = props;
+  const { address } = props;
+  const [abi, setAbi] = useState(props.abi);
+  useEffect(() => {
+    if (abi != null) return;
+    // fetch abi if needed
+    smartContractService.getAbiByAddress(address.toLowerCase())
+      .then(result => {
+        if (result.data.type === 'smart_contract_abi') {
+          setAbi(result.data.body.abi.filter(isReadFunction))
+        }
+      })
+  }, [abi, address])
+  const isReadFunction = (functionData) => {
+    const constant = get(functionData, ['constant'], null);
+    const stateMutability = get(functionData, ['stateMutability'], null);
+    return (stateMutability === "view" || stateMutability === "pure" || constant === true);
+  }
   return (<div>
-    {abi.map((data, i) => {
+    {abi && abi.map((data, i) => {
       return (<FunctionUnit key={i} functionData={data} index={i + 1} address={address} abi={abi}>{JSON.stringify(data)}</FunctionUnit>)
     })}
   </div>)
@@ -66,7 +83,7 @@ const FunctionUnit = (props) => {
     }
     catch (e) {
       console.log('error occurs:', e)
-      //Stop loading and put the error message in the vm_error like it came fromm the blockchain.
+      //Stop loading and put the error message in the vm_error like it came from the blockchain.
       setCallResult({ vm_error: e.message })
     }
   }

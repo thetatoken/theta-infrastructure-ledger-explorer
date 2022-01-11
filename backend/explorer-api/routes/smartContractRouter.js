@@ -3,9 +3,10 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
+var { updateTokenHistoryByTx } = require('../helper/smart-contract');
 
-var smartContractRouter = (app, smartContractDao) => {
-  router.use(bodyParser.json({limit: '1mb'}));
+var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao) => {
+  router.use(bodyParser.json({ limit: '1mb' }));
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to verify the source and bytecode
@@ -23,6 +24,7 @@ var smartContractRouter = (app, smartContractDao) => {
       if (result.data.result.verified === true) {
         let newSc = { ...result.data.smart_contract, bytecode: byteCode }
         await smartContractDao.upsertSmartContractAsync(newSc);
+        updateTokenHistoryByTx(newSc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
       }
       const data = {
         result: result.data.result,
@@ -64,6 +66,40 @@ var smartContractRouter = (app, smartContractDao) => {
       });
   });
 
+  // The api to update smart contract tx history by address
+  router.get("/smartContract/updateHistory/:address", async (req, res) => {
+    let address = helper.normalize(req.params.address.toLowerCase());
+    console.log('Updating smart contract tx history for address:', address);
+    const info = await tokenSummaryDao.getInfoByAddressAsync(address);
+    if (info) {
+      res.status(200).send({
+        type: 'smart_contract_update_history',
+        body: "done",
+      });
+      return;
+    }
+    smartContractDao.getSmartContractByAddressAsync(address)
+      .then(async info => {
+        await updateTokenHistoryByTx(info, transactionDao, accountTxDao, tokenDao, tokenSummaryDao);
+        const data = ({
+          type: 'smart_contract_update_history',
+          body: "done",
+        });
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
+  });
+
   // The api to smart contract info by address
   router.get("/smartContract/:address", (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
@@ -88,7 +124,6 @@ var smartContractRouter = (app, smartContractDao) => {
         }
       });
   });
-
 
 
   //the / route of router will get mapped to /api

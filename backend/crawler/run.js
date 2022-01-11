@@ -20,6 +20,10 @@ var dailyAccountDaoLib = require('../mongo-db/daily-account-dao.js')
 var rewardDistributionDaoLib = require('../mongo-db/reward-distribution-dao.js')
 var dailyTfuelBurntDaoLib = require('../mongo-db/daily-tfuel-burnt-dao')
 var stakeHistoryDaoLib = require('../mongo-db/stake-history-dao.js')
+var tokenDaoLib = require('../mongo-db/token-dao.js')
+var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
+
+var Theta = require('./libs/Theta');
 
 var Redis = require("ioredis");
 var redis = null;
@@ -66,6 +70,10 @@ function main() {
   }
   const networkId = config.blockchain.networkId;
   rpc.setConfig(config);
+  
+  Theta.chainId = config.defaultThetaChainID;
+  Logger.log('Theta.chainId:', Theta.chainId);
+
   bluebird.promisifyAll(rpc);
 
   redisConfig = config.redis;
@@ -185,14 +193,21 @@ function setupGetBlockCronJob(mongoClient, networkId) {
   stakeHistoryDao = new stakeHistoryDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(stakeHistoryDao);
 
+  tokenDao = new tokenDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(tokenDao);
+
+  tokenSummaryDao = new tokenSummaryDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(tokenSummaryDao);
+
   readPreFeeCronJob.Initialize(progressDao, blockDao, transactionDao);
   let readPreFeeTimer;
   readPreFeeTimer = setInterval(async function () {
     await readPreFeeCronJob.Execute(networkId, readPreFeeTimer);
   }, 1000);
 
-  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao, checkpointDao,
-    smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, cacheEnabled, config.maxBlockPerCrawl);
+  readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao,
+    checkpointDao, smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, tokenDao,
+    tokenSummaryDao, cacheEnabled, config.maxBlockPerCrawl);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(networkId);
     setTimeout(run, 1000);
