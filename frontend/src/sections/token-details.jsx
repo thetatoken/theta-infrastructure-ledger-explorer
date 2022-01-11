@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
+import { validateHex } from 'common/helpers/utils';
 import { tokenService } from 'common/services/token';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
@@ -29,6 +30,10 @@ const TokenDetails = ({ match, location }) => {
 
   useEffect(() => {
     const { contractAddress } = match.params;
+    if (!validateHex(contractAddress, 40)) {
+      setErrorType("invalid_address");
+      return;
+    }
     const search = location.search; // could be '?foo=bar'
     const params = new URLSearchParams(search);
     const tId = params.get('a');
@@ -48,6 +53,10 @@ const TokenDetails = ({ match, location }) => {
     function fetchInfo() {
       tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
+          if (res.data.type === "error_not_found") {
+            setErrorType("error_not_found");
+            return;
+          }
           setTokenInfo(res.data.body);
         })
         .catch(console.log)
@@ -79,6 +88,9 @@ const TokenDetails = ({ match, location }) => {
   function fetchHolders(address, tokenId) {
     tokenService.getHoldersByAccountAndTokenId(address, tokenId)
       .then(res => {
+        if (res.data.type === "error_not_found") {
+          return;
+        }
         let h = get(res, 'data.body.holders').sort((a, b) => b.value - a.value);
         setHolders(h)
       })
@@ -88,8 +100,9 @@ const TokenDetails = ({ match, location }) => {
     <div className="content token">
       <div className="page-title account">Token Detail</div>
       {errorType === 'invalid_address' &&
-        // <NotExist msg="Note: An account will not be created until the first time it receives some tokens." />
         <NotExist msg="Note: Invalid address." />}
+      {errorType === "error_not_found" &&
+        <NotExist />}
       {tokenInfo && !errorType &&
         <>
           <table className="details token-info">
