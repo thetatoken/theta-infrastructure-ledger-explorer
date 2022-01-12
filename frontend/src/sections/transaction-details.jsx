@@ -470,7 +470,9 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       })
       setTokens(tokenArr);
     })
-  }, [logs, abi]);
+    setIsTnt721(checkTnt721(abi) && logs.length > 0);
+    setIsTnt20(checkTnt20(abi));
+  }, [transaction, abi])
 
   useEffect(() => {
     if (!abi) return;
@@ -483,11 +485,6 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       if (feeSplit === null) setFeeSplit(result);
     })
   }, [logs, abi])
-  
-  useEffect(() => {
-    setIsTnt721(checkTnt721(abi) && logs.length > 0);
-    setIsTnt20(checkTnt20(abi));
-  }, [transaction, abi])
 
   return (
     <>
@@ -514,10 +511,10 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-              {isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
+              {tokens.length > 0 && isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
                 return <TransactionAction key={i} abi={abi} address={contractAddress} token={token} />
               })} />}
-              {(isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
+              {tokens.length > 0 && (isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
                 return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} log={logs[0]} />
               })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
