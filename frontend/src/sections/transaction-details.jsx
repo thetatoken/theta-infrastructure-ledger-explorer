@@ -511,12 +511,13 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-              {tokens.length > 0 && isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
+              {/* Note: Disabled token feature */}
+              {/* {tokens.length > 0 && isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
                 return <TransactionAction key={i} abi={abi} address={contractAddress} token={token} />
               })} />}
               {tokens.length > 0 && (isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
                 return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} log={logs[0]} />
-              })} />}
+              })} />} */}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
