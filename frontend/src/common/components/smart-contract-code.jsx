@@ -50,7 +50,7 @@ const CodeUploader = props => {
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
-  const optimizerRunRef = useRef(null);
+  const optimizerRunsRef = useRef(null);
   const abiRef = useRef(null);
   useEffect(() => {
     if (sourceCodeRef.current) {
@@ -70,8 +70,8 @@ const CodeUploader = props => {
     const versionFullname = window.soljsonReleases[version]
     const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
-    const optimizerRun = optimizerRunRef.current.value;
-    console.log('optimizerRun:', optimizerRun);
+    const optimizerRuns = optimizerRunsRef.current.value;
+    console.log('optimizerRuns:', optimizerRuns);
     const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
     setUploaderAbi(abi);
@@ -91,8 +91,8 @@ const CodeUploader = props => {
     }
     setIsVerifying(true);
 
-    return;
-    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer)
+    // return;
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
@@ -179,7 +179,7 @@ const CodeUploader = props => {
               </div>
               Runs (Optimizer)
               <div className="setting-section__tooltip">
-                <input type="number" defaultValue={200} placeholder={200} ref={optimizerRunRef} />
+                <input type="number" defaultValue={200} placeholder={200} ref={optimizerRunsRef} />
                 <div className="setting-section__tooltip--text">
                   Do not change if you are unsure. Previous versions of truffle defaulted to a value of 0
                 </div>

@@ -13,7 +13,9 @@ var smartContractRouter = (app) => {
   // The api to verify the source and bytecode
   router.post("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, byteCode, abi, version, versionFullName, optimizer } = req.body;
+    let { sourceCode, byteCode, abi, version, versionFullName, optimizer, optimizerRuns = 200 } = req.body;
+    optimizerRuns = +optimizerRuns;
+    if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     try {
       console.log('Verifing the source code and bytecode for address:', address);
       let start = +new Date();
@@ -21,7 +23,8 @@ var smartContractRouter = (app) => {
         language: 'Solidity',
         settings: {
           optimizer: {
-            enabled: optimizer === '1'
+            enabled: optimizer === '1',
+            runs: optimizerRuns
           },
           outputSelection: {
             '*': {
@@ -95,6 +98,7 @@ var smartContractRouter = (app) => {
                 'verification_date': +new Date(),
                 'compiler_version': breifVersion,
                 'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
+                'optimizerRuns': optimizerRuns,
                 'name': contractName,
                 'function_hash': output.contracts['test.sol'][contractName].evm.methodIdentifiers,
                 'constructor_arguments': constructor_arguments
