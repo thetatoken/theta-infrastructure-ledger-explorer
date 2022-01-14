@@ -671,9 +671,9 @@ const EventName = ({ event }) => {
           {input.indexed ? `indexed_topic_${++index} ` : ''}
           <span className="text-green">{`${input.type} `}</span>
           <span className="text-danger">{`${input.name}`}</span>
-          {i === event.inputs.length - 1 ? ')' : ', '}
+          {i === event.inputs.length - 1 ? '' : ', '}
         </span>)
-      })}
+      })})
     </span>
   )
 }
