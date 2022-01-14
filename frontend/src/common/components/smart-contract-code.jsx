@@ -3,6 +3,7 @@ import get from 'lodash/get';
 
 import LoadingPanel from 'common/components/loading-panel';
 import AceEditor from 'common/components/ace-editor';
+import { Accordion, AccordionHeader } from 'common/components/accordion';
 import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
 
@@ -49,6 +50,7 @@ const CodeUploader = props => {
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
+  const optimizerRunRef = useRef(null);
   const abiRef = useRef(null);
   useEffect(() => {
     if (sourceCodeRef.current) {
@@ -68,6 +70,8 @@ const CodeUploader = props => {
     const versionFullname = window.soljsonReleases[version]
     const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
+    const optimizerRun = optimizerRunRef.current.value;
+    console.log('optimizerRun:', optimizerRun);
     const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
     setUploaderAbi(abi);
@@ -87,6 +91,7 @@ const CodeUploader = props => {
     }
     setIsVerifying(true);
 
+    return;
     smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer)
       .then(res => {
         setIsVerifying(false);
@@ -133,8 +138,8 @@ const CodeUploader = props => {
                 Select the option you used when compiling this contract.
               </div>
             </div>
-              Optimization
-            </label>
+            Optimization
+          </label>
           <div className="select__selector optimizer">
             <select ref={optimizerRef} defaultValue={0}>
               <option value={1}>Yes</option>
@@ -149,8 +154,59 @@ const CodeUploader = props => {
         <span className="text-danger">{isCodeEmpty ? 'source code is reqired. ' : ''}Only Single File Supported</span>
       </label>
       <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
-      <label>Constructor Arguments ABI-encoded (for contracts that were created with constructor parameters)</label>
-      <textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />
+      <Accordion
+        header={<AccordionHeader
+          title="Constructor Arguments ABI-encoded"
+          subTitle="(for contracts that were created with constructor parameters)"
+        />}
+        body={<textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />} />
+      <Accordion
+        header={<AccordionHeader
+          title="Misc Settings"
+          subTitle="(Runs & EvmVerion Settings)"
+        />}
+        body={<>
+          <div className="setting-section">
+            <label>
+              <div className="setting-section__tooltip question-mark">?
+                <div className="setting-section__tooltip--text">
+                  <p>
+                    (Applicable when Optimization = Yes) <br />
+                    Optimize for how many times you intend to run the code.Lower values will optimize more for initial deployment cost,
+                    higher values will optimize more for high-frequency usage.
+                  </p>
+                </div>
+              </div>
+              Runs (Optimizer)
+              <div className="setting-section__tooltip">
+                <input type="number" defaultValue={200} placeholder={200} ref={optimizerRunRef} />
+                <div className="setting-section__tooltip--text">
+                  Do not change if you are unsure. Previous versions of truffle defaulted to a value of 0
+                </div>
+              </div>
+            </label>
+          </div>
+          <div className="setting-section">
+            <label>
+              <div className="setting-section__tooltip question-mark">?
+                <div className="setting-section__tooltip--text">
+                  When you compile your contract code you can specify the Ethereum virtual machine version to
+                  compile for to avoid particular features or behaviours.
+                </div>
+              </div>
+              EVM Version to target
+              <div className="setting-section__tooltip">
+                <select defaultValue='default' disabled>
+                  <option value='default'>default (complier defaults)</option>
+                </select>
+                <div className="setting-section__tooltip--text">
+                  A list of target EVM versions and the compiler-relevant changes introduced at each version.
+                  Backward compatibility is not guaranteed between each version.
+                </div>
+              </div>
+            </label>
+          </div>
+        </>} />
       {errMsg.length ? <div className='code-error-text text-danger'>Validation failed with an error: {errMsg}</div> : null}
       <div className="code-buttons">
         <div onClick={submit}>Verify and Publish</div>
@@ -158,6 +214,29 @@ const CodeUploader = props => {
       </div>
     </>
   )
+}
+
+const SettingSection = props => {
+  return <div className="setting-section">
+    <label>
+      <div className="setting-section__tooltip question-mark">?
+        <div className="setting-section__tooltip--text">
+          <p>
+            (Applicable when Optimization = Yes) <br />
+            Optimize for how many times you intend to run the code.Lower values will optimize more for initial deployment cost,
+            higher values will optimize more for high-frequency usage.
+          </p>
+        </div>
+      </div>
+      Runs (Optimizer)
+      <div className="setting-section__tooltip">
+        <input type="number" />
+        <div className="setting-section__tooltip--text">
+          Do not change if you are unsure. Previous versions of truffle defaulted to a value of 0
+        </div>
+      </div>
+    </label>
+  </div>
 }
 const CodeViewer = props => {
   const { contract } = props;

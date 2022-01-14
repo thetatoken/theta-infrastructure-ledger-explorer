@@ -1,0 +1,49 @@
+.accordion {
+  background-color: $color-black;
+  box-shadow: 0 4px 8px 0 rgba($color-line, 0.2), 0 6px 20px 0 rgba($color-line, 0.19);
+  margin-bottom: 20px;
+  // box-shadow: 0 0.5rem 1.2rem rgb(189 197 209 / 20%);
+  // background-clip: border-box;
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 5px 5px 0 0;
+    border: 1px solid $color-line;
+    cursor: pointer;
+    &:hover {
+      background-color: $color-panel;
+    }
+    & label {
+      cursor: pointer;
+      & > span {
+        margin-left: 5px;
+        color: $color-font-light;
+      }
+    }
+    &--arrow {
+      color: $color-white;
+      transition: 0.2s ease-in-out;
+      &.downwards {
+        transform: rotate(90deg);
+      }
+      &::before {
+        content: '\21E8';
+        font-size: 1rem;
+      }
+    }
+  }
+  &__body {
+    border-radius: 0 0 5px 5px;
+    border: 1px solid $color-line;
+    margin-top: -1px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    &--inner {
+      width: 100%;
+      padding: 12px;
+      display: flex;
+    }
+  }
+}

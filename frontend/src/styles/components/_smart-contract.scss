@@ -46,9 +46,10 @@
   &__tooltip{
     $self: &;
     margin: 0 5px;
-    color: $color-font-light;
+    z-index: 100;
     &.question-mark{
       display: inline-block;
+      color: $color-font-light;
       border: 1px solid $color-font-light;
       border-radius: 50%;
       width: 0.875rem;
@@ -62,11 +63,13 @@
       visibility: hidden;
       position: absolute;
       z-index: 1;
-      background: $color-panel;
+      background: $color-font-light;
       border-radius: 6px;
-      padding: 15px 0 20px 15px;
+      padding: 8px 0 5px 10px;
       text-align: left;
-      line-height: 25px;
+      line-height: 15px;
+      color: $color-white;
+      font-size: 12px;
 
       bottom: calc(100% + 10px);
       left: 50%;
@@ -78,7 +81,7 @@
         top: 100%;
         left: 50%;
         margin-left: -5px;
-        border-color: $color-panel transparent transparent transparent;
+        border-color: $color-font-light transparent transparent transparent;
         border-width: 5px;
       }
     }
@@ -182,5 +185,61 @@
   &__block{
     margin: 10px 0;
     width: 100%;
+  }
+}
+.setting-section {
+  width: 33.3%;
+  & label {
+    & input, select {
+      width: 100%;
+      margin-top: 5px;
+    }
+  }
+  &__tooltip{
+    $self: &;
+    margin: 0 5px;
+    z-index: 100;
+    &.question-mark{
+      display: inline-block;
+      border: 1px solid $color-font-light;
+      color: $color-font-light;
+      border-radius: 50%;
+      width: 0.875rem;
+      height: 0.875rem;
+      text-align: center;
+      line-height: 0.875rem;
+      font-size: 0.875rem;
+    }
+    &--text{
+      width: 250px;
+      visibility: hidden;
+      position: absolute;
+      color: $color-white;
+      z-index: 1;
+      background: $color-font-light;
+      border: 1px solid $color-font-light;
+      border-radius: 6px;
+      padding: 8px 0 5px 10px;
+      font-size: 12px;
+      text-align: left;
+      line-height: 15px;
+
+      bottom: calc(100% + 10px);
+      left: 50%;
+      margin-left: -125px;
+      &:after{
+        content: '';
+        position: absolute;
+        border-style: solid;
+        top: 100%;
+        left: 50%;
+        margin-left: -10px;
+        border-color: $color-font-light transparent transparent transparent;
+        border-width: 10px;
+      }
+    }
+    &:hover #{ $self }--text{
+        visibility: visible;
+    }
   }
 }

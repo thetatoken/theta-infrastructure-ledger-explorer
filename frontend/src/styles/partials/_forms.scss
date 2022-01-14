@@ -19,7 +19,7 @@ textarea {
 }
 
 select {
-  padding: 5px 10px;
+  padding: .5rem;
 
   font-size: .75rem;
   line-height: .875rem;
@@ -35,6 +35,13 @@ select {
   -moz-appearance: none;
   &:focus {
     outline: 0;
+  }
+  &[disabled] {
+    background-color: rgba($color-input-background, .20);
+    cursor: not-allowed;
+  }
+  &::placeholder {
+      color: $color-input-placeholder;
   }
 }
 
