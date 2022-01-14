@@ -262,7 +262,12 @@ const CodeViewer = props => {
             <div className="contract-info__raws">
               <div className="contract-info__cell">
                 <div>Optimization Enabled:</div>
-                <div><b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with <b>200</b> runs</div>
+                <div>
+                  <b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with
+                  <b>
+                    {contract.optimizer === 'enabled' ? contract.optimizerRuns ? ' '+ contract.optimizerRuns : ' 200' : ' 0'}
+                  </b> runs
+                </div>
               </div>
               <div className="contract-info__cell">
                 <div>Other Settings:</div>
