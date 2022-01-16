@@ -513,7 +513,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiM
           <div className="txn-type smart-contract items">Items</div>
         </div>
         <div className="details txn-details item">
-          <Items abi={abi} logs={logs} />
+          <Items abiMap={abiMap} logs={logs} />
         </div>
       </>}
       <div className="details-header">
@@ -763,7 +763,7 @@ const LogData = ({ data, decode }) => {
 }
 
 const Items = props => {
-  const { logs, abi } = props;
+  const { logs, abiMap } = props;
   const [filteredLogs, setFiltedLogs] = useState([]);
   useEffect(() => {
     let ids = new Set();
@@ -783,7 +783,7 @@ const Items = props => {
     {filteredLogs.map((log, i) => {
       const tokenId = get(log, 'decode.result.tokenId');
       const address = get(log, 'address');
-      return <Item tokenId={tokenId} abi={abi} address={address} key={i} />
+      return <Item tokenId={tokenId} abi={abiMap ? abiMap[`${address}`] : []} address={address} key={i} />
     })}
   </>
 }
