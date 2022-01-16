@@ -96,7 +96,7 @@ export default class TransactionExplorer extends React.Component {
                 try {
                   for (let address of addressList) {
                     let res = await smartContractService.getAbiByAddress(address.toLowerCase());
-                    abiMap[`${address}`] = get(res, 'data.body.abi');
+                    abiMap[`${address}`] = get(res, 'data.body.abi') || [];
                   }
                 } catch (e) {
                   console.log(e);
@@ -445,6 +445,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiM
   const [tabIndex, setTabIndex] = useState(0);
   const [feeSplit, setFeeSplit] = useState(null);
 
+  const [hasItem, setHasItem] = useState(false);
   const [hasTnt721Transfer, setHasTnt721Transfer] = useState(false);
   const [hasTnt20Transfer, setHasTnt20Transfer] = useState(false);
   const [tokens, setTokens] = useState([]);
@@ -468,10 +469,11 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiM
 
   useEffect(() => {
     const tokenArr = [];
+    const addressSet = new Set();
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
       const eventName = get(log, 'decode.eventName');
-      if (tokenId === undefined && eventName !== 'Transfer') return;
+      if (eventName !== 'Transfer') return;
       const value = get(log, 'decode.result.value');
       const type = value === undefined && tokenId !== undefined ? "TNT-721" :
         value !== undefined && tokenId === undefined ? "TNT-20" : "";
@@ -489,9 +491,10 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiM
         type,
         contractAddress: get(log, 'address')
       })
+      addressSet.add(get(log, 'address'));
     })
     setTokens(tokenArr);
-  }, [transaction, logs])
+  }, [logs])
 
   useEffect(() => {
     if (!abiMap) return;
@@ -506,9 +509,29 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiM
     })
   }, [logs, abiMap])
 
+  useEffect(() => {
+    if (!abiMap || hasItem || logs.length === 0) return;
+    const set = new Set();
+    Object.keys(abiMap).forEach(key => {
+      const abi = abiMap[`${key}`];
+      const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+      if (arr.length > 0) {
+        set.add(key)
+      }
+    })
+    if (set.size === 0) return;
+    for (let log of logs) {
+      const address = get(log, 'address');
+      if (!set.has(address)) continue;
+      const eventName = get(log, 'decode.eventName');
+      if (eventName !== 'Transfer') continue;
+      setHasItem(true);
+      break;
+    }
+  }, [logs, abiMap])
   return (
     <>
-      {hasTnt721Transfer && <>
+      {hasItem && <>
         <div className="details-header item">
           <div className="txn-type smart-contract items">Items</div>
         </div>
@@ -778,7 +801,6 @@ const Items = props => {
     })
     setFiltedLogs(tmpLogs);
   }, [logs])
-
   return <>
     {filteredLogs.map((log, i) => {
       const tokenId = get(log, 'decode.result.tokenId');
