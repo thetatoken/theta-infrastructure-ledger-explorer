@@ -77,9 +77,14 @@ export function validateHex(hash, limit) {
   return reg.test(hash);
 }
 
-export function decodeLogs(logs, abi) {
-  const iface = new ethers.utils.Interface(abi || []);
+export function decodeLogs(logs, abiMap) {
+  let ifaceMap = {};
+  if (abiMap !== null) {
+    Object.keys(abiMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(abiMap[k]))
+  }
   return logs.map(log => {
+    const iface = abiMap === null ? new ethers.utils.Interface([]) : ifaceMap[`${log.address}`];
+    const abi = abiMap === null ? [] : abiMap[`${log.address}`];
     try {
       let event = null;
       for (let i = 0; i < abi.length; i++) {

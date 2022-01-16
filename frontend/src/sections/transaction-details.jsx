@@ -34,7 +34,7 @@ export default class TransactionExplorer extends React.Component {
       errorType: null,
       showRaw: false,
       price: { 'Theta': 0, 'TFuel': 0 },
-      abi: []
+      abiMap: null
     };
   }
   componentDidUpdate(preProps) {
@@ -81,7 +81,7 @@ export default class TransactionExplorer extends React.Component {
   getOneTransactionByUuid(hash) {
     if (hash) {
       transactionsService.getOneTransactionByUuid(hash.toLowerCase())
-        .then(res => {
+        .then(async res => {
           switch (res.data.type) {
             case 'transaction':
               this.setState({
@@ -91,13 +91,24 @@ export default class TransactionExplorer extends React.Component {
               })
               const type = get(res, 'data.body.type');
               if (type === TxnTypes.SMART_CONTRACT) {
-                const address = get(res, 'data.body.receipt.ContractAddress');
-                smartContractService.getAbiByAddress(address.toLowerCase())
-                  .then(result => {
-                    if (result.data.type === 'smart_contract_abi') {
-                      this.setState({ abi: result.data.body.abi })
-                    }
-                  })
+                const addressList = _getAbiAddressList(res.data.body);
+                const abiMap = {};
+                try {
+                  for (let address of addressList) {
+                    let res = await smartContractService.getAbiByAddress(address.toLowerCase());
+                    abiMap[`${address}`] = get(res, 'data.body.abi');
+                  }
+                } catch (e) {
+                  console.log(e);
+                }
+                this.setState({ abiMap })
+                // const address = get(res, 'data.body.receipt.ContractAddress');
+                // smartContractService.getAbiByAddress(address.toLowerCase())
+                //   .then(result => {
+                //     if (result.data.type === 'smart_contract_abi') {
+                //       this.setState({ abi: result.data.body.abi })
+                //     }
+                //   })
               }
               break;
             case 'error_not_found':
@@ -120,7 +131,7 @@ export default class TransactionExplorer extends React.Component {
     this.setState({ showRaw: !this.state.showRaw });
   }
   render() {
-    const { transaction, errorType, showRaw, price, abi } = this.state;
+    const { transaction, errorType, showRaw, price, abiMap } = this.state;
     return (
       <div className="content transaction-details">
         <div className="page-title transactions">Transaction Detail</div>
@@ -186,7 +197,7 @@ export default class TransactionExplorer extends React.Component {
               <SplitContract transaction={transaction} price={price} />}
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
-              <SmartContract transaction={transaction} price={price} abi={abi}
+              <SmartContract transaction={transaction} price={price} abi={[]} abiMap={abiMap}
                 handleToggleDetailsClick={this.handleToggleDetailsClick} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
@@ -206,7 +217,7 @@ export default class TransactionExplorer extends React.Component {
                 json={transaction}
                 onClose={this.handleToggleDetailsClick}
                 className="tx-raw"
-                abi={abi} />}
+                abiMap={abiMap} />}
           </React.Fragment>}
       </div>);
   }
@@ -430,52 +441,61 @@ const StakeRewardDistribution = ({ transaction, price }) => {
       </tbody>
     </table>);
 }
-const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) => {
+const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price, abiMap }) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [hasItems, setHasItems] = useState(false);
   const [feeSplit, setFeeSplit] = useState(null);
 
-  const [isTnt721, setIsTnt721] = useState(false);
-  const [isTnt20, setIsTnt20] = useState(false);
+  const [hasTnt721Transfer, setHasTnt721Transfer] = useState(false);
+  const [hasTnt20Transfer, setHasTnt20Transfer] = useState(false);
   const [tokens, setTokens] = useState([]);
+  const [logs, setLogs] = useState([]);
   let { data, receipt } = transaction;
   // getFunctionNameById(abi, getHex(data.data).slice(0, 9))
 
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
   let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
-  let logs = get(transaction, 'receipt.Logs');
-  logs = JSON.parse(JSON.stringify(logs));
-  logs = logs.map(obj => {
-    obj.data = getHex(obj.data)
-    return obj;
-  })
-  logs = decodeLogs(logs, abi);
-  const logLength = (logs || []).length;
   useEffect(() => {
-    if (!abi) return;
-    const arr = abi.filter(obj => (obj.name == "tokenURI" && obj.type === 'function')
-      || (obj.name === 'Transfer' && obj.type === 'event'));
+    let logs = get(transaction, 'receipt.Logs');
+    logs = JSON.parse(JSON.stringify(logs));
+    logs = logs.map(obj => {
+      obj.data = getHex(obj.data)
+      return obj;
+    })
+    logs = decodeLogs(logs, abiMap);
+    setLogs(logs);
+  }, [abiMap])
+
+  useEffect(() => {
     const tokenArr = [];
-    if (arr.length === 0) return;
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
       const eventName = get(log, 'decode.eventName');
       if (tokenId === undefined && eventName !== 'Transfer') return;
+      const value = get(log, 'decode.result.value');
+      const type = value === undefined && tokenId !== undefined ? "TNT-721" :
+        value !== undefined && tokenId === undefined ? "TNT-20" : "";
+      if (type === "TNT-721" && !hasTnt721Transfer) {
+        setHasTnt721Transfer(true);
+      }
+      if (type === "TNT-20" && !hasTnt20Transfer) {
+        setHasTnt20Transfer(true);
+      }
       tokenArr.push({
         from: get(log, 'decode.result.from'),
         to: get(log, 'decode.result.to'),
-        tokenId: get(log, 'decode.result.tokenId'),
-        value: get(log, 'decode.result.value')
+        tokenId,
+        value,
+        type,
+        contractAddress: get(log, 'address')
       })
-      setTokens(tokenArr);
     })
-    setIsTnt721(checkTnt721(abi) && logs.length > 0);
-    setIsTnt20(checkTnt20(abi));
-  }, [transaction, abi])
+    setTokens(tokenArr);
+  }, [transaction, logs])
 
   useEffect(() => {
-    if (!abi) return;
+    if (!abiMap) return;
+    const abi = abiMap[`${get(transaction, 'receipt.ContractAddress')}`]
     const arr = abi.filter(obj => obj.name == "FeeSplit" && obj.type === 'event');
     if (arr.length === 0) return;
     logs.forEach(log => {
@@ -484,11 +504,11 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       const result = get(log, 'decode.result');
       if (feeSplit === null) setFeeSplit(result);
     })
-  }, [logs, abi])
+  }, [logs, abiMap])
 
   return (
     <>
-      {isTnt721 && <>
+      {hasTnt721Transfer && <>
         <div className="details-header item">
           <div className="txn-type smart-contract items">Items</div>
         </div>
@@ -503,7 +523,7 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
       <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
         <TabList>
           <Tab>Overview</Tab>
-          <Tab disabled={logLength == 0} >{`Logs(${logLength})`}</Tab>
+          <Tab disabled={logs.length == 0} >{`Logs(${logs.length})`}</Tab>
         </TabList>
         <TabPanel>
           <table className="details txn-details">
@@ -511,13 +531,12 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
               <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
-              {/* Note: Disabled token feature */}
-              {/* {tokens.length > 0 && isTnt721 && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
-                return <TransactionAction key={i} abi={abi} address={contractAddress} token={token} />
+              {hasTnt721Transfer && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
+                return <TransactionAction key={i} abi={abiMap ? abiMap[`${token.contractAddress}`] : []} token={token} />
               })} />}
-              {tokens.length > 0 && (isTnt721 || isTnt20) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
-                return <TokenTransferred token={token} isTnt20={isTnt20} isTnt721={isTnt721} key={i} abi={abi} address={contractAddress} log={logs[0]} />
-              })} />} */}
+              {(hasTnt20Transfer || hasTnt721Transfer) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
+                return <TokenTransferred token={token} key={i} abi={abiMap ? abiMap[`${token.contractAddress}`] : []} />
+              })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
               <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
@@ -527,7 +546,11 @@ const SmartContract = ({ transaction, abi, handleToggleDetailsClick, price }) =>
               </span>} /> : null}
               <DetailsRow label="Value" data={<SmartContractValue value={get(data, 'from.coins.tfuelwei')}
                 price={price} feeSplit={feeSplit} />} />
-              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs} hasDetails={isTnt721 || (isTnt20 && tokens.reduce((pre, t) => pre && (t.from !== ZeroAddress), true))} />} />
+              <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs}
+                hasDetails={false}
+              // hasDetails={hasTnt721Transfer ||
+              //   (hasTnt20Transfer && tokens.filter(t => t.type === 'TNT-20').reduce((pre, t) => pre && (t.from !== ZeroAddress), true))}
+              />} />
             </tbody>
           </table>
         </TabPanel>
@@ -765,10 +788,11 @@ const Items = props => {
   </>
 }
 
-const TransactionAction = ({ token, abi, address }) => {
+const TransactionAction = ({ token, abi }) => {
   const isZeroFrom = ZeroAddress === token.from;
+  const address = token.contractAddress;
   const truncate = isZeroFrom ? 0 : 15;
-  return <div className="transaction-action-row">
+  return token.type === "TNT-721" && <div className="transaction-action-row">
     <div className="transaction-action-row__info">
       {isZeroFrom ? <>
         Mint&nbsp;&nbsp;
@@ -786,18 +810,20 @@ const TransactionAction = ({ token, abi, address }) => {
   </div>
 }
 
-const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
+const TokenTransferred = ({ token, abi }) => {
   const truncate = 15;
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
+  const isTnt20 = token.type === "TNT-20";
+  const isTnt721 = token.type === "TNT-721";
+  const address = get(token, 'contractAddress');
   useEffect(() => {
     if (!isTnt721) return;
-    const tokenId = get(log, 'decode.result.tokenId');
+    const tokenId = get(token, "tokenId");
     if (tokenId === undefined) return;
     const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
     if (arr.length === 0) return;
     const functionData = arr[0];
-    const address = get(log, 'address');
     const inputValues = [tokenId]
 
     async function fetchUrl() {
@@ -842,7 +868,7 @@ const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
           fetch(url)
             .then(res => res.json())
             .then(data => {
-              console.log('data:', data)
+              // console.log('data:', data)
               setName(get(data, 'name'))
             }).catch(e => {
               console.log('error occurs in fetch url:', e)
@@ -856,7 +882,7 @@ const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
       }
     }
     fetchUrl();
-  }, [log, abi, isTnt721])
+  }, [abi, isTnt721])
   useEffect(() => {
     if (!isTnt20) return;
     let nameFunctionData, symbolFunctionData;
@@ -865,8 +891,8 @@ const TokenTransferred = ({ token, isTnt20, isTnt721, abi, address, log }) => {
       else if (obj.name === 'symbol') symbolFunctionData = obj;
     })
     const inputValues = [];
-    fetchData(nameFunctionData, 'name');
-    fetchData(symbolFunctionData, 'symbol');
+    if (nameFunctionData) fetchData(nameFunctionData, 'name');
+    if (symbolFunctionData) fetchData(symbolFunctionData, 'symbol');
 
     async function fetchData(functionData, key) {
       const iface = new ethers.utils.Interface(abi || []);
@@ -935,4 +961,12 @@ const ReturnTime = props => {
     setStr('In ' + dayStr + hourStr + minStr)
   }, [returnTime]);
   return <div className="text-grey">{str}</div>
+}
+
+function _getAbiAddressList(transaction) {
+  const abiMap = {};
+  let logs = get(transaction, 'receipt.Logs');
+  let abiSet = new Set();
+  logs.forEach(log => abiSet.add(log.address));
+  return [...abiSet];
 }

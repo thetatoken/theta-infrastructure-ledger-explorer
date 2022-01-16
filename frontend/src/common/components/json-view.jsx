@@ -6,7 +6,7 @@ import { TxnTypes } from 'common/constants';
 import get from 'lodash/get';
 import has from 'lodash/has';
 
-export default function JsonView({ json, onClose, className, abi }) {
+export default function JsonView({ json, onClose, className, abiMap }) {
   let jsonTmp = JSON.parse(JSON.stringify(json));
   if (get(jsonTmp, 'type') === TxnTypes.SMART_CONTRACT) {
     if (has(jsonTmp, 'data.data')) jsonTmp.data.data = getHex(jsonTmp.data.data);
@@ -23,7 +23,7 @@ export default function JsonView({ json, onClose, className, abi }) {
         return obj;
       })
     }
-    jsonTmp.receipt.Logs = decodeLogs(jsonTmp.receipt.Logs, abi);
+    jsonTmp.receipt.Logs = decodeLogs(jsonTmp.receipt.Logs, abiMap);
   }
 
   return (
