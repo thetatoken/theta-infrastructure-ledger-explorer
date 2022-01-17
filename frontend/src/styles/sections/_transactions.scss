@@ -272,6 +272,7 @@
 .token-transaffered-row {
   color: $color-font-light;
   display: flex;
+  flex-wrap: wrap;
   & a{
     margin: 0 10px;
   }
