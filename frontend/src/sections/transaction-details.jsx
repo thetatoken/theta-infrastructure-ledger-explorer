@@ -495,9 +495,9 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     if (abiMap) fetchTokenInfoMap();
 
     async function fetchTokenInfoMap() {
-      try {
-        const map = {};
-        for (let address of Object.keys(addressMap)) {
+      const map = {};
+      for (let address of Object.keys(addressMap)) {
+        try {
           const abi = abiMap ? abiMap[`${address}`] : [];
           if (abi.length === 0) continue;
           if (addressMap[`${address}`].type === 'TNT-20') {
@@ -533,11 +533,12 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
               map[`${address}`] = data;
             }
           }
+        } catch (e) {
+          console.log('Error in fetchTokenInfoMap:', e.message);
         }
-        setTokenInfoMap(map);
-      } catch (e) {
-        console.log('Error in fetchTokenInfoMap:', e.message);
       }
+      setTokenInfoMap(map);
+
     }
     async function fetchData(functionData, inputValues, abi, address) {
       const iface = new ethers.utils.Interface(abi || []);
@@ -583,7 +584,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   // handle state feeSplit
   useEffect(() => {
     if (!abiMap) return;
-    const abi = abiMap[`${get(transaction, 'receipt.ContractAddress')}`]
+    const abi = abiMap[`${get(transaction, 'receipt.ContractAddress')}`] || [];
     const arr = abi.filter(obj => obj.name == "FeeSplit" && obj.type === 'event');
     if (arr.length === 0) return;
     logs.forEach(log => {
@@ -599,7 +600,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     if (!abiMap || hasItem || logs.length === 0) return;
     const set = new Set();
     Object.keys(abiMap).forEach(key => {
-      const abi = abiMap[`${key}`];
+      const abi = abiMap[`${key}`] || [];
       const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
       if (arr.length > 0) {
         set.add(key)
@@ -618,14 +619,15 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
 
   return (
     <>
-      {hasItem && <>
+      {/* {hasItem && abiMap && <>
         <div className="details-header item">
           <div className="txn-type smart-contract items">Items</div>
         </div>
         <div className="details txn-details item">
           <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} />
         </div>
-      </>}
+      </>} */}
+      <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} hasItem={hasItem} />
       <div className="details-header">
         <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
         <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
@@ -879,8 +881,9 @@ const LogData = ({ data, decode }) => {
 }
 
 const Items = props => {
-  const { logs, abiMap, tokenInfoMap } = props;
+  const { logs, abiMap, tokenInfoMap, hasItem } = props;
   const [filteredLogs, setFiltedLogs] = useState([]);
+  const [isHidden, setIsHidden] = useState(true);
   useEffect(() => {
     let ids = new Set();
     let tmpLogs = [];
@@ -890,22 +893,37 @@ const Items = props => {
       if (!ids.has(tokenId)) {
         ids.add(tokenId);
         tmpLogs.push(log);
+        if (tokenInfoMap) {
+          const address = get(log, 'address');
+          const info = tokenInfoMap[`${address}`];
+          if (info !== undefined && hasItem && isHidden) {
+            setIsHidden(false);
+          }
+        }
       }
     })
     setFiltedLogs(tmpLogs);
-  }, [logs])
-  return <>
-    {filteredLogs.map((log, i) => {
-      const tokenId = get(log, 'decode.result.tokenId');
-      const address = get(log, 'address');
-      return <Item
-        tokenId={tokenId}
-        address={address}
-        abi={abiMap ? abiMap[`${address}`] : []}
-        item={tokenInfoMap ? tokenInfoMap[`${address}`] : {}}
-        key={i}
-      />
-    })}
+  }, [logs, tokenInfoMap])
+  return hasItem && !isHidden && <>
+    <div className="details-header item">
+      <div className="txn-type smart-contract items">Items</div>
+    </div>
+    <div className="details txn-details item">
+      {
+        filteredLogs.map((log, i) => {
+          const tokenId = get(log, 'decode.result.tokenId');
+          const address = get(log, 'address');
+          return <Item
+            tokenId={tokenId}
+            address={address}
+            abi={abiMap ? abiMap[`${address}`] : []}
+            item={tokenInfoMap ? tokenInfoMap[`${address}`] : {}}
+            key={i}
+          />
+        })
+      }
+    </div>
+
   </>
 }
 
