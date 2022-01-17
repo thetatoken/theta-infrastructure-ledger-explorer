@@ -491,8 +491,6 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
         addressMap[`${get(log, 'address')}`] = { type, tokenId };
       }
     })
-    console.log('addressMap:', addressMap)
-    console.log('tokenArr:', tokenArr)
     setTokens(tokenArr);
     if (abiMap) fetchTokenInfoMap();
 
@@ -618,7 +616,6 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     }
   }, [logs, abiMap])
 
-  console.log('tokenInfoMap:', tokenInfoMap)
   return (
     <>
       {hasItem && <>
