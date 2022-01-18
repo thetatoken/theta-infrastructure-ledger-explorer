@@ -2,8 +2,11 @@
 //  DAO for token
 //  Require index: `db.token.createIndex({contract_address:1, timestamp:-1})`
 //  Require index: `db.token.createIndex({contract_address:1, tokenId:1, timestamp:-1})`
+//  Require index: `db.token.createIndex({contract_address:1, type:1})`
 //  Require index: `db.token.createIndex({from:1, type:1, timestamp:-1})`
 //  Require index: `db.token.createIndex({to:1, type:1, timestamp:-1})`
+//  Require index: `db.token.createIndex({from:1, type:1})`
+//  Require index: `db.token.createIndex({to:1, type:1})`
 //------------------------------------------------------------------------------
 
 module.exports = class TotalAccountDAO {
@@ -17,6 +20,11 @@ module.exports = class TotalAccountDAO {
     this.client.insert(this.collection, data, callback);
   }
 
+  upsert(id, updateObj, callback) {
+    const queryObject = { _id: id };
+    this.client.upsert(this.collection, queryObject, updateObj, callback);
+  }
+
   checkToken(id, callback) {
     const queryObject = { '_id': id };
     return this.client.exist(this.collection, queryObject, function (err, res) {
@@ -26,6 +34,12 @@ module.exports = class TotalAccountDAO {
       }
       callback(err, res);
     });
+  }
+
+  getInfoListByAddressAndType(address, type, callback) {
+    const queryObject = { contract_address: address, type: type };
+    const sortObject = {};
+    this.client.getRecords(this.collection, queryObject, sortObject, 0, 0, callback);
   }
 
   getInfoListByAddressAndTokenId(address, tokenId, page = 0, limit = 0, callback) {

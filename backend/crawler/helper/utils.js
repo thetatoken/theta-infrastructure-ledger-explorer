@@ -40,8 +40,16 @@ exports.createIndexes = async function () {
 
     await createIndexAsync('token', { contract_address: 1, timestamp: -1 })
     await createIndexAsync('token', { contract_address: 1, tokenId: 1, timestamp: -1 })
+    await createIndexAsync('token', { contract_address: 1, type: 1 })
     await createIndexAsync('token', { from: 1, type: 1, timestamp: -1 })
     await createIndexAsync('token', { to: 1, type: 1, timestamp: -1 })
+    await createIndexAsync('token', { from: 1, type: 1 })
+    await createIndexAsync('token', { to: 1, type: 1 })
+
+    await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1 })
+    await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1, holder: 1 })
+    await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1, amount: 1 })
+    await createIndexAsync('tokenHolder', { contract_address: 1, holder: 1 })
 }
 
 function _createIndex(collectionName, object, callback) {
