@@ -976,8 +976,8 @@ const TokenTransferred = ({ token, info }) => {
     </span>}
     {isTnt20 && <span className="text-container">
       {/* Note: Disabled token feature */}
-      {/* {formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name}(${symbol})`}</Link> */}
-      {formatCoin(token.value)}<Link to="#">{`${name}(${symbol})`}</Link>
+      {/* {formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name} (${symbol})`}</Link> */}
+      {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link>
     </span>}
   </div>
 }
