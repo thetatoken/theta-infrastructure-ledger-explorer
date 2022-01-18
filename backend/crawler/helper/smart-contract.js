@@ -63,6 +63,7 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
   }
   console.log('tokenArr:', tokenArr);
   await updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
+  await updateTokenSummaryHolders(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
 
@@ -280,7 +281,23 @@ async function updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenH
     }
     updateAsyncList.push(tokenSummaryDao.upsertAsync({ ...tokenSummaryMap[`${address}`] }));
   }
-  return Promise.all(updateAsyncList);
+  await Promise.all(updateAsyncList);
+  const updateHoldersList = [];
+  // Update tokenSummary.total for TNT-721 tokens
+  for (let address of Object.keys(tokenSummaryMap)) {
+    if (tokenSummaryMap[`${address}`].type !== 'TNT-721') {
+      continue;
+    }
+    try {
+      const holderList = await tokenHolderDao.getHolderListAsync(address, null);
+      let holderSet = new Set(holderList.map(info => info.holder));
+      tokenSummaryMap[`${address}`].holders.total = holderSet.size;
+      updateHoldersList.push(tokenSummaryDao.upsertAsync({ ...tokenSummaryMap[`${address}`] }))
+    } catch (e) {
+      console.log('Error in update tokenSummary.total for TNT-721 tokens. Error:', e.message);
+    }
+  }
+  return Promise.all(updateHoldersList);
 }
 
 function _getContractAddressSet(tx) {
