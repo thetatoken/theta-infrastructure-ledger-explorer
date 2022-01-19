@@ -197,7 +197,17 @@ module.exports = class ProgressDAO {
       })
     }
   }
-
+  upsertTokenProgress(height, callback) {
+    const queryObject = { '_id': 'token_progress' };
+    const newObject = {
+      'block_height': height,
+    }
+    this.client.upsert(this.progressInfoCollection, queryObject, newObject, callback);
+  }
+  getTokenProgress(callback) {
+    const queryObject = { '_id': 'token_progress' };
+    this.client.findOne(this.progressInfoCollection, queryObject, callback);
+  }
   upsertFeeProgress(height, callback) {
     let self = this;
     const redis_key = 'progress_fee_height';

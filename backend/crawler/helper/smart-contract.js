@@ -70,7 +70,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   return Promise.all(insertList);
 }
 
-function decodeLogs(logs, infoMap) {
+exports.decodeLogs = function (logs, infoMap) {
   let ifaceMap = {};
   Object.keys(infoMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(infoMap[k].abi))
   return logs.map(log => {
@@ -113,7 +113,7 @@ function decodeLogs(logs, infoMap) {
   })
 }
 
-function checkTnt721(abi) {
+exports.checkTnt721 = function (abi) {
   const obj = {
     'balanceOf': { contains: false, type: 'function' },
     'ownerOf': { contains: false, type: 'function' },
@@ -131,7 +131,7 @@ function checkTnt721(abi) {
   return _check(obj, abi);
 }
 
-function checkTnt20(abi) {
+exports.checkTnt20 = function (abi) {
   const obj = {
     'name': { contains: false, type: 'function' },
     'symbol': { contains: false, type: 'function' },
@@ -165,7 +165,7 @@ function _check(obj, abi) {
 }
 
 
-async function checkAndInsertToken(token, tokenDao) {
+exports.checkAndInsertToken = async function (token, tokenDao) {
   let hasToken = await tokenDao.checkTokenAsync(token._id)
   if (hasToken) return;
   await tokenDao.insertAsync(token);

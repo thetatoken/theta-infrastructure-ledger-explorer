@@ -18,5 +18,18 @@ exports.ZeroAddress = '0x0000000000000000000000000000000000000000';
 exports.ZeroTxAddress = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 exports.EventHashMap = {
-  TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+  TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+  TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457"
+}
+
+exports.CommonABI = {
+  "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457": [{
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: "address", name: "seller", type: "address" },
+    { indexed: false, internalType: "uint256", name: "sellerEarning", type: "uint256" },
+    { indexed: true, internalType: "address", name: "platformFeeRecipient", type: "address" },
+    { indexed: false, internalType: "uint256", name: "platformFee", type: "uint256" }],
+    name: "TFuelSplit",
+    type: "event"
+  }]
 }
