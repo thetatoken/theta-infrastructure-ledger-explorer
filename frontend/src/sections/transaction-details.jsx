@@ -945,9 +945,9 @@ const TransactionAction = ({ token, info }) => {
     </div>
     <div className="transaction-action-row__token">
       {/* Note: Disabled token feature */}
-      {/* 1 of TokenID[<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
-      <Link className="token-link" to={`/token/${address}`}>{info ? info.name : ""}</Link> */}
-      1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      1 of TokenID[<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
+      <Link className="token-link" to={`/token/${address}`}>{info ? info.name : ""}</Link>
+      {/* 1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>] */}
       <Link className="token-link" to="#">{info ? info.name : ""}</Link>
     </div>
   </div>
@@ -969,15 +969,15 @@ const TokenTransferred = ({ token, info }) => {
     <b>For</b>
     {isTnt721 && <span className="text-container">
       {/* Note: Disabled token feature */}
-      {/* TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
-      <Link className="token-link" to={`/token/${address}`}>{name}</Link> */}
-      TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
+      <Link className="token-link" to={`/token/${address}`}>{name}</Link>
+      {/* TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>] */}
       <Link className="token-link" to="#">{name}</Link>
     </span>}
     {isTnt20 && <span className="text-container">
       {/* Note: Disabled token feature */}
-      {/* {formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name} (${symbol})`}</Link> */}
-      {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link>
+      {formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name} (${symbol})`}</Link>
+      {/* {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link> */}
     </span>}
   </div>
 }

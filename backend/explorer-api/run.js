@@ -256,7 +256,7 @@ function pushTopBlocks() {
 
       var query_block_height_max = latest_block_height;
       var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 50 blocks initially
-      console.log('Querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
+      // console.log('Querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
       //return blockDao.getBlockAsync(123) 
       return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
     })
