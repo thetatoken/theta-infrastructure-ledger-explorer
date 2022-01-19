@@ -98,7 +98,7 @@ const TokenDetails = ({ match, location }) => {
         if (res.data.type === "error_not_found") {
           return;
         }
-        let h = get(res, 'data.body.holders').sort((a, b) => b.value - a.value);
+        let h = get(res, 'data.body.holders').sort((a, b) => b.amount - a.amount || a.address - b.address);
         setHolders(h)
       })
   }

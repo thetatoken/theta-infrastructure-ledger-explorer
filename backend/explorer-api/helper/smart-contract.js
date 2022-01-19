@@ -75,8 +75,7 @@ exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, 
         insertList.push(tokenDao.upsertAsync(id, newToken))
       }
     }
-    console.log('tokenArr:', tokenArr);
-    await updateTokenSummary_new(tokenArr, address, tokenName, tokenType, tokenSummaryDao, tokenHolderDao);
+    await updateTokenSummary_new(tokenArr, address, tokenName, tokenType, abi, tokenSummaryDao, tokenHolderDao);
     return Promise.all(insertList);
   } catch (e) {
     console.log('Something wrong happened during the updateTokenHistoryByAddress process:', e)
@@ -280,7 +279,6 @@ async function _getTNT20Name(address, abi) {
     });
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let url = abiCoder.decode(outputTypes, outputValues)[0];
-    console.log('url:', url);
     return url;
   } catch (e) {
     console.log('error occurs:', e.message);
@@ -354,9 +352,8 @@ async function _getTNT721Name(address, abi) {
 //   await tokenDao.insertAsync(token);
 // }
 
-async function updateTokenSummary_new(tokenArr, address, tokenName, tokenType, tokenSummaryDao, tokenHolderDao) {
+async function updateTokenSummary_new(tokenArr, address, tokenName, tokenType, abi, tokenSummaryDao, tokenHolderDao) {
   console.log('In updateTokenSummary')
-  const tokenSummaryMap = {};
   const tokenInfo = {
     _id: address,
     holders: { total: 0 },
@@ -365,6 +362,11 @@ async function updateTokenSummary_new(tokenArr, address, tokenName, tokenType, t
     name: tokenName,
     type: tokenType
   };
+  try {
+    tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
+  } catch (e) {
+    console.log('Error met when get max total supply in updateTokenSummary: ', e.message);
+  }
   // Collect balance changes and store in holderMap
   /* holderMap = {
       // TNT-20
@@ -536,7 +538,6 @@ async function getMaxTotalSupply(address, abi) {
     });
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let max = abiCoder.decode(outputTypes, outputValues)[0];
-    console.log('max:', max);
     return max.toString();
   } catch (e) {
     console.log('error occurs:', e.message);

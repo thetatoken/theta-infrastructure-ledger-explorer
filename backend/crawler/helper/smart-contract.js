@@ -259,7 +259,6 @@ async function updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenH
       });
       // Insert new holders 
       [...newHolderList].forEach(account => {
-        console.log('insert new holder info: ',);
         updateAsyncList.push(tokenHolderDao.upsertAsync({
           contract_address: address,
           holder: account,

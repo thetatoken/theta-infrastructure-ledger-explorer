@@ -27,14 +27,15 @@ const HoldersTable = ({ holders, totalSupply, className }) => {
         </thead>
         <tbody>
           {map(currentHolders, (holder, i) => {
+            const percent = totalSupply ? (holder.amount / totalSupply * 100).toFixed(4) : 100;
             return (
               <tr key={i}>
                 <td className="rank">{(currentPage - 1) * NUM_PER_PAGE + i + 1}</td>
                 <td>
-                  <Link to={`/account/${holder.key}`}>{holder.key}</Link>
+                  <Link to={`/account/${holder.address}`}>{holder.address}</Link>
                 </td>
-                <td className="rank">{holder.value}</td>
-                <td className="rank">{(holder.value / totalSupply * 100).toFixed(4)}%</td>
+                <td className="rank">{holder.amount}</td>
+                <td className="rank">{percent}%</td>
               </tr>);
           })}
         </tbody>

@@ -25,6 +25,7 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
           })
           res.status(200).send(data);
         })
+      return;
     } else {
       tokenSumDao.getInfoByAddressAsync(address)
         .then(result => {
@@ -72,8 +73,9 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
         }
       })
       .then(info => {
+        if (!info) return;
         const data = ({
-          "type": "token_info",
+          type: "token_info",
           body: info,
           totalPageNumber,
           currentPageNumber: pageNumber
@@ -94,10 +96,6 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
     tokenHolderDao.getHolderListAsync(address, tokenId)
       .then(result => {
         console.log(result);
-      })
-    return;
-    tokenSumDao.getInfoByAddressAsync(address)
-      .then(result => {
         if (result === null) {
           res.status(404).send({
             type: 'error_not_found',
@@ -106,25 +104,20 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
         }
         let holders = [];
         if (tokenId == null) {
-          const obj = result.holders;
-          let map = {};
-          Object.keys(obj).forEach(key => {
-            Object.keys(obj[key]).forEach(account => {
-              if (map[account] === undefined) map[account] = 0;
-              map[account] = BigNumber.sum(new BigNumber(map[account]), new BigNumber(obj[key][account])).toFixed();
-            })
+          const map = {};
+          result.forEach(info => {
+            const address = info.holder;
+            if (map[address] === undefined) map[address] = 0;
+            map[address] = BigNumber.sum(new BigNumber(map[address]), new BigNumber(info.amount)).toFixed();
           })
-          holders = Object.keys(map).map(key => ({
-            key: key,
-            value: map[key]
+          holders = Object.keys(map).map(address => ({
+            address: address,
+            amount: map[address]
           }))
         } else {
-          const key = address + tokenId;
-          let obj = result.holders[key];
-          holders = Object.keys(obj).map(key => ({
-            key: key,
-            value: obj[key]
-          }))
+          holders = result.map(info => {
+            return { address: info.holder, amount: info.amount }
+          });
         }
         const data = ({
           "type": "token_holders",
