@@ -1,6 +1,7 @@
 var get = require('lodash/get');
 var map = require('lodash/map');
 var BigNumber = require('bignumber.js');
+var { ZeroAddress, EventHashMap } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
 
@@ -48,10 +49,10 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
       continue;
     }
     const newToken = {
-      _id: tx.hash + i,
-      hash: tx.hash,
-      from: get(log, 'decode.result.from'),
-      to: get(log, 'decode.result.to'),
+      _id: tx.hash.toLowerCase() + i,
+      hash: tx.hash.toLowerCase(),
+      from: get(log, 'decode.result.from').toLowerCase(),
+      to: get(log, 'decode.result.to').toLowerCase(),
       token_id: get(log, 'decode.result.tokenId'),
       value: get(log, 'decode.result.value'),
       name: get(infoMap, `${contractAddress}.name`),
