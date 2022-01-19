@@ -9,9 +9,12 @@ const { default: axios } = require('axios');
 var BigNumber = require('bignumber.js');
 
 const ZeroAddress = '0x0000000000000000000000000000000000000000';
+const EventHashMap = {
+  TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+}
 
 exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
-  const abi = tx.abi;
+  const abi = sc.abi;
   if (!abi) {
     return;
   }
@@ -38,6 +41,7 @@ exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, 
     txHashes = txHashes.concat([...tokenTxSet]);
     const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
     const tokenArr = [];
+    const insertList = [];
     for (let tx of txs) {
       let logs = get(tx, 'receipt.Logs');
       logs = JSON.parse(JSON.stringify(logs));
