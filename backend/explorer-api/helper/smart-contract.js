@@ -60,12 +60,14 @@ exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, 
           continue;
         }
         const id = tx.hash + i;
+        const tokenId = get(log, 'decode.result.tokenId');
+        const value = tokenId != null ? 1 : get(log, 'decode.result[2]');
         const newToken = {
           hash: tx.hash.toLowerCase(),
           from: get(log, 'decode.result.from').toLowerCase(),
           to: get(log, 'decode.result.to').toLowerCase(),
-          token_id: get(log, 'decode.result.tokenId'),
-          value: get(log, 'decode.result[2]'),
+          token_id: tokenId,
+          value,
           name: tokenName,
           type: tokenType,
           timestamp: tx.timestamp,

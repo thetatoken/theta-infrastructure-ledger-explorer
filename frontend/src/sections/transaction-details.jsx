@@ -479,11 +479,12 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
       if (type === "TNT-20" && !hasTnt20Transfer) {
         setHasTnt20Transfer(true);
       }
+      const value = tokenId != null ? 1 : get(log, 'decode.result[2]');
       tokenArr.push({
         from: get(log, 'decode.result.from'),
         to: get(log, 'decode.result.to'),
         tokenId,
-        value: get(log, 'decode.result[2]'),
+        value,
         type,
         contractAddress: get(log, 'address')
       })

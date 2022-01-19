@@ -48,13 +48,15 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
     if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
       continue;
     }
+    const tokenId = get(log, 'decode.result.tokenId');
+    const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
     const newToken = {
       _id: tx.hash.toLowerCase() + i,
       hash: tx.hash.toLowerCase(),
       from: get(log, 'decode.result.from').toLowerCase(),
       to: get(log, 'decode.result.to').toLowerCase(),
-      token_id: get(log, 'decode.result.tokenId'),
-      value: get(log, 'decode.result[2]'),
+      token_id: tokenId,
+      value,
       name: get(infoMap, `${contractAddress}.name`),
       type: get(infoMap, `${contractAddress}.type`),
       timestamp: tx.timestamp,
