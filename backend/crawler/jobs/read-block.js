@@ -259,7 +259,7 @@ exports.Execute = async function (networkId) {
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
                   if (transaction.type === TxnTypes.SMART_CONTRACT) {
-                    updateTokenList.push(scHelper.updateToken_new(transaction, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+                    updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
                   }
                 }
               }

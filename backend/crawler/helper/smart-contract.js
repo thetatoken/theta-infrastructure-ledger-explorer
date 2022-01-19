@@ -5,7 +5,7 @@ var { ZeroAddress, EventHashMap } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
 
-exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
+exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
   let addressList = _getContractAddressSet(tx);
   if (addressList.length === 0) {
     return;
@@ -54,7 +54,7 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
       from: get(log, 'decode.result.from').toLowerCase(),
       to: get(log, 'decode.result.to').toLowerCase(),
       token_id: get(log, 'decode.result.tokenId'),
-      value: get(log, 'decode.result.value'),
+      value: get(log, 'decode.result[2]'),
       name: get(infoMap, `${contractAddress}.name`),
       type: get(infoMap, `${contractAddress}.type`),
       timestamp: tx.timestamp,
@@ -64,7 +64,7 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
     insertList.push(checkAndInsertToken(newToken, tokenDao))
   }
   console.log('tokenArr:', tokenArr);
-  await updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
+  await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
 
@@ -169,7 +169,7 @@ async function checkAndInsertToken(token, tokenDao) {
   await tokenDao.insertAsync(token);
 }
 
-async function updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao) {
+async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao) {
   console.log('In updateTokenSummary')
   const tokenSummaryMap = {};
 
