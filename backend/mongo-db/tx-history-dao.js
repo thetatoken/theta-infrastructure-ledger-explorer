@@ -16,7 +16,7 @@ module.exports = class TxHistoryDAO {
   getAllTxHistory(callback) {
     this.client.findAll(this.txHistoryInfoCollection, function (error, recordList) {
       if (error) {
-        console.log('TX history dao getAllTxHistory ERR - ', error, height);
+        console.log('TX history dao getAllTxHistory ERR - ', error);
         callback(error);
       } else if (!recordList || !recordList.length) {
         callback(Error('NOT_FOUND - Transaction History.'));
@@ -29,7 +29,7 @@ module.exports = class TxHistoryDAO {
   removeAll(callback) {
     this.client.remove(this.txHistoryInfoCollection, function (err, res) {
       if (err) {
-        console.log('TX history dao removeAll ERR - ', err, height);
+        console.log('TX history dao removeAll ERR - ', err);
         callback(err);
       }
       callback(err, res);

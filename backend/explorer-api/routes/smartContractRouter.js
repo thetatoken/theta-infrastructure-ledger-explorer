@@ -12,13 +12,15 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   // The api to verify the source and bytecode
   router.post("/smartContract/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, abi, version, optimizer, versionFullName } = req.body;
+    let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200 } = req.body;
+    optimizerRuns = +optimizerRuns;
+    if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     console.log('Verifying source code for address', address);
     try {
       let sc = await smartContractDao.getSmartContractByAddressAsync(address)
       let byteCode = sc.bytecode;
       let result = await axios.post(`http://localhost:9090/api/verify/${address}`, {
-        byteCode, sourceCode, abi, version, optimizer, versionFullName
+        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns
       })
       console.log('Received response from verification server.', result.data.result);
       if (result.data.result.verified === true) {
@@ -67,6 +69,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   });
 
   // The api to update smart contract tx history by address
+  // Note: Disabled token feature
   // router.get("/smartContract/updateHistory/:address", async (req, res) => {
   //   let address = helper.normalize(req.params.address.toLowerCase());
   //   console.log('Updating smart contract tx history for address:', address);

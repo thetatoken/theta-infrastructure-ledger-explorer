@@ -111,3 +111,45 @@ export const NetworkUrlOfChainId = {
   'https://smart-contracts-sandbox-explorer.thetatoken.org': Networks.THETA_PRIVATENET,
   'https://localhost': Networks.THETA_PRIVATENET,
 };
+
+export const CommonABIs = {
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'from', type: 'address' },
+    { indexed: true, name: 'to', type: 'address' },
+    { indexed: false, name: 'value', type: 'uint256' }],
+    name: 'Transfer',
+    type: 'event'
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'from', type: 'address' },
+    { indexed: true, name: 'to', type: 'address' },
+    { indexed: true, name: 'tokenId', type: 'uint256' }],
+    name: 'Transfer',
+    type: 'event'
+  }],
+  "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": [{
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'owner', type: 'address' },
+    { indexed: true, name: 'spender', type: 'address' },
+    { indexed: false, name: 'value', type: 'uint256' }],
+    name: "Approval",
+    type: "event"
+  }, {
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'owner', type: 'address' },
+    { indexed: true, name: 'approved', type: 'address' },
+    { indexed: true, name: 'tokenId', type: 'uint256' }],
+    name: "Approval",
+    type: "event"
+  }],
+  "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31": [{
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'owner', type: 'address' },
+    { indexed: true, name: 'operator', type: 'address' },
+    { indexed: false, name: 'approved', type: 'bool' }],
+    name: 'ApprovalForAll',
+    type: 'event'
+  }]
+}

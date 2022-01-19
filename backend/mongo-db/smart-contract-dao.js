@@ -18,6 +18,7 @@ module.exports = class smartContractDAO {
       'verification_date': smartContractInfo.verification_date,
       'compiler_version': smartContractInfo.compiler_version,
       'optimizer': smartContractInfo.optimizer,
+      'optimizerRuns': smartContractInfo.optimizerRuns,
       'name': smartContractInfo.name,
       'function_hash': smartContractInfo.function_hash,
       'constructor_arguments': smartContractInfo.constructor_arguments

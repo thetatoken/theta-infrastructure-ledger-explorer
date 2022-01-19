@@ -85,8 +85,8 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
 
         // Update smart contract account
         if (tx.receipt) {
-          await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
+            await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
             await _updateAccountMaps(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
             await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
           }

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from "ethers";
 
-import { WEI } from 'common/constants';
+import { WEI, CommonABIs } from 'common/constants';
 
 export function truncateMiddle(str, maxLength = 20, separator = '...') {
   if (str && str.length <= 20)
@@ -77,9 +77,14 @@ export function validateHex(hash, limit) {
   return reg.test(hash);
 }
 
-export function decodeLogs(logs, abi) {
-  const iface = new ethers.utils.Interface(abi || []);
+export function decodeLogs(logs, abiMap) {
+  let ifaceMap = {};
+  if (abiMap !== null) {
+    Object.keys(abiMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(abiMap[k]))
+  }
   return logs.map(log => {
+    const iface = abiMap === null ? new ethers.utils.Interface([]) : ifaceMap[`${log.address}`];
+    const abi = abiMap === null ? [] : abiMap[`${log.address}`];
     try {
       let event = null;
       for (let i = 0; i < abi.length; i++) {
@@ -101,6 +106,29 @@ export function decodeLogs(logs, abi) {
           result: data,
           eventName: event.name,
           event: event
+        }
+      } else if (CommonABIs[log.topics[0]] !== undefined) {
+        const events = CommonABIs[log.topics[0]];
+        for (let event of events) {
+          try {
+            const ifaceTmp = new ethers.utils.Interface([event] || []);
+            let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+            let data = {};
+            Object.keys(bigNumberData).forEach(k => {
+              data[k] = bigNumberData[k].toString();
+            })
+            log.decode = {
+              result: data,
+              eventName: event.name,
+              event: event
+            }
+            break;
+          } catch (e) {
+            continue;
+          }
+        }
+        if (typeof log.decode !== 'object') {
+          log.decode = 'No matched event or the smart contract source code has not been verified.';
         }
       } else {
         log.decode = 'No matched event or the smart contract source code has not been verified.';
