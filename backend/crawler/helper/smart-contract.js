@@ -52,7 +52,7 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
       hash: tx.hash,
       from: get(log, 'decode.result.from'),
       to: get(log, 'decode.result.to'),
-      tokenId: get(log, 'decode.result.tokenId'),
+      token_id: get(log, 'decode.result.tokenId'),
       value: get(log, 'decode.result.value'),
       name: get(infoMap, `${contractAddress}.name`),
       type: get(infoMap, `${contractAddress}.type`),
@@ -214,7 +214,7 @@ async function updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenH
     let holders = holderMap[`${token.contract_address}`];
     let from = token.from.toLowerCase();
     let to = token.to.toLowerCase();
-    const key = token.tokenId != null ? token.tokenId : 'TNT20';
+    const key = token.token_id != null ? token.token_id : 'TNT20';
     let value = token.value || 1;
     if (from !== ZeroAddress) {
       if (holders[key] === undefined) {
