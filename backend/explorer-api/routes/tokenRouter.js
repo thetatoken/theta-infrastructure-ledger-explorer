@@ -95,7 +95,6 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
     let { tokenId } = req.query;
     tokenHolderDao.getHolderListAsync(address, tokenId)
       .then(result => {
-        console.log(result);
         if (result === null) {
           res.status(404).send({
             type: 'error_not_found',

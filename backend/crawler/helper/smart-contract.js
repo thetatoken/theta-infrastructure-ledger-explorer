@@ -271,7 +271,7 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       updateAsyncList.push(tokenHolderDao.removeRecordByAdressAndHolderListAsync(address, tokenId, [...removeList]));
       // Update token summary holders
       if (key === 'TNT20') {
-        tokenSummaryMap[`${address}`].holders.total += newHolderList.length - removeList.length;
+        tokenSummaryMap[`${address}`].holders.total += newHolderList.size - removeList.length;
       } else {
         if (tokenSummaryMap[`${address}`].holders[`${tokenId}`]) {
           tokenSummaryMap[`${address}`].holders[`${tokenId}`] = 0;
