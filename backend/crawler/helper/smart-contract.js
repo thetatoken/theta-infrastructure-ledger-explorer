@@ -1,12 +1,8 @@
 var get = require('lodash/get');
 var map = require('lodash/map');
 var BigNumber = require('bignumber.js');
-var { ZeroAddress, ZeroTxAddress, EventHashMap } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
-var Theta = require('../libs/Theta');
-var ThetaJS = require('../libs/thetajs.esm');
-var smartContractApi = require('../api/smart-contract-api');
 
 exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
   let addressList = _getContractAddressSet(tx);
@@ -46,6 +42,11 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
       continue;
     }
     const contractAddress = get(log, 'address');
+    // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
+    // this record will be hanlded in the contract verification
+    if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
+      continue;
+    }
     const newToken = {
       _id: tx.hash + i,
       hash: tx.hash,
@@ -63,7 +64,6 @@ exports.updateToken_new = async function (tx, smartContractDao, tokenDao, tokenS
   }
   console.log('tokenArr:', tokenArr);
   await updateTokenSummary_new(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
-  await updateTokenSummaryHolders(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
 

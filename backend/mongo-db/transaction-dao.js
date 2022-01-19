@@ -95,8 +95,6 @@ module.exports = class TransactionDAO {
 
     function query(type) {
       const queryObject = type == undefined ? { '_id': pk } : { 'eth_tx_hash': pk };
-      console.log('type:', type, type == undefined);
-      console.log('queryObject:', queryObject);
       self.client.findOne(self.transactionInfoCollection, queryObject, function (error, record) {
         if (error) {
           console.log('Transation dao getTransactionByPk ERR - ', error, pk);
@@ -138,7 +136,7 @@ module.exports = class TransactionDAO {
         console.log('Transation dao getTotalNumberByHour ERR - ', error);
         callback(error);
       } else {
-        console.log('Calling get total number of txs, returns:', record)
+        // console.log('Calling get total number of txs, returns:', record)
         callback(error, record);
       }
     });

@@ -24,8 +24,6 @@ var tokenDaoLib = require('../mongo-db/token-dao.js')
 var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
 var tokenHolderDaoLib = require('../mongo-db/token-holder-dao.js')
 
-var Theta = require('./libs/Theta');
-
 var Redis = require("ioredis");
 var redis = null;
 var redisConfig = null;
@@ -71,9 +69,6 @@ function main() {
   }
   const networkId = config.blockchain.networkId;
   rpc.setConfig(config);
-
-  Theta.chainId = config.defaultThetaChainID;
-  Logger.log('Theta.chainId:', Theta.chainId);
 
   bluebird.promisifyAll(rpc);
 
