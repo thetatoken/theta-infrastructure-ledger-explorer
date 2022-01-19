@@ -5,7 +5,7 @@ var helper = require('../helper/utils');
 var BigNumber = require('bignumber.js');
 
 
-var tokenRouter = (app, tokenDao, tokenSumDao) => {
+var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   // The api to get token summary

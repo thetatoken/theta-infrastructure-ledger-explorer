@@ -10,7 +10,7 @@ var BigNumber = require('bignumber.js');
 
 const ZeroAddress = '0x0000000000000000000000000000000000000000';
 
-exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao, tokenSummaryDao) {
+exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
   const abi = tx.abi;
   if (!abi) {
     return;
@@ -21,15 +21,23 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
   if (!isTnt721 && !isTnt20) {
     return;
   }
-
+  const address = sc.address;
+  const tokenType = isTnt721 ? 'TNT-721' : 'TNT-20';
+  let tokenName = ""
+  try {
+    tokenName = isTnt20 ? await _getTNT20Name(address, abi) : await _getTNT721Name(address, abi);
+  } catch (e) {
+    console.log('Error in fetch token name in updateTokenHistoryBySmartContract: ', e.message);
+  }
   try {
     const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
-    const address = tx.address;
-    const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse)
-    const txHashes = txList.map(tx => tx.hash);
+    const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse);
+    let txHashes = txList.map(tx => tx.hash);
+    const tokenList = await tokenDao.getInfoListByAddressAndTokenIdAsync(address, null, pageNum, limitNumber);
+    let tokenTxSet = new Set(tokenList.map(info => info.hash));
+    txHashes = txHashes.concat([...tokenTxSet]);
     const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-    let insertList = [];
-    let tokenName = "";
+    const tokenArr = [];
     for (let tx of txs) {
       let logs = get(tx, 'receipt.Logs');
       logs = JSON.parse(JSON.stringify(logs));
@@ -38,49 +46,111 @@ exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDa
         return obj;
       })
       logs = decodeLogs(logs, abi);
-      const arr = abi.filter(obj => (obj.name == "tokenURI" && obj.type === 'function')
-        || (obj.name === 'Transfer' && obj.type === 'event'));
-      const tokenArr = [];
-      if (arr.length === 0) return;
       for (let [i, log] of logs.entries()) {
-        const tokenId = get(log, 'decode.result.tokenId');
-        const eventName = get(log, 'decode.eventName');
-        if (tokenId === undefined && eventName !== 'Transfer') return;
-        if (tokenName === "") {
-          tokenName = isTnt721 ? await _getTNT721Name(log, abi) : await _getTNT20Name(log, abi);
+        if (get(log, 'topics[0]') !== EventHashMap.TRANSFER) {
+          continue;
         }
-        tokenArr.push({
-          id: tx.hash + i,
+        const contractAddress = get(log, 'address');
+        // If log.address !== sc.address, it will be handled in verification of contract log.address
+        if (contractAddress !== address) {
+          continue;
+        }
+        const id = tx.hash + i;
+        const newToken = {
+          hash: tx.hash,
           from: get(log, 'decode.result.from'),
           to: get(log, 'decode.result.to'),
           tokenId: get(log, 'decode.result.tokenId'),
-          value: get(log, 'decode.result.value')
-        })
-      }
-      const type = isTnt20 ? 'TNT-20' : 'TNT-721';
-      tokenArr.forEach(token => {
-        const newToken = {
-          _id: token.id,
-          hash: tx.hash,
+          value: get(log, 'decode.result.value'),
           name: tokenName,
-          type: type,
-          token_id: token.tokenId,
-          from: token.from.toLowerCase(),
-          to: token.to.toLowerCase(),
-          value: token.value,
+          type: tokenType,
           timestamp: tx.timestamp,
-          contract_address: address
-          //TODOs: add method field from decoded data
+          contract_address: contractAddress
         }
-        insertList.push(checkAndInsertToken(newToken, tokenDao))
-      })
-      await updateTokenSummary(address, tokenArr, tokenName, type, abi, tokenSummaryDao);
+        tokenArr.push(newToken);
+        insertList.push(tokenDao.upsertAsync(id, newToken))
+      }
     }
+    console.log('tokenArr:', tokenArr);
+    await updateTokenSummary_new(tokenArr, address, tokenName, tokenType, tokenSummaryDao, tokenHolderDao);
     return Promise.all(insertList);
   } catch (e) {
     console.log('Something wrong happened during the updateTokenHistoryByAddress process:', e)
   }
+
 }
+// exports.updateTokenHistoryByTx = async function (tx, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
+
+//   const abi = tx.abi;
+//   if (!abi) {
+//     return;
+//   }
+
+//   const isTnt721 = checkTnt721(abi);
+//   const isTnt20 = checkTnt20(abi);
+//   if (!isTnt721 && !isTnt20) {
+//     return;
+//   }
+
+//   try {
+//     const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
+//     const address = tx.address;
+//     const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse)
+//     const txHashes = txList.map(tx => tx.hash);
+//     const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
+//     let insertList = [];
+//     let tokenName = "";
+//     for (let tx of txs) {
+//       let logs = get(tx, 'receipt.Logs');
+//       logs = JSON.parse(JSON.stringify(logs));
+//       logs = logs.map(obj => {
+//         obj.data = getHex(obj.data)
+//         return obj;
+//       })
+//       logs = decodeLogs(logs, abi);
+//       const arr = abi.filter(obj => (obj.name == "tokenURI" && obj.type === 'function')
+//         || (obj.name === 'Transfer' && obj.type === 'event'));
+//       const tokenArr = [];
+//       if (arr.length === 0) return;
+//       for (let [i, log] of logs.entries()) {
+//         const tokenId = get(log, 'decode.result.tokenId');
+//         const eventName = get(log, 'decode.eventName');
+//         if (tokenId === undefined && eventName !== 'Transfer') return;
+//         if (tokenName === "") {
+//           tokenName = isTnt721 ? await _getTNT721Name(log, abi) : await _getTNT20Name(log, abi);
+//         }
+//         tokenArr.push({
+//           id: tx.hash + i,
+//           from: get(log, 'decode.result.from'),
+//           to: get(log, 'decode.result.to'),
+//           tokenId: get(log, 'decode.result.tokenId'),
+//           value: get(log, 'decode.result.value')
+//         })
+//       }
+//       const type = isTnt20 ? 'TNT-20' : 'TNT-721';
+//       tokenArr.forEach(token => {
+//         const newToken = {
+//           _id: token.id,
+//           hash: tx.hash,
+//           name: tokenName,
+//           type: type,
+//           token_id: token.tokenId,
+//           from: token.from.toLowerCase(),
+//           to: token.to.toLowerCase(),
+//           value: token.value,
+//           timestamp: tx.timestamp,
+//           contract_address: address
+//           //TODOs: add method field from decoded data
+//         }
+//         insertList.push(checkAndInsertToken(newToken, tokenDao))
+//       })
+//       await updateTokenSummary(address, tokenArr, tokenName, type, abi, tokenSummaryDao, tokenHolderDao);
+//     }
+//     return Promise.all(insertList);
+//   } catch (e) {
+//     console.log('Something wrong happened during the updateTokenHistoryByAddress process:', e)
+//   }
+// }
 
 function checkTnt721(abi) {
   const obj = {
@@ -168,11 +238,10 @@ function decodeLogs(logs, abi) {
     }
   })
 }
-async function _getTNT20Name(log, abi) {
+async function _getTNT20Name(address, abi) {
   const arr = abi.filter(obj => obj.name == "name" && obj.type === 'function');
   if (arr.length === 0) return "";
   const functionData = arr[0];
-  const address = get(log, 'address');
   const inputValues = []
 
   const iface = new ethers.utils.Interface(abi || []);
@@ -215,14 +284,11 @@ async function _getTNT20Name(log, abi) {
   }
 }
 
-async function _getTNT721Name(log, abi) {
-  const tokenId = get(log, 'decode.result.tokenId');
-  if (tokenId === undefined) return "";
+async function _getTNT721Name(address, abi) {
   const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
   if (arr.length === 0) return "";
   const functionData = arr[0];
-  const address = get(log, 'address');
-  const inputValues = [tokenId]
+  const inputValues = [0]
 
   const iface = new ethers.utils.Interface(abi || []);
   const senderSequence = 1;
@@ -265,7 +331,8 @@ async function _getTNT721Name(log, abi) {
     } else {
       return axios.get(url)
         .then(res => {
-          return get(res, 'data.name')
+          let name = get(res, 'data.name');
+          return name.replace(/\(Edition #(.*)\)/, "");
         }).catch(e => {
           console.log('error occurs in fetch url:', e.message)
           return "";
@@ -277,62 +344,155 @@ async function _getTNT721Name(log, abi) {
   }
 }
 
-async function checkAndInsertToken(token, tokenDao) {
-  let hasToken = await tokenDao.checkTokenAsync(token._id);
-  if (hasToken) return;
-  await tokenDao.insertAsync(token);
-}
+// async function checkAndInsertToken(token, tokenDao) {
+//   let hasToken = await tokenDao.checkTokenAsync(token._id);
+//   if (hasToken) return;
+//   await tokenDao.insertAsync(token);
+// }
 
-async function updateTokenSummary(address, tokenArr, tokenName, type, abi, tokenSummaryDao) {
+async function updateTokenSummary_new(tokenArr, address, tokenName, tokenType, tokenSummaryDao, tokenHolderDao) {
   console.log('In updateTokenSummary')
-  let tokenInfo = {
+  const tokenSummaryMap = {};
+  const tokenInfo = {
     _id: address,
-    holders: {},
+    holders: { total: 0 },
     max_total_supply: 0,
-    total_transfers: -1,
+    total_transfers: 0,
     name: tokenName,
-    type: type
+    type: tokenType
   };
-  try {
-    let info = await tokenSummaryDao.getInfoByAddressAsync(address)
-    if (info !== null) {
-      tokenInfo = info;
-    } else {
-      tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi)
-    }
-  } catch (e) {
-    console.log('error:', e);
-  }
-  let holders = tokenInfo.holders;
-  tokenArr.forEach(token => {
+  // Collect balance changes and store in holderMap
+  /* holderMap = {
+      // TNT-20
+      TNT20: {
+        ${account_address}: balance_change,
+        ...
+      }
+      // TNT-721
+      ${tokenId}: {
+        ${account_address}: balance_change,
+        ...
+      },
+      ...
+  }*/
+  const holders = {};
+  for (let token of tokenArr) {
     let from = token.from.toLowerCase();
     let to = token.to.toLowerCase();
-    const key = token.tokenId != null ? address + token.tokenId : address;
+    const key = token.tokenId != null ? token.tokenId : 'TNT20';
     let value = token.value || 1;
     if (from !== ZeroAddress) {
       if (holders[key] === undefined) {
-        holders[key] = { [from]: new BigNumber(0).minus(value).toFixed() }
+        holders[key] = { [from]: new BigNumber(0).minus(value).toFixed(0) }
       } else if (holders[key][from] === undefined) {
-        holders[key][from] = new BigNumber(0).minus(value).toFixed();
+        holders[key][from] = new BigNumber(0).minus(value).toFixed(0);
       } else {
-        holders[key][from] = new BigNumber(holders[key][from]).minus(value).toFixed();
+        holders[key][from] = new BigNumber(holders[key][from]).minus(value).toFixed(0);
       }
       if (holders[key][from] == 0) delete holders[key][from];
       if (Object.keys(holders[key]).length == 0) delete holders[key];
     }
-    if (holders[key] === undefined) {
-      holders[key] = { [to]: new BigNumber(value).toFixed() }
-    } else if (holders[key][to] === undefined) {
-      holders[key][to] = new BigNumber(value).toFixed();
-    } else {
-      holders[key][to] = new BigNumber(holders[key][to]).plus(value).toFixed();
+    if (to !== ZeroAddress) {
+      if (holders[key] === undefined) {
+        holders[key] = { [to]: new BigNumber(value).toFixed(0) }
+      } else if (holders[key][to] === undefined) {
+        holders[key][to] = new BigNumber(value).toFixed(0);
+      } else {
+        holders[key][to] = new BigNumber(holders[key][to]).plus(value).toFixed(0);
+      }
+      if (holders[key][to] == 0) delete holders[key][to];
+      if (Object.keys(holders[key]).length == 0) delete holders[key];
     }
-    if (holders[key][to] == 0) delete holders[key][to];
-    if (Object.keys(holders[key]).length == 0) delete holders[key];
-  })
-  tokenInfo.total_transfers++;
-  await tokenSummaryDao.upsertAsync(tokenInfo);
+    tokenInfo.total_transfers++;
+  }
+  const updateAsyncList = [];
+  const totalHolderSet = new Set();
+  for (let key of Object.keys(holders)) {
+    const map = holders[`${key}`];
+    const tokenId = key === 'TNT20' ? null : key;
+    let newHolderList = Object.keys(map);
+
+    newHolderList.forEach(account => {
+      totalHolderSet.add(account);
+      updateAsyncList.push(tokenHolderDao.insertAsync({
+        contract_address: address,
+        holder: account,
+        amount: map[`${account}`],
+        token_id: tokenId
+      }))
+    })
+    // Update token summary holders
+    if (key === 'TNT20') {
+      tokenInfo.holders.total = newHolderList.length;
+    } else {
+      tokenInfo.holders[`${tokenId}`] = newHolderList.length;
+    }
+  }
+  if (tokenType === 'TNT-721') {
+    tokenInfo.holders.total = totalHolderSet.size;
+  }
+  updateAsyncList.push(tokenSummaryDao.upsertAsync({ ...tokenInfo }));
+  return Promise.all(updateAsyncList);
 }
+
+// async function updateTokenSummary(address, tokenArr, tokenName, type, abi, tokenSummaryDao, tokenHolderDao) {
+//   console.log('In updateTokenSummary')
+//   let tokenInfo = {
+//     _id: address,
+//     holders: 0,
+//     max_total_supply: 0,
+//     total_transfers: -1,
+//     name: tokenName,
+//     type: type
+//   };
+//   try {
+//     let info = await tokenSummaryDao.getInfoByAddressAsync(address)
+//     if (info !== null) {
+//       tokenInfo = info;
+//     } else {
+//       tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
+//     }
+//     let holders = await tokenHolderDao.getHolderListAsync(address, null);
+//     // let holderMap = {};
+//     if (holders.length > 0) {
+//       holders.forEach(info => {
+//         // holdersMap
+
+//       })
+//     }
+//   } catch (e) {
+//     console.log('error:', e);
+//   }
+//   // let holders = tokenInfo.holders;
+//   // tokenArr.forEach(token => {
+//   //   let from = token.from.toLowerCase();
+//   //   let to = token.to.toLowerCase();
+//   //   const key = token.tokenId != null ? address + token.tokenId : address;
+//   //   let value = token.value || 1;
+//   //   if (from !== ZeroAddress) {
+//   //     if (holders[key] === undefined) {
+//   //       holders[key] = { [from]: new BigNumber(0).minus(value).toFixed() }
+//   //     } else if (holders[key][from] === undefined) {
+//   //       holders[key][from] = new BigNumber(0).minus(value).toFixed();
+//   //     } else {
+//   //       holders[key][from] = new BigNumber(holders[key][from]).minus(value).toFixed();
+//   //     }
+//   //     if (holders[key][from] == 0) delete holders[key][from];
+//   //     if (Object.keys(holders[key]).length == 0) delete holders[key];
+//   //   }
+//   //   if (holders[key] === undefined) {
+//   //     holders[key] = { [to]: new BigNumber(value).toFixed() }
+//   //   } else if (holders[key][to] === undefined) {
+//   //     holders[key][to] = new BigNumber(value).toFixed();
+//   //   } else {
+//   //     holders[key][to] = new BigNumber(holders[key][to]).plus(value).toFixed();
+//   //   }
+//   //   if (holders[key][to] == 0) delete holders[key][to];
+//   //   if (Object.keys(holders[key]).length == 0) delete holders[key];
+//   // })
+//   tokenInfo.total_transfers++;
+//   await tokenSummaryDao.upsertAsync(tokenInfo);
+// }
 
 async function getMaxTotalSupply(address, abi) {
   const arr = abi.filter(obj => obj.name == "totalSupply" && obj.type === 'function');

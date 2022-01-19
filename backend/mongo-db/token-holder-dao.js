@@ -13,8 +13,12 @@ module.exports = class TokenHolderDAO {
     this.collection = 'tokenHolder';
   }
 
+  insert(data, callback) {
+    this.client.insert(this.collection, data, callback);
+  }
+
   upsert(updateObj, callback) {
-    const queryObject = updateObj._id ? { _id: updateObj._id } : {};
+    const queryObject = { _id: updateObj._id };
     this.client.upsert(this.collection, queryObject, updateObj, callback);
   }
 
