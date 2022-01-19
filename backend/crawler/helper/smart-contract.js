@@ -260,7 +260,7 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       });
       // Insert new holders 
       [...newHolderList].forEach(account => {
-        updateAsyncList.push(tokenHolderDao.upsertAsync({
+        updateAsyncList.push(tokenHolderDao.insertAsync({
           contract_address: address,
           holder: account,
           amount: map[`${account}`],
@@ -268,7 +268,7 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
         }))
       })
       // Remove zero balance holders in removeList
-      updateAsyncList.push(tokenHolderDao.removeRecordByAdressAndHolderListAsync(address, tokenId, [...removeList]));
+      updateAsyncList.push(tokenHolderDao.removeRecordByAdressAndHolderListAsync(address, tokenId, removeList));
       // Update token summary holders
       if (key === 'TNT20') {
         tokenSummaryMap[`${address}`].holders.total += newHolderList.size - removeList.length;

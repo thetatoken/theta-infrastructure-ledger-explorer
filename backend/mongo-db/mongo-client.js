@@ -182,7 +182,7 @@ exports.removeAll = function (collectionName, callback) {
 }
 
 exports.remove = function (collectionName, queryObject, callback) {
-  if (collectionName === 'stake' || collectionName === 'txHistory' || collectionName === 'dailyAct' || collection === 'tokenHolder') {
+  if (collectionName === 'stake' || collectionName === 'txHistory' || collectionName === 'dailyAct' || collectionName === 'tokenHolder') {
     var collection = _db.collection(collectionName);
     collection.deleteMany(queryObject, function (err, res) {
       if (err) callback(err);
