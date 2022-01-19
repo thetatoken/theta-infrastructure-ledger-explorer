@@ -947,8 +947,8 @@ const TransactionAction = ({ token, info }) => {
       {/* Note: Disabled token feature */}
       1 of TokenID[<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
       <Link className="token-link" to={`/token/${address}`}>{info ? info.name : ""}</Link>
-      {/* 1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>] */}
-      <Link className="token-link" to="#">{info ? info.name : ""}</Link>
+      {/* 1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      <Link className="token-link" to="#">{info ? info.name : ""}</Link> */}
     </div>
   </div>
 }
@@ -971,8 +971,8 @@ const TokenTransferred = ({ token, info }) => {
       {/* Note: Disabled token feature */}
       TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
       <Link className="token-link" to={`/token/${address}`}>{name}</Link>
-      {/* TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>] */}
-      <Link className="token-link" to="#">{name}</Link>
+      {/* TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      <Link className="token-link" to="#">{name}</Link> */}
     </span>}
     {isTnt20 && <span className="text-container">
       {/* Note: Disabled token feature */}

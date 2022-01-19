@@ -12,7 +12,13 @@ import { smartContractService } from 'common/services/smartContract';
 import ReadContract from 'common/components/read-contract';
 import Item from 'common/components/tnt721-item';
 import HolderTable from 'common/components/holder-table';
+import { ethers } from "ethers";
+import smartContractApi from 'common/services/smart-contract-api';
+import Theta from 'libs/Theta';
+import ThetaJS from 'libs/thetajs.esm';
 import get from 'lodash/get';
+import map from 'lodash/map';
+
 
 const NUM_TRANSACTIONS = 20;
 
@@ -27,6 +33,7 @@ const TokenDetails = ({ match, location }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [abi, setAbi] = useState([]);
   const [holders, setHolders] = useState([]);
+  const [item, setItem] = useState();
 
   useEffect(() => {
     const { contractAddress } = match.params;
@@ -96,6 +103,72 @@ const TokenDetails = ({ match, location }) => {
       })
   }
 
+  useEffect(() => {
+    if (tokenId === undefined) return;
+    const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+    if (arr.length === 0) return;
+    const { contractAddress } = match.params;
+    const functionData = arr[0];
+    const inputValues = [tokenId]
+
+    async function fetchUrl() {
+      const iface = new ethers.utils.Interface(abi || []);
+      const senderSequence = 1;
+      const functionInputs = get(functionData, ['inputs'], []);
+      const functionOutputs = get(functionData, ['outputs'], []);
+      const functionSignature = iface.getSighash(functionData.name)
+
+      const inputTypes = map(functionInputs, ({ name, type }) => {
+        return type;
+      });
+      try {
+        var abiCoder = new ethers.utils.AbiCoder();
+        var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+        const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+        const gasLimit = 2000000;
+        const data = functionSignature + encodedParameters;
+        const tx = Theta.unsignedSmartContractTx({
+          from: contractAddress,
+          to: contractAddress,
+          data: data,
+          value: 0,
+          transactionFee: gasPrice,
+          gasLimit: gasLimit
+        }, senderSequence);
+        const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponseJSON = await callResponse.json();
+        const result = get(callResponseJSON, 'result');
+        let outputValues = get(result, 'vm_return');
+        const outputTypes = map(functionOutputs, ({ name, type }) => {
+          return type;
+        });
+        outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+        let url = abiCoder.decode(outputTypes, outputValues)[0];
+        if (/^http:\/\/(.*)api.thetadrop.com.*\.json(\?[-a-zA-Z0-9@:%._\\+~#&//=]*){0,1}$/g.test(url) && typeof url === "string") {
+          url = url.replace("http://", "https://")
+        }
+        const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
+        if (isImage) {
+          setItem({ image: url });
+        } else {
+          fetch(url)
+            .then(res => res.json())
+            .then(data => {
+              setItem(data);
+            }).catch(e => {
+              console.log('error occurs in fetch url:', e)
+              setItem('Error occurs')
+            })
+        }
+      }
+      catch (e) {
+        console.log('error occurs:', e);
+        setItem('Error occurs')
+      }
+    }
+    fetchUrl();
+  }, [tokenId, abi, match.params.contractAddress])
   return (
     <div className="content token">
       <div className="page-title account">Token Detail</div>
@@ -137,7 +210,7 @@ const TokenDetails = ({ match, location }) => {
           <div className="txn-type items">Item</div>
         </div>
         <div className="details item">
-          <Item tokenId={tokenId} abi={abi} address={match.params.contractAddress} />
+          <Item item={item} />
         </div>
       </div>}
       {transactions && transactions.length > 0 &&

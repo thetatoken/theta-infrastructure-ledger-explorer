@@ -383,7 +383,7 @@ async function updateTokenSummary_new(tokenArr, address, tokenName, tokenType, t
   for (let token of tokenArr) {
     let from = token.from.toLowerCase();
     let to = token.to.toLowerCase();
-    const key = token.tokenId != null ? token.tokenId : 'TNT20';
+    const key = token.token_id != null ? token.token_id : 'TNT20';
     let value = token.value || 1;
     if (from !== ZeroAddress) {
       if (holders[key] === undefined) {
