@@ -6,9 +6,9 @@ var lineCount = 0;
 var linesPerFile = 4500;
 var file = null;
 module.exports = {
-  initialize: function () {
-    makeSurePathExist("./log/");
-    var filename = makeLogFileName(fileCount);
+  initialize: function (folderName = "crawler") {
+    makeSurePathExist(`./log/${folderName}/`);
+    var filename = makeLogFileName(fileCount, folderName);
     file = fs.createWriteStream(filename, { 'flags': 'w', 'encoding': 'utf8', 'mode': 0644 });
   },
   isLoggingEnabled: function () {
@@ -77,7 +77,7 @@ function makeSurePathExist(path) {
   }
 }
 
-function makeLogFileName(count) {
+function makeLogFileName(count, folderName) {
   var now = new Date();
   var year = 1900 + now.getYear();
   var month = to2Digit(now.getMonth() + 1);
@@ -85,7 +85,7 @@ function makeLogFileName(count) {
   var hour = to2Digit(now.getHours());
   var min = to2Digit(now.getMinutes());
   var index = to2Digit(count);
-  return "./log/crawler" + "_" + year + "-" + month + "-" + date + "_" + hour + "-" + min + "_" + index + ".txt";
+  return `./log/${folderName}/` + year + "-" + month + "-" + date + "_" + hour + "-" + min + "_" + index + ".txt";
 };
 
 function createNewFile() {

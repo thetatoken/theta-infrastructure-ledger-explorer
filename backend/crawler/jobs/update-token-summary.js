@@ -35,10 +35,10 @@ exports.Execute = async function () {
   try {
     smartContractIds = await smartContractDao.getAllIdsAsync({ source_code: { $ne: "" } });
     smartContractIds = smartContractIds.map(o => o._id);
-    console.log('smartContractIds:', smartContractIds);
+    Logger.log('smartContractIds:', smartContractIds);
     tokenSummaryIds = await tokenSummaryDao.getAllIdsAsync();
     tokenSummaryIds = tokenSummaryIds.map(o => o._id);
-    console.log('tokenSummaryIds:', tokenSummaryIds);
+    Logger.log('tokenSummaryIds:', tokenSummaryIds);
     tokenSummarySet = new Set(tokenSummaryIds);
   } catch (e) {
     Logger.log('Error occurs in get get ids:', e.message);
@@ -46,8 +46,8 @@ exports.Execute = async function () {
   for (let i = 0; i < smartContractIds.length; i++) {
     const address = smartContractIds[i];
     const startTime = +new Date();
-    console.log('-----------------------------------------------------------------------------------');
-    console.log(`Processing smart contract #${i + 1}/${smartContractIds.length} with address:${address}.`);
+    Logger.log('-----------------------------------------------------------------------------------');
+    Logger.log(`Processing smart contract #${i + 1}/${smartContractIds.length} with address:${address}.`);
     let abi;
     try {
       const abiRes = await smartContractDao.getAbiAsync(address);
@@ -56,32 +56,32 @@ exports.Execute = async function () {
       Logger.log(`Error occurs in get abi by address:${address}. Error: ${e.message}`);
     }
     if (!abi) {
-      console.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} doesn't have abi field, skip.`);
+      Logger.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} doesn't have abi field, skip.`);
       continue;
     }
 
     const isTnt721 = checkTnt721(abi);
     const isTnt20 = checkTnt20(abi);
     if (!isTnt721 && !isTnt20) {
-      console.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} is not TNT-721 or TNT-20, skip.`);
+      Logger.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} is not TNT-721 or TNT-20, skip.`);
       continue;
     }
 
     if (tokenSummarySet.has(address)) {
-      console.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} is been updated in tokenSummaryDao, skip.`);
+      Logger.log(`Smart contract #${i}/${smartContractIds.length} Add:${address} is been updated in tokenSummaryDao, skip.`);
       continue;
     }
     const tokenType = isTnt721 ? 'TNT-721' : 'TNT-20';
-    console.log('Token type:', tokenType);
+    Logger.log('Token type:', tokenType);
     let tokenName = ""
     try {
       tokenName = isTnt20 ? await _getTNT20Name(address, abi) : await _getTNT721Name(address, abi);
-      console.log('Fetched token name:', tokenName);
+      Logger.log('Fetched token name:', tokenName);
     } catch (e) {
-      console.log('Error in fetch token name in updateTokenHistoryBySmartContract: ', e.message);
+      Logger.log('Error in fetch token name in updateTokenHistoryBySmartContract: ', e.message);
     }
     if (tokenName === "" && tokenType === "TNT-20") {
-      console.log(`Failed to fetch total name, skip.`);
+      Logger.log(`Failed to fetch total name, skip.`);
     }
     try {
       const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
@@ -131,12 +131,12 @@ exports.Execute = async function () {
       await updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, tokenSummaryDao, tokenHolderDao);
       await Promise.all(insertList);
     } catch (e) {
-      console.log(`Error occurs when handling the smart contract: ${address}, Error: ${e.message}`);
+      Logger.log(`Error occurs when handling the smart contract: ${address}, Error: ${e.message}`);
     }
-    console.log(`Complete update smart contract #${i}/${smartContractIds.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
-    console.log('-----------------------------------------------------------------------------------');
+    Logger.log(`Complete update smart contract #${i}/${smartContractIds.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
+    Logger.log('-----------------------------------------------------------------------------------');
   }
-  console.log('Mission Completed!');
+  Logger.log('Mission Completed!');
 
 }
 
@@ -216,7 +216,7 @@ async function _getTNT20Name(address, abi) {
     let url = abiCoder.decode(outputTypes, outputValues)[0];
     return url;
   } catch (e) {
-    console.log('Error occurs in getTNT20Name:', e.message);
+    Logger.log('Error occurs in getTNT20Name:', e.message);
     return "";
   }
 }
@@ -271,18 +271,18 @@ async function _getTNT721Name(address, abi) {
           let name = get(res, 'data.name');
           return name.replace(/\(Edition #(.*)\)/, "");
         }).catch(e => {
-          console.log('error occurs in fetch url:', e.message)
+          Logger.log('error occurs in fetch url:', e.message)
           return "";
         })
     }
   } catch (e) {
-    console.log('Error occurs in getTNT721Name:', e.message);
+    Logger.log('Error occurs in getTNT721Name:', e.message);
     return "";
   }
 }
 
 async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, tokenSummaryDao, tokenHolderDao) {
-  console.log(`In updateTokenSummary of address:${address}`)
+  Logger.log(`In updateTokenSummary of address:${address}`)
   const tokenInfo = {
     _id: address,
     holders: { total: 0 },
@@ -294,11 +294,11 @@ async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, 
   try {
     tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
     if (!tokenInfo.max_total_supply) {
-      console.log(`Failed to fetch total supply, skip.`);
+      Logger.log(`Failed to fetch total supply, skip.`);
       return;
     }
   } catch (e) {
-    console.log('Error met when get max total supply in updateTokenSummary: ', e.message);
+    Logger.log('Error met when get max total supply in updateTokenSummary: ', e.message);
   }
   // Collect balance changes and store in holderMap
   /* holderMap = {
@@ -415,7 +415,7 @@ async function getMaxTotalSupply(address, abi) {
     let max = abiCoder.decode(outputTypes, outputValues)[0];
     return max.toString();
   } catch (e) {
-    console.log('Error occurs in getMaxTotalSupply:', e.message);
+    Logger.log('Error occurs in getMaxTotalSupply:', e.message);
     return 0;
   }
 }

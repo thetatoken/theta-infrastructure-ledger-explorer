@@ -27,7 +27,7 @@ var configFileName = 'config.cfg'
 main();
 
 function main() {
-  Logger.initialize()
+  Logger.initialize('token-summary')
   // load config
   Logger.log('Loading config file: ' + configFileName)
   try {
@@ -42,7 +42,7 @@ function main() {
   bluebird.promisifyAll(rpc);
 
   if (!config.defaultThetaChainID) {
-    console.log('Error: unable to load config.defaultThetaChainID:', config.defaultThetaChainID);
+    Logger.log('Error: unable to load config.defaultThetaChainID:', config.defaultThetaChainID);
     process.exit(1);
   }
   Theta.chainId = config.defaultThetaChainID;

@@ -38,7 +38,7 @@ var rewardDistributionDao = null;
 main();
 
 function main() {
-  Logger.initialize()
+  Logger.initialize('token')
   // load config
   Logger.log('Loading config file: ' + configFileName)
   try {
@@ -122,16 +122,16 @@ function setupGetBlockCronJob(mongoClient, networkId, retrieveStartHeight) {
     smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao);
 
   setTimeout(async function run() {
-    console.log('Start of Execute.');
+    Logger.log('Start of Execute.');
     const startTime = +new Date();
     let flag = { result: true };
     await readPreTokenCronJob.Execute(networkId, retrieveStartHeight, flag);
     if (flag.result) {
       readPreTokenTimer = setTimeout(run, 1000);
     } else {
-      console.log('Mission Completed!');
+      Logger.log('Mission Completed!');
     }
-    console.log('End of Execute, takes:', (+new Date() - startTime) / 1000, ' seconds');
+    Logger.log('End of Execute, takes:', (+new Date() - startTime) / 1000, ' seconds');
   }, 1000);
 
 }

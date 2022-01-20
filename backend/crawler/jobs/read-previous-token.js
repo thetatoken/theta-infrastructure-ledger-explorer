@@ -49,13 +49,13 @@ exports.Execute = async function (networkId, retrieveStartHeight, flag) {
   }
   try {
     const startHeight = height - blockNum > 0 ? height - blockNum : 1;
-    console.log(`startHeight: ${startHeight}, height: ${height}`)
+    Logger.log(`startHeight: ${startHeight}, height: ${height}`)
     const blockListInfo = await blockDao.getBlocksByRangeAsync(startHeight, height);
     let txHashList = [];
     blockListInfo.forEach(block => {
       txHashList = txHashList.concat(block.txs.filter(tx => tx.type === 7).map(tx => tx.hash))
     })
-    console.log('txHashList:', txHashList);
+    Logger.log('txHashList:', txHashList);
     const txsInfoList = await transactionDao.getTransactionsByPkAsync(txHashList);
     //TODO: update token info
     await updateTokens(txsInfoList, smartContractDao, tokenDao, tokenSummaryDao)
@@ -91,7 +91,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
         infoMap[address].tokenName = get(tokenInfo, 'tokenName');
       }
     }
-    console.log('Info map:', infoMap);
+    Logger.log('Info map:', infoMap);
     let logs = get(tx, 'receipt.Logs');
     logs = JSON.parse(JSON.stringify(logs));
     // Only log of transfer event remains
@@ -157,7 +157,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
       }
     }
   }
-  console.log('tokenArr:', tokenArr);
+  Logger.log('tokenArr:', tokenArr);
   return Promise.all(insertList);
 }
 
