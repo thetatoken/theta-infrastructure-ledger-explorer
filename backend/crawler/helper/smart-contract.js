@@ -1,7 +1,7 @@
 var get = require('lodash/get');
 var map = require('lodash/map');
 var BigNumber = require('bignumber.js');
-var { ZeroAddress, EventHashMap } = require('./constants');
+var { ZeroAddress, EventHashMap, CommonABIs } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
 
@@ -39,31 +39,57 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   logs = decodeLogs(logs, infoMap);
   const insertList = [];
   for (let [i, log] of logs.entries()) {
-    if (get(log, 'topics[0]') !== EventHashMap.TRANSFER) {
-      continue;
+    switch (get(log, 'topics[0]')) {
+      case EventHashMap.TFUEL_SPLIT:
+        if (typeof get(log, 'decode') !== "object") {
+          log = decodeLogByAbiHash(log, EventHashMap.TFUEL_SPLIT);
+          let sellerInfo = {
+            _id: tx.hash.toLowerCase() + i + 'seller',
+            hash: tx.hash.toLowerCase(),
+            to: get(log, 'decode.result.seller').toLowerCase(),
+            value: get(log, 'decode.result.sellerEarning'),
+            type: 'TFUEL',
+            timestamp: tx.timestamp,
+          }
+          let platformInfo = {
+            _id: tx.hash.toLowerCase() + i + 'platform',
+            hash: tx.hash.toLowerCase(),
+            to: get(log, 'decode.result.platformFeeRecipient').toLowerCase(),
+            value: get(log, 'decode.result.platformFee'),
+            type: 'TFUEL',
+            timestamp: tx.timestamp,
+          }
+          tokenArr.push(sellerInfo, platformInfo);
+          insertList.push(checkAndInsertToken(sellerInfo, tokenDao), checkAndInsertToken(platformInfo, tokenDao))
+        }
+        break;
+      case EventHashMap.TRANSFER:
+        const contractAddress = get(log, 'address');
+        // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
+        // this record will be hanlded in the contract verification
+        if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
+          continue;
+        }
+        const tokenId = get(log, 'decode.result.tokenId');
+        const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
+        const newToken = {
+          _id: tx.hash.toLowerCase() + i,
+          hash: tx.hash.toLowerCase(),
+          from: (get(log, 'decode.result.from') || '').toLowerCase(),
+          to: (get(log, 'decode.result.to') || '').toLowerCase(),
+          token_id: tokenId,
+          value,
+          name: get(infoMap, `${contractAddress}.name`),
+          type: get(infoMap, `${contractAddress}.type`),
+          timestamp: tx.timestamp,
+          contract_address: contractAddress
+        }
+        tokenArr.push(newToken);
+        insertList.push(checkAndInsertToken(newToken, tokenDao))
+        break;
+      default:
+        break;
     }
-    const contractAddress = get(log, 'address');
-    // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
-    // this record will be hanlded in the contract verification
-    if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
-      continue;
-    }
-    const tokenId = get(log, 'decode.result.tokenId');
-    const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
-    const newToken = {
-      _id: tx.hash.toLowerCase() + i,
-      hash: tx.hash.toLowerCase(),
-      from: (get(log, 'decode.result.from') || '').toLowerCase(),
-      to: (get(log, 'decode.result.to') || '').toLowerCase(),
-      token_id: tokenId,
-      value,
-      name: get(infoMap, `${contractAddress}.name`),
-      type: get(infoMap, `${contractAddress}.type`),
-      timestamp: tx.timestamp,
-      contract_address: contractAddress
-    }
-    tokenArr.push(newToken);
-    insertList.push(checkAndInsertToken(newToken, tokenDao))
   }
   console.log('tokenArr:', tokenArr);
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
@@ -315,4 +341,27 @@ function _getContractAddressSet(tx) {
     }
   })
   return [...set];
+}
+
+function decodeLogByAbiHash(log, abiHash) {
+  const events = CommonABIs[abiHash];
+  for (let event of events) {
+    try {
+      const ifaceTmp = new ethers.utils.Interface([event] || []);
+      let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+      let data = {};
+      Object.keys(bigNumberData).forEach(k => {
+        data[k] = bigNumberData[k].toString();
+      })
+      log.decode = {
+        result: data,
+        eventName: event.name,
+        event: event
+      }
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
+  return log;
 }

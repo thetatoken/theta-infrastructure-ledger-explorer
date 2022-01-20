@@ -82,6 +82,7 @@ exports.Execute = async function () {
     }
     if (tokenName === "" && tokenType === "TNT-20") {
       Logger.log(`Failed to fetch total name, skip.`);
+      return;
     }
     try {
       const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
