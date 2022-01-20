@@ -22,7 +22,7 @@ exports.EventHashMap = {
   TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457"
 }
 
-exports.CommonABI = {
+exports.CommonABIs = {
   "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457": [{
     anonymous: false,
     inputs: [{ indexed: true, internalType: "address", name: "seller", type: "address" },

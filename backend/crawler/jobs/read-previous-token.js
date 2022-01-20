@@ -1,7 +1,9 @@
 const { get } = require('lodash');
-const { EventHashMap } = require('../helper/constants');
+const { EventHashMap, ZeroAddress, CommonABIs } = require('../helper/constants');
 var Logger = require('../helper/logger');
-var { decodeLogs, checkTnt721, checkAndInsertToken } = require('../helper/smart-contract');
+var { decodeLogs, checkTnt721, checkTnt20, checkAndInsertToken } = require('../helper/smart-contract');
+var { getHex } = require('../helper/utils');
+var { ethers } = require("ethers");
 
 var progressDao = null;
 var blockDao = null;
@@ -26,9 +28,9 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   tokenSummaryDao = tokenSummaryDaoInstance;
 }
 
-exports.Execute = async function (networkId, retrieveStartHeight, readPreTokenTimer) {
+exports.Execute = async function (networkId, retrieveStartHeight, flag) {
   if (!retrieveStartHeight) {
-    clearInterval(readPreTokenTimer);
+    flag.result = false;
     return;
   }
   let height = retrieveStartHeight;
@@ -40,19 +42,18 @@ exports.Execute = async function (networkId, retrieveStartHeight, readPreTokenTi
     Logger.log('Error occurs in get fee:', e.message);
   }
   Logger.log('Read previous token height:', height);
-  if (height === 0) {
-    clearInterval(readPreTokenTimer);
+  // if (height < 13123789) { // for mainnet
+  if (height < 7952047) {
+    flag.result = false;
     return;
   }
   try {
     const startHeight = height - blockNum > 0 ? height - blockNum : 1;
     console.log(`startHeight: ${startHeight}, height: ${height}`)
     const blockListInfo = await blockDao.getBlocksByRangeAsync(startHeight, height);
-    console.log('blockListInfo:', blockListInfo)
-    console.log(blockListInfo[0].txs[0])
-    const txHashList = [];
+    let txHashList = [];
     blockListInfo.forEach(block => {
-      txHashList.push(block.txs.filter(tx => tx.type === 7).map(tx => tx.hash))
+      txHashList = txHashList.concat(block.txs.filter(tx => tx.type === 7).map(tx => tx.hash))
     })
     console.log('txHashList:', txHashList);
     const txsInfoList = await transactionDao.getTransactionsByPkAsync(txHashList);
@@ -60,7 +61,7 @@ exports.Execute = async function (networkId, retrieveStartHeight, readPreTokenTi
     await updateTokens(txsInfoList, smartContractDao, tokenDao, tokenSummaryDao)
     await progressDao.upsertTokenProgressAsync(startHeight - 1);
   } catch (e) {
-    Logger.log('Error occurs while updating fee and fee progress:', e.message);
+    Logger.log('Error occurs while updating token and token progress:', e.message);
   }
 }
 
@@ -100,10 +101,13 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
     })
     logs = decodeLogs(logs, infoMap);
     for (let [i, log] of logs.entries()) {
+      if (get(log, 'address') === get(tx, 'receipt.ContractAddress')) {
+        continue;
+      }
       switch (get(log, 'topics[0]')) {
         case EventHashMap.TFUEL_SPLIT:
           if (typeof get(log, 'decode') !== "object") {
-            log = decodeLogByCommonAbi(log, EventHashMap.TFUEL_SPLIT);
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_SPLIT);
             let sellerInfo = {
               _id: tx.hash.toLowerCase() + i + 'seller',
               hash: tx.hash.toLowerCase(),
@@ -136,8 +140,8 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           const newToken = {
             _id: tx.hash.toLowerCase() + i,
             hash: tx.hash.toLowerCase(),
-            from: get(log, 'decode.result.from').toLowerCase(),
-            to: get(log, 'decode.result.to').toLowerCase(),
+            from: (get(log, 'decode.result.from') || '').toLowerCase(),
+            to: (get(log, 'decode.result.to') || '').toLowerCase(),
             token_id: tokenId,
             value,
             name: get(infoMap, `${contractAddress}.name`),
@@ -170,4 +174,27 @@ function _getOtherContractAddressSet(tx) {
     }
   })
   return [...set];
+}
+
+function decodeLogByAbiHash(log, abiHash) {
+  const events = CommonABIs[abiHash];
+  for (let event of events) {
+    try {
+      const ifaceTmp = new ethers.utils.Interface([event] || []);
+      let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+      let data = {};
+      Object.keys(bigNumberData).forEach(k => {
+        data[k] = bigNumberData[k].toString();
+      })
+      log.decode = {
+        result: data,
+        eventName: event.name,
+        event: event
+      }
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
+  return log;
 }

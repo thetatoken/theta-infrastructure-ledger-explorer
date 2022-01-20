@@ -120,9 +120,18 @@ function setupGetBlockCronJob(mongoClient, networkId, retrieveStartHeight) {
 
   readPreTokenCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao,
     smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao);
-  let readPreTokenTimer;
-  readPreTokenTimer = setInterval(async function () {
-    await readPreTokenCronJob.Execute(networkId, retrieveStartHeight, readPreTokenTimer);
+
+  setTimeout(async function run() {
+    console.log('Start of Execute.');
+    const startTime = +new Date();
+    let flag = { result: true };
+    await readPreTokenCronJob.Execute(networkId, retrieveStartHeight, flag);
+    if (flag.result) {
+      readPreTokenTimer = setTimeout(run, 1000);
+    } else {
+      console.log('Mission Completed!');
+    }
+    console.log('End of Execute, takes:', (+new Date() - startTime) / 1000, ' seconds');
   }, 1000);
 
 }
