@@ -53,9 +53,14 @@ module.exports = class smartContractDAO {
     });
   }
 
-  getAbi(address, callback){
+  getAbi(address, callback) {
     const queryObject = { '_id': address };
     let projectionObject = { abi: 1, _id: 0 };
+    this.client.queryWithProjection(this.collection, queryObject, projectionObject, callback);
+  }
+
+  getAllIds(queryObject, callback) {
+    let projectionObject = { _id: 1 };
     this.client.queryWithProjection(this.collection, queryObject, projectionObject, callback);
   }
 }

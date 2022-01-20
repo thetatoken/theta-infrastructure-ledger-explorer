@@ -39,7 +39,7 @@ exports.Execute = async function (networkId, retrieveStartHeight, flag) {
     let tokenProgressInfo = await progressDao.getTokenProgressAsync();
     height = tokenProgressInfo.block_height;
   } catch (e) {
-    Logger.log('Error occurs in get fee:', e.message);
+    Logger.log('Error occurs in get token progress:', e.message);
   }
   Logger.log('Read previous token height:', height);
   // if (height < 13123789) { // for mainnet
