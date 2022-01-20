@@ -1,13 +1,17 @@
-const { get } = require('lodash');
-const { EventHashMap, ZeroAddress } = require('../helper/constants');
+var get = require('lodash/get');
+var map = require('lodash/map');
 var Logger = require('../helper/logger');
 var { checkTnt721, checkTnt20 } = require('../helper/smart-contract');
 var { getHex } = require('../helper/utils');
 var { ethers } = require("ethers");
 
+var BigNumber = require('bignumber.js');
 var Theta = require('../libs/Theta');
 var ThetaJS = require('../libs/thetajs.esm');
 var smartContractApi = require('../api/smart-contract-api');
+
+const { default: axios } = require('axios');
+const { EventHashMap, ZeroAddress } = require('../helper/constants');
 
 var transactionDao = null;
 var accountTxDao = null;
@@ -30,8 +34,10 @@ exports.Execute = async function () {
   let smartContractIds = [], tokenSummaryIds = [], tokenSummarySet;
   try {
     smartContractIds = await smartContractDao.getAllIdsAsync({ source_code: { $ne: "" } });
+    smartContractIds = smartContractIds.map(o => o._id);
     console.log('smartContractIds:', smartContractIds);
     tokenSummaryIds = await tokenSummaryDao.getAllIdsAsync();
+    tokenSummaryIds = tokenSummaryIds.map(o => o._id);
     console.log('tokenSummaryIds:', tokenSummaryIds);
     tokenSummarySet = new Set(tokenSummaryIds);
   } catch (e) {
@@ -40,10 +46,12 @@ exports.Execute = async function () {
   for (let i = 0; i < smartContractIds.length; i++) {
     const address = smartContractIds[i];
     const startTime = +new Date();
-    console.log(`Processing smart contract #${i}/${smartContractIds.length} with address:${address}.`);
-    const abi;
+    console.log('-----------------------------------------------------------------------------------');
+    console.log(`Processing smart contract #${i + 1}/${smartContractIds.length} with address:${address}.`);
+    let abi;
     try {
-      abi = await smartContractDao.getAbiAsync(address);
+      const abiRes = await smartContractDao.getAbiAsync(address);
+      abi = get(abiRes[0], 'abi');
     } catch (e) {
       Logger.log(`Error occurs in get abi by address:${address}. Error: ${e.message}`);
     }
@@ -72,6 +80,9 @@ exports.Execute = async function () {
     } catch (e) {
       console.log('Error in fetch token name in updateTokenHistoryBySmartContract: ', e.message);
     }
+    if (tokenName === "" && tokenType === "TNT-20") {
+      console.log(`Failed to fetch total name, skip.`);
+    }
     try {
       const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
       const txList = await accountTxDao.getListAsync(address, type, isEqualType, pageNum, limitNumber, reverse);
@@ -80,8 +91,6 @@ exports.Execute = async function () {
       let tokenTxSet = new Set(tokenList.map(info => info.hash));
       txHashes = txHashes.concat([...tokenTxSet]);
       const txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-      const tokenArr = [];
-      const insertList = [];
       const tokenArr = [];
       const insertList = [];
       for (let tx of txs) {
@@ -125,7 +134,9 @@ exports.Execute = async function () {
       console.log(`Error occurs when handling the smart contract: ${address}, Error: ${e.message}`);
     }
     console.log(`Complete update smart contract #${i}/${smartContractIds.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
+    console.log('-----------------------------------------------------------------------------------');
   }
+  console.log('Mission Completed!');
 
 }
 
@@ -205,7 +216,7 @@ async function _getTNT20Name(address, abi) {
     let url = abiCoder.decode(outputTypes, outputValues)[0];
     return url;
   } catch (e) {
-    console.log('error occurs:', e.message);
+    console.log('Error occurs in getTNT20Name:', e.message);
     return "";
   }
 }
@@ -265,7 +276,7 @@ async function _getTNT721Name(address, abi) {
         })
     }
   } catch (e) {
-    console.log('error occurs:', e.message);
+    console.log('Error occurs in getTNT721Name:', e.message);
     return "";
   }
 }
@@ -282,6 +293,10 @@ async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, 
   };
   try {
     tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
+    if (!tokenInfo.max_total_supply) {
+      console.log(`Failed to fetch total supply, skip.`);
+      return;
+    }
   } catch (e) {
     console.log('Error met when get max total supply in updateTokenSummary: ', e.message);
   }
@@ -400,7 +415,7 @@ async function getMaxTotalSupply(address, abi) {
     let max = abiCoder.decode(outputTypes, outputValues)[0];
     return max.toString();
   } catch (e) {
-    console.log('error occurs:', e.message);
+    console.log('Error occurs in getMaxTotalSupply:', e.message);
     return 0;
   }
 }
