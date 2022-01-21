@@ -140,8 +140,8 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           const newToken = {
             _id: tx.hash.toLowerCase() + i,
             hash: tx.hash.toLowerCase(),
-            from: (get(log, 'decode.result.from') || '').toLowerCase(),
-            to: (get(log, 'decode.result.to') || '').toLowerCase(),
+            from: (get(log, 'decode.result[0]') || '').toLowerCase(),
+            to: (get(log, 'decode.result[1]') || '').toLowerCase(),
             token_id: tokenId,
             value,
             name: get(infoMap, `${contractAddress}.name`),
