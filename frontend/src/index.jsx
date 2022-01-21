@@ -34,7 +34,7 @@ render(
         <Route path='/stakes' component={() => <Stakes stakeCoinType='theta' />} />
         
         {/* Note: Disabled token feature */}
-        <Route path='/token/:contractAddress' component={TokenDetails} />
+        {/* <Route path='/token/:contractAddress' component={TokenDetails} /> */}
 
         {/* <Route path='/tmp-internal-check' component={Check} />*/}
         <Route path='/' component={() => <Home backendAddress={backendSocketAddress} />} />

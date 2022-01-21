@@ -55,7 +55,7 @@ exports.Execute = async function (networkId, retrieveStartHeight, flag) {
     blockListInfo.forEach(block => {
       txHashList = txHashList.concat(block.txs.filter(tx => tx.type === 7).map(tx => tx.hash))
     })
-    Logger.log('txHashList:', txHashList);
+    Logger.log('txHashList length:', txHashList.length);
     const txsInfoList = await transactionDao.getTransactionsByPkAsync(txHashList);
     //TODO: update token info
     await updateTokens(txsInfoList, smartContractDao, tokenDao, tokenSummaryDao)
@@ -73,7 +73,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
   for (let tx of txs) {
     let addressList = _getOtherContractAddressSet(tx);
     if (addressList.length === 0) {
-      return;
+      continue;
     }
     // Generate info map
     for (let address of addressList) {
@@ -91,7 +91,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
         infoMap[address].tokenName = get(tokenInfo, 'tokenName');
       }
     }
-    Logger.log('Info map:', infoMap);
+    // Logger.log('Info map:', infoMap);
     let logs = get(tx, 'receipt.Logs');
     logs = JSON.parse(JSON.stringify(logs));
     // Only log of transfer event remains
