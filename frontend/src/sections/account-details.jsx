@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
 
-import { formatCoin, priceCoin, validateHex } from 'common/helpers/utils';
+import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress } from 'common/helpers/utils';
 import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -27,6 +27,7 @@ import { Multiselect } from 'multiselect-react-dropdown';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
+const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
 export default class AccountDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -54,7 +55,9 @@ export default class AccountDetails extends React.Component {
       beneficiary: "",
       tabIndex: 0,
       hasTNT721: false,
-      hasTNT20: false
+      hasTNT20: false,
+      hasToken: false,
+      tokenBalance: INITIAL_TOKEN_BALANCE
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -75,7 +78,13 @@ export default class AccountDetails extends React.Component {
   }
   componentDidUpdate(preProps) {
     if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
-      this.setState({ hasOtherTxs: true, includeService: false, rewardSplit: 0, beneficiary: "" })
+      this.setState({
+        hasOtherTxs: true,
+        includeService: false,
+        rewardSplit: 0,
+        beneficiary: "",
+        tokenBalance: INITIAL_TOKEN_BALANCE
+      })
       this.fetchData(this.props.match.params.accountAddress);
     }
   }
@@ -87,6 +96,7 @@ export default class AccountDetails extends React.Component {
     if (validateHex(address, 40)) {
       this.getOneAccountByAddress(address);
       this.getStakeTransactions(address);
+      this.fetchTokenBalance(address);
       if (!hasPrice) this.getPrices();
     } else {
       this.setState({ errorType: 'invalid_address' })
@@ -346,11 +356,34 @@ export default class AccountDetails extends React.Component {
   setTabIndex = index => {
     this.setState({ tabIndex: index })
   }
+  setHasToken = hasToken => {
+    this.setState({ hasToken });
+  }
+  fetchTokenBalance = async (accountAddress) => {
+    const tokenMap = {
+      TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+      // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
+      TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
+    }
+    let keys = Object.keys(tokenMap);
+    let tokenBalance = this.state.tokenBalance;
+    for (let key of keys) {
+      let balance = await fetchBalanceByAddress(tokenMap[key], accountAddress);
+      tokenBalance[key] = balance.toString();
+      if (balance.toString() !== '0') {
+        this.setState({ tokenBalance })
+        if (!this.state.hasToken) {
+          this.setState({ hasToken: true })
+        }
+      }
+    }
+  }
   render() {
-    const { account, transactions, currentPage, totalPages, errorType, loading_txns,
-      includeService, hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
+    const { account, transactions, currentPage, totalPages, errorType, loading_txns, tokenBalance,
+      hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
-      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721 } = this.state;
+      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -369,6 +402,7 @@ export default class AccountDetails extends React.Component {
               <tbody>
                 <DetailsRow label="Balance" data={<Balance balance={account.balance} price={price} />} />
                 <DetailsRow label="Sequence" data={account.sequence} />
+                {hasToken && <DetailsRow label="Token" data={<Token tokenBalance={tokenBalance} />} />}
                 {((hasThetaStakes && thetaHolderTxs.length > 0) || (hasTfuelStakes && tfuelHolderTxs.length > 0)) &&
                   <DetailsRow label="Reward Split" data={rewardSplit / 100 + '%'} />}
                 {rewardSplit !== 0 && <DetailsRow label="Beneficiary" data={<Address hash={beneficiary} />} />}
@@ -486,6 +520,18 @@ const Balance = ({ balance, price }) => {
         {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
         <div className='price'>{`[\$${priceCoin(v, price[CurrencyLabels[k]])} USD]`}</div>
       </div>)}
+    </div>)
+}
+
+const Token = ({ tokenBalance }) => {
+  return (
+    <div className="act balance">
+      {map(tokenBalance, (v, k) => {
+        const isZero = v === '0';
+        return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
+          {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
+        </div>
+      })}
     </div>)
 }
 

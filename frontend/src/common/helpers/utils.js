@@ -1,7 +1,12 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from "ethers";
+import get from 'lodash/get';
+import map from 'lodash/map';
 
 import { WEI, CommonABIs } from 'common/constants';
+import smartContractApi from 'common/services/smart-contract-api';
+import Theta from 'libs/Theta';
+import ThetaJS from 'libs/thetajs.esm'
 
 export function truncateMiddle(str, maxLength = 20, separator = '...') {
   if (str && str.length <= 20)
@@ -190,4 +195,59 @@ function _check(obj, abi) {
     res = res && obj[key].contains
   }
   return res;
+}
+
+export async function fetchBalanceByAddress(address, account) {
+  const balanceAbi = [{
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+    "name": "balanceOf",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }];
+  const functionData = balanceAbi[0];
+  const inputValues = [account]
+
+  const iface = new ethers.utils.Interface(balanceAbi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance;
+  } catch (e) {
+    console.log('error occurs in fetchTokenBalance:', e.message);
+    return 0;
+  }
 }

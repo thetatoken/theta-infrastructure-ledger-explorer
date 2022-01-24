@@ -15,7 +15,7 @@
     background-position: center center;
     background-size: contain;
     background-repeat: no-repeat;
-
+    background-image: url('/images/icons/token_default@2x.png')
   }
   &.tfuel,
   &.tfuelwei {
@@ -25,6 +25,15 @@
   &.thetawei {
     &:before { background-image: url('/images/icons/theta-icon@2x.png'); }
     &.left { float: left; }
+  }
+  &.tdrop {
+    &:before { background-image: url('/images/icons/tdrop_token.png'); }
+  }
+  &.tbill {
+    &:before {
+      width: 35px;
+      background-image: url('/images/icons/tbill_token.svg'); 
+    }
   }
 }
 
