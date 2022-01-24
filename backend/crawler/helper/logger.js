@@ -5,10 +5,12 @@ var fileCount = 0;
 var lineCount = 0;
 var linesPerFile = 4500;
 var file = null;
+var prefix = 'crawler';
 module.exports = {
-  initialize: function (prefix = "crawler") {
+  initialize: function (pf) {
+    if (pf) prefix = pf;
     makeSurePathExist(`./log/`);
-    var filename = makeLogFileName(fileCount, prefix);
+    var filename = makeLogFileName(fileCount);
     file = fs.createWriteStream(filename, { 'flags': 'w', 'encoding': 'utf8', 'mode': 0644 });
   },
   isLoggingEnabled: function () {
@@ -77,7 +79,7 @@ function makeSurePathExist(path) {
   }
 }
 
-function makeLogFileName(count, prefix) {
+function makeLogFileName(count) {
   var now = new Date();
   var year = 1900 + now.getYear();
   var month = to2Digit(now.getMonth() + 1);
