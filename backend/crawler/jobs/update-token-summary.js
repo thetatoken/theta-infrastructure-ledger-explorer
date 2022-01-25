@@ -55,13 +55,13 @@ exports.UpdateTNT721Name = async function () {
     try {
       tokenName = await _getTNT20Name(address, abi);
     } catch (e) {
-      console.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
+      Logger.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
     }
-    if (tokenName === "" && isTnt721) {
+    if (tokenName === "") {
       try {
         tokenName = await _getTNT721Name(address, abi);
       } catch (e) {
-        console.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
+        Logger.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
       }
     }
     if (tokenName !== "") {

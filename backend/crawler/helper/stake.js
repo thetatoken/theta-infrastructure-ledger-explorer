@@ -89,7 +89,7 @@ exports.updateStake = async function (candidate, type, stakeDao) {
     }
     insertList.push(stakeDao.insertAsync(stakeInfo));
   });
-  console.log('update stake list', type, 'length:', insertList.length)
+  Logger.log('update stake list', type, 'length:', insertList.length)
   await Promise.all(insertList);
 }
 exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabled) {
@@ -139,7 +139,7 @@ exports.updateTotalStake = function (totalStake, progressDao) {
 }
 
 exports.insertStakePairs = async function (paris, type, blockHeight, timestamp, stakeHistoryDao) {
-  console.log('In sert stake pairs', type)
+  Logger.log('In sert stake pairs', type)
   const insertList = []
   paris.forEach(pair => {
     get(pair, pathMap[type]).forEach(candidate => {
@@ -158,7 +158,7 @@ exports.insertStakePairs = async function (paris, type, blockHeight, timestamp, 
       })
     })
   })
-  console.log('insertList', type, 'length:', insertList.length)
+  Logger.log('insertList', type, 'length:', insertList.length)
   await Promise.all(insertList);
 }
 

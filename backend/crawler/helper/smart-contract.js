@@ -7,6 +7,7 @@ var smartContractApi = require('../api/smart-contract-api');
 var { ZeroAddress, EventHashMap, CommonABIs } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
+var Logger = require('./logger');
 
 exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
   let addressList = _getContractAddressSet(tx);
@@ -29,15 +30,14 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
       infoMap[`${address}`].tokenName = get(tokenInfo, 'tokenName');
     }
   }
-  console.log('Info map:', infoMap);
+  Logger.log('Info map:', infoMap);
   let logs = get(tx, 'receipt.Logs');
   logs = JSON.parse(JSON.stringify(logs));
-  // Only log of transfer event remains
   logs = logs.map(obj => {
     obj.data = getHex(obj.data);
     return obj;
   })
-  console.log('logs in updateTokenNew:', logs)
+  Logger.log('logs in updateTokenNew:', logs)
   const tokenArr = [];
   logs = _decodeLogs(logs, infoMap);
   const insertList = [];
@@ -94,7 +94,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
         break;
     }
   }
-  console.log('tokenArr:', tokenArr);
+  Logger.log('tokenArr:', tokenArr);
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
@@ -209,7 +209,7 @@ exports.checkAndInsertToken = _checkAndInsertToken;
 
 
 async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao) {
-  console.log('In updateTokenSummary')
+  Logger.log('In updateTokenSummary')
   const tokenSummaryMap = {};
 
   // Generate tokenSummaryMap
@@ -220,10 +220,10 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       tokenSummaryMap[`${address}`] = info;
       tokenSummaryMap[`${address}`].max_total_supply = await getMaxTotalSupply(address, infoMap[address].abi);
     } catch (e) {
-      console.log(`Error in get token summary by address: ${address}. Error:`, e.message);
+      Logger.log(`Error in get token summary by address: ${address}. Error:`, e.message);
     }
   }
-  console.log('tokenSummaryMap:', tokenSummaryMap);
+  Logger.log('tokenSummaryMap:', tokenSummaryMap);
 
   // Collect balance changes and store in holderMap
   /* holderMap = {
@@ -293,7 +293,7 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
         if (newAmount.eq(0)) {
           removeList.push(info.holder);
         } else {
-          console.log('update holder info:', { ...info, amount: newAmount.toFixed(0) })
+          Logger.log('update holder info:', { ...info, amount: newAmount.toFixed(0) })
           updateAsyncList.push(tokenHolderDao.upsertAsync({ ...info, amount: newAmount.toFixed(0) }))
         }
         newHolderList.delete(info.holder);
@@ -311,15 +311,18 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       updateAsyncList.push(tokenHolderDao.removeRecordByAdressAndHolderListAsync(address, tokenId, removeList));
       // Update token summary holders
       if (key === 'TNT20') {
-        tokenSummaryMap[`${address}`].holders.total += newHolderList.size - removeList.length;
+        tokenSummaryMap[address].holders.total += newHolderList.size - removeList.length;
       } else {
-        if (tokenSummaryMap[`${address}`].holders[`${tokenId}`]) {
-          tokenSummaryMap[`${address}`].holders[`${tokenId}`] = 0;
+        if (tokenSummaryMap[address].holders[tokenId] === undefined) {
+          tokenSummaryMap[address].holders[tokenId] = 0;
         }
-        tokenSummaryMap[`${address}`].holders[`${tokenId}`] += newHolderList.length - removeList.length;
+        if (Number.isNaN(tokenSummaryMap[address].holders[tokenId])) {
+          tokenSummaryMap[address].holders[tokenId] = 1;
+        }
+        tokenSummaryMap[address].holders[tokenId] += newHolderList.size - removeList.length;
       }
     }
-    updateAsyncList.push(tokenSummaryDao.upsertAsync({ ...tokenSummaryMap[`${address}`] }));
+    updateAsyncList.push(tokenSummaryDao.upsertAsync({ ...tokenSummaryMap[address] }));
   }
   await Promise.all(updateAsyncList);
   const updateHoldersList = [];
@@ -334,7 +337,7 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       tokenSummaryMap[`${address}`].holders.total = holderSet.size;
       updateHoldersList.push(tokenSummaryDao.upsertAsync({ ...tokenSummaryMap[`${address}`] }))
     } catch (e) {
-      console.log('Error in update tokenSummary.total for TNT-721 tokens. Error:', e.message);
+      Logger.log('Error in update tokenSummary.total for TNT-721 tokens. Error:', e.message);
     }
   }
   return Promise.all(updateHoldersList);
@@ -418,7 +421,7 @@ async function getMaxTotalSupply(address, abi) {
     let max = abiCoder.decode(outputTypes, outputValues)[0];
     return max.toString();
   } catch (e) {
-    console.log('error occurs:', e.message);
+    Logger.log('error occurs:', e.message);
     return 0;
   }
 }

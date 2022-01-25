@@ -32,12 +32,14 @@ exports.updateTokenHistoryBySmartContract = async function (sc, transactionDao, 
   } catch (e) {
     console.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
   }
+  console.log('tokenName after name function:', tokenName);
   if (tokenName === "" && isTnt721) {
     try {
       tokenName = await _getTNT721Name(address, abi);
     } catch (e) {
       console.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
     }
+    console.log('tokenName after tokenURI function:', tokenName);
   }
   try {
     const type = 7, isEqualType = 'true', pageNum = 0, limitNumber = 0, reverse = false;
