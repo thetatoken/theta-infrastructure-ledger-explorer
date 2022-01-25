@@ -481,8 +481,8 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
       }
       const value = tokenId != null ? 1 : get(log, 'decode.result[2]');
       tokenArr.push({
-        from: get(log, 'decode.result.from'),
-        to: get(log, 'decode.result.to'),
+        from: get(log, 'decode.result[0]'),
+        to: get(log, 'decode.result[1]'),
         tokenId,
         value,
         type,

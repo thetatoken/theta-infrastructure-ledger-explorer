@@ -159,8 +159,8 @@ exports.Execute = async function () {
           const value = tokenId != null ? 1 : get(log, 'decode.result[2]');
           const newToken = {
             hash: tx.hash.toLowerCase(),
-            from: get(log, 'decode.result.from').toLowerCase(),
-            to: get(log, 'decode.result.to').toLowerCase(),
+            from: get(log, 'decode.result[0]').toLowerCase(),
+            to: get(log, 'decode.result[1]').toLowerCase(),
             token_id: tokenId,
             value,
             name: tokenName,
