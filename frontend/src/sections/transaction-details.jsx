@@ -437,6 +437,7 @@ const StakeRewardDistribution = ({ transaction, price }) => {
 const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [feeSplit, setFeeSplit] = useState(null);
+  const [tfuelSplit, setTfuelSplit] = useState(null);
 
   const [hasItem, setHasItem] = useState(false);
   const [hasTnt721Transfer, setHasTnt721Transfer] = useState(false);
@@ -596,6 +597,20 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     })
   }, [logs, abiMap])
 
+  // handle state TFuelSplit
+  useEffect(() => {
+    if (!abiMap) return;
+    const abi = abiMap[`${get(transaction, 'receipt.ContractAddress')}`] || [];
+    const arr = abi.filter(obj => obj.name == "TFuelSplit" && obj.type === 'event');
+    if (arr.length === 0) return;
+    logs.forEach(log => {
+      const eventName = get(log, 'decode.eventName');
+      if (eventName !== 'TFuelSplit') return;
+      const result = get(log, 'decode.result');
+      if (tfuelSplit === null) setTfuelSplit(result);
+    })
+  }, [logs, abiMap])
+
   // handle state hasItem
   useEffect(() => {
     if (!abiMap || hasItem || logs.length === 0) return;
@@ -664,7 +679,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
                 {Buffer.from(get(transaction, 'receipt.EvmRet'), 'base64').toString() || err}
               </span>} /> : null}
               <DetailsRow label="Value" data={<SmartContractValue value={get(data, 'from.coins.tfuelwei')}
-                price={price} feeSplit={feeSplit} />} />
+                price={price} feeSplit={feeSplit} tfuelSplit={tfuelSplit} />} />
               <DetailsRow label="Data" data={<SmartContractData data={getHex(data.data)} logs={logs}
                 hasDetails={false}
               // hasDetails={hasTnt721Transfer ||
@@ -769,38 +784,35 @@ const Log = ({ log }) => {
   )
 }
 
-const SmartContractValue = ({ value, price, feeSplit }) => {
-  const isMobile = window.screen.width <= 560;
-  const truncate = 20;
+const SmartContractValue = ({ value, price, feeSplit, tfuelSplit }) => {
   return <div className="sc-value">
     <div className="currency tfuel">
       {formatCoin(value)} TFuel
       <div className='price'>{`[\$${priceCoin(value, price['TFuel'])} USD]`}</div>
     </div>
     {feeSplit && <>
-      <div className="sc-value__row">
-        <div className="sc-value__arrow"></div>
-        <div className="currency tfuel">
-          {formatCoin(feeSplit.userPayout)} TFuel
-          <div className='price'>{`[\$${priceCoin(feeSplit.userPayout, price['TFuel'])} USD]`}</div>
-        </div>
-        <div className="sc-value__address">
-          <div className="sc-value__text">To</div>
-          <Address hash={feeSplit.userAddress} truncate={isMobile ? truncate : 0} />
-        </div>
-      </div>
-      <div className="sc-value__row">
-        <div className="sc-value__arrow"></div>
-        <div className="currency tfuel">
-          {formatCoin(feeSplit.ownerPayout)} TFuel
-          <div className='price'>{`[\$${priceCoin(feeSplit.ownerPayout, price['TFuel'])} USD]`}</div>
-        </div>
-        <div className="sc-value__address">
-          <div className="sc-value__text">To</div>
-          <Address hash={feeSplit.ownerAddress} truncate={isMobile ? truncate : 0} />
-        </div>
-      </div>
+      <FeeSplitRow address={feeSplit.userAddress} fee={feeSplit.userPayout} price={price} />
+      <FeeSplitRow address={feeSplit.ownerAddress} fee={feeSplit.ownerPayout} price={price} />
     </>}
+    {tfuelSplit && <>
+      <FeeSplitRow address={tfuelSplit.seller} fee={tfuelSplit.sellerEarning} price={price} />
+      <FeeSplitRow address={tfuelSplit.platformFeeRecipient} fee={tfuelSplit.platformFee} price={price} />
+    </>}
+  </div>
+}
+const FeeSplitRow = ({ address, fee, price }) => {
+  const isMobile = window.screen.width <= 560;
+  const truncate = 20;
+  return <div className="sc-value__row">
+    <div className="sc-value__arrow"></div>
+    <div className="currency tfuel">
+      {formatCoin(fee)} TFuel
+      <div className='price'>{`[\$${priceCoin(fee, price['TFuel'])} USD]`}</div>
+    </div>
+    <div className="sc-value__address">
+      <div className="sc-value__text">To</div>
+      <Address hash={address} truncate={isMobile ? truncate : 0} />
+    </div>
   </div>
 }
 const EventName = ({ event }) => {
