@@ -297,8 +297,11 @@ async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, 
   };
   try {
     tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
+    if (tokenType === 'TNT-20') {
+      tokenInfo.decimals = await getDecimals(address, abi);
+    }
   } catch (e) {
-    console.log('Error met when get max total supply in updateTokenSummary: ', e.message);
+    console.log('Error met when get max total supply and decimals in updateTokenSummary: ', e.message);
   }
   // Collect balance changes and store in holderMap
   /* holderMap = {
@@ -417,5 +420,50 @@ async function getMaxTotalSupply(address, abi) {
   } catch (e) {
     console.log('error occurs:', e.message);
     return 0;
+  }
+}
+
+async function getDecimals(address, abi) {
+  const arr = abi.filter(obj => obj.name == "decimals" && obj.type === 'function');
+  if (arr.length === 0) return 0;
+  const functionData = arr[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(abi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const result = get(callResponse, 'data.result');
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+    let decimals = abiCoder.decode(outputTypes, outputValues)[0];
+    return decimals.toString();
+  } catch (e) {
+    console.log('error occurs:', e.message);
+    return null;
   }
 }

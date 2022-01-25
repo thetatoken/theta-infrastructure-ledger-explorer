@@ -75,6 +75,45 @@ exports.UpdateTNT721Name = async function () {
   }
   Logger.log('Mission Completed!');
 }
+exports.UpdateTNT20Decimals = async function () {
+  let tokenSummaryInfoList = [];
+  try {
+    tokenSummaryInfoList = await tokenSummaryDao.getRecordsAsync({ type: "TNT-20" });
+    Logger.log('tokenSummaryInfoList[0]:', tokenSummaryInfoList[0]);
+    Logger.log('tokenSummaryInfoList.length:', tokenSummaryInfoList.length);
+  } catch (e) {
+    Logger.log('Error occurs in get tokenSummary info:', e.message);
+  }
+  for (let i = 0; i < tokenSummaryInfoList.length; i++) {
+    const tokenInfo = tokenSummaryInfoList[i];
+    const address = tokenInfo._id;
+    const startTime = +new Date();
+    Logger.log('-----------------------------------------------------------------------------------');
+    Logger.log(`Processing token summary #${i + 1}/${tokenSummaryInfoList.length} with address:${address}.`);
+    const abi = [{
+      "constant": true,
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }];
+    let decimals;
+    try {
+      decimals = await getDecimals(address, abi);
+    } catch (e) {
+      Logger.log('Error in fetch decimals in UpdateTNT20Decimals: ', e.message);
+    }
+    if (decimals !== "") {
+      tokenInfo.name = decimals;
+      await tokenSummaryDao.upsertAsync({ ...tokenInfo });
+    }
+    Logger.log(`Complete update token summary #${i}/${tokenSummaryInfoList.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
+    Logger.log('-----------------------------------------------------------------------------------');
+  }
+  Logger.log('Mission Completed!');
+}
 exports.Execute = async function () {
   let smartContractIds = [], tokenSummaryIds = [], tokenSummarySet;
   try {
@@ -463,5 +502,51 @@ async function getMaxTotalSupply(address, abi) {
   } catch (e) {
     Logger.log('Error occurs in getMaxTotalSupply:', e.message);
     return 0;
+  }
+}
+
+async function getDecimals(address, abi) {
+  const arr = abi.filter(obj => obj.name == "decimals" && obj.type === 'function');
+  if (arr.length === 0) return null;
+  const functionData = arr[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(abi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const result = get(callResponse, 'data.result');
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+    let decimals = abiCoder.decode(outputTypes, outputValues)[0];
+    console.log(`decimals: ${decimals}, typeof: ${typeof decimals}`);
+    return decimals.toString();
+  } catch (e) {
+    console.log('error occurs:', e.message);
+    return null;
   }
 }
