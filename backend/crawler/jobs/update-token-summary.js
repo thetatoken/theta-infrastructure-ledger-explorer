@@ -29,7 +29,50 @@ exports.Initialize = function (transactionDaoInstance, accountTxDaoInstance, sma
   tokenHolderDao = tokenHolderDaoInstance;
   tokenSummaryDao = tokenSummaryDaoInstance;
 }
-
+exports.UpdateTNT721Name = async function () {
+  let tokenSummaryInfoList = [];
+  try {
+    tokenSummaryInfoList = await tokenSummaryDao.getRecordsAsync({ type: "TNT-721", name: "" });
+    Logger.log('tokenSummaryInfoList[0]:', tokenSummaryInfoList[0]);
+    Logger.log('tokenSummaryInfoList.length:', tokenSummaryInfoList.length);
+  } catch (e) {
+    Logger.log('Error occurs in get tokenSummary info:', e.message);
+  }
+  for (let i = 0; i < tokenSummaryInfoList.length; i++) {
+    const tokenInfo = tokenSummaryInfoList[i];
+    const address = tokenInfo._id;
+    const startTime = +new Date();
+    Logger.log('-----------------------------------------------------------------------------------');
+    Logger.log(`Processing token summary #${i + 1}/${tokenSummaryInfoList.length} with address:${address}.`);
+    const abi = [{
+      "inputs": [],
+      "name": "name",
+      "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+      "stateMutability": "view",
+      "type": "function"
+    }];
+    let tokenName = ""
+    try {
+      tokenName = await _getTNT20Name(address, abi);
+    } catch (e) {
+      console.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
+    }
+    if (tokenName === "" && isTnt721) {
+      try {
+        tokenName = await _getTNT721Name(address, abi);
+      } catch (e) {
+        console.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
+      }
+    }
+    if (tokenName !== "") {
+      tokenInfo.name = tokenName;
+      await tokenSummaryDao.upsertAsync({ ...tokenInfo });
+    }
+    Logger.log(`Complete update token summary #${i}/${tokenSummaryInfoList.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
+    Logger.log('-----------------------------------------------------------------------------------');
+  }
+  Logger.log('Mission Completed!');
+}
 exports.Execute = async function () {
   let smartContractIds = [], tokenSummaryIds = [], tokenSummarySet;
   try {
@@ -41,7 +84,7 @@ exports.Execute = async function () {
     Logger.log('tokenSummaryIds:', tokenSummaryIds);
     tokenSummarySet = new Set(tokenSummaryIds);
   } catch (e) {
-    Logger.log('Error occurs in get get ids:', e.message);
+    Logger.log('Error occurs in get ids:', e.message);
   }
   for (let i = 0; i < smartContractIds.length; i++) {
     const address = smartContractIds[i];

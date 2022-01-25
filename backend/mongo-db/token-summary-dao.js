@@ -23,4 +23,8 @@ module.exports = class TokenSummaryDAO {
     let projectionObject = { _id: 1 };
     this.client.queryWithProjection(this.collection, {}, projectionObject, callback);
   }
+
+  getRecords(queryObject, callback) {
+    this.client.getRecords(this.collection, queryObject, {}, 0, 0, callback);
+  }
 }
