@@ -835,7 +835,12 @@ const Topic = ({ topic, decode, i }) => {
   const [model, setModel] = useState(isDisabled ? 'hex' : 'decode');
 
   const handleOnChange = e => setModel(e.target.value);
-
+  let indexedArr = [];
+  if (!isDisabled) {
+    get(decode, `event.inputs`).forEach((input, i) => {
+      if (input.indexed) indexedArr.push(i);
+    });
+  }
   return <div className="sc-topic">
     <div className="sc-topic__index">{i}</div>
     {i !== 0 &&
@@ -847,8 +852,8 @@ const Topic = ({ topic, decode, i }) => {
         <div className="sc-topic__arrow"></div>
       </>}
     {model === 'hex' || i === 0 ?
-      topic : get(decode, `event.inputs.${index}.type`) === 'address' ?
-        <Address hash={get(decode, `result.${index}`)} /> : get(decode, `result.${index}`)}
+      topic : get(decode, `event.inputs.${indexedArr[index]}.type`) === 'address' ?
+        <Address hash={get(decode, `result.${indexedArr[index]}`)} /> : get(decode, `result.${indexedArr[index]}`)}
   </div>
 }
 const LogData = ({ data, decode }) => {
