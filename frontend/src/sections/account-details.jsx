@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Popup from "reactjs-popup";
 import { Link } from 'react-router-dom';
+import BigNumber from 'bignumber.js';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
@@ -369,9 +370,11 @@ export default class AccountDetails extends React.Component {
     let keys = Object.keys(tokenMap);
     let tokenBalance = this.state.tokenBalance;
     for (let key of keys) {
-      let balance = await fetchBalanceByAddress(tokenMap[key], accountAddress);
-      tokenBalance[key] = balance.toString();
-      if (balance.toString() !== '0') {
+      let balanceBN = await fetchBalanceByAddress(tokenMap[key], accountAddress);
+      let balance = balanceBN.toString();
+      tokenBalance[key] = balance;
+      const MIN_DISPLAY_VALUE = new BigNumber('10000000000000000');
+      if (new BigNumber(balance).gt(MIN_DISPLAY_VALUE)) {
         this.setState({ tokenBalance })
         if (!this.state.hasToken) {
           this.setState({ hasToken: true })
@@ -529,7 +532,7 @@ const Token = ({ tokenBalance }) => {
       {map(tokenBalance, (v, k) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
-          {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
+          {`${formatCoin(v, 2)} ${CurrencyLabels[k] || k}`}
         </div>
       })}
     </div>)
