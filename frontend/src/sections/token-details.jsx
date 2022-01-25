@@ -52,7 +52,7 @@ const TokenDetails = ({ match, location }) => {
       smartContractService.getAbiByAddress(contractAddress.toLowerCase())
         .then(result => {
           if (result.data.type === 'smart_contract_abi') {
-            setAbi(result.data.body.abi);
+            setAbi(result.data.body.abi || []);
           }
         })
     }
@@ -61,6 +61,10 @@ const TokenDetails = ({ match, location }) => {
       tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
           if (res.data.type === "error_not_found") {
+            setErrorType("error_not_found");
+            return;
+          }
+          if (tId != null && get(res, 'data.body.total_transfers') === 0) {
             setErrorType("error_not_found");
             return;
           }
@@ -206,7 +210,7 @@ const TokenDetails = ({ match, location }) => {
         </>}
       {!transactions && loadingTxns &&
         <LoadingPanel />}
-      {transactions && transactions.length > 0 && tokenId != null && <div className="wrap">
+      {tokenInfo && !errorType && transactions && transactions.length > 0 && tokenId != null && <div className="wrap">
         <div className="details-header item">
           <div className="txn-type items">Item</div>
         </div>
@@ -214,7 +218,7 @@ const TokenDetails = ({ match, location }) => {
           <Item item={item} />
         </div>
       </div>}
-      {transactions && transactions.length > 0 &&
+      {tokenInfo && !errorType && transactions && transactions.length > 0 &&
         <div className="wrap">
           <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList>
