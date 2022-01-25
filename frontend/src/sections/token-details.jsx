@@ -169,6 +169,7 @@ const TokenDetails = ({ match, location }) => {
     }
     fetchUrl();
   }, [tokenId, abi, match.params.contractAddress])
+  let name = get(item, 'name') || get(transactions[0], 'name');
   return (
     <div className="content token">
       <div className="page-title account">Token Detail</div>
@@ -196,7 +197,7 @@ const TokenDetails = ({ match, location }) => {
                 <DetailsRow label="Transfers" data={tokenInfo.total_transfers} />
               </>}
               {tokenId != null && <>
-                {transactions && transactions.length > 0 && <DetailsRow label="Name" data={transactions[0].name} />}
+                {name && <DetailsRow label="Name" data={name} />}
                 <DetailsRow label="Token Id" data={tokenId} />
                 <DetailsRow label="Transfers" data={transactions.length} />
               </>}

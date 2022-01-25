@@ -57,12 +57,14 @@ exports.UpdateTNT721Name = async function () {
     } catch (e) {
       Logger.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
     }
+    console.log('tokenName after name function:', tokenName);
     if (tokenName === "") {
       try {
         tokenName = await _getTNT721Name(address, abi);
       } catch (e) {
         Logger.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
       }
+      console.log('tokenName after tokenURI function:', tokenName);
     }
     if (tokenName !== "") {
       tokenInfo.name = tokenName;
