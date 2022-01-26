@@ -75,4 +75,8 @@ module.exports = class TotalAccountDAO {
     };
     this.client.getTotal(this.collection, queryObject, callback);
   }
+  //TODO: remove after update tfuel records
+  getRecords(queryObject) {
+    this.client.getRecords(this.collection, queryObject, {}, 0, 0, callback);
+  }
 }

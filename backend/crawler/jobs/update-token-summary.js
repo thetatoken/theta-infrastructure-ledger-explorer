@@ -112,6 +112,38 @@ exports.UpdateTNT20Decimals = async function () {
   }
   Logger.log('Mission Completed!');
 }
+exports.UpdateTFUELFrom = async function () {
+  let tokenInfoList = [];
+  try {
+    tokenInfoList = await tokenDao.getRecordsAsync({ type: "TFUEL" });
+    Logger.log('tokenInfoList[0]:', tokenInfoList[0]);
+    Logger.log('tokenInfoList.length:', tokenInfoList.length);
+  } catch (e) {
+    Logger.log('Error occurs in get tokenSummary info:', e.message);
+  }
+  for (let i = 0; i < tokenInfoList.length; i++) {
+    const tokenInfo = tokenInfoList[i];
+    const txHash = tokenInfo.hash;
+    const startTime = +new Date();
+    Logger.log('-----------------------------------------------------------------------------------');
+    Logger.log(`Processing update tfuel from #${i + 1}/${tokenInfoList.length} with address:${address}.`);
+    let txInfo;
+    try {
+      txInfo = await transactionDao.getTransactionByPkAsync(txHash);
+    } catch (e) {
+      Logger.log('Error in fetch transaction in UpdateTFUELFrom: ', e.message);
+    }
+    if (!txInfo) {
+      tokenInfo.from = get(tx, 'data.from.address');
+      let id = tokenInfo._id;
+      delete tokenInfo._id;
+      await tokenSummaryDao.upsertAsync(id, { ...tokenInfo });
+    }
+    Logger.log(`Complete update tfuel from #${i}/${tokenInfoList.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
+    Logger.log('-----------------------------------------------------------------------------------');
+  }
+  Logger.log('Mission Completed!');
+}
 exports.Execute = async function () {
   let smartContractIds = [], tokenSummaryIds = [], tokenSummarySet;
   try {
