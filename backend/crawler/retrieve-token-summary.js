@@ -86,7 +86,6 @@ function setupGetBlockCronJob(mongoClient) {
     smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao);
 
   // updatePreTokenSummaryCronJob.Execute();
-  // updatePreTokenSummaryCronJob.UpdateTNT721Name();
+  updatePreTokenSummaryCronJob.UpdateTNT721Name();
   // updatePreTokenSummaryCronJob.UpdateTNT20Decimals();
-  updatePreTokenSummaryCronJob.UpdateTFUELFrom();
 }

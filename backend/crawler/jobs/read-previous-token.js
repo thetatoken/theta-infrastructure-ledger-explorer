@@ -109,18 +109,20 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_SPLIT);
             let sellerInfo = {
-              _id: tx.hash.toLowerCase() + i + 'seller',
+              _id: tx.hash.toLowerCase() + i + '_0',
               hash: tx.hash.toLowerCase(),
-              to: get(log, 'decode.result.seller').toLowerCase(),
-              value: get(log, 'decode.result.sellerEarning'),
+              from: get(tx, 'data.from.address').toLowerCase(),
+              to: get(log, 'decode.result[0]').toLowerCase(),
+              value: get(log, 'decode.result[1]'),
               type: 'TFUEL',
               timestamp: tx.timestamp,
             }
             let platformInfo = {
-              _id: tx.hash.toLowerCase() + i + 'platform',
+              _id: tx.hash.toLowerCase() + i + '_1',
               hash: tx.hash.toLowerCase(),
-              to: get(log, 'decode.result.platformFeeRecipient').toLowerCase(),
-              value: get(log, 'decode.result.platformFee'),
+              from: get(tx, 'data.from.address').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase(),
+              value: get(log, 'decode.result[3]'),
               type: 'TFUEL',
               timestamp: tx.timestamp,
             }
