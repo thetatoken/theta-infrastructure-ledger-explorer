@@ -7,10 +7,11 @@ import cx from 'classnames';
 import map from 'lodash/map';
 import get from 'lodash/get';
 import truncate from 'lodash/truncate';
+import { formatCoin } from '../helpers/utils';
 
-const NUM_TRANSACTIONS = 25;
 
 const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenMap }) => {
+  const NUM_TRANSACTIONS = type === 'TFUEL' ? 30 : 25;
   return (
     <table className={cx("data txn-table", className)}>
       <thead>
@@ -21,7 +22,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
           {tabType !== "token" && <th></th>}
           <th className="to">To</th>
           {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
-          {type === 'TNT-20' && <th className="quantity">Quantity</th>}
+          {(type === 'TNT-20' || type === 'TFUEL') && <th className="quantity">Quantity</th>}
           {type === 'TNT-20' && <th>Token</th>}
         </tr>
       </thead>
@@ -45,6 +46,11 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                 </td>
                 {type === 'TNT-721' && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
+                </td>}
+                {type === 'TFUEL' && <td className="quantity">
+                  <div className="currency tfuel">
+                    {formatCoin(txn.value, 2)}
+                  </div>
                 </td>}
                 {type === 'TNT-20' && <td className="quantity">{quantity}</td>}
                 {type === 'TNT-20' && <td className="token">

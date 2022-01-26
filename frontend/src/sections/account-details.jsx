@@ -57,6 +57,7 @@ export default class AccountDetails extends React.Component {
       tabIndex: 0,
       hasTNT721: false,
       hasTNT20: false,
+      hasInternalTxs: false,
       hasToken: false,
       tokenBalance: INITIAL_TOKEN_BALANCE
     };
@@ -199,8 +200,8 @@ export default class AccountDetails extends React.Component {
   }
 
   getTokenTransactionsNumber(address) {
-    const tokenList = ["TNT-721", "TNT-20"];
-    const { hasTNT20, hasTNT721 } = this.state;
+    const tokenList = ["TNT-721", "TNT-20", "TFUEL"];
+    const { hasTNT20, hasTNT721, hasInternalTxs } = this.state;
     for (let name of tokenList) {
       tokenService.getTokenTxsNumByAccountAndType(address, name)
         .then(res => {
@@ -210,6 +211,8 @@ export default class AccountDetails extends React.Component {
               this.setState({ hasTNT721: true });
             } else if (name === 'TNT-20' && !hasTNT20) {
               this.setState({ hasTNT20: true });
+            } else if (name === 'TFUEL' && !hasInternalTxs) {
+              this.setState({ hasInternalTxs: true });
             }
           }
         })
@@ -362,8 +365,8 @@ export default class AccountDetails extends React.Component {
   }
   fetchTokenBalance = async (accountAddress) => {
     const tokenMap = {
-      TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-      // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      // TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+      TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
       WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
       TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
     }
@@ -385,8 +388,8 @@ export default class AccountDetails extends React.Component {
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns, tokenBalance,
       hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
-      tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading,
-      hasRefreshBtn, typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken } = this.state;
+      tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
+      typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs } = this.state;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -430,6 +433,7 @@ export default class AccountDetails extends React.Component {
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
+            {hasInternalTxs && <Tab>Internal Txns</Tab>}
             {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
             {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
           </TabList>
@@ -505,6 +509,9 @@ export default class AccountDetails extends React.Component {
               <SmartContract address={account.address} />
             </TabPanel>
           }
+          {hasInternalTxs && <TabPanel>
+            <TokenTab type="TFUEL" address={account.address} />
+          </TabPanel>}
           {hasTNT20 && <TabPanel>
             <TokenTab type="TNT-20" address={account.address} />
           </TabPanel>}
@@ -569,8 +576,13 @@ const TokenTab = props => {
         setLoadingTxns(false);
         let addressSet = new Set();
         txs.forEach(tx => {
-          addressSet.add(tx.contract_address);
+          if (tx.contract_address) {
+            addressSet.add(tx.contract_address);
+          }
         })
+        if (addressSet.size === 0) {
+          return;
+        }
         tokenService.getTokenInfoByAddressList([...addressSet])
           .then(res => {
             let infoList = get(res, 'data.body') || [];
