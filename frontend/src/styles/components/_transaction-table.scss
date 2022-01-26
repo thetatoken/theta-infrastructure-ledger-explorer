@@ -55,6 +55,39 @@ table.data.txn-table {
   }
   td.dim a, td.token{
     color: $color-font-light;
+    & .tooltip{
+      z-index: 100;
+      &--text{
+        width: 200px;
+        visibility: hidden;
+        position: absolute;
+        z-index: 1;
+        background: $color-font-light;
+        border-radius: 6px;
+        padding: 8px 0 5px 10px;
+        text-align: left;
+        line-height: 15px;
+        color: $color-white;
+        font-size: 12px;
+  
+        bottom: calc(100% + 10px);
+        left: 50%;
+        margin-left: -125px;
+        &:after{
+          content: '';
+          position: absolute;
+          border-style: solid;
+          top: 100%;
+          left: 50%;
+          margin-left: -5px;
+          border-color: $color-font-light transparent transparent transparent;
+          border-width: 5px;
+        }
+      }
+      &:hover .tooltip--text{
+          visibility: visible;
+      }
+    }
   }
   tr .icon {
     &:before {

@@ -23,7 +23,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
           <th className="to">To</th>
           {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
           {(type === 'TNT-20' || type === 'TFUEL') && <th className="quantity">Quantity</th>}
-          {type === 'TNT-20' && <th>Token</th>}
+          {type !== 'TFUEL' && tabType !== 'token' && <th>Token</th>}
         </tr>
       </thead>
       <tbody>
@@ -53,17 +53,31 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                   </div>
                 </td>}
                 {type === 'TNT-20' && <td className="quantity">{quantity}</td>}
-                {type === 'TNT-20' && <td className="token">
-                  <div className={cx("currency", TokenIcons[name])}>
-                    <Link to={`/token/${txn.contract_address}`}>{name}</Link>
-                  </div>
-                </td>}
+                {type !== 'TFUEL' && tabType !== 'token' && <TokenName name={name} address={txn.contract_address} />}
+
               </React.Fragment>
             </tr>);
         })}
       </tbody>
     </table>
   );
+}
+
+const TokenName = (props) => {
+  const { name, address } = props;
+  const isTruncated = name.length > 12;
+  const tokenName = isTruncated ? truncate(name, { length: 12 }) : name;
+  return <td className="token">
+    {isTruncated ?
+      <div className={cx("currency tooltip", TokenIcons[name])}>
+        <Link to={`/token/${address}`}>{tokenName}</Link>
+        <div className='tooltip--text'>{name}</div>
+      </div> :
+      <div className={cx("currency", TokenIcons[name])}>
+        <Link to={`/token/${address}`}>{tokenName}</Link>
+      </div>
+    }
+  </td>
 }
 
 export default TokenTxsTable;

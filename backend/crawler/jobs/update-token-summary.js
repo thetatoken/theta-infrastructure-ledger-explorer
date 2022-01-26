@@ -44,7 +44,7 @@ exports.UpdateTNT721Name = async function () {
     const startTime = +new Date();
     Logger.log('-----------------------------------------------------------------------------------');
     Logger.log(`Processing token summary #${i + 1}/${tokenSummaryInfoList.length} with address:${address}.`);
-    const abi = [{
+    const nameAbi = [{
       "inputs": [],
       "name": "name",
       "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
@@ -53,18 +53,27 @@ exports.UpdateTNT721Name = async function () {
     }];
     let tokenName = ""
     try {
-      tokenName = await _getTNT20Name(address, abi);
+      tokenName = await _getTNT20Name(address, nameAbi);
     } catch (e) {
       Logger.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
     }
-    console.log('tokenName after name function:', tokenName);
+    Logger.log('tokenName after name function:', tokenName);
+    const tokenURIAbi = [{
+      "constant": true,
+      "inputs": [{ "name": "_tokenId", "type": "uint256" }],
+      "name": "tokenURI",
+      "outputs": [{ "name": "", "type": "string" }],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }];
     if (tokenName === "") {
       try {
-        tokenName = await _getTNT721Name(address, abi);
+        tokenName = await _getTNT721Name(address, tokenURIAbi);
       } catch (e) {
         Logger.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
       }
-      console.log('tokenName after tokenURI function:', tokenName);
+      Logger.log('tokenName after tokenURI function:', tokenName);
     }
     if (tokenName !== "") {
       tokenInfo.name = tokenName;
@@ -158,10 +167,18 @@ exports.Execute = async function () {
     Logger.log('Token type:', tokenType);
     let tokenName = ""
     try {
-      tokenName = isTnt20 ? await _getTNT20Name(address, abi) : await _getTNT721Name(address, abi);
-      Logger.log('Fetched token name:', tokenName);
+      tokenName = await _getTNT20Name(address, abi);
     } catch (e) {
-      Logger.log('Error in fetch token name in updateTokenHistoryBySmartContract: ', e.message);
+      Logger.log('Error in fetch token name by name function in updateTokenHistoryBySmartContract: ', e.message);
+    }
+    Logger.log('tokenName after name function:', tokenName);
+    if (tokenName === "" && isTnt721) {
+      try {
+        tokenName = await _getTNT721Name(address, abi);
+      } catch (e) {
+        Logger.log('Error in fetch TNT-721 token name by tokenURI in updateTokenHistoryBySmartContract: ', e.message);
+      }
+      Logger.log('tokenName after tokenURI function:', tokenName);
     }
     if (tokenName === "" && tokenType === "TNT-20") {
       Logger.log(`Failed to fetch total name, skip.`);
@@ -542,10 +559,10 @@ async function getDecimals(address, abi) {
     });
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let decimals = abiCoder.decode(outputTypes, outputValues)[0];
-    console.log(`decimals: ${decimals}, typeof: ${typeof decimals}`);
+    Logger.log(`decimals: ${decimals}, typeof: ${typeof decimals}`);
     return decimals;
   } catch (e) {
-    console.log('error occurs:', e.message);
+    Logger.log('error occurs:', e.message);
     return 0;
   }
 }
