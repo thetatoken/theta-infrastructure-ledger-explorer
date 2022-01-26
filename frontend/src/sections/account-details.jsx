@@ -548,13 +548,13 @@ const TokenTab = props => {
   const [totalPages, setTotalPages] = useState(1);
   const [loadingTxns, setLoadingTxns] = useState(true);
   const [transactions, setTransactions] = useState([]);
+  const [tokenMap, setTokenMap] = useState({});
 
   useEffect(() => {
     fetchTokenTransactions(address, type, currentPage);
   }, [type, address])
 
   const handlePageChange = pageNumber => {
-    console.log('handle')
     fetchTokenTransactions(address, type, pageNumber);
   }
 
@@ -567,6 +567,23 @@ const TokenTab = props => {
         setTotalPages(res.data.totalPageNumber);
         setCurrentPage(res.data.currentPageNumber);
         setLoadingTxns(false);
+        let addressSet = new Set();
+        txs.forEach(tx => {
+          addressSet.add(tx.contract_address);
+        })
+        tokenService.getTokenInfoByAddressList([...addressSet])
+          .then(res => {
+            let infoList = get(res, 'data.body') || [];
+            let map = {};
+            infoList.forEach(info => {
+              map[info.contract_address] = {
+                name: info.name,
+                decimals: info.decimals
+              }
+            })
+            setTokenMap(map);
+          })
+          .catch(e => console.log(e.message))
       })
       .catch(e => {
         setLoadingTxns(false);
@@ -577,7 +594,7 @@ const TokenTab = props => {
     <div>
       {loadingTxns &&
         <LoadingPanel className="fill" />}
-      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} />}
+      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} tokenMap={tokenMap} />}
     </div>
     <Pagination
       size={'lg'}

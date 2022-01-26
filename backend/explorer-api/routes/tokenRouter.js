@@ -50,6 +50,48 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
     }
   });
 
+  // The api to get token summaries by address list
+  router.get("/tokenSummaries", (req, res) => {
+    console.log('Querying the token summaries.');
+    const { addressList } = req.query;
+    let list = [];
+    try {
+      list = JSON.parse(addressList);
+    } catch (e) {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    if (!Array.isArray(list)) {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    list = list
+      .filter(address => helper.validateHex(address, 40))
+      .map(address => address.toLowerCase())
+    tokenSumDao.getRecordsAsync({ _id: { $in: list } })
+      .then(result => {
+        if (result.length === 0) {
+          res.status(404).send({
+            type: 'error_not_found',
+          });
+          return;
+        }
+        const data = ({
+          "type": "token_info",
+          body: result.map(r => ({
+            "name": r.name,
+            "holders": r.holders.total,
+            "max_total_supply": r.max_total_supply,
+            "total_transfers": r.total_transfers,
+            "type": r.type,
+            "decimals": r.decimals,
+            "contract_address": r._id
+          }))
+        })
+        res.status(200).send(data);
+      })
+  });
+
   // The api to get token info
   router.get("/token/:address", (req, res) => {
     console.log('Querying the token info.');

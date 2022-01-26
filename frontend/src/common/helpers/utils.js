@@ -34,6 +34,16 @@ export function formatCoin(weiAmount, length = 4) {
   });
 }
 
+export function formatQuantity(amount, decimals, length = 4) {
+  decimals = decimals || 0;
+  let wei = new BigNumber(10).exponentiatedBy(decimals);
+  return new BigNumber(amount).dividedBy(wei).decimalPlaces(length).toFormat({
+    decimalSeparator: '.',
+    groupSeparator: ',',
+    groupSize: 3,
+  });
+}
+
 export function priceCoin(weiAmount, price) {
   return new BigNumber(weiAmount).dividedBy(WEI).multipliedBy(price).decimalPlaces(2).toFormat({
     decimalSeparator: '.',

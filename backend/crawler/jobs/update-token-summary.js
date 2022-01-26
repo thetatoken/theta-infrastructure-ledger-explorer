@@ -99,16 +99,14 @@ exports.UpdateTNT20Decimals = async function () {
       "stateMutability": "view",
       "type": "function"
     }];
-    let decimals;
+    let decimals = 0;
     try {
       decimals = await getDecimals(address, abi);
     } catch (e) {
       Logger.log('Error in fetch decimals in UpdateTNT20Decimals: ', e.message);
     }
-    if (decimals !== "") {
-      tokenInfo.name = decimals;
-      await tokenSummaryDao.upsertAsync({ ...tokenInfo });
-    }
+    tokenInfo.decimals = decimals;
+    await tokenSummaryDao.upsertAsync({ ...tokenInfo });
     Logger.log(`Complete update token summary #${i}/${tokenSummaryInfoList.length} Add:${address}. Takes ${(+new Date() - startTime) / 1000} seconds`);
     Logger.log('-----------------------------------------------------------------------------------');
   }
@@ -507,7 +505,7 @@ async function getMaxTotalSupply(address, abi) {
 
 async function getDecimals(address, abi) {
   const arr = abi.filter(obj => obj.name == "decimals" && obj.type === 'function');
-  if (arr.length === 0) return null;
+  if (arr.length === 0) return 0;
   const functionData = arr[0];
   const inputValues = []
 
@@ -544,9 +542,9 @@ async function getDecimals(address, abi) {
     outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
     let decimals = abiCoder.decode(outputTypes, outputValues)[0];
     console.log(`decimals: ${decimals}, typeof: ${typeof decimals}`);
-    return decimals.toString();
+    return decimals;
   } catch (e) {
     console.log('error occurs:', e.message);
-    return null;
+    return 0;
   }
 }

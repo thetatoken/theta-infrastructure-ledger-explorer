@@ -74,6 +74,10 @@ export const CurrencyLabels = {
   tfuelwei: 'TFuel',
 }
 
+export const TokenIcons = {
+  'TDrop Token': 'tdrop'
+}
+
 export const TxnPurpose = {
   0: 'Validator Staking',
   1: 'Guardian Staking',

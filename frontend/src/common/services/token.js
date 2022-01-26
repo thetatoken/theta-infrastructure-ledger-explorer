@@ -6,6 +6,11 @@ export const tokenService = {
     return apiService.get(uri);
   },
 
+  getTokenInfoByAddressList(addressList) {
+    const uri = `tokenSummaries?addressList=${JSON.stringify(addressList)}`;
+    return apiService.get(uri);
+  },
+
   getTokenInfoByAddressAndTokenId(address, tokenId) {
     const uri = `tokenSummary/${address}${tokenId == null ? `` : `?tokenId=${tokenId}`}`;
     return apiService.get(uri);
