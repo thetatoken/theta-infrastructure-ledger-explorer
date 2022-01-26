@@ -29,7 +29,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
       <tbody>
         {map(transactions, (txn, i) => {
           const source = !address ? 'none' : address === txn.from ? 'from' : 'to';
-          const name = get(tokenMap, `${txn.contract_address}.name`) || txn.name;
+          const name = get(tokenMap, `${txn.contract_address}.name`) || txn.name || "";
           const decimals = get(tokenMap, `${txn.contract_address}.decimals`);
           const quantity = decimals ? formatQuantity(txn.value, decimals) : txn.value;
           return (
@@ -69,11 +69,11 @@ const TokenName = (props) => {
   const tokenName = isTruncated ? truncate(name, { length: 12 }) : name;
   return <td className="token">
     {isTruncated ?
-      <div className={cx("currency tooltip", TokenIcons[name])}>
+      <div className={cx("tooltip", TokenIcons[name], { "currency": name })}>
         <Link to={`/token/${address}`}>{tokenName}</Link>
         <div className='tooltip--text'>{name}</div>
       </div> :
-      <div className={cx("currency", TokenIcons[name])}>
+      <div className={cx(TokenIcons[name], { "currency": name })}>
         <Link to={`/token/${address}`}>{tokenName}</Link>
       </div>
     }
