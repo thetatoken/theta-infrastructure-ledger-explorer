@@ -39,6 +39,8 @@ var express = require('express');
 var app = express();
 var cors = require('cors');
 
+var Theta = require('./libs/Theta');
+
 //------------------------------------------------------------------------------
 //  Global variables
 //------------------------------------------------------------------------------
@@ -72,6 +74,13 @@ function main() {
 
   bluebird.promisifyAll(rpc);
 
+  if (!config.defaultThetaChainID) {
+    Logger.log('Error: unable to load config.defaultThetaChainID:', config.defaultThetaChainID);
+    process.exit(1);
+  }
+  Theta.chainId = config.defaultThetaChainID;
+  Logger.log('Theta.chainId:', Theta.chainId);
+  
   redisConfig = config.redis;
   Logger.log("redisConfig:", redisConfig)
   cacheEnabled = config.nodeCache && config.nodeCache.enabled;

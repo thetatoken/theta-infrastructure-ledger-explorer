@@ -220,7 +220,10 @@ async function updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolde
       const info = await tokenSummaryDao.getInfoByAddressAsync(address);
       if (!info) continue;
       tokenSummaryMap[`${address}`] = info;
-      tokenSummaryMap[`${address}`].max_total_supply = await getMaxTotalSupply(address, infoMap[address].abi);
+      let totalSupply = await getMaxTotalSupply(address, infoMap[address].abi);
+      if (totalSupply !== 0) {
+        tokenSummaryMap[`${address}`].max_total_supply = totalSupply;
+      }
     } catch (e) {
       Logger.log(`Error in get token summary by address: ${address}. Error:`, e.message);
     }
