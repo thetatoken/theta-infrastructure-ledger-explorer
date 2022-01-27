@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
 
-import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress } from 'common/helpers/utils';
+import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress, formatQuantity } from 'common/helpers/utils';
 import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -370,13 +370,18 @@ export default class AccountDetails extends React.Component {
       WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
       TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
     }
+    const decimalsMap = {
+      'TBill': 9,
+      'WTFuel': 18,
+      'TDrop': 18
+    }
     let keys = Object.keys(tokenMap);
     let tokenBalance = this.state.tokenBalance;
     for (let key of keys) {
       let balanceBN = await fetchBalanceByAddress(tokenMap[key], accountAddress);
       let balance = balanceBN.toString();
       tokenBalance[key] = balance;
-      const MIN_DISPLAY_VALUE = new BigNumber('10000000000000000');
+      const MIN_DISPLAY_VALUE = new BigNumber(10).exponentiatedBy(decimalsMap[key] - 2);
       if (new BigNumber(balance).gt(MIN_DISPLAY_VALUE)) {
         this.setState({ tokenBalance })
         if (!this.state.hasToken) {
@@ -534,12 +539,17 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
+  const decimalsMap = {
+    'TBill': 9,
+    'WTFuel': 18,
+    'TDrop': 18
+  }
   return (
     <div className="act balance">
       {map(tokenBalance, (v, k) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
-          {`${formatCoin(v, 2)} ${CurrencyLabels[k] || k}`}
+          {`${formatQuantity(v, decimalsMap[k], 2)} ${CurrencyLabels[k] || k}`}
         </div>
       })}
     </div>)
