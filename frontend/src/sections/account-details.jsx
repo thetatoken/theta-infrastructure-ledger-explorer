@@ -85,6 +85,10 @@ export default class AccountDetails extends React.Component {
         includeService: false,
         rewardSplit: 0,
         beneficiary: "",
+        tabIndex: 0,
+        hasToken: false,
+        hasTNT20: false,
+        hasTNT721: false,
         tokenBalance: INITIAL_TOKEN_BALANCE
       })
       this.fetchData(this.props.match.params.accountAddress);
@@ -99,6 +103,7 @@ export default class AccountDetails extends React.Component {
       this.getOneAccountByAddress(address);
       this.getStakeTransactions(address);
       this.fetchTokenBalance(address);
+      this.getTokenTransactionsNumber(address);
       if (!hasPrice) this.getPrices();
     } else {
       this.setState({ errorType: 'invalid_address' })
@@ -207,11 +212,11 @@ export default class AccountDetails extends React.Component {
         .then(res => {
           const num = get(res, 'data.body.total_number');
           if (num > 0) {
-            if (name === 'TNT-721' && !hasTNT721) {
+            if (name === 'TNT-721') {
               this.setState({ hasTNT721: true });
-            } else if (name === 'TNT-20' && !hasTNT20) {
+            } else if (name === 'TNT-20') {
               this.setState({ hasTNT20: true });
-            } else if (name === 'TFUEL' && !hasInternalTxs) {
+            } else if (name === 'TFUEL') {
               this.setState({ hasInternalTxs: true });
             }
           }
@@ -250,7 +255,6 @@ export default class AccountDetails extends React.Component {
         });
         let types = this.state.selectedTypes.map(o => o.value);
         this.getTransactionsByAddress(address, types, 1);
-        this.getTokenTransactionsNumber(address);
       }).catch(err => {
         this.setState({ loading_acct: false });
         console.log(err);
@@ -382,6 +386,7 @@ export default class AccountDetails extends React.Component {
       let balance = balanceBN.toString();
       tokenBalance[key] = balance;
       const MIN_DISPLAY_VALUE = new BigNumber(10).exponentiatedBy(decimalsMap[key] - 2);
+
       if (new BigNumber(balance).gt(MIN_DISPLAY_VALUE)) {
         this.setState({ tokenBalance })
         if (!this.state.hasToken) {
@@ -434,7 +439,7 @@ export default class AccountDetails extends React.Component {
         }
         <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
-            <Tab>Transactions</Tab>
+            {transactions && transactions.length > 0 && <Tab>Transactions</Tab>}
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
@@ -442,7 +447,7 @@ export default class AccountDetails extends React.Component {
             {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
             {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
           </TabList>
-          <TabPanel>
+          {transactions && transactions.length > 0 && < TabPanel >
             {!transactions && loading_txns &&
               <LoadingPanel />}
             {transactions && transactions.length > 0 &&
@@ -508,7 +513,7 @@ export default class AccountDetails extends React.Component {
                   onPageChange={this.handlePageChange}
                   disabled={loading_txns} />
               </>}
-          </TabPanel>
+          </TabPanel>}
           {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
             <TabPanel>
               <SmartContract address={account.address} />
@@ -524,7 +529,7 @@ export default class AccountDetails extends React.Component {
             <TokenTab type="TNT-721" address={account.address} />
           </TabPanel>}
         </Tabs>
-      </div>);
+      </div >);
   }
 }
 

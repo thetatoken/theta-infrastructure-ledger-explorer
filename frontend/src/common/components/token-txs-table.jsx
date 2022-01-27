@@ -19,7 +19,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
           <th className="hash">Txn Hash</th>
           <th className="age">Age</th>
           <th className="from">From</th>
-          {tabType !== "token" && <th></th>}
+          {tabType !== "token" && <th className="icon"></th>}
           <th className="to">To</th>
           {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
           {(type === 'TNT-20' || type === 'TFUEL') && <th className="quantity">Quantity</th>}
