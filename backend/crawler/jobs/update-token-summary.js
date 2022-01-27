@@ -370,7 +370,7 @@ async function _getTNT721Name(address, abi) {
       return axios.get(url)
         .then(res => {
           let name = get(res, 'data.name');
-          return name.replace(/\(Edition #(.*)\)/, "");
+          return name || "";
         }).catch(e => {
           Logger.log('error occurs in fetch url:', e.message)
           return "";
