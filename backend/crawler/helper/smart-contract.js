@@ -4,7 +4,7 @@ var BigNumber = require('bignumber.js');
 var Theta = require('../libs/Theta');
 var ThetaJS = require('../libs/thetajs.esm');
 var smartContractApi = require('../api/smart-contract-api');
-var { ZeroAddress, EventHashMap, CommonABIs } = require('./constants');
+var { ZeroAddress, EventHashMap, CommonEventABIs } = require('./constants');
 var { getHex } = require('./utils');
 var { ethers } = require("ethers");
 var Logger = require('./logger');
@@ -364,7 +364,7 @@ function _getContractAddressSet(tx) {
 }
 
 function decodeLogByAbiHash(log, abiHash) {
-  const events = CommonABIs[abiHash];
+  const events = CommonEventABIs[abiHash];
   for (let event of events) {
     try {
       const ifaceTmp = new ethers.utils.Interface([event] || []);

@@ -5,9 +5,9 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
 
-import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress } from 'common/constants';
+import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
 import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, checkTnt721, checkTnt20, getFunctionNameById } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -34,7 +34,7 @@ export default class TransactionExplorer extends React.Component {
       errorType: null,
       showRaw: false,
       price: { 'Theta': 0, 'TFuel': 0 },
-      abiMap: null
+      abiMap: {}
     };
   }
   componentDidUpdate(preProps) {
@@ -96,7 +96,7 @@ export default class TransactionExplorer extends React.Component {
                 try {
                   for (let address of addressList) {
                     let res = await smartContractService.getAbiByAddress(address.toLowerCase());
-                    abiMap[`${address}`] = get(res, 'data.body.abi') || [];
+                    abiMap[address] = get(res, 'data.body.abi') || [];
                   }
                 } catch (e) {
                   console.log(e);
@@ -438,8 +438,6 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [tabIndex, setTabIndex] = useState(0);
   const [feeSplit, setFeeSplit] = useState(null);
   const [tfuelSplit, setTfuelSplit] = useState(null);
-
-  const [hasItem, setHasItem] = useState(false);
   const [hasTnt721Transfer, setHasTnt721Transfer] = useState(false);
   const [hasTnt20Transfer, setHasTnt20Transfer] = useState(false);
   const [tokens, setTokens] = useState([]);
@@ -447,13 +445,12 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [logs, setLogs] = useState([]);
   let { data, receipt } = transaction;
   // getFunctionNameById(abi, getHex(data.data).slice(0, 9))
-
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
   let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
-
   // handle logs
   useEffect(() => {
+    if (Object.keys(abiMap).length === 0) return;
     let logs = get(transaction, 'receipt.Logs');
     logs = JSON.parse(JSON.stringify(logs));
     logs = logs.map(obj => {
@@ -466,6 +463,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
 
   // handle tokens and tokenInfoMap
   useEffect(() => {
+    if (logs.length === 0) return;
     const tokenArr = [];
     const addressMap = {};
     logs.forEach(log => {
@@ -494,45 +492,31 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
       }
     })
     setTokens(tokenArr);
-    if (abiMap) fetchTokenInfoMap();
+    fetchTokenInfoMap();
 
     async function fetchTokenInfoMap() {
       const map = {};
       for (let address of Object.keys(addressMap)) {
         try {
-          const abi = abiMap ? abiMap[`${address}`] : [];
-          if (abi.length === 0) continue;
-          if (addressMap[`${address}`].type === 'TNT-20') {
-            // fetch name and symbol
-            let nameFunctionData, symbolFunctionData, inputValues = [];
-            let name, symbol;
-            abi.forEach(obj => {
-              if (obj.name === 'name') nameFunctionData = obj;
-              else if (obj.name === 'symbol') symbolFunctionData = obj;
-            })
-            if (nameFunctionData) {
-              name = await fetchData(nameFunctionData, inputValues, abi, address);
-            }
-            if (symbolFunctionData) {
-              symbol = await fetchData(symbolFunctionData, inputValues, abi, address);
-            }
-            map[`${address}`] = { name, symbol };
-          } else if (addressMap[`${address}`].type === 'TNT-721') {
-            const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
-            if (arr.length === 0) continue;
+          const abi = [CommonFunctionABIs.name, CommonFunctionABIs.symbol, CommonFunctionABIs.decimals, CommonFunctionABIs.tokenURI];
+          if (addressMap[address].type === 'TNT-20') {
+            const name = await fetchData(CommonFunctionABIs.name, [], [CommonFunctionABIs.name], address);
+            const symbol = await fetchData(CommonFunctionABIs.symbol, [], [CommonFunctionABIs.symbol], address);
+            const decimals = await fetchData(CommonFunctionABIs.decimals, [], [CommonFunctionABIs.decimals], address);
+            map[address] = { name, symbol, decimals };
+          } else if (addressMap[address].type === 'TNT-721') {
             // fetch image info
-            const functionData = arr[0];
-            const inputValues = [addressMap[`${address}`].tokenId];
-            let url = await fetchData(functionData, inputValues, abi, address);
+            const inputValues = [addressMap[address].tokenId];
+            let url = await fetchData(CommonFunctionABIs.tokenURI, inputValues, [CommonFunctionABIs.tokenURI], address);
             if (/^http:\/\/(.*)api.thetadrop.com.*\.json(\?[-a-zA-Z0-9@:%._\\+~#&//=]*){0,1}$/g.test(url) && typeof url === "string") {
               url = url.replace("http://", "https://")
             }
             const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
             if (isImage) {
-              map[`${address}`] = { image: url };
+              map[address] = { image: url };
             } else {
               const data = await fetch(url).then(res => res.json())
-              map[`${address}`] = data;
+              map[address] = data;
             }
           }
         } catch (e) {
@@ -581,7 +565,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
         console.log('error occurs:', e);
       }
     }
-  }, [logs, abiMap])
+  }, [logs])
 
   // handle state feeSplit
   useEffect(() => {
@@ -611,28 +595,6 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     })
   }, [logs, abiMap])
 
-  // handle state hasItem
-  useEffect(() => {
-    if (!abiMap || hasItem || logs.length === 0) return;
-    const set = new Set();
-    Object.keys(abiMap).forEach(key => {
-      const abi = abiMap[`${key}`] || [];
-      const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
-      if (arr.length > 0) {
-        set.add(key)
-      }
-    })
-    if (set.size === 0) return;
-    for (let log of logs) {
-      const address = get(log, 'address');
-      if (!set.has(address)) continue;
-      const eventName = get(log, 'decode.eventName');
-      if (eventName !== 'Transfer') continue;
-      setHasItem(true);
-      break;
-    }
-  }, [logs, abiMap])
-
   return (
     <>
       {/* {hasItem && abiMap && <>
@@ -643,7 +605,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
           <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} />
         </div>
       </>} */}
-      <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} hasItem={hasItem} />
+      <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} />
       <div className="details-header">
         <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
         <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
@@ -663,12 +625,14 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
                 return <TransactionAction
                   key={i}
                   info={tokenInfoMap ? tokenInfoMap[`${token.contractAddress}`] : null}
+                  disabled={abiMap[token.contractAddress] ? abiMap[token.contractAddress].length === 0 : true}
                   token={token} />
               })} />}
               {(hasTnt20Transfer || hasTnt721Transfer) && <DetailsRow label="Tokens Transferred" data={tokens.map((token, i) => {
                 return <TokenTransferred
                   key={i}
                   info={tokenInfoMap ? tokenInfoMap[`${token.contractAddress}`] : null}
+                  disabled={abiMap[token.contractAddress] ? abiMap[token.contractAddress].length === 0 : true}
                   token={token} />
               })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
@@ -899,7 +863,7 @@ const LogData = ({ data, decode }) => {
 }
 
 const Items = props => {
-  const { logs, abiMap, tokenInfoMap, hasItem } = props;
+  const { logs, abiMap, tokenInfoMap } = props;
   const [filteredLogs, setFiltedLogs] = useState([]);
   const [isHidden, setIsHidden] = useState(true);
   useEffect(() => {
@@ -913,8 +877,8 @@ const Items = props => {
         tmpLogs.push(log);
         if (tokenInfoMap) {
           const address = get(log, 'address');
-          const info = tokenInfoMap[`${address}`];
-          if (info !== undefined && hasItem && isHidden) {
+          const info = tokenInfoMap[address];
+          if (info !== undefined && isHidden) {
             setIsHidden(false);
           }
         }
@@ -922,7 +886,7 @@ const Items = props => {
     })
     setFiltedLogs(tmpLogs);
   }, [logs, tokenInfoMap])
-  return hasItem && !isHidden && <>
+  return !isHidden && <>
     <div className="details-header item">
       <div className="txn-type smart-contract items">Items</div>
     </div>
@@ -934,8 +898,8 @@ const Items = props => {
           return <Item
             tokenId={tokenId}
             address={address}
-            abi={abiMap ? abiMap[`${address}`] : []}
-            item={tokenInfoMap ? tokenInfoMap[`${address}`] : {}}
+            abi={abiMap ? abiMap[address] : []}
+            item={tokenInfoMap ? tokenInfoMap[address] : {}}
             key={i}
           />
         })
@@ -945,10 +909,19 @@ const Items = props => {
   </>
 }
 
-const TransactionAction = ({ token, info }) => {
+const TransactionAction = ({ token, info, disabled }) => {
   const isZeroFrom = ZeroAddress === token.from;
   const address = token.contractAddress;
   const truncate = isZeroFrom ? 0 : 15;
+  const TokenId = () => {
+    return disabled ? <span className="text-disabled">{token.tokenId}</span> :
+      <Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>
+  }
+  const Name = () => {
+    const name = info ? info.name : "";
+    return disabled ? <span className="text-disabled"> {name}</span> :
+      <Link className="token-link" to={`/token/${address}`}> {name}</Link>;
+  }
   return token.type === "TNT-721" && <div className="transaction-action-row">
     <div className="transaction-action-row__info">
       {isZeroFrom ? <>
@@ -963,22 +936,34 @@ const TransactionAction = ({ token, info }) => {
     </div>
     <div className="transaction-action-row__token">
       {/* Note: Disabled token feature */}
-      {/* 1 of TokenID[<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
-      <Link className="token-link" to={`/token/${address}`}>{info ? info.name : ""}</Link> */}
-      1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
-      <Link className="token-link" to="#">{info ? info.name : ""}</Link>
+      1 of TokenID[<TokenId />]<Name />
+      {/* 1 of TokenID[<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      <Link className="token-link" to="#">{info ? info.name : ""}</Link> */}
     </div>
   </div>
 }
 
-const TokenTransferred = ({ token, info }) => {
+const TokenTransferred = ({ token, info, disabled }) => {
   const truncate = 15;
   const name = info ? info.name : "";
   const symbol = info ? info.symbol : "";
+  const decimals = (info ? info.decimals : 0) || 0;
   const isTnt20 = token.type === "TNT-20";
   const isTnt721 = token.type === "TNT-721";
   const address = get(token, 'contractAddress');
-
+  const Name = () => {
+    if (disabled) {
+      if (isTnt20) return <span className="text-disabled">{` ${name} ${symbol ? `(${symbol})` : '-'}`}</span>;
+      if (isTnt721) return <span className="text-disabled"> {name}</span>;
+    } else {
+      if (isTnt20) return <Link to={`/token/${address}`}>{` ${name} ${symbol ? `(${symbol})` : '-'}`}</Link>;
+      if (isTnt721) return <Link className="token-link" to={`/token/${address}`}> {name}</Link>;
+    }
+  }
+  const TokenId = () => {
+    return disabled ? <span className="text-disabled">{token.tokenId}</span> :
+      <Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>
+  }
   return <div className="token-transaffered-row">
     <b>From:</b>
     <Address hash={token.from} truncate={truncate} />
@@ -987,15 +972,14 @@ const TokenTransferred = ({ token, info }) => {
     <b>For</b>
     {isTnt721 && <span className="text-container">
       {/* Note: Disabled token feature */}
-      {/* TNT-721 TokenID [<Link className="token-link__token-id" to={`/token/${address}?a=${token.tokenId}`}>{token.tokenId}</Link>]
-      <Link className="token-link" to={`/token/${address}`}>{name}</Link> */}
-      TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
-      <Link className="token-link" to="#">{name}</Link>
+      TNT-721 TokenID [<TokenId />]<Name />
+      {/* TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
+      <Link className="token-link" to="#">{name}</Link> */}
     </span>}
     {isTnt20 && <span className="text-container">
       {/* Note: Disabled token feature */}
-      {/* {formatCoin(token.value)}<Link to={`/token/${address}`}>{`${name} (${symbol})`}</Link> */}
-      {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link>
+      {formatQuantity(token.value, decimals, 2)}<Name />
+      {/* {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link> */}
     </span>}
   </div>
 }
@@ -1015,7 +999,6 @@ const ReturnTime = props => {
 }
 
 function _getAbiAddressList(transaction) {
-  const abiMap = {};
   let logs = get(transaction, 'receipt.Logs');
   let abiSet = new Set();
   logs.forEach(log => abiSet.add(log.address));

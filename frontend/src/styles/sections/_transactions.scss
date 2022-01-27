@@ -283,7 +283,7 @@
   & .text-container {
     margin-left: 10px;
     & .token-link {
-      // margin: 0;
+      margin: 0 5px;
       &__token-id {
         margin: 0;
       }
@@ -303,7 +303,7 @@
       padding-right: 10px;
     }
     & .token-link {
-      margin: 0 10px;
+      margin: 0 5px;
     }
     & a {
       margin: 0;

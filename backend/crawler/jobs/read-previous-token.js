@@ -1,5 +1,5 @@
 const { get } = require('lodash');
-const { EventHashMap, ZeroAddress, CommonABIs } = require('../helper/constants');
+const { EventHashMap, ZeroAddress, CommonEventABIs } = require('../helper/constants');
 var Logger = require('../helper/logger');
 var { decodeLogs, checkTnt721, checkTnt20, checkAndInsertToken } = require('../helper/smart-contract');
 var { getHex } = require('../helper/utils');
@@ -179,7 +179,7 @@ function _getOtherContractAddressSet(tx) {
 }
 
 function decodeLogByAbiHash(log, abiHash) {
-  const events = CommonABIs[abiHash];
+  const events = CommonEventABIs[abiHash];
   for (let event of events) {
     try {
       const ifaceTmp = new ethers.utils.Interface([event] || []);

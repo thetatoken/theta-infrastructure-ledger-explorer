@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import get from 'lodash/get';
 import map from 'lodash/map';
 
-import { WEI, CommonABIs } from 'common/constants';
+import { WEI, CommonEventABIs } from 'common/constants';
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm'
@@ -94,12 +94,10 @@ export function validateHex(hash, limit) {
 
 export function decodeLogs(logs, abiMap) {
   let ifaceMap = {};
-  if (abiMap !== null) {
-    Object.keys(abiMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(abiMap[k]))
-  }
+  Object.keys(abiMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(abiMap[k]))
   return logs.map(log => {
-    const iface = abiMap === null ? new ethers.utils.Interface([]) : ifaceMap[`${log.address}`];
-    const abi = abiMap === null ? [] : abiMap[`${log.address}`];
+    const iface = ifaceMap[log.address] ? ifaceMap[log.address] : new ethers.utils.Interface([]);
+    const abi = abiMap[log.address] ? abiMap[log.address] : [];
     try {
       let event = null;
       for (let i = 0; i < abi.length; i++) {
@@ -122,8 +120,8 @@ export function decodeLogs(logs, abiMap) {
           eventName: event.name,
           event: event
         }
-      } else if (CommonABIs[log.topics[0]] !== undefined) {
-        const events = CommonABIs[log.topics[0]];
+      } else if (CommonEventABIs[log.topics[0]] !== undefined) {
+        const events = CommonEventABIs[log.topics[0]];
         for (let event of events) {
           try {
             const ifaceTmp = new ethers.utils.Interface([event] || []);

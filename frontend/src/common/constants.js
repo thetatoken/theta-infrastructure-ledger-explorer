@@ -116,7 +116,7 @@ export const NetworkUrlOfChainId = {
   'https://localhost': Networks.THETA_PRIVATENET,
 };
 
-export const CommonABIs = {
+export const CommonEventABIs = {
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{
     anonymous: false,
     inputs: [{ indexed: true, name: 'from', type: 'address' },
@@ -156,4 +156,43 @@ export const CommonABIs = {
     name: 'ApprovalForAll',
     type: 'event'
   }]
+}
+
+export const CommonFunctionABIs = {
+  name: {
+    "constant": true,
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "name": "", "type": "string" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  symbol: {
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "name": "", "type": "string" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  decimals: {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "name": "", "type": "uint8" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  tokenURI: {
+    "constant": true,
+    "inputs": [{ "name": "_tokenId", "type": "uint256" }],
+    "name": "tokenURI",
+    "outputs": [{ "name": "", "type": "string" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
 }
