@@ -25,11 +25,14 @@ import TokenTxsTable from "common/components/token-txs-table";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
+import { useIsMountedRef } from 'common/helpers/hooks';
 
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
 export default class AccountDetails extends React.Component {
+  _isMounted = true;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -98,6 +101,9 @@ export default class AccountDetails extends React.Component {
     const { accountAddress } = this.props.match.params;
     this.fetchData(accountAddress, false);
   }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
   fetchData(address, hasPrice = true) {
     if (validateHex(address, 40)) {
       this.getOneAccountByAddress(address);
@@ -120,8 +126,10 @@ export default class AccountDetails extends React.Component {
       })
   }
   getPrices(counter = 0) {
+    const self = this;
     priceService.getAllprices()
       .then(res => {
+        if (!self._isMounted) return;
         const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
@@ -145,8 +153,10 @@ export default class AccountDetails extends React.Component {
     if (!address) {
       return;
     }
+    const self = this;
     stakeService.getStakeByAddress(address)
       .then(res => {
+        if (!self._isMounted) return;
         const stakes = get(res, 'data.body');
         let thetaHolderTxs = [], tfuelHolderTxs = [];
         let thetaSourceTxs = [], tfuelSourceTxs = [];
@@ -178,9 +188,11 @@ export default class AccountDetails extends React.Component {
     if (!address) {
       return;
     }
+    const self = this;
     this.setState({ loading_txns: true });
     transactionsService.getTransactionsByAddress(address, page, NUM_TRANSACTIONS, types)
       .then(res => {
+        if (!self._isMounted) return;
         const txs = get(res, 'data.body');
         if (!txs) {
           this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
@@ -206,10 +218,11 @@ export default class AccountDetails extends React.Component {
 
   getTokenTransactionsNumber(address) {
     const tokenList = ["TNT-721", "TNT-20", "TFUEL"];
-    const { hasTNT20, hasTNT721, hasInternalTxs } = this.state;
+    const self = this;
     for (let name of tokenList) {
       tokenService.getTokenTxsNumByAccountAndType(address, name)
         .then(res => {
+          if (!self._isMounted) return;
           const num = get(res, 'data.body.total_number');
           if (num > 0) {
             if (name === 'TNT-721') {
@@ -227,10 +240,11 @@ export default class AccountDetails extends React.Component {
     if (!address) {
       return;
     }
-
+    const self = this;
     this.setState({ loading_acct: true });
     accountService.getOneAccountByAddress(address)
       .then(res => {
+        if (!self._isMounted) return;
         switch (res.data.type) {
           case 'account':
             const txs_counter = get(res, 'data.body.txs_counter');
@@ -280,8 +294,10 @@ export default class AccountDetails extends React.Component {
       return
     }
     this.setState({ isDownloading: true })
+    const self = this;
     accountService.getTransactionHistory(accountAddress, startDate, endDate)
       .then(res => {
+        if (!self._isMounted) return;
         if (res.status === 200) {
           function convertToCSV(objArray) {
             var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
@@ -381,6 +397,7 @@ export default class AccountDetails extends React.Component {
     }
     let keys = Object.keys(tokenMap);
     let tokenBalance = this.state.tokenBalance;
+    const self = this;
     for (let key of keys) {
       let balanceBN = await fetchBalanceByAddress(tokenMap[key], accountAddress);
       let balance = balanceBN.toString();
@@ -388,6 +405,7 @@ export default class AccountDetails extends React.Component {
       const MIN_DISPLAY_VALUE = new BigNumber(10).exponentiatedBy(decimalsMap[key] - 2);
 
       if (new BigNumber(balance).gt(MIN_DISPLAY_VALUE)) {
+        if (!self._isMounted) return;
         this.setState({ tokenBalance })
         if (!this.state.hasToken) {
           this.setState({ hasToken: true })
@@ -571,6 +589,7 @@ const TokenTab = props => {
   const [loadingTxns, setLoadingTxns] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [tokenMap, setTokenMap] = useState({});
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     fetchTokenTransactions(address, type, currentPage);
@@ -583,6 +602,7 @@ const TokenTab = props => {
   const fetchTokenTransactions = (address, type, page) => {
     tokenService.getTokenTxsByAccountAndType(address, type, page, NUM_TRANSACTIONS)
       .then(res => {
+        if (!isMountedRef.current) return;
         let txs = res.data.body;
         txs = txs.sort((a, b) => b.timestamp - a.timestamp);
         setTransactions(txs);
@@ -600,6 +620,7 @@ const TokenTab = props => {
         }
         tokenService.getTokenInfoByAddressList([...addressSet])
           .then(res => {
+            if (!isMountedRef.current) return;
             let infoList = get(res, 'data.body') || [];
             let map = {};
             infoList.forEach(info => {

@@ -12,6 +12,8 @@ import BigNumber from 'bignumber.js';
 
 
 export default class Stakes extends React.Component {
+  _isMounted = true;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -29,9 +31,15 @@ export default class Stakes extends React.Component {
     this.getAllRewardDistribution()
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   getAllRewardDistribution() {
+    const self = this;
     rewardDistributionService.getAllRewardDistribution()
       .then(res => {
+        if(!self._isMounted) return;
         const list = get(res, 'data.body')
         let map = new Map();
         list.forEach(s => {
@@ -46,8 +54,10 @@ export default class Stakes extends React.Component {
 
   getAllStakes(map) {
     const types = this.props.stakeCoinType === 'tfuel' ? ['eenp'] : ['vcp', 'gcp'];
+    const self = this;
     stakeService.getAllStake(types)
       .then(res => {
+        if(!self._isMounted) return;
         const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.withdrawn ? 0 : info.amount) }, 0);
         let holderObj = stakeList.reduce((map, obj) => {

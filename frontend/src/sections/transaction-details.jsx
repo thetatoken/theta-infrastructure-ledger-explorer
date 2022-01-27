@@ -18,6 +18,7 @@ import JsonView from 'common/components/json-view';
 import BodyTag from 'common/components/body-tag';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Item from 'common/components/tnt721-item';
+import { useIsMountedRef } from 'common/helpers/hooks';
 
 import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
@@ -25,6 +26,8 @@ import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
 
 export default class TransactionExplorer extends React.Component {
+  _isMounted = true;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -47,6 +50,9 @@ export default class TransactionExplorer extends React.Component {
     const hash = transactionHash.toLowerCase()
     this.fetchData(hash, false);
   }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
   fetchData(hash, hasPrice = true) {
     if (validateHex(hash, 64)) {
       this.getOneTransactionByUuid(hash);
@@ -58,8 +64,10 @@ export default class TransactionExplorer extends React.Component {
     }
   }
   getPrices(counter = 0) {
+    const self = this;
     priceService.getAllprices()
       .then(res => {
+        if (!self._isMounted) return;
         const prices = get(res, 'data.body');
         let price = {};
         prices.forEach(info => {
@@ -79,9 +87,11 @@ export default class TransactionExplorer extends React.Component {
     }, 1000);
   }
   getOneTransactionByUuid(hash) {
+    const self = this;
     if (hash) {
       transactionsService.getOneTransactionByUuid(hash.toLowerCase())
         .then(async res => {
+          if (!self._isMounted) return;
           switch (res.data.type) {
             case 'transaction':
               this.setState({
@@ -443,8 +453,9 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [tokens, setTokens] = useState([]);
   const [tokenInfoMap, setTokenInfoMap] = useState();
   const [logs, setLogs] = useState([]);
+  const isMountedRef = useIsMountedRef();
   let { data, receipt } = transaction;
-  // getFunctionNameById(abi, getHex(data.data).slice(0, 9))
+
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
   let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
@@ -523,6 +534,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
           console.log('Error in fetchTokenInfoMap:', e.message);
         }
       }
+      if (!isMountedRef.current) return;
       setTokenInfoMap(map);
 
     }

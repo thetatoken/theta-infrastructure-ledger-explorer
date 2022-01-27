@@ -6,6 +6,8 @@ import { smartContractService } from 'common/services/smartContract';
 import get from 'lodash/get';
 
 export default class SmartContract extends React.PureComponent {
+  _isMounted = true;
+
   constructor(props) {
     super(props)
     this.state = {
@@ -24,13 +26,18 @@ export default class SmartContract extends React.PureComponent {
       this.fetchSmartContract(this.props.address)
     }
   }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
   fetchSmartContract = (address) => {
     if (!address) {
       return;
     }
+    const self = this;
     this.setState({ isLoading: true, tabIndex: 0 })
     smartContractService.getOneByAddress(address)
       .then(res => {
+        if (!self._isMounted) return;
         switch (res.data.type) {
           case 'smart_contract':
             const smartContract = get(res, 'data.body')

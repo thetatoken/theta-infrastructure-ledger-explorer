@@ -18,6 +18,7 @@ import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm';
 import get from 'lodash/get';
 import map from 'lodash/map';
+import { useIsMountedRef } from 'common/helpers/hooks';
 
 
 const NUM_TRANSACTIONS = 20;
@@ -34,6 +35,7 @@ const TokenDetails = ({ match, location }) => {
   const [abi, setAbi] = useState([]);
   const [holders, setHolders] = useState([]);
   const [item, setItem] = useState();
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     const { contractAddress } = match.params;
@@ -52,6 +54,7 @@ const TokenDetails = ({ match, location }) => {
       smartContractService.getAbiByAddress(contractAddress.toLowerCase())
         .then(result => {
           if (result.data.type === 'smart_contract_abi') {
+            if (!isMountedRef.current) return;
             setAbi(result.data.body.abi || []);
           }
         })
@@ -60,6 +63,7 @@ const TokenDetails = ({ match, location }) => {
     function fetchInfo() {
       tokenService.getTokenInfoByAddressAndTokenId(contractAddress, tId)
         .then(res => {
+          if (!isMountedRef.current) return;
           if (res.data.type === "error_not_found") {
             setErrorType("error_not_found");
             return;
@@ -84,6 +88,7 @@ const TokenDetails = ({ match, location }) => {
     setLoadingTxns(true);
     tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId, page, NUM_TRANSACTIONS)
       .then(res => {
+        if (!isMountedRef.current) return;
         let txs = res.data.body;
         txs = txs.sort((a, b) => b.timestamp - a.timestamp);
         setTransactions(txs);
@@ -99,6 +104,7 @@ const TokenDetails = ({ match, location }) => {
   function fetchHolders(address, tokenId) {
     tokenService.getHoldersByAccountAndTokenId(address, tokenId)
       .then(res => {
+        if (!isMountedRef.current) return;
         if (res.data.type === "error_not_found") {
           return;
         }
@@ -153,12 +159,14 @@ const TokenDetails = ({ match, location }) => {
           url = url.replace("http://", "https://")
         }
         const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
+        if (!isMountedRef.current) return;
         if (isImage) {
           setItem({ image: url });
         } else {
           fetch(url)
             .then(res => res.json())
             .then(data => {
+              if (!isMountedRef.current) return;
               setItem(data);
             }).catch(e => {
               console.log('error occurs in fetch url:', e)
