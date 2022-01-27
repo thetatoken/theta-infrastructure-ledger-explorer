@@ -60,8 +60,8 @@ exports.UpdateTNT721Name = async function () {
     Logger.log('tokenName after name function:', tokenName);
     const tokenURIAbi = [{
       "constant": true,
-      "inputs": [{ "name": "_tokenId", "type": "uint256" }],
-      "name": "tokenURI",
+      "inputs": [],
+      "name": "contractURI",
       "outputs": [{ "name": "", "type": "string" }],
       "payable": false,
       "stateMutability": "view",
@@ -323,10 +323,10 @@ async function _getTNT20Name(address, abi) {
 }
 
 async function _getTNT721Name(address, abi) {
-  const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+  const arr = abi.filter(obj => obj.name == "contractURI" && obj.type === 'function');
   if (arr.length === 0) return "";
   const functionData = arr[0];
-  const inputValues = [0]
+  const inputValues = []
 
   const iface = new ethers.utils.Interface(abi || []);
   const senderSequence = 1;

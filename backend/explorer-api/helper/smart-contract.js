@@ -226,10 +226,10 @@ async function _getTNT20Name(address, abi) {
 }
 
 async function _getTNT721Name(address, abi) {
-  const arr = abi.filter(obj => obj.name == "tokenURI" && obj.type === 'function');
+  const arr = abi.filter(obj => obj.name == "contractURI" && obj.type === 'function');
   if (arr.length === 0) return "";
   const functionData = arr[0];
-  const inputValues = [0]
+  const inputValues = []
 
   const iface = new ethers.utils.Interface(abi || []);
   const senderSequence = 1;
