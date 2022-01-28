@@ -24,6 +24,7 @@ import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
+import { tokenService } from "../common/services/token";
 
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;
@@ -529,6 +530,10 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
               const data = await fetch(url).then(res => res.json())
               map[address] = data;
             }
+            const tokenInfoRes = await tokenService.getTokenInfoByAddressAndTokenId(address);
+            const tokenName = get(tokenInfoRes, 'data.body.name');
+            if (!map[address]) map[address] = {};
+            map[address].tokenName = tokenName;
           }
         } catch (e) {
           console.log('Error in fetchTokenInfoMap:', e.message);
@@ -931,8 +936,9 @@ const TransactionAction = ({ token, info, disabled }) => {
   }
   const Name = () => {
     const name = info ? info.name : "";
-    return disabled ? <span className="text-disabled"> {name}</span> :
-      <Link className="token-link" to={`/token/${address}`}> {name}</Link>;
+    const tokenName = info ? info.tokenName || name : "";
+    return disabled ? <span className="text-disabled name"> {tokenName}</span> :
+      <Link className="token-link" to={`/token/${address}`}> {tokenName}</Link>;
   }
   return token.type === "TNT-721" && <div className="transaction-action-row">
     <div className="transaction-action-row__info">
@@ -958,6 +964,7 @@ const TransactionAction = ({ token, info, disabled }) => {
 const TokenTransferred = ({ token, info, disabled }) => {
   const truncate = 15;
   const name = info ? info.name : "";
+  const tokenName = info ? info.tokenName || name : "";
   const symbol = info ? info.symbol : "";
   const decimals = (info ? info.decimals : 0) || 0;
   const isTnt20 = token.type === "TNT-20";
@@ -965,11 +972,11 @@ const TokenTransferred = ({ token, info, disabled }) => {
   const address = get(token, 'contractAddress');
   const Name = () => {
     if (disabled) {
-      if (isTnt20) return <span className="text-disabled">{` ${name} ${symbol ? `(${symbol})` : '-'}`}</span>;
-      if (isTnt721) return <span className="text-disabled"> {name}</span>;
+      if (isTnt20) return <span className="text-disabled name">{` ${name} ${symbol ? `(${symbol})` : '-'}`}</span>;
+      if (isTnt721) return <span className="text-disabled name"> {tokenName}</span>;
     } else {
-      if (isTnt20) return <Link to={`/token/${address}`}>{` ${name} ${symbol ? `(${symbol})` : '-'}`}</Link>;
-      if (isTnt721) return <Link className="token-link" to={`/token/${address}`}> {name}</Link>;
+      if (isTnt20) return <Link className="token-link" to={`/token/${address}`}>{` ${name} ${symbol ? `(${symbol})` : '-'}`}</Link>;
+      if (isTnt721) return <Link className="token-link" to={`/token/${address}`}> {tokenName}</Link>;
     }
   }
   const TokenId = () => {

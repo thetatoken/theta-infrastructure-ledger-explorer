@@ -282,6 +282,9 @@
   }
   & .text-container {
     margin-left: 10px;
+    & .text-disabled.name {
+      margin: 0 5px;
+    }
     & .token-link {
       margin: 0 5px;
       &__token-id {
