@@ -231,7 +231,7 @@ const TokenDetails = ({ match, location }) => {
           <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
             <TabList>
               <Tab>Transactions</Tab>
-              <Tab>Holders</Tab>
+              {/* <Tab>Holders</Tab> */}
               <Tab>Read Contract</Tab>
               <Tab disabled>Write Contract</Tab>
             </TabList>
@@ -250,9 +250,9 @@ const TokenDetails = ({ match, location }) => {
                 onPageChange={handlePageChange}
                 disabled={loadingTxns} />
             </TabPanel>
-            <TabPanel>
+            {/* <TabPanel>
               <HolderTable holders={holders} totalSupply={tokenInfo.max_total_supply} />
-            </TabPanel>
+            </TabPanel> */}
             <TabPanel>
               <ReadContract address={match.params.contractAddress} />
             </TabPanel>
