@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import { validateHex } from 'common/helpers/utils';
+import { validateHex, formatQuantity } from 'common/helpers/utils';
 import { tokenService } from 'common/services/token';
 import NotExist from 'common/components/not-exist';
 import DetailsRow from 'common/components/details-row';
@@ -204,7 +204,7 @@ const TokenDetails = ({ match, location }) => {
               {tokenId == null && <>
                 <DetailsRow label="Name" data={tokenInfo.name} />
                 <DetailsRow label="Type" data={tokenInfo.type} />
-                <DetailsRow label="Total Supply" data={tokenInfo.max_total_supply} />
+                <DetailsRow label="Total Supply" data={formatQuantity(tokenInfo.max_total_supply, tokenInfo.decimals, 4)} />
                 <DetailsRow label="Holders" data={tokenInfo.holders} />
                 <DetailsRow label="Transfers" data={tokenInfo.total_transfers} />
               </>}

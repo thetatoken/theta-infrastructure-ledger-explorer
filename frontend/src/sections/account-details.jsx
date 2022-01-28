@@ -562,6 +562,12 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
+  const tokenMap = {
+    TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+    // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+    WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
+    TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
+  }
   const decimalsMap = {
     'TBill': 9,
     'WTFuel': 18,
@@ -572,7 +578,9 @@ const Token = ({ tokenBalance }) => {
       {map(tokenBalance, (v, k) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
-          {`${formatQuantity(v, decimalsMap[k], 2)} ${CurrencyLabels[k] || k}`}
+          {`${formatQuantity(v, decimalsMap[k], 2)}`}
+          {k === 'TBill' ? <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
+            : <Link className="currency-link" to={`/token/${tokenMap[k]}`}>{CurrencyLabels[k] || k}</Link>}
         </div>
       })}
     </div>)
