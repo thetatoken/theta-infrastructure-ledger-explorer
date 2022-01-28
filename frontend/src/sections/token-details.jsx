@@ -204,7 +204,7 @@ const TokenDetails = ({ match, location }) => {
               {tokenId == null && <>
                 <DetailsRow label="Name" data={tokenInfo.name} />
                 <DetailsRow label="Type" data={tokenInfo.type} />
-                <DetailsRow label="Max Total Supply" data={tokenInfo.max_total_supply} />
+                <DetailsRow label="Total Supply" data={tokenInfo.max_total_supply} />
                 <DetailsRow label="Holders" data={tokenInfo.holders} />
                 <DetailsRow label="Transfers" data={tokenInfo.total_transfers} />
               </>}
