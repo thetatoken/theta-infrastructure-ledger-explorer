@@ -19,15 +19,15 @@
   }
   &.tfuel,
   &.tfuelwei {
-    &:before { background-image: url('/images/icons/tfuel-icon@2x.png'); }
+    &:before { background-image: url('/images/icons/tfuel_flat.png'); }
   }
   &.theta,
   &.thetawei {
-    &:before { background-image: url('/images/icons/theta-icon@2x.png'); }
+    &:before { background-image: url('/images/icons/theta_flat.png'); }
     &.left { float: left; }
   }
   &.tdrop {
-    &:before { background-image: url('/images/icons/tdrop_token.png'); }
+    &:before { background-image: url('/images/icons/tdrop_flat.png'); }
   }
   &.tbill {
     &:before {
