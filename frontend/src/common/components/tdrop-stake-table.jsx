@@ -65,8 +65,8 @@ const TDropStakeTable = React.memo(({ address }) => {
           return type;
         });
         outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
-        let res = abiCoder.decode(outputTypes, outputValues)[0];
-        return res;
+        let balance = abiCoder.decode(outputTypes, outputValues)[0];
+        return balance.toString();
       } catch (e) {
         console.log('error occurs:', e);
       }
