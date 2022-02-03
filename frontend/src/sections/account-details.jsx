@@ -22,6 +22,7 @@ import LoadingPanel from 'common/components/loading-panel';
 import StakeTxsTable from "../common/components/stake-txs";
 import SmartContract from 'common/components/smart-contract';
 import TokenTxsTable from "common/components/token-txs-table";
+import TDropStakeTable from "common/components/tdrop-stake-table";
 
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
@@ -418,6 +419,7 @@ export default class AccountDetails extends React.Component {
       hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
       typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs } = this.state;
+    const { accountAddress } = this.props.match.params;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -455,6 +457,7 @@ export default class AccountDetails extends React.Component {
             {tfuelHolderTxs.length > 0 && <StakeTxsTable type='holder' stakeCoinType='tfuel' txs={tfuelHolderTxs} price={price} />}
           </div>
         }
+        <TDropStakeTable address={accountAddress} />
         <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
             {transactions && transactions.length > 0 && <Tab>Transactions</Tab>}

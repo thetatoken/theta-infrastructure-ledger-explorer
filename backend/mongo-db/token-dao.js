@@ -9,7 +9,7 @@
 //  Require index: `db.token.createIndex({to:1, type:1})`
 //------------------------------------------------------------------------------
 
-module.exports = class TotalAccountDAO {
+module.exports = class TokenDAO {
 
   constructor(execDir, client) {
     this.client = client;

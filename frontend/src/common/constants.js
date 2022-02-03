@@ -194,5 +194,14 @@ export const CommonFunctionABIs = {
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  estimatedTDropOwnedBy: {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+    "name": "estimatedTDropOwnedBy",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
   }
 }
