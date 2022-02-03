@@ -18,6 +18,7 @@ import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm';
 import get from 'lodash/get';
 import map from 'lodash/map';
+import cx from 'classnames';
 import { useIsMountedRef } from 'common/helpers/hooks';
 
 
@@ -202,7 +203,7 @@ const TokenDetails = ({ match, location }) => {
             </thead>
             <tbody>
               {tokenId == null && <>
-                <DetailsRow label="Name" data={tokenInfo.name} />
+                <DetailsRow label="Name" data={<TokenName info={tokenInfo} />} />
                 <DetailsRow label="Type" data={tokenInfo.type} />
                 <DetailsRow label="Total Supply" data={formatQuantity(tokenInfo.max_total_supply, tokenInfo.decimals, 4)} />
                 <DetailsRow label="Holders" data={tokenInfo.holders} />
@@ -266,4 +267,9 @@ const TokenDetails = ({ match, location }) => {
   );
 }
 
+const TokenName = ({ info }) => {
+  return <div className={cx({ 'currency tdrop': info.name === 'TDrop Token' })}>
+    {info.name}{info.type === 'TNT-20' && info.symbol && `  (${info.symbol})`}
+  </div>
+}
 export default TokenDetails;

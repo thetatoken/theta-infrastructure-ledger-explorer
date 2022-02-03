@@ -44,7 +44,8 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
               "total_transfers": result.total_transfers,
               "type": result.type,
               "decimals": result.decimals,
-              "contract_address": result._id
+              "contract_address": result._id,
+              "symbol": result.symbol
             }
           })
           res.status(200).send(data);
