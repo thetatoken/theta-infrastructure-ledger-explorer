@@ -5,28 +5,29 @@ import BigNumber from 'bignumber.js';
 
 import { formatCoin } from 'common/helpers/utils';
 import { useIsMountedRef } from 'common/helpers/hooks';
-import { CommonFunctionABIs } from 'common/constants';
+import { CommonFunctionABIs, TDropStakingAddress } from 'common/constants';
 import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm';
 import get from 'lodash/get';
 import map from 'lodash/map';
+import Config from '../../config';
 
 const MIN_DISPLAY_VALUE = new BigNumber(10).exponentiatedBy(18 - 2);
 const TRUNCATE = window.screen.width <= 560 ? 10 : 35;
+const contractAddress = TDropStakingAddress[Config.defaultThetaChainID];
 
 const TDropStakeTable = React.memo(({ address }) => {
   const isMountedRef = useIsMountedRef();
   const [balance, setBalance] = useState(0);
-  
   useEffect(() => {
 
     fetchBalance();
 
     async function fetchBalance() {
       let balance = await fetchData(CommonFunctionABIs.estimatedTDropOwnedBy, [address],
-        [CommonFunctionABIs.estimatedTDropOwnedBy], "0xA89c744Db76266ecA60e2b0F62Afcd1f8581b7ed");
+        [CommonFunctionABIs.estimatedTDropOwnedBy], contractAddress);
       if (!isMountedRef.current) return;
       setBalance(balance);
     }
@@ -87,8 +88,8 @@ const TDropStakeTable = React.memo(({ address }) => {
           <tr>
             <td className="tdrop-token"><div className="currency tdrop left">{`${formatCoin(balance)} TDrop`}</div></td>
             <td className="address">
-              <Link to={`/account/0xA89c744Db76266ecA60e2b0F62Afcd1f8581b7ed`}>
-                {_truncate(address, { length: TRUNCATE })}(TDrop Staking)
+              <Link to={`/account/${contractAddress}`}>
+                {_truncate(contractAddress, { length: TRUNCATE })}(TDrop Staking)
               </Link>
             </td>
             <td className="status">Staked</td>

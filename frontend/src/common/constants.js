@@ -116,6 +116,11 @@ export const NetworkUrlOfChainId = {
   'https://localhost': Networks.THETA_PRIVATENET,
 };
 
+export const TDropStakingAddress = {
+  'testnet': '0xa8bfa60203e55f86dc7013cbf3d8ff85bb1d3cc7',
+  'mainnet': '0xa89c744db76266eca60e2b0f62afcd1f8581b7ed'
+};
+
 export const CommonEventABIs = {
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{
     anonymous: false,
