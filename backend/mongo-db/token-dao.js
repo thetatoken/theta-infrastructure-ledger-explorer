@@ -75,4 +75,21 @@ module.exports = class TokenDAO {
     };
     this.client.getTotal(this.collection, queryObject, callback);
   }
+
+  getInfoListByDays(address, type, target, days, callback) {
+    const startTime = ~~(+new Date() / 1000) - days * 24 * 60 * 60 + "";
+    let queryObject = { to: address, type: type, timestamp: { $gte: startTime } };
+    if (target === 'out') {
+      queryObject = { from: address, type: type, timestamp: { $gte: startTime } };
+    } else if (target === 'both') {
+      queryObject = {
+        $or: [
+          { from: address, type: type, timestamp: { $gte: startTime } },
+          { to: address, type: type, timestamp: { $gte: startTime } }
+        ]
+      };
+    }
+    const sortObject = { timestamp: -1 };
+    this.client.getRecords(this.collection, queryObject, sortObject, 0, 0, callback);
+  }
 }

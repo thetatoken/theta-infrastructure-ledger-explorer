@@ -213,6 +213,25 @@ var accountRouter = (app, accountDao, tokenDao, rpc, config) => {
         res.status(200).send(data);
       })
   });
+
+  router.get("/account/tokenTxByDays/:address", (req, res) => {
+    let address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    let { tokenType = 'TNT-20', days = 30, target = 'in' } = req.query;
+    days = Number(days);
+    tokenDao.getInfoListByDaysAsync(address, tokenType, target, days)
+      .then(infoList => {
+        const data = ({
+          "type": "token_txs",
+          body: infoList
+        })
+        res.status(200).send(data);
+      })
+  });
+
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
