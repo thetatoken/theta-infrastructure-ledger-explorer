@@ -150,7 +150,7 @@ export default class TokenDashboard extends React.PureComponent {
             <Detail title={isTheta ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
             <Detail title={isTheta ? 'THETA STAKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
               value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />}
-              className={isTheta ? '' : "tfuel-locked tooltip"}
+              className={isTheta ? '' : "tooltip"}
               tooltipText={isTheta ? <></> :
                 <TFuelTooltip totalSupply={tokenInfo.circulating_supply} staked={tfuelStaked} locked={wtfuelLocaked} />} />
           </div>
