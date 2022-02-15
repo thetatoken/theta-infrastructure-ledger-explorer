@@ -20,7 +20,9 @@ export default class TokenDashboard extends React.PureComponent {
       percentage: { theta: [], tfuel: [] },
       txTs: [],
       txNumber: [],
-      nodeNum: 0
+      nodeNum: 0,
+      tfuelStaked: 0,
+      wtfuelLocaked: 0
     };
   }
   componentDidMount() {
@@ -113,17 +115,23 @@ export default class TokenDashboard extends React.PureComponent {
           }
         }
         const totalStaked = BigNumber.sum(stake.totalAmount, wtfuelTotalSupply);
-        this.setState({ totalStaked: totalStaked, nodeNum: stake.totalNodes });
+        this.setState({
+          totalStaked: totalStaked,
+          nodeNum: stake.totalNodes,
+          tfuelStaked: stake.totalAmount,
+          wtfuelLocaked: wtfuelTotalSupply
+        });
       })
       .catch(err => {
         console.log(err);
       });
   }
   render() {
-    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum } = this.state;
+    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum, tfuelStaked, wtfuelLocaked } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
+    const isTheta = type === 'theta';
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("dashboard-row", type)}>
@@ -139,9 +147,12 @@ export default class TokenDashboard extends React.PureComponent {
             <Detail title={'CIRCULATING SUPPLY'} value={formatNumber(tokenInfo.circulating_supply)} />
           </div>
           <div className="column">
-            <Detail title={type === 'theta' ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
-            <Detail title={type === 'theta' ? 'THETA STAKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
-              value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
+            <Detail title={isTheta ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
+            <Detail title={isTheta ? 'THETA STAKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
+              value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />}
+              className={isTheta ? '' : "tfuel-locked tooltip"}
+              tooltipText={isTheta ? <></> :
+                <TFuelTooltip totalSupply={tokenInfo.circulating_supply} staked={tfuelStaked} locked={wtfuelLocaked} />} />
           </div>
           <div className="column pie-charts">
             {type === 'tfuel' ?
@@ -183,4 +194,21 @@ const StakedPercent = ({ staked, totalSupply }) => {
       {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
     </React.Fragment>
   );
+}
+
+const TFuelTooltip = ({ staked, locked, totalSupply }) => {
+  return <div className="tooltip--text">
+    <div>
+      TFUEL STAKED:
+      <span>
+        {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
+      </span>
+    </div>
+    <div>
+      WTFUEL LOCKED:
+      <span>
+        {`${new BigNumber(locked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
+      </span>
+    </div>
+  </div>
 }
