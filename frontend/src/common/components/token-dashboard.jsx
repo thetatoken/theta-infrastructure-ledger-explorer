@@ -2,7 +2,7 @@ import React from "react";
 import get from 'lodash/get';
 import cx from 'classnames';
 
-import { formatNumber, formatCurrency, sumCoin } from 'common/helpers/utils';
+import { formatNumber, formatCurrency, sumCoin, fetchWTFuelTotalSupply } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { blocksService } from 'common/services/block';
@@ -102,9 +102,18 @@ export default class TokenDashboard extends React.PureComponent {
   getTotalStaked() {
     const { type } = this.props;
     stakeService.getTotalStake(type)
-      .then(res => {
-        const stake = get(res, 'data.body')
-        this.setState({ totalStaked: stake.totalAmount, nodeNum: stake.totalNodes });
+      .then(async res => {
+        const stake = get(res, 'data.body');
+        let wtfuelTotalSupply = 0
+        if (type === 'tfuel') {
+          try {
+            wtfuelTotalSupply = await fetchWTFuelTotalSupply();
+          } catch (e) {
+            console.log('Error in fetch WTFuel total supply. Err:', e.message);
+          }
+        }
+        const totalStaked = BigNumber.sum(stake.totalAmount, wtfuelTotalSupply);
+        this.setState({ totalStaked: totalStaked, nodeNum: stake.totalNodes });
       })
       .catch(err => {
         console.log(err);
@@ -131,7 +140,7 @@ export default class TokenDashboard extends React.PureComponent {
           </div>
           <div className="column">
             <Detail title={type === 'theta' ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
-            <Detail title={type === 'theta' ? 'THETA STAKED (%)' : 'TFUEL STAKED (%)'}
+            <Detail title={type === 'theta' ? 'THETA STAKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
               value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />} />
           </div>
           <div className="column pie-charts">
