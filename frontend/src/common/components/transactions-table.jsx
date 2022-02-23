@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
 import map from 'lodash/map';
 import cx from 'classnames';
+import truncate from 'lodash/truncate';
 
 import { truncateMiddle } from 'common/helpers/utils';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
@@ -53,7 +54,6 @@ export default class TransactionTable extends React.Component {
       this.setState({ transactions })
     }
   }
-
   handleRowClick = (hash) => {
     history.push(`/txs/${hash}`);
   }
@@ -94,11 +94,13 @@ export default class TransactionTable extends React.Component {
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
                     <td className={cx({ 'dim': source === 'to' }, "from overflow")}>
-                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, 20, address, txSet)}</Link>
+                      {txn.fromTns && <Tns txn={txn} address={address} type="from" trunc={truncate} />}
+                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, truncate, address, txSet)}</Link>
                     </td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address, txSet)}</Link>
+                      {txn.toTns && <Tns txn={txn} address={address} type="to" trunc={truncate} />}
+                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, truncate, address, txSet)}</Link>
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
@@ -124,4 +126,23 @@ const Value = ({ coins, price }) => {
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>
     </React.Fragment>)
+}
+
+const Tns = ({ txn, address, type, trunc=20}) => {
+  if (type === 'from') {
+    if (txn && txn.fromTns) {
+      return(
+      <div>
+        <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
+      </div>);
+    }
+  } else if (type === 'to') {
+    if (txn && txn.toTns) {
+      return(
+      <div>
+        <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
+      </div>);
+    }
+  }
+  return (<span></span>);
 }

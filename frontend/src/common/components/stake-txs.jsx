@@ -70,7 +70,10 @@ export default class StakeTxsTable extends React.PureComponent {
                 <tr key={record._id}>
                   <td className={cx("node-type", record.type)}>{nodeTypes[record.type]}</td>
                   {type === 'source' && <td className="token left"><div className={cx("currency", currencyUnit, "left")}>{`${formatCoin(record.amount)} ${currency}`}</div></td>}
-                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
+                  <td className="address">
+                    {record.toTns && <div><Link to={`/account/${address}`}>{_truncate(record.toTns, { length: truncate })}</Link></div>}
+                    <Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>
+                  </td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
                   {type !== 'source' && <td className="token"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount)} {window.screen.width <= 560 ? '' : currency}</div></td>}
