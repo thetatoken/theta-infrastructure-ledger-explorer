@@ -5,9 +5,10 @@ import BigNumber from 'bignumber.js';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
-import { getDomainName, getDomainNames} from 'tns-resolver';
+import { getAddress, getDomainName, getDomainNames} from 'tns-resolver';
 import { arrayUnique } from 'common/helpers/tns';
 import { from, to } from 'common/helpers/transactions';
+import history from 'common/history'
 
 import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress, formatQuantity } from 'common/helpers/utils';
 import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
@@ -142,8 +143,16 @@ export default class AccountDetails extends React.Component {
       this.fetchData(this.props.match.params.accountAddress);
     }
   }
-  componentDidMount() {
+
+ async componentDidMount() {
     const { accountAddress } = this.props.match.params;
+    if (accountAddress.endsWith(".theta")) {
+      const address = await getAddress(accountAddress);
+      if (address) {
+        history.push(`/account/${address}`);
+        return;
+      }
+    }
     this.fetchData(accountAddress, false);
   }
   componentWillUnmount() {

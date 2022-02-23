@@ -1,6 +1,7 @@
 import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
+import { getAddress } from 'tns-resolver';
 
 export default class Header extends React.Component {
   constructor(props) {
@@ -9,13 +10,19 @@ export default class Header extends React.Component {
     this.searchType = React.createRef();
     this.handleSearch = this.handleSearch.bind(this);
   }
-  handleSearch() {
+  async handleSearch() {
     const value = this.searchInput.value;
     switch (this.searchType.value) {
       case 'address':
         if(value !== ''){
-          history.push(`/account/${value}`);
-          this.searchInput.value = '';
+          if (value.endsWith(".theta")) {
+            const address = await getAddress(value);
+            history.push(`/account/${address ? address : value}`);
+            this.searchInput.value = '';
+          } else {
+            history.push(`/account/${value}`);
+            this.searchInput.value = '';
+          }
         }
         break;
       case 'block':
