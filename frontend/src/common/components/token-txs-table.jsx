@@ -6,7 +6,7 @@ import { hash, age } from 'common/helpers/transactions';
 import cx from 'classnames';
 import map from 'lodash/map';
 import get from 'lodash/get';
-import truncate from 'lodash/truncate';
+import _truncate from 'lodash/truncate';
 import { formatCoin } from '../helpers/utils';
 
 
@@ -38,13 +38,11 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
                 <td className={cx({ 'dim': source === 'to' }, "from")}>
-                  {txn.fromTns && <div><Link to={`/account/${txn.from}`}>{truncate(txn.fromTns, { length: NUM_TRANSACTIONS })}</Link></div>}
-                  <Link to={`/account/${txn.from}`}>{truncate(txn.from, { length: NUM_TRANSACTIONS })}</Link>
+                  <AddressTNS hash={txn.from} tns={txn.fromTns} truncate={NUM_TRANSACTIONS} />
                 </td>
                 {tabType !== "token" && <td className={cx(source, "icon")}></td>}
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
-                  {txn.toTns && <div><Link to={`/account/${txn.to}`}>{truncate(txn.toTns, { length: NUM_TRANSACTIONS })}</Link></div>}
-                  <Link to={`/account/${txn.to}`}>{truncate(txn.to, { length: NUM_TRANSACTIONS })}</Link>
+                  <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />
                 </td>
                 {type === 'TNT-721' && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
@@ -65,10 +63,23 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
   );
 }
 
+const AddressTNS = ({ hash, tns, truncate = false }) => {
+  if (tns) {
+    return (
+      <div className="value tooltip">
+      <div className="tooltip--text">
+        {hash}
+      </div>
+      <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
+    </div>);
+  }
+  return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
+}
+
 const TokenName = (props) => {
   const { name, address } = props;
   const isTruncated = name.length > 12;
-  const tokenName = isTruncated ? truncate(name, { length: 12 }) : name;
+  const tokenName = isTruncated ? _truncate(name, { length: 12 }) : name;
   return <td className="token">
     {isTruncated ?
       <div className={cx("tooltip", TokenIcons[name], { "currency": name })}>

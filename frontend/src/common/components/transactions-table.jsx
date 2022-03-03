@@ -6,10 +6,9 @@ import map from 'lodash/map';
 import cx from 'classnames';
 import truncate from 'lodash/truncate';
 
-import { truncateMiddle } from 'common/helpers/utils';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
-import { from, to, fee, value, hash, age, date, type, coins } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
+import { from, to, hash, age, date, type, coins } from 'common/helpers/transactions';
+import { TxnClasses } from 'common/constants';
 
 
 
@@ -93,14 +92,12 @@ export default class TransactionTable extends React.Component {
                   <React.Fragment>
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
-                    <td className={cx({ 'dim': source === 'to' }, "from overflow")}>
-                      {txn.fromTns && <Tns txn={txn} address={address} type="from" trunc={truncate} />}
-                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, truncate, address, txSet)}</Link>
+                    <td className={cx({ 'dim': source === 'to' }, "from")}>
+                      <AddressTNS txn={txn} address={address} type="from" trunc={truncate} txSet={txSet} />
                     </td>
                     <td className={cx(source, "icon")}></td>
-                    <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      {txn.toTns && <Tns txn={txn} address={address} type="to" trunc={truncate} />}
-                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, truncate, address, txSet)}</Link>
+                    <td className={cx({ 'dim': source === 'from' }, "to")}>
+                      <AddressTNS txn={txn} address={address} type="to" trunc={truncate} />
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
@@ -128,21 +125,31 @@ const Value = ({ coins, price }) => {
     </React.Fragment>)
 }
 
-const Tns = ({ txn, address, type, trunc=20}) => {
+const AddressTNS = ({ txn, address, type, trunc=20, txSet}) => {
   if (type === 'from') {
     if (txn && txn.fromTns) {
       return(
-      <div>
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          {from(txn, null, address, txSet)}
+        </div>
         <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
       </div>);
+    } else {
+      return (<Link to={`/account/${from(txn, null, address)}`}>{from(txn, trunc, address, txSet)}</Link>)
     }
   } else if (type === 'to') {
     if (txn && txn.toTns) {
       return(
-      <div>
-        <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
-      </div>);
+        <div className="value tooltip">
+          <div className="tooltip--text">
+            {to(txn, null, address)}
+          </div>
+          <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
+        </div>);
+    } else {
+      return (<Link to={`/account/${to(txn, null, address)}`}>{to(txn, trunc, address, txSet)}</Link>)
     }
   }
-  return (<span></span>);
+  return (<span></span>)
 }

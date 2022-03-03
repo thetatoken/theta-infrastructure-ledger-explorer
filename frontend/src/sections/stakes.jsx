@@ -7,7 +7,7 @@ import { rewardDistributionService } from 'common/services/rewardDistribution';
 import ThetaChart from 'common/components/chart';
 import { sumCoin } from 'common/helpers/utils';
 import StakesTable from "../common/components/stakes-table";
-import { getDomainNames} from 'tns-resolver';
+import TNS from 'tns-resolver';
 import BigNumber from 'bignumber.js';
 
 
@@ -113,7 +113,8 @@ export default class Stakes extends React.Component {
   }
   setStakesTns = async(stakes, addrKey, stateKey) => {
     const slicedStakes = stakes.slice(0, 21).map((x) => x[addrKey]);
-    const domainNames = await getDomainNames(slicedStakes);
+    const tns = new TNS();
+    const domainNames = await tns.getDomainNames(slicedStakes);
     stakes.map((x) => { x.tns = x[addrKey] ? domainNames[x[addrKey]] : null });
     let state = {};
     state[stateKey] = stakes;

@@ -41,7 +41,7 @@
     "sass-loader": "^5.0.1",
     "socket.io": "^2.1.1",
     "style-loader": "^0.13.1",
-    "tns-resolver": "^1.0.12",
+    "tns-resolver": "^2.0.1",
     "webpack": "^4.29.5",
     "webpack-dev-middleware": "^3.6.0",
     "webpack-dev-server": "^3.11.0",

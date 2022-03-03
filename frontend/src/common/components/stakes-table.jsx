@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { formatCoin } from 'common/helpers/utils';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
-import { getDomainNames} from 'tns-resolver';
+import TNS from 'tns-resolver';
 
 const TRUNC = 20;
 const TitleMap = {
@@ -48,8 +48,6 @@ export default class StakesTable extends React.Component {
     this.setState({ curStakeLength: TRUNC })
   }
   loadAllStakes() {
-    //TODO: Too long
-    // this.setStakesTns(this.props.stakes, this.state.totalStakeLength)
     this.setState({ curStakeLength: this.state.totalStakeLength })
 
   }
@@ -63,7 +61,8 @@ export default class StakesTable extends React.Component {
     const stakes = addresses.slice(0, limit).map((x) => {
       return x.source ? x.source : x.holder
     });
-    const domainNames = await getDomainNames(stakes);
+    const tns = new TNS();
+    const domainNames = await tns.getDomainNames(stakes);
     addresses.map((x) => { x.tns = x.holder ? domainNames[x.holder] : x.source ? domainNames[x.source] : null });
     this.setState({ stakeList: addresses.slice(0, limit), isSliced: true });
   }
@@ -94,8 +93,7 @@ export default class StakesTable extends React.Component {
               return (
                 <tr key={address}>
                   <td className="address">
-                    {record.tns && <div><Link to={`/account/${address}`}>{_truncate(record.tns, { length: truncate })}</Link></div>}
-                    <Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>
+                    <AddressTNS address={address} tns={record.tns} truncate={truncate} />
                   </td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
@@ -134,4 +132,17 @@ export default class StakesTable extends React.Component {
         </table>
       </div>);
   }
+}
+
+const AddressTNS = ({ address, tns, truncate }) => {
+  if (tns) {
+    return (
+    <div className="value tooltip">
+      <div className="tooltip--text">
+        {address}
+      </div>
+      <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
+    </div>);
+  }
+  return (<Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>)
 }

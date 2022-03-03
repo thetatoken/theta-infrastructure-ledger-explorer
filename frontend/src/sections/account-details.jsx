@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
-import { getAddress, getDomainName, getDomainNames} from 'tns-resolver';
+import TNS from 'tns-resolver';
 import { arrayUnique } from 'common/helpers/tns';
 import { from, to } from 'common/helpers/transactions';
 import history from 'common/history'
@@ -31,7 +31,7 @@ import TDropStakeTable from "common/components/tdrop-stake-table";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
-
+const tns = new TNS();
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
@@ -80,20 +80,21 @@ export default class AccountDetails extends React.Component {
     this.resetInput = this.resetInput.bind(this);
   }
   setSingleTNS = async(address, stateKey) => {
-    const name = await getDomainName(address);
+    const name = await tns.getDomainName(address);
     let state = {};
     state[stateKey] = name;
     this.setState(state);
   }
   setTransactionsTNS = async(transactions) => {
+    const address = this.state.account.address;
     const uniqueAddresses = arrayUnique(
-      transactions.map((x) => from(x))
-        .concat(transactions.map((x) => to(x)))
-      );
-    const domainNames = await getDomainNames(uniqueAddresses);
+      transactions.map((x) => from(x, null, address))
+        .concat(transactions.map((x) => to(x, null, address)))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
     transactions.map((transaction) => {
-      transaction.fromTns = from(transaction) ? domainNames[from(transaction)] : null;
-      transaction.toTns = to(transaction) ? domainNames[to(transaction)] : null;
+      transaction.fromTns = from(transaction, null, address) ? domainNames[from(transaction, null, address)] : null;
+      transaction.toTns = to(transaction, null, address) ? domainNames[to(transaction, null, address)] : null;
     });
     this.setState({transactions});
   }
@@ -104,7 +105,7 @@ export default class AccountDetails extends React.Component {
         .concat(thetaHolderTxs.map((x) => x.source))
         .concat(tfuelHolderTxs.map((x) => x.source))
       );
-    const domainNames = await getDomainNames(uniqueAddresses);
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
     thetaSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
     tfuelSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
     thetaHolderTxs.map((x) => { x.toTns = x.source ? domainNames[x.source] : null });
@@ -147,7 +148,8 @@ export default class AccountDetails extends React.Component {
  async componentDidMount() {
     const { accountAddress } = this.props.match.params;
     if (accountAddress.endsWith(".theta")) {
-      const address = await getAddress(accountAddress);
+
+      const address = await tns.getAddress(accountAddress);
       if (address) {
         history.push(`/account/${address}`);
         return;
@@ -639,15 +641,18 @@ const Token = ({ tokenBalance }) => {
     </div>)
 }
 
-const Address = ({ hash }) => {
+const AddressTNS = ({ hash, tns }) => {
+  if (tns) {
+    return (
+    <div className="value tooltip">
+      <div className="tooltip--text">
+        {hash}
+      </div>
+      <Link to={`/account/${hash}`}>{tns}</Link>
+    </div>);
+  }
   return (<Link to={`/account/${hash}`}>{hash}</Link>)
 }
-
-const AddressTNS = ({ hash, tns }) => {
-  if (tns)
-    return (<Link to={`/account/${hash}`}>{tns}<br/>{hash}</Link>)
-    return (<Link to={`/account/${hash}`}>{hash}</Link>)
-  }
 
 
 const TokenTab = props => {
@@ -672,7 +677,7 @@ const TokenTab = props => {
       transactions.map((x) => x.from)
       .concat(transactions.map((x) => x.to))
     );
-    const domainNames = await getDomainNames(uniqueAddresses);
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
     transactions.map((transaction) => {
       transaction.fromTns = transaction.from ? domainNames[transaction.from] : null;
       transaction.toTns = transaction.to ? domainNames[transaction.to] : null;

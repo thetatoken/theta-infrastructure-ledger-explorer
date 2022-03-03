@@ -144,6 +144,41 @@
     }
   }
 
+  .account-info {
+    .value {
+      &.tooltip {
+        z-index: 100;
+        width: fit-content;
+        & .tooltip--text {
+          width: 280px;
+          visibility: hidden;
+          position: absolute;
+          z-index: 1;
+          background: #000000;
+          padding: 10px 0 10px 10px;
+          text-align: left;
+          line-height: 15px;
+          color: $color-font-light;
+          font-size: 12px;
+          bottom: calc(100% + 5px);
+          margin-left: -95px;
+          &:after {
+            content: '';
+            position: absolute;
+            border-style: solid;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-color: #000000 transparent transparent transparent;
+            border-width: 5px;
+          }
+        }
+        &:hover .tooltip--text {
+          visibility: visible;
+        }
+      }
+    }
+  }
 
   table.data.txn-table,
   & > .loading-panel {

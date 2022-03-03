@@ -4,7 +4,7 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
-import { getDomainName} from 'tns-resolver';
+import TNS from 'tns-resolver';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
 import { from, to, date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
@@ -26,6 +26,8 @@ import smartContractApi from 'common/services/smart-contract-api';
 import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
 import { tokenService } from "../common/services/token";
+
+const tns = new TNS();
 
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;
@@ -132,8 +134,8 @@ export default class TransactionExplorer extends React.Component {
     }
   }
   setTransactionTNS = async(transaction) => {
-    transaction.fromTns = from(transaction) ? await getDomainName(from(transaction)) : null;
-    transaction.toTns = to(transaction) ? await getDomainName(to(transaction)) : null;
+    transaction.fromTns = from(transaction) ? await tns.getDomainName(from(transaction)) : null;
+    transaction.toTns = to(transaction) ? await tns.getDomainName(to(transaction)) : null;
     this.setState({transaction});
   }
 
@@ -265,12 +267,15 @@ const Address = ({ hash, truncate = null }) => {
 }
 
 const AddressTNS = ({ hash, tns, truncate = null }) => {
-  if (tns)
-    return (<Link to={`/account/${hash}`}>
-      {truncate ? _truncate(tns, { length: truncate }) : tns}
-      <br/>
-      {truncate ? _truncate(hash, { length: truncate }) : hash}</Link>
-    )
+  if (tns) {
+    return (
+      <div className="value tooltip">
+      <div className="tooltip--text">
+        {hash}
+      </div>
+      <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
+    </div>);
+  }
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
@@ -472,12 +477,17 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [tokens, setTokens] = useState([]);
   const [tokenInfoMap, setTokenInfoMap] = useState();
   const [logs, setLogs] = useState([]);
+  const [contractTns, setContractTns] = useState(null);
+
   const isMountedRef = useIsMountedRef();
   let { data, receipt } = transaction;
 
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
-  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
+  tns.getDomainName(contractAddress).then((x)=> {
+    setContractTns(x)
+  });
+  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <AddressTNS hash={contractAddress} tns={contractTns} />;
   // handle logs
   useEffect(() => {
     if (Object.keys(abiMap).length === 0) return;

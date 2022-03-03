@@ -71,8 +71,7 @@ export default class StakeTxsTable extends React.PureComponent {
                   <td className={cx("node-type", record.type)}>{nodeTypes[record.type]}</td>
                   {type === 'source' && <td className="token left"><div className={cx("currency", currencyUnit, "left")}>{`${formatCoin(record.amount)} ${currency}`}</div></td>}
                   <td className="address">
-                    {record.toTns && <div><Link to={`/account/${address}`}>{_truncate(record.toTns, { length: truncate })}</Link></div>}
-                    <Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>
+                    <AddressTNS address={address} tns={record.toTns} truncate={truncate} />
                   </td>
                   {/* <td className="txn"><Link to={`/txs/${record.txn}`}>{hash(record, truncate)}</Link></td> */}
                   <td className="status">{record.withdrawn ? 'Pending Withdrawal' : 'Staked'}</td>
@@ -100,5 +99,15 @@ export default class StakeTxsTable extends React.PureComponent {
   }
 }
 
-
-
+const AddressTNS = ({ address, tns, truncate }) => {
+  if (tns) {
+    return (
+    <div className="value tooltip">
+      <div className="tooltip--text">
+        {address}
+      </div>
+      <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
+    </div>);
+  }
+  return (<Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>)
+}
