@@ -55,7 +55,8 @@ table.data.txn-table {
           color: $color-font-light;
           font-size: 12px;
           bottom: calc(100% + 5px);
-          margin-left: -95px;
+          margin-left: -140px;
+          left: 50%;
           &:after {
             content: '';
             position: absolute;
