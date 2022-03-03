@@ -1,7 +1,7 @@
 import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
-import TNS from 'tns-resolver';
+import tns from 'libs/tns';
 
 export default class Header extends React.Component {
   constructor(props) {
@@ -16,7 +16,6 @@ export default class Header extends React.Component {
       case 'address':
         if(value !== ''){
           if (value.endsWith(".theta")) {
-            const tns = new TNS();
             const address = await tns.getAddress(value);
             history.push(`/account/${address ? address : value}`);
             this.searchInput.value = '';

@@ -3,7 +3,7 @@ import history from 'common/history'
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
 import toNumber from 'lodash/toNumber';
-import TNS from 'tns-resolver';
+import tns from 'libs/tns';
 import { arrayUnique } from 'common/helpers/tns';
 import { from, to } from 'common/helpers/transactions';
 
@@ -79,7 +79,6 @@ export default class Transactions extends React.Component {
     transactions.map((x) => from(x))
       .concat(transactions.map((x) => to(x)))
     );
-    const tns = new TNS();
     const domainNames = await tns.getDomainNames(uniqueAddresses);
     transactions.map((transaction) => {
       transaction.fromTns = from(transaction) ? domainNames[from(transaction)] : null;

@@ -49,6 +49,7 @@ export default class SmartContract extends React.PureComponent {
             })
             if (!this.state.isVerified) {
               this.loadReleases(() => {
+                if (!self._isMounted) return;
                 this.setState({ isReleasesReady: true })
               })
             }

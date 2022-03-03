@@ -4,7 +4,7 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
-import TNS from 'tns-resolver';
+import tns from 'libs/tns';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
 import { from, to, date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
@@ -26,8 +26,6 @@ import smartContractApi from 'common/services/smart-contract-api';
 import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
 import { tokenService } from "../common/services/token";
-
-const tns = new TNS();
 
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;

@@ -20,8 +20,9 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
 import { useIsMountedRef } from 'common/helpers/hooks';
-import TNS from 'tns-resolver';
 import { arrayUnique } from 'common/helpers/tns';
+import tns from 'libs/tns';
+
 
 const NUM_TRANSACTIONS = 20;
 
@@ -91,7 +92,6 @@ const TokenDetails = ({ match, location }) => {
       transactions.map((x) => x.from)
         .concat(transactions.map((x) => x.to))
     );
-    const tns = new TNS();
     const domainNames = await tns.getDomainNames(uniqueAddresses);
     transactions.map((tx) => {
       tx.fromTns = tx.from ? domainNames[tx.from] : null;

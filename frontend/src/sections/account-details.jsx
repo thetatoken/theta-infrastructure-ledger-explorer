@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
-import TNS from 'tns-resolver';
+import tns from 'libs/tns';
 import { arrayUnique } from 'common/helpers/tns';
 import { from, to } from 'common/helpers/transactions';
 import history from 'common/history'
@@ -31,7 +31,6 @@ import TDropStakeTable from "common/components/tdrop-stake-table";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
-const tns = new TNS();
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };

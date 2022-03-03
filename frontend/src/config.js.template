@@ -1,4 +1,4 @@
-import { NetworkUrlOfChainId } from 'common/constants';
+import { NetworkUrlOfChainId, EthRPCEndpoints } from 'common/constants';
 const host = 'https://localhost';
 const config = {
     restApi: {
@@ -9,6 +9,7 @@ const config = {
         host: host,
         port: 2096
     },
-    defaultThetaChainID: NetworkUrlOfChainId[host]
+    defaultThetaChainID: NetworkUrlOfChainId[host],
+    ethRPCEndpoint: EthRPCEndpoints[host]
 };
 export default config;

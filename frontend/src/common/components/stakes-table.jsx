@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { formatCoin } from 'common/helpers/utils';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
-import TNS from 'tns-resolver';
+import tns from 'libs/tns';
 
 const TRUNC = 20;
 const TitleMap = {
@@ -61,7 +61,6 @@ export default class StakesTable extends React.Component {
     const stakes = addresses.slice(0, limit).map((x) => {
       return x.source ? x.source : x.holder
     });
-    const tns = new TNS();
     const domainNames = await tns.getDomainNames(stakes);
     addresses.map((x) => { x.tns = x.holder ? domainNames[x.holder] : x.source ? domainNames[x.source] : null });
     this.setState({ stakeList: addresses.slice(0, limit), isSliced: true });
