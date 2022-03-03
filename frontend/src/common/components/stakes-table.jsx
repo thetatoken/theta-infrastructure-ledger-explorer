@@ -57,7 +57,7 @@ export default class StakesTable extends React.Component {
     }
   }
 
-  setStakesTns = async(addresses, limit=25) => {
+  setStakesTns = async (addresses, limit = 25) => {
     const stakes = addresses.slice(0, limit).map((x) => {
       return x.source ? x.source : x.holder
     });
@@ -136,12 +136,13 @@ export default class StakesTable extends React.Component {
 const AddressTNS = ({ address, tns, truncate }) => {
   if (tns) {
     return (
-    <div className="value tooltip">
-      <div className="tooltip--text">
-        {address}
-      </div>
-      <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
-    </div>);
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <span>{tns}</span>
+          <span>({address})</span>
+        </div>
+        <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
+      </div>);
   }
   return (<Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>)
 }

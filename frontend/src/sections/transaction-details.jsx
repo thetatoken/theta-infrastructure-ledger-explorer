@@ -131,10 +131,10 @@ export default class TransactionExplorer extends React.Component {
       });
     }
   }
-  setTransactionTNS = async(transaction) => {
+  setTransactionTNS = async (transaction) => {
     transaction.fromTns = from(transaction) ? await tns.getDomainName(from(transaction)) : null;
     transaction.toTns = to(transaction) ? await tns.getDomainName(to(transaction)) : null;
-    this.setState({transaction});
+    this.setState({ transaction });
   }
 
   handleToggleDetailsClick = e => {
@@ -268,11 +268,12 @@ const AddressTNS = ({ hash, tns, truncate = null }) => {
   if (tns) {
     return (
       <div className="value tooltip">
-      <div className="tooltip--text">
-        {hash}
-      </div>
-      <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
-    </div>);
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({hash})</p>
+        </div>
+        <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
+      </div>);
   }
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
@@ -290,7 +291,7 @@ const CoinbaseOutput = ({ output, price, isSingle, tns }) => {
       <div>
         <Amount coins={output.coins} price={price} />
       </div>
-      <AddressTNS hash={output.address} tns={tns} truncate={truncate}  />
+      <AddressTNS hash={output.address} tns={tns} truncate={truncate} />
     </div>);
 }
 
@@ -482,7 +483,7 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
 
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
-  tns.getDomainName(contractAddress).then((x)=> {
+  tns.getDomainName(contractAddress).then((x) => {
     setContractTns(x)
   });
   let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <AddressTNS hash={contractAddress} tns={contractTns} />;

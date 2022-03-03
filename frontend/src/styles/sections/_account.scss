@@ -173,6 +173,9 @@
             border-color: #000000 transparent transparent transparent;
             border-width: 5px;
           }
+          & p {
+            margin: 0;
+          }
         }
         &:hover .tooltip--text {
           visibility: visible;

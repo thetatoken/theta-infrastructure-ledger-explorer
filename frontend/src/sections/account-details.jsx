@@ -78,13 +78,13 @@ export default class AccountDetails extends React.Component {
     this.handleInput = this.handleInput.bind(this);
     this.resetInput = this.resetInput.bind(this);
   }
-  setSingleTNS = async(address, stateKey) => {
+  setSingleTNS = async (address, stateKey) => {
     const name = await tns.getDomainName(address);
     let state = {};
     state[stateKey] = name;
     this.setState(state);
   }
-  setTransactionsTNS = async(transactions) => {
+  setTransactionsTNS = async (transactions) => {
     const address = this.state.account.address;
     const uniqueAddresses = arrayUnique(
       transactions.map((x) => from(x, null, address))
@@ -95,15 +95,15 @@ export default class AccountDetails extends React.Component {
       transaction.fromTns = from(transaction, null, address) ? domainNames[from(transaction, null, address)] : null;
       transaction.toTns = to(transaction, null, address) ? domainNames[to(transaction, null, address)] : null;
     });
-    this.setState({transactions});
+    this.setState({ transactions });
   }
-  setStakesTNS = async(thetaSourceTxs, tfuelSourceTxs, thetaHolderTxs, tfuelHolderTxs) => {
+  setStakesTNS = async (thetaSourceTxs, tfuelSourceTxs, thetaHolderTxs, tfuelHolderTxs) => {
     const uniqueAddresses = arrayUnique(
       thetaSourceTxs.map((x) => x.holder)
         .concat(tfuelSourceTxs.map((x) => x.holder))
         .concat(thetaHolderTxs.map((x) => x.source))
         .concat(tfuelHolderTxs.map((x) => x.source))
-      );
+    );
     const domainNames = await tns.getDomainNames(uniqueAddresses);
     thetaSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
     tfuelSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
@@ -144,7 +144,7 @@ export default class AccountDetails extends React.Component {
     }
   }
 
- async componentDidMount() {
+  async componentDidMount() {
     const { accountAddress } = this.props.match.params;
     if (accountAddress.endsWith(".theta")) {
 
@@ -643,12 +643,13 @@ const Token = ({ tokenBalance }) => {
 const AddressTNS = ({ hash, tns }) => {
   if (tns) {
     return (
-    <div className="value tooltip">
-      <div className="tooltip--text">
-        {hash}
-      </div>
-      <Link to={`/account/${hash}`}>{tns}</Link>
-    </div>);
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({hash})</p>
+        </div>
+        <Link to={`/account/${hash}`}>{tns}</Link>
+      </div>);
   }
   return (<Link to={`/account/${hash}`}>{hash}</Link>)
 }
@@ -671,10 +672,10 @@ const TokenTab = props => {
     fetchTokenTransactions(address, type, pageNumber);
   }
 
-  const setTokensTNS = async(transactions) => {
+  const setTokensTNS = async (transactions) => {
     const uniqueAddresses = arrayUnique(
       transactions.map((x) => x.from)
-      .concat(transactions.map((x) => x.to))
+        .concat(transactions.map((x) => x.to))
     );
     const domainNames = await tns.getDomainNames(uniqueAddresses);
     transactions.map((transaction) => {

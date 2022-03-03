@@ -125,25 +125,27 @@ const Value = ({ coins, price }) => {
     </React.Fragment>)
 }
 
-const AddressTNS = ({ txn, address, type, trunc=20, txSet}) => {
+const AddressTNS = ({ txn, address, type, trunc = 20, txSet }) => {
   if (type === 'from') {
     if (txn && txn.fromTns) {
-      return(
-      <div className="value tooltip">
-        <div className="tooltip--text">
-          {from(txn, null, address, txSet)}
-        </div>
-        <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
-      </div>);
+      return (
+        <div className="value tooltip">
+          <div className="tooltip--text">
+            <p>{txn.fromTns}</p>
+            <p>({from(txn, null, address, txSet)})</p>
+          </div>
+          <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
+        </div>);
     } else {
       return (<Link to={`/account/${from(txn, null, address)}`}>{from(txn, trunc, address, txSet)}</Link>)
     }
   } else if (type === 'to') {
     if (txn && txn.toTns) {
-      return(
+      return (
         <div className="value tooltip">
           <div className="tooltip--text">
-            {to(txn, null, address)}
+            <p>{txn.toTns}</p>
+            <p>({to(txn, null, address)})</p>
           </div>
           <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
         </div>);

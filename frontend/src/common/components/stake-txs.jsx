@@ -102,12 +102,13 @@ export default class StakeTxsTable extends React.PureComponent {
 const AddressTNS = ({ address, tns, truncate }) => {
   if (tns) {
     return (
-    <div className="value tooltip">
-      <div className="tooltip--text">
-        {address}
-      </div>
-      <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
-    </div>);
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({address})</p>
+        </div>
+        <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
+      </div>);
   }
   return (<Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>)
 }

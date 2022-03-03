@@ -67,11 +67,12 @@ const AddressTNS = ({ hash, tns, truncate = false }) => {
   if (tns) {
     return (
       <div className="value tooltip">
-      <div className="tooltip--text">
-        {hash}
-      </div>
-      <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
-    </div>);
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({hash})</p>
+        </div>
+        <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
+      </div>);
   }
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
