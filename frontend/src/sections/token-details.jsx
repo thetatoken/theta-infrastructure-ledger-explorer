@@ -20,6 +20,8 @@ import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
 import { useIsMountedRef } from 'common/helpers/hooks';
+import { arrayUnique } from 'common/helpers/tns';
+import tns from 'libs/tns';
 
 
 const NUM_TRANSACTIONS = 20;
@@ -85,6 +87,20 @@ const TokenDetails = ({ match, location }) => {
     fetchTransactions(contractAddress, tokenId, pageNumber);
   }
 
+  const setTransactionsTNS = async (transactions) => {
+    const uniqueAddresses = arrayUnique(
+      transactions.map((x) => x.from)
+        .concat(transactions.map((x) => x.to))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    transactions.map((tx) => {
+      tx.fromTns = tx.from ? domainNames[tx.from] : null;
+      tx.toTns = tx.to ? domainNames[tx.to] : null;
+    });
+    setTransactions(transactions);
+    setLoadingTxns(false);
+  }
+
   function fetchTransactions(contractAddress, tId, page = 1) {
     setLoadingTxns(true);
     tokenService.getTokenTxsByAddressAndTokenId(contractAddress, tId, page, NUM_TRANSACTIONS)
@@ -92,10 +108,9 @@ const TokenDetails = ({ match, location }) => {
         if (!isMountedRef.current) return;
         let txs = res.data.body;
         txs = txs.sort((a, b) => b.timestamp - a.timestamp);
-        setTransactions(txs);
+        setTransactionsTNS(txs)
         setTotalPages(res.data.totalPageNumber);
         setCurrentPage(res.data.currentPageNumber);
-        setLoadingTxns(false);
       })
       .catch(e => {
         setLoadingTxns(false);

@@ -116,6 +116,12 @@ export const NetworkUrlOfChainId = {
   'https://localhost': Networks.THETA_PRIVATENET,
 };
 
+export const EthRPCEndpoints = {
+  'https://explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
+  'https://beta-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
+  'https://localhost': "http://localhost:18888/rpc",
+}
+
 export const TDropStakingAddress = {
   'testnet': '0xa8bfa60203e55f86dc7013cbf3d8ff85bb1d3cc7',
   'mainnet': '0xa89c744db76266eca60e2b0f62afcd1f8581b7ed'

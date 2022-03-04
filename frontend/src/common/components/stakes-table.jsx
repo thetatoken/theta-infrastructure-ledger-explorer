@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { formatCoin } from 'common/helpers/utils';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
+import tns from 'libs/tns';
 
 const TRUNC = 20;
 const TitleMap = {
@@ -41,18 +42,30 @@ export default class StakesTable extends React.Component {
   }
   loadMoreStakes() {
     this.setState({ curStakeLength: this.state.curStakeLength + TRUNC })
+    this.setStakesTns(this.props.stakes, this.state.curStakeLength + TRUNC)
   }
   loadLessStakes() {
     this.setState({ curStakeLength: TRUNC })
   }
   loadAllStakes() {
     this.setState({ curStakeLength: this.state.totalStakeLength })
+
   }
   componentDidUpdate(preProps) {
     if (preProps.stakes.length !== this.props.stakes.length) {
       this.setState({ totalStakeLength: this.props.stakes.length, curStakeLength: TRUNC })
     }
   }
+
+  setStakesTns = async (addresses, limit = 25) => {
+    const stakes = addresses.slice(0, limit).map((x) => {
+      return x.source ? x.source : x.holder
+    });
+    const domainNames = await tns.getDomainNames(stakes);
+    addresses.map((x) => { x.tns = x.holder ? domainNames[x.holder] : x.source ? domainNames[x.source] : null });
+    this.setState({ stakeList: addresses.slice(0, limit), isSliced: true });
+  }
+
 
   render() {
     const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
@@ -78,7 +91,9 @@ export default class StakesTable extends React.Component {
               const address = type === 'node' ? record.holder : record.source;
               return (
                 <tr key={address}>
-                  <td className="address"><Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link></td>
+                  <td className="address">
+                    <AddressTNS address={address} tns={record.tns} truncate={truncate} />
+                  </td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
                   <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount, 0)}</div></td>
@@ -116,4 +131,18 @@ export default class StakesTable extends React.Component {
         </table>
       </div>);
   }
+}
+
+const AddressTNS = ({ address, tns, truncate }) => {
+  if (tns) {
+    return (
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <span>{tns}</span>
+          <span>({address})</span>
+        </div>
+        <Link to={`/account/${address}`}>{_truncate(tns, { length: truncate })}</Link>
+      </div>);
+  }
+  return (<Link to={`/account/${address}`}>{_truncate(address, { length: truncate })}</Link>)
 }

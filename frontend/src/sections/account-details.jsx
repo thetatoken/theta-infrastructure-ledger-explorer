@@ -5,6 +5,10 @@ import BigNumber from 'bignumber.js';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import cx from 'classnames';
+import tns from 'libs/tns';
+import { arrayUnique } from 'common/helpers/tns';
+import { from, to } from 'common/helpers/transactions';
+import history from 'common/history'
 
 import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress, formatQuantity } from 'common/helpers/utils';
 import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
@@ -27,7 +31,6 @@ import TDropStakeTable from "common/components/tdrop-stake-table";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
-
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
@@ -38,6 +41,7 @@ export default class AccountDetails extends React.Component {
     super(props);
     this.state = {
       account: this.getEmptyAccount(this.props.match.params.accountAddress),
+      accountTNS: null,
       transactions: null,
       currentPage: 1,
       totalPages: null,
@@ -58,6 +62,7 @@ export default class AccountDetails extends React.Component {
       typeOptions: null,
       rewardSplit: 0,
       beneficiary: "",
+      beneficiaryTNS: null,
       tabIndex: 0,
       hasTNT721: false,
       hasTNT20: false,
@@ -72,6 +77,46 @@ export default class AccountDetails extends React.Component {
     this.select = React.createRef();
     this.handleInput = this.handleInput.bind(this);
     this.resetInput = this.resetInput.bind(this);
+  }
+  setSingleTNS = async (address, stateKey) => {
+    const name = await tns.getDomainName(address);
+    let state = {};
+    state[stateKey] = name;
+    this.setState(state);
+  }
+  setTransactionsTNS = async (transactions) => {
+    const address = this.state.account.address;
+    const uniqueAddresses = arrayUnique(
+      transactions.map((x) => from(x, null, address))
+        .concat(transactions.map((x) => to(x, null, address)))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    transactions.map((transaction) => {
+      transaction.fromTns = from(transaction, null, address) ? domainNames[from(transaction, null, address)] : null;
+      transaction.toTns = to(transaction, null, address) ? domainNames[to(transaction, null, address)] : null;
+    });
+    this.setState({ transactions });
+  }
+  setStakesTNS = async (thetaSourceTxs, tfuelSourceTxs, thetaHolderTxs, tfuelHolderTxs) => {
+    const uniqueAddresses = arrayUnique(
+      thetaSourceTxs.map((x) => x.holder)
+        .concat(tfuelSourceTxs.map((x) => x.holder))
+        .concat(thetaHolderTxs.map((x) => x.source))
+        .concat(tfuelHolderTxs.map((x) => x.source))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    thetaSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
+    tfuelSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
+    thetaHolderTxs.map((x) => { x.toTns = x.source ? domainNames[x.source] : null });
+    tfuelHolderTxs.map((x) => { x.toTns = x.source ? domainNames[x.source] : null });
+    this.setState({
+      thetaHolderTxs,
+      thetaSourceTxs,
+      tfuelHolderTxs,
+      tfuelSourceTxs,
+      hasThetaStakes: thetaHolderTxs.length + thetaSourceTxs.length > 0,
+      hasTfuelStakes: tfuelHolderTxs.length + tfuelSourceTxs.length > 0
+    });
   }
   getEmptyAccount(address) {
     return {
@@ -98,8 +143,17 @@ export default class AccountDetails extends React.Component {
       this.fetchData(this.props.match.params.accountAddress);
     }
   }
-  componentDidMount() {
+
+  async componentDidMount() {
     const { accountAddress } = this.props.match.params;
+    if (accountAddress.endsWith(".theta")) {
+
+      const address = await tns.getAddress(accountAddress);
+      if (address) {
+        history.push(`/account/${address}`);
+        return;
+      }
+    }
     this.fetchData(accountAddress, false);
   }
   componentWillUnmount() {
@@ -112,6 +166,7 @@ export default class AccountDetails extends React.Component {
       this.fetchTokenBalance(address);
       this.getTokenTransactionsNumber(address);
       if (!hasPrice) this.getPrices();
+      this.setSingleTNS(address, "accountTNS");
     } else {
       this.setState({ errorType: 'invalid_address' })
     }
@@ -122,6 +177,7 @@ export default class AccountDetails extends React.Component {
         let rewardSplit = get(res, 'data.body.splitBasisPoint') || 0;
         let beneficiary = get(res, 'data.body.beneficiary') || "";
         this.setState({ rewardSplit, beneficiary })
+        this.setSingleTNS(beneficiary, "beneficiaryTNS");
       }).catch(err => {
         console.log(err)
       })
@@ -172,14 +228,7 @@ export default class AccountDetails extends React.Component {
         if (thetaHolderTxs.length > 0 || tfuelHolderTxs.length > 0) {
           this.getSplitPercent(address);
         }
-        this.setState({
-          thetaHolderTxs,
-          thetaSourceTxs,
-          tfuelHolderTxs,
-          tfuelSourceTxs,
-          hasThetaStakes: thetaHolderTxs.length + thetaSourceTxs.length > 0,
-          hasTfuelStakes: tfuelHolderTxs.length + tfuelSourceTxs.length > 0
-        })
+        this.setStakesTNS(thetaSourceTxs, tfuelSourceTxs, thetaHolderTxs, tfuelHolderTxs);
       })
       .catch(err => {
         console.log(err);
@@ -206,6 +255,7 @@ export default class AccountDetails extends React.Component {
             totalPages: get(res, 'data.totalPageNumber'),
             loading_txns: false,
           })
+          this.setTransactionsTNS(get(res, 'data.body'));
         } else {
           this.setState({ hasOtherTxs: false, loading_txns: false })
         }
@@ -418,7 +468,7 @@ export default class AccountDetails extends React.Component {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns, tokenBalance,
       hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
-      typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs } = this.state;
+      typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs, accountTNS, beneficiaryTNS } = this.state;
     const { accountAddress } = this.props.match.params;
     return (
       <div className="content account">
@@ -436,12 +486,13 @@ export default class AccountDetails extends React.Component {
                 </tr>
               </thead>
               <tbody>
+                {accountTNS && <DetailsRow label="TNS" data={accountTNS} />}
                 <DetailsRow label="Balance" data={<Balance balance={account.balance} price={price} />} />
                 <DetailsRow label="Sequence" data={account.sequence} />
                 {hasToken && <DetailsRow label="Token" data={<Token tokenBalance={tokenBalance} />} />}
                 {((hasThetaStakes && thetaHolderTxs.length > 0) || (hasTfuelStakes && tfuelHolderTxs.length > 0)) &&
                   <DetailsRow label="Reward Split" data={rewardSplit / 100 + '%'} />}
-                {rewardSplit !== 0 && <DetailsRow label="Beneficiary" data={<Address hash={beneficiary} />} />}
+                {rewardSplit !== 0 && <DetailsRow label="Beneficiary" data={<AddressTNS hash={beneficiary} tns={beneficiaryTNS} />} />}
               </tbody>
             </table>
           </React.Fragment>}
@@ -589,9 +640,20 @@ const Token = ({ tokenBalance }) => {
     </div>)
 }
 
-const Address = ({ hash }) => {
+const AddressTNS = ({ hash, tns }) => {
+  if (tns) {
+    return (
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({hash})</p>
+        </div>
+        <Link to={`/account/${hash}`}>{tns}</Link>
+      </div>);
+  }
   return (<Link to={`/account/${hash}`}>{hash}</Link>)
 }
+
 
 const TokenTab = props => {
   const { type, address } = props;
@@ -610,16 +672,31 @@ const TokenTab = props => {
     fetchTokenTransactions(address, type, pageNumber);
   }
 
+  const setTokensTNS = async (transactions) => {
+    const uniqueAddresses = arrayUnique(
+      transactions.map((x) => x.from)
+        .concat(transactions.map((x) => x.to))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    transactions.map((transaction) => {
+      transaction.fromTns = transaction.from ? domainNames[transaction.from] : null;
+      transaction.toTns = transaction.to ? domainNames[transaction.to] : null;
+    });
+    if (!isMountedRef.current) return;
+    setTransactions(transactions);
+  }
+
+
   const fetchTokenTransactions = (address, type, page) => {
     tokenService.getTokenTxsByAccountAndType(address, type, page, NUM_TRANSACTIONS)
       .then(res => {
         if (!isMountedRef.current) return;
         let txs = res.data.body;
         txs = txs.sort((a, b) => b.timestamp - a.timestamp);
-        setTransactions(txs);
         setTotalPages(res.data.totalPageNumber);
         setCurrentPage(res.data.currentPageNumber);
         setLoadingTxns(false);
+        setTokensTNS(txs);
         let addressSet = new Set();
         txs.forEach(tx => {
           if (tx.contract_address) {

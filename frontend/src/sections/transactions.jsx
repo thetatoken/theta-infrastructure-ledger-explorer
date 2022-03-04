@@ -3,6 +3,9 @@ import history from 'common/history'
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
 import toNumber from 'lodash/toNumber';
+import tns from 'libs/tns';
+import { arrayUnique } from 'common/helpers/tns';
+import { from, to } from 'common/helpers/transactions';
 
 import { transactionsService } from 'common/services/transaction';
 import { priceService } from 'common/services/price';
@@ -41,6 +44,7 @@ export default class Transactions extends React.Component {
             totalPages: toNumber(res.data.totalPageNumber),
             loading: false,
           })
+          this.setTransactionsTNS(orderBy(res.data.body, 'number', 'desc'));
         }
       })
       .catch(err => {
@@ -69,6 +73,20 @@ export default class Transactions extends React.Component {
       }
     }, 1000);
   }
+
+  setTransactionsTNS = async(transactions) => {
+    const uniqueAddresses = arrayUnique(
+    transactions.map((x) => from(x))
+      .concat(transactions.map((x) => to(x)))
+    );
+    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    transactions.map((transaction) => {
+      transaction.fromTns = from(transaction) ? domainNames[from(transaction)] : null;
+      transaction.toTns = to(transaction) ? domainNames[to(transaction)] : null;
+    });
+    this.setState({transactions});
+  }
+
   handlePageChange = (pageNumber) => {
     this.fetchData(pageNumber);
   }

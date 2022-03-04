@@ -4,9 +4,10 @@ import cx from 'classnames';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
+import tns from 'libs/tns';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
-import { date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
+import { from, to, date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
 import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
@@ -100,6 +101,7 @@ export default class TransactionExplorer extends React.Component {
                 totalTransactionsNumber: res.data.totalTxsNumber,
                 errorType: null
               })
+              this.setTransactionTNS(res.data.body);
               const type = get(res, 'data.body.type');
               if (type === TxnTypes.SMART_CONTRACT) {
                 const addressList = _getAbiAddressList(res.data.body);
@@ -129,6 +131,12 @@ export default class TransactionExplorer extends React.Component {
       });
     }
   }
+  setTransactionTNS = async (transaction) => {
+    transaction.fromTns = from(transaction) ? await tns.getDomainName(from(transaction)) : null;
+    transaction.toTns = to(transaction) ? await tns.getDomainName(to(transaction)) : null;
+    this.setState({ transaction });
+  }
+
   handleToggleDetailsClick = e => {
     e.preventDefault();
     e.stopPropagation();
@@ -256,11 +264,25 @@ const Address = ({ hash, truncate = null }) => {
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
+const AddressTNS = ({ hash, tns, truncate = null }) => {
+  if (tns) {
+    return (
+      <div className="value tooltip">
+        <div className="tooltip--text">
+          <p>{tns}</p>
+          <p>({hash})</p>
+        </div>
+        <Link to={`/account/${hash}`}>{truncate ? _truncate(tns, { length: truncate }) : tns}</Link>
+      </div>);
+  }
+  return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
+}
+
 const Fee = ({ transaction }) => {
   return (<span className="currency tfuel">{fee(transaction) + " TFuel"}</span>);
 }
 
-const CoinbaseOutput = ({ output, price, isSingle }) => {
+const CoinbaseOutput = ({ output, price, isSingle, tns }) => {
   const isPhone = window.screen.width <= 560;
   const isSmallPhone = window.screen.width <= 320;
   const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
@@ -269,7 +291,7 @@ const CoinbaseOutput = ({ output, price, isSingle }) => {
       <div>
         <Amount coins={output.coins} price={price} />
       </div>
-      <Address hash={output.address} truncate={truncate} />
+      <AddressTNS hash={output.address} tns={tns} truncate={truncate} />
     </div>);
 }
 
@@ -288,8 +310,8 @@ const ServicePayment = ({ transaction, price }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
-        <DetailsRow label="From Address" data={<Address hash={data.source.address} />} />
-        <DetailsRow label="To Address" data={<Address hash={data.target.address} />} />
+        <DetailsRow label="From Address" data={<AddressTNS hash={data.source.address} tns={transaction.fromTns} />} />
+        <DetailsRow label="To Address" data={<AddressTNS hash={data.target.address} tns={transaction.toTns} />} />
         <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
         <DetailsRow label="Payment Sequence" data={data.payment_sequence} />
         <DetailsRow label="Reserve Sequence" data={data.reserve_sequence} />
@@ -308,7 +330,7 @@ const ReserveFund = ({ transaction, price }) => {
         <DetailsRow label="Collateral" data={<Amount coins={data.collateral} price={price} />} />
         <DetailsRow label="Duration" data={data.duration} />
         <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
-        <DetailsRow label="Source Address" data={<Address hash={data.source.address} />} />
+        <DetailsRow label="Source Address" data={<AddressTNS hash={data.source.address} tns={transaction.fromTns} />} />
         <DetailsRow label="Resource Ids" data={_renderIds(data.resource_ids)} />
       </tbody>
     </table>);
@@ -332,7 +354,7 @@ const SplitContract = ({ transaction }) => {
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
         <DetailsRow label="Duration" data={data.duration} />
-        <DetailsRow label="Initiator Address" data={<Address hash={data.initiator.address} />} />
+        <DetailsRow label="Initiator Address" data={<AddressTNS hash={data.initiator.address} tns={transaction.fromTns} />} />
         <DetailsRow label="Resource Id" data={data.resource_id} />
         <DetailsRow label="Splits" data={
           (<div className="th-tx-text__split">
@@ -362,8 +384,8 @@ const Send = ({ transaction, price }) => {
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
         {hasTotalCoins ? <DetailsRow label="Total Amount" data={<TotalAmount coins={totalCoins} price={price} />} /> : <></>}
-        <DetailsRow label="From Address" data={map(data.inputs, (input, i, inputs) => <CoinbaseOutput key={i} output={input} price={price} isSingle={inputs.length === 1} />)} />
-        <DetailsRow label="To Address" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
+        <DetailsRow label="From Address" data={map(data.inputs, (input, i, inputs) => <CoinbaseOutput key={i} output={input} price={price} isSingle={inputs.length === 1} tns={transaction.fromTns} />)} />
+        <DetailsRow label="To Address" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} tns={transaction.toTns} />)} />
       </tbody>
     </table>);
 }
@@ -373,7 +395,7 @@ const Slash = ({ transaction }) => {
   return (
     <table className="details txn-details">
       <tbody>
-        <DetailsRow label="Proposer Address" data={<Address hash={data.proposer.address} />} />
+        <DetailsRow label="Proposer Address" data={<AddressTNS hash={data.proposer.address} tns={transaction.fromTns} />} />
         <DetailsRow label="Reserved Sequence" data={data.reserved_sequence} />
         <DetailsRow label="Slash Proof" data={data.slash_proof.substring(0, 12) + '.......'} />
         <DetailsRow label="Slashed Address" data={<Address hash={data.slashed_address} />} />
@@ -409,10 +431,10 @@ const WithdrawStake = ({ transaction, price }) => {
         {returnTime > 0 && <DetailsRow label="Estimated Return" data={<ReturnTime returnTime={returnTime} />} />}
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
-        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake Addr." data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.fromTns} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
+        <DetailsRow label="Staker" data={<AddressTNS hash={get(data, 'source.address')} tns={transaction.toTns} />} />
       </tbody>
     </table>);
 }
@@ -424,10 +446,10 @@ const DepositStake = ({ transaction, price }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
-        <DetailsRow label="Stake Addr." data={<Address hash={get(data, 'holder.address')} />} />
+        <DetailsRow label="Stake Addr." data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.toTns} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
-        <DetailsRow label="Staker" data={<Address hash={get(data, 'source.address')} />} />
+        <DetailsRow label="Staker" data={<AddressTNS hash={get(data, 'source.address')} tns={transaction.fromTns} />} />
       </tbody>
     </table>);
 }
@@ -438,8 +460,8 @@ const StakeRewardDistribution = ({ transaction, price }) => {
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
         <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
-        <DetailsRow label="Holder" data={<Address hash={get(data, 'holder.address')} />} />
-        <DetailsRow label="Beneficiary" data={<Address hash={get(data, 'beneficiary.address')} />} />
+        <DetailsRow label="Holder" data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.fromTns} />} />
+        <DetailsRow label="Beneficiary" data={<AddressTNS hash={get(data, 'beneficiary.address')} tns={transaction.toTns} />} />
         <DetailsRow label="Purpose" data={TxnSplitPurpose[get(data, 'purpose')]} />
         <DetailsRow label="Split PERCENTAGE" data={get(data, 'split_basis_point') / 100 + '%'} />
       </tbody>
@@ -454,12 +476,17 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [tokens, setTokens] = useState([]);
   const [tokenInfoMap, setTokenInfoMap] = useState();
   const [logs, setLogs] = useState([]);
+  const [contractTns, setContractTns] = useState(null);
+
   const isMountedRef = useIsMountedRef();
   let { data, receipt } = transaction;
 
   let err = get(receipt, 'EvmErr');
   const contractAddress = get(receipt, 'ContractAddress');
-  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <Address hash={contractAddress} />;
+  tns.getDomainName(contractAddress).then((x) => {
+    setContractTns(x)
+  });
+  let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <AddressTNS hash={contractAddress} tns={contractTns} />;
   // handle logs
   useEffect(() => {
     if (Object.keys(abiMap).length === 0) return;
@@ -635,8 +662,8 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
         <TabPanel>
           <table className="details txn-details">
             <tbody>
-              <DetailsRow label="From Addr." data={<Address hash={get(data, 'from.address')} />} />
-              <DetailsRow label="To Addr." data={<Address hash={get(data, 'to.address')} />} />
+              <DetailsRow label="From Addr." data={<AddressTNS hash={get(data, 'from.address')} tns={transaction.fromTns} />} />
+              <DetailsRow label="To Addr." data={<AddressTNS hash={get(data, 'to.address')} tns={transaction.toTns} />} />
               {receipt ? <DetailsRow label="Contract Address" data={receiptAddress} /> : null}
               {hasTnt721Transfer && <DetailsRow label="Transaction Action" data={tokens.map((token, i) => {
                 return <TransactionAction

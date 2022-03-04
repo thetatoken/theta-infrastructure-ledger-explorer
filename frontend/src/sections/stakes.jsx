@@ -7,8 +7,8 @@ import { rewardDistributionService } from 'common/services/rewardDistribution';
 import ThetaChart from 'common/components/chart';
 import { sumCoin } from 'common/helpers/utils';
 import StakesTable from "../common/components/stakes-table";
-
 import BigNumber from 'bignumber.js';
+import tns from 'libs/tns';
 
 
 export default class Stakes extends React.Component {
@@ -26,7 +26,6 @@ export default class Stakes extends React.Component {
       rewardMap: {}
     };
   }
-
   componentDidMount() {
     this.getAllRewardDistribution()
   }
@@ -51,7 +50,6 @@ export default class Stakes extends React.Component {
         console.log(err)
       })
   }
-
   getAllStakes(map) {
     const types = this.props.stakeCoinType === 'tfuel' ? ['eenp'] : ['vcp', 'gcp'];
     const self = this;
@@ -106,10 +104,20 @@ export default class Stakes extends React.Component {
           sortedStakesByHolder: sortedStakesByHolder,
           sortedStakesBySource: sortedStakesBySource
         });
+        this.setStakesTns(sortedStakesBySource, 'source', 'sortedStakesBySource');
+        this.setStakesTns(sortedStakesByHolder, 'holder', 'sortedStakesByHolder');
       })
       .catch(err => {
         console.log(err);
       });
+  }
+  setStakesTns = async(stakes, addrKey, stateKey) => {
+    const slicedStakes = stakes.slice(0, 21).map((x) => x[addrKey]);
+    const domainNames = await tns.getDomainNames(slicedStakes);
+    stakes.map((x) => { x.tns = x[addrKey] ? domainNames[x[addrKey]] : null });
+    let state = {};
+    state[stateKey] = stakes;
+    this.setState(state);
   }
 
   render() {

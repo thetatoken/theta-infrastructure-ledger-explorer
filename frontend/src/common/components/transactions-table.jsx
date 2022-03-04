@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
 import map from 'lodash/map';
 import cx from 'classnames';
+import truncate from 'lodash/truncate';
 
-import { truncateMiddle } from 'common/helpers/utils';
 import { formatCoin, priceCoin } from 'common/helpers/utils';
-import { from, to, fee, value, hash, age, date, type, coins } from 'common/helpers/transactions';
-import { TxnTypeText, TxnClasses } from 'common/constants';
+import { from, to, hash, age, date, type, coins } from 'common/helpers/transactions';
+import { TxnClasses } from 'common/constants';
 
 
 
@@ -53,7 +53,6 @@ export default class TransactionTable extends React.Component {
       this.setState({ transactions })
     }
   }
-
   handleRowClick = (hash) => {
     history.push(`/txs/${hash}`);
   }
@@ -93,12 +92,12 @@ export default class TransactionTable extends React.Component {
                   <React.Fragment>
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
-                    <td className={cx({ 'dim': source === 'to' }, "from overflow")}>
-                      <Link to={`/account/${from(txn, null, address)}`}>{from(txn, 20, address, txSet)}</Link>
+                    <td className={cx({ 'dim': source === 'to' }, "from")}>
+                      <AddressTNS txn={txn} address={address} type="from" trunc={truncate} txSet={txSet} />
                     </td>
                     <td className={cx(source, "icon")}></td>
-                    <td className={cx({ 'dim': source === 'from' }, "to overflow")}>
-                      <Link to={`/account/${to(txn, null, address)}`}>{to(txn, 20, address, txSet)}</Link>
+                    <td className={cx({ 'dim': source === 'from' }, "to")}>
+                      <AddressTNS txn={txn} address={address} type="to" trunc={truncate} />
                     </td>
                     <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
                   </React.Fragment>}
@@ -124,4 +123,35 @@ const Value = ({ coins, price }) => {
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>
     </React.Fragment>)
+}
+
+const AddressTNS = ({ txn, address, type, trunc = 20, txSet }) => {
+  if (type === 'from') {
+    if (txn && txn.fromTns) {
+      return (
+        <div className="value tooltip">
+          <div className="tooltip--text">
+            <p>{txn.fromTns}</p>
+            <p>({from(txn, null, address, txSet)})</p>
+          </div>
+          <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
+        </div>);
+    } else {
+      return (<Link to={`/account/${from(txn, null, address)}`}>{from(txn, trunc, address, txSet)}</Link>)
+    }
+  } else if (type === 'to') {
+    if (txn && txn.toTns) {
+      return (
+        <div className="value tooltip">
+          <div className="tooltip--text">
+            <p>{txn.toTns}</p>
+            <p>({to(txn, null, address)})</p>
+          </div>
+          <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
+        </div>);
+    } else {
+      return (<Link to={`/account/${to(txn, null, address)}`}>{to(txn, trunc, address, txSet)}</Link>)
+    }
+  }
+  return (<span></span>)
 }
