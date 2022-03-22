@@ -10,7 +10,8 @@ module.exports = class rewardDistributionDAO {
   }
 
   insert(info, callback) {
-    this.client.insert(this.collection, info, callback);
+    const queryObject = { _id: info._id }
+    this.client.upsert(this.collection, queryObject, info, callback);
   }
 
   getRewardDistributionByAddress(address, callback) {

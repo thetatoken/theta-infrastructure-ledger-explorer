@@ -30,6 +30,7 @@ async function updateRewardDistributionWithCache(list, rewardDistributionDao) {
       existKeys.delete(id);
       if (!shallowEqual(cacheRef.get(id), ruleSet)) {
         updateList.push(ruleSet);
+        cacheRef.set(id, ruleSet);
       }
     } else {
       updateList.push(ruleSet);

@@ -52,6 +52,7 @@ async function updateStakeWithCache(candidateList, type, stakeDao) {
         existKeys.delete(id);
         if (!shallowEqual(cacheRef.get(id), stakeInfo)) {
           updateStakeList.push(stakeInfo);
+          cacheRef.set(id, stakeInfo);
         }
       } else {
         updateStakeList.push(stakeInfo);
