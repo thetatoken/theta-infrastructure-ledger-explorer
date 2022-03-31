@@ -101,6 +101,101 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   return Promise.all(insertList);
 }
 
+exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
+  let addressList = _getContractAddressSetByTxs(txs);
+  Logger.log('addressList.length:', addressList.length);
+  if (addressList.length === 0) {
+    return;
+  }
+  let infoMap = {};
+  // Generate info map
+  for (let address of addressList) {
+    infoMap[`${address}`] = {};
+    const abiRes = await smartContractDao.getAbiAsync(address);
+    const abi = get(abiRes[0], 'abi');
+    if (!abi) {
+      infoMap[`${address}`].abi = [];
+      infoMap[`${address}`].type = 'unknown';
+    } else {
+      infoMap[`${address}`].abi = abi;
+      infoMap[`${address}`].type = _checkTnt721(abi) ? 'TNT-721' : _checkTnt20(abi) ? 'TNT-20' : 'unknown';
+      const tokenInfo = await tokenSummaryDao.getInfoByAddressAsync(address);
+      infoMap[`${address}`].tokenName = get(tokenInfo, 'tokenName');
+    }
+  }
+  Logger.log('Info map keys length:', Object.keys(infoMap).length);
+  const tokenArr = [];
+  const insertList = [];
+  for (let tx of txs) {
+    let logs = get(tx, 'receipt.Logs');
+    logs = JSON.parse(JSON.stringify(logs));
+    logs = logs.map(obj => {
+      obj.data = getHex(obj.data);
+      return obj;
+    })
+    Logger.log('logs in updateTokenNew:', logs)
+    logs = _decodeLogs(logs, infoMap);
+    for (let [i, log] of logs.entries()) {
+      switch (get(log, 'topics[0]')) {
+        case EventHashMap.TFUEL_SPLIT:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_SPLIT);
+            let sellerInfo = {
+              _id: tx.hash.toLowerCase() + i + '_0',
+              hash: tx.hash.toLowerCase(),
+              from: get(tx, 'data.from.address').toLowerCase(),
+              to: get(log, 'decode.result[0]').toLowerCase(),
+              value: get(log, 'decode.result[1]'),
+              type: 'TFUEL',
+              timestamp: tx.timestamp,
+            }
+            let platformInfo = {
+              _id: tx.hash.toLowerCase() + i + '_1',
+              hash: tx.hash.toLowerCase(),
+              from: get(tx, 'data.from.address').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase(),
+              value: get(log, 'decode.result[3]'),
+              type: 'TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(sellerInfo, platformInfo);
+            insertList.push(_checkAndInsertToken(sellerInfo, tokenDao), _checkAndInsertToken(platformInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TRANSFER:
+          const contractAddress = get(log, 'address');
+          // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
+          // this record will be hanlded in the contract verification
+          if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
+            continue;
+          }
+          const tokenId = get(log, 'decode.result.tokenId');
+          const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
+          const newToken = {
+            _id: tx.hash.toLowerCase() + i,
+            hash: tx.hash.toLowerCase(),
+            from: (get(log, 'decode.result[0]') || '').toLowerCase(),
+            to: (get(log, 'decode.result[1]') || '').toLowerCase(),
+            token_id: tokenId,
+            value,
+            name: get(infoMap, `${contractAddress}.name`),
+            type: get(infoMap, `${contractAddress}.type`),
+            timestamp: tx.timestamp,
+            contract_address: contractAddress
+          }
+          tokenArr.push(newToken);
+          insertList.push(_checkAndInsertToken(newToken, tokenDao))
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  Logger.log('tokenArr.length:', tokenArr.length);
+  await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
+  return Promise.all(insertList);
+}
+
 const _decodeLogs = function (logs, infoMap) {
   let ifaceMap = {};
   Object.keys(infoMap).forEach(k => ifaceMap[`${k}`] = new ethers.utils.Interface(infoMap[k].abi))
@@ -360,6 +455,23 @@ function _getContractAddressSet(tx) {
       }
     }
   })
+  return [...set];
+}
+
+function _getContractAddressSetByTxs(txs) {
+  let set = new Set();
+  for (let tx of txs) {
+    let logs = get(tx, 'receipt.Logs');
+    if (!logs) continue;
+    logs.forEach(log => {
+      if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+        const address = get(log, 'address');
+        if (address !== undefined && address !== ZeroAddress) {
+          set.add(get(log, 'address'))
+        }
+      }
+    })
+  }
   return [...set];
 }
 

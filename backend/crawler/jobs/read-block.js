@@ -153,6 +153,7 @@ exports.Execute = async function (networkId) {
         var checkpoint_height, checkpoint_hash;
         var upsertCheckpointAsyncList = [];
         var updateTokenList = [];
+        var tokenTxs = [];
         var stakes = { vcp: [], gcp: [], eenp: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
@@ -259,13 +260,15 @@ exports.Execute = async function (networkId) {
                     upsertTransactionAsyncList.push(transactionDao.upsertTransactionAsync(transaction));
                   }
                   if (transaction.type === TxnTypes.SMART_CONTRACT) {
-                    updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+                    tokenTxs.push(transaction);
+                    // updateTokenList.push(scHelper.updateToken(transaction, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
                   }
                 }
               }
             }
           }
         }
+        updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
         if (stakes.vcp.length !== 0) {
           // Update total stake info
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
