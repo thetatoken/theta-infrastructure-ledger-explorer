@@ -3,10 +3,11 @@ import cx from 'classnames';
 import map from 'lodash/map';
 import { Link } from "react-router-dom";
 import Pagination from "common/components/pagination";
+import { formatQuantity } from 'common/helpers/utils';
 
 const NUM_PER_PAGE = 50;
 
-const HoldersTable = ({ holders, totalSupply, className }) => {
+const HoldersTable = ({ holders, totalSupply, className, decimals }) => {
   const totalPages = Math.ceil(holders.length / NUM_PER_PAGE);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentHolders, setCurrentHolders] = useState(holders.slice(0, NUM_PER_PAGE));
@@ -34,7 +35,7 @@ const HoldersTable = ({ holders, totalSupply, className }) => {
                 <td>
                   <Link to={`/account/${holder.address}`}>{holder.address}</Link>
                 </td>
-                <td className="rank">{holder.amount}</td>
+                <td className="rank">{formatQuantity(holder.amount, decimals, 4)}</td>
                 <td className="rank">{percent}%</td>
               </tr>);
           })}

@@ -267,7 +267,7 @@ const TokenDetails = ({ match, location }) => {
                 disabled={loadingTxns} />
             </TabPanel>
             {/* <TabPanel>
-              <HolderTable holders={holders} totalSupply={tokenInfo.max_total_supply} />
+              <HolderTable holders={holders} totalSupply={tokenInfo.max_total_supply} decimals={tokenInfo.decimals} />
             </TabPanel> */}
             <TabPanel>
               <ReadContract address={match.params.contractAddress} />
