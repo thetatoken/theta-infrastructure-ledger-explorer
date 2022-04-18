@@ -15,8 +15,8 @@ module.exports = class DailyTfuelBurntDAO {
   }
 
   getLatestRecord(callback) {
-    const queryObject = { timestamp: -1 };
-    this.client.getTopRecords(this.collection, queryObject, 1, function (error, recordList) {
+    const sortObject = { timestamp: -1 };
+    this.client.getTopRecords(this.collection, {}, sortObject, 1, function (error, recordList) {
       if (recordList.length === 0) {
         callback(Error('NO_RECORD'));
         return;

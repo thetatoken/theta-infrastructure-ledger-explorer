@@ -48,8 +48,8 @@ module.exports = class AccountDAO {
   }
   getTopAccounts(tokenType, limitNumber, callback) {
     const key = "balance." + tokenType;
-    const queryObject = { [key]: -1 };
-    this.client.getTopRecords(this.accountInfoCollection, queryObject, limitNumber, function (error, recordList) {
+    const sortObject = { [key]: -1 };
+    this.client.getTopRecords(this.accountInfoCollection, {}, sortObject, limitNumber, function (error, recordList) {
       var accountInfoList = []
       for (var i = 0; i < recordList.length; i++) {
         var accountInfo = {};

@@ -14,8 +14,8 @@ module.exports = class TotalAccountDAO {
     this.client.insert(this.collection, data, callback);
   }
   getLatestRecords(limitNumber = 1, callback) {
-    const queryObject = { timestamp: -1 };
-    this.client.getTopRecords(this.collection, queryObject, limitNumber, function (error, recordList) {
+    const sortObject = { timestamp: -1 };
+    this.client.getTopRecords(this.collection, {}, sortObject, limitNumber, function (error, recordList) {
       var totalActList = []
       if (recordList.length === 0) {
         callback(Error('NO_RECORD'));

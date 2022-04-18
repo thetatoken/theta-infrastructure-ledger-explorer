@@ -152,9 +152,9 @@ exports.getTotal = function (collectionName, queryObject, callback) {
     callback(err, res);
   });
 }
-exports.getTopRecords = function (collectionName, queryObject, limitNumber, callback) {
+exports.getTopRecords = function (collectionName, queryObject, sortObject, limitNumber, callback) {
   var collection = _db.collection(collectionName);
-  collection.find().sort(queryObject).collation({ locale: "en_US", numericOrdering: true }).limit(limitNumber).toArray(function (err, res) {
+  collection.find(queryObject).sort(sortObject).collation({ locale: "en_US", numericOrdering: true }).limit(limitNumber).toArray(function (err, res) {
     if (err) callback(err);
     callback(err, res);
   });
