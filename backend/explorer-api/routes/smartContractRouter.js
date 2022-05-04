@@ -5,7 +5,7 @@ var helper = require('../helper/utils');
 var axios = require("axios").default;
 var { updateTokenHistoryBySmartContract } = require('../helper/smart-contract');
 
-var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao) => {
+var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao, rpc) => {
   router.use(bodyParser.json({ limit: '1mb' }));
   router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -82,6 +82,12 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       })
       .catch(error => {
         if (error.message.includes('NOT_FOUND')) {
+          rpc.getCodeAsync([{ 'address': address, 'height': 0 }])
+            .then(async function (data) {
+              console.log('data:', data);
+            }).catch(err => {
+              console.log('err msg:', err.message);
+            })
           const err = ({
             type: 'error_not_found',
             error

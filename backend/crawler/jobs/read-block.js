@@ -268,7 +268,9 @@ exports.Execute = async function (networkId) {
             }
           }
         }
-        updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+        if (tokenTxs.length !== 0) {
+          updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+        }
         if (stakes.vcp.length !== 0) {
           // Update total stake info
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
