@@ -34,6 +34,9 @@
       background-image: url('/images/icons/tbill_token.png'); 
     }
   }
+  &.aura {
+    &:before { background-image: url('/images/icons/aura_token.png'); }
+  }
 }
 
 .currency-link {
