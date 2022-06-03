@@ -799,8 +799,10 @@ const SmartContractValue = ({ value, price, feeSplit, tfuelSplit }) => {
       <div className='price'>{`[\$${priceCoin(value, price['TFuel'])} USD]`}</div>
     </div>
     {feeSplit && <>
-      <FeeSplitRow address={feeSplit.userAddress} fee={feeSplit.userPayout} price={price} />
-      <FeeSplitRow address={feeSplit.ownerAddress} fee={feeSplit.ownerPayout} price={price} />
+      {feeSplit.userAddress && <FeeSplitRow address={feeSplit.userAddress} fee={feeSplit.userPayout} price={price} />}
+      {feeSplit.ownerAddress && <FeeSplitRow address={feeSplit.ownerAddress} fee={feeSplit.ownerPayout} price={price} />}
+      {feeSplit.creatorAddress && <FeeSplitRow address={feeSplit.creatorAddress} fee={feeSplit.creatorPayout} price={price} />}
+      {feeSplit.feeAddress && <FeeSplitRow address={feeSplit.feeAddress} fee={feeSplit.feePayout} price={price} />}
     </>}
     {tfuelSplit && <>
       <FeeSplitRow address={tfuelSplit.seller} fee={tfuelSplit.sellerEarning} price={price} />
@@ -972,7 +974,7 @@ const TransactionAction = ({ token, info, disabled }) => {
       {isZeroFrom ? <>
         Mint&nbsp;&nbsp;
       </> : <>
-        Trannsfer From
+        Transfer From
         <Address hash={token.from} truncate={truncate} />
       </>
       }

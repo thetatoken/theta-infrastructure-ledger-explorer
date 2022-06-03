@@ -75,7 +75,8 @@ export const CurrencyLabels = {
 }
 
 export const TokenIcons = {
-  'TDrop Token': 'tdrop'
+  'TDrop Token': 'tdrop',
+  'AuraToken': 'aura'
 }
 
 export const TxnPurpose = {
