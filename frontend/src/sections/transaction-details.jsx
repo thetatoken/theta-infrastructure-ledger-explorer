@@ -974,7 +974,7 @@ const TransactionAction = ({ token, info, disabled }) => {
       {isZeroFrom ? <>
         Mint&nbsp;&nbsp;
       </> : <>
-        Trannsfer From
+        Transfer From
         <Address hash={token.from} truncate={truncate} />
       </>
       }
