@@ -7,16 +7,20 @@ import smartContractApi from 'common/services/smart-contract-api';
 import { smartContractService } from 'common/services/smartContract';
 import Theta from '../../libs/Theta';
 import ThetaJS from '../../libs/thetajs.esm'
+import { useIsMountedRef } from 'common/helpers/hooks';
 
 export default function ReadContract(props) {
   const { address } = props;
   const [abi, setAbi] = useState(props.abi);
+  const isMountedRef = useIsMountedRef();
+
   useEffect(() => {
     if (abi != null) return;
     // fetch abi if needed
     smartContractService.getAbiByAddress(address.toLowerCase())
       .then(result => {
         if (result.data.type === 'smart_contract_abi') {
+          if (!isMountedRef.current) return;
           setAbi(result.data.body.abi.filter(isReadFunction))
         }
       })
@@ -42,6 +46,7 @@ const FunctionUnit = (props) => {
   const decodedParameters = get(callResult, 'decodedParameters');
   const hasInput = inputs.length > 0 || false;
   const vm_error = get(callResult, 'vm_error');
+  const isMountedRef = useIsMountedRef();
 
   async function fetchFunction() {
     const iface = new ethers.utils.Interface(abi || []);
@@ -76,6 +81,7 @@ const FunctionUnit = (props) => {
         return type;
       });
       outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+      if (!isMountedRef.current) return;
       setCallResult(merge(result, {
         outputs: functionOutputs,
         decodedParameters: abiCoder.decode(outputTypes, outputValues)
@@ -84,6 +90,7 @@ const FunctionUnit = (props) => {
     catch (e) {
       console.log('error occurs:', e)
       //Stop loading and put the error message in the vm_error like it came from the blockchain.
+      if (!isMountedRef.current) return;
       setCallResult({ vm_error: e.message })
     }
   }

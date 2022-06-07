@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { formatQuantity } from 'common/helpers/utils';
 import { TokenIcons } from 'common/constants';
@@ -10,8 +10,11 @@ import _truncate from 'lodash/truncate';
 import { formatCoin } from '../helpers/utils';
 
 
-const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenMap }) => {
+const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenMap, handleHashScroll }) => {
   const NUM_TRANSACTIONS = type === 'TFUEL' ? 30 : 25;
+  useEffect(() => {
+    if (handleHashScroll) handleHashScroll();
+  }, [transactions])
   return (
     <table className={cx("data txn-table", className)}>
       <thead>
