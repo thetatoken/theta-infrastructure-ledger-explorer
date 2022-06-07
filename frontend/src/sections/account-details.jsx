@@ -34,6 +34,9 @@ import { useIsMountedRef } from 'common/helpers/hooks';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
+let scrollTimes = 0;
+let maxScrollTimes = 1;
+
 export default class AccountDetails extends React.Component {
   _isMounted = true;
 
@@ -173,6 +176,11 @@ export default class AccountDetails extends React.Component {
       let tabName = this.props.location.hash.replace("#", "").split('-')[0];
 
       let tabIndex = tabNames.indexOf(tabName) === -1 ? 0 : tabNames.indexOf(tabName);
+      if (tabName) {
+        maxScrollTimes++;
+      } else {
+        maxScrollTimes = 0;
+      }
       this.handleHashScroll();
       this.setState({ tabNames, tabIndex });
     }
@@ -502,8 +510,9 @@ export default class AccountDetails extends React.Component {
   }
   handleHashScroll = () => {
     let tabName = this.props.location.hash.replace("#", "").split('-')[0];
-    if (tabName && this.tabRef) {
-      this.tabRef.scrollIntoView({ behavior: "smooth" });
+    if (tabName && this.tabRef && scrollTimes < maxScrollTimes) {
+      setTimeout(() => this.tabRef.scrollIntoView({ behavior: "smooth" }));
+      scrollTimes++;
     }
   }
   render() {
@@ -512,7 +521,7 @@ export default class AccountDetails extends React.Component {
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
       typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs, accountTNS, beneficiaryTNS } = this.state;
     const { accountAddress } = this.props.match.params;
-    const { history, location } = this.props;
+    const { location } = this.props;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
