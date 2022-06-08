@@ -10,7 +10,7 @@ import ThetaJS from '../../libs/thetajs.esm'
 import { useIsMountedRef } from 'common/helpers/hooks';
 
 export default function ReadContract(props) {
-  const { address } = props;
+  const { address, handleHashScroll } = props;
   const [abi, setAbi] = useState(props.abi);
   const isMountedRef = useIsMountedRef();
 
@@ -25,6 +25,12 @@ export default function ReadContract(props) {
         }
       })
   }, [abi, address])
+
+  useEffect(() => {
+    if (handleHashScroll && abi) {
+      setTimeout(() => handleHashScroll(), 0);
+    }
+  }, [abi])
   const isReadFunction = (functionData) => {
     const constant = get(functionData, ['constant'], null);
     const stateMutability = get(functionData, ['stateMutability'], null);
