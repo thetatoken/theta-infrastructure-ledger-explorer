@@ -151,11 +151,6 @@ export default class AccountDetails extends React.Component {
       || preState.hasInternalTxs !== this.state.hasInternalTxs
       || preState.hasTNT20 !== this.state.hasTNT20
       || preState.hasTNT721 !== this.state.hasTNT721) {
-      console.log('account', preState.account !== this.state.account);
-      console.log('transactions', preState.transactions !== this.state.transactions);
-      console.log('hasInternalTxs', preState.hasInternalTxs !== this.state.hasInternalTxs);
-      console.log('hasTNT20', preState.hasTNT20 !== this.state.hasTNT20);
-      console.log('hasTNT721', preState.hasTNT721 !== this.state.hasTNT721);
       let tabNames = [];
       const { transactions, account, hasInternalTxs, hasTNT20, hasTNT721 } = this.state;
       if (transactions && transactions.length > 0) {
