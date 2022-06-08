@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from "react-router-dom";
 import { validateHex, formatQuantity } from 'common/helpers/utils';
 import { tokenService } from 'common/services/token';
@@ -21,8 +21,10 @@ import map from 'lodash/map';
 import cx from 'classnames';
 import { useIsMountedRef } from 'common/helpers/hooks';
 import { arrayUnique } from 'common/helpers/tns';
+import history from 'common/history'
 import tns from 'libs/tns';
 
+let flag = false;
 
 const NUM_TRANSACTIONS = 20;
 
@@ -39,6 +41,27 @@ const TokenDetails = ({ match, location }) => {
   const [holders, setHolders] = useState([]);
   const [item, setItem] = useState();
   const isMountedRef = useIsMountedRef();
+  const tabRef = useRef();
+  const tabNames = ['Transactions', 'ReadContract', 'WriteContract'];
+
+  function handleHashScroll() {
+    let tabName = location.hash.replace("#", "").split('-')[0];
+    if (tabName && tabRef.current && !flag) {
+      tabRef.current.scrollIntoView({ behavior: "smooth" })
+      flag = true
+    }
+  }
+
+  function handleSelectTab(index) {
+    setTabIndex(index);
+    history.replace({ search: history.location.search, hash: `#${tabNames[index]}` });
+  }
+
+  useEffect(() => {
+    const tabName = location.hash.replace("#", "").split('-')[0];
+    console.log('tabName:', tabName);
+    setTabIndex(tabNames.indexOf(tabName) > -1 ? tabNames.indexOf(tabName) : 0);
+  }, [])
 
   useEffect(() => {
     const { contractAddress } = match.params;
@@ -76,6 +99,7 @@ const TokenDetails = ({ match, location }) => {
             return;
           }
           setTokenInfo(res.data.body);
+          handleHashScroll();
         })
         .catch(console.log)
     }
@@ -239,12 +263,12 @@ const TokenDetails = ({ match, location }) => {
           <div className="txn-type items">Item</div>
         </div>
         <div className="details item">
-          <Item item={item} />
+          <Item item={item} handleHashScroll={handleHashScroll} />
         </div>
       </div>}
       {tokenInfo && !errorType && transactions && transactions.length > 0 &&
-        <div className="wrap">
-          <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+        <div className="wrap" ref={tabRef}>
+          <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={handleSelectTab}>
             <TabList>
               <Tab>Transactions</Tab>
               {/* <Tab>Holders</Tab> */}
@@ -257,7 +281,8 @@ const TokenDetails = ({ match, location }) => {
                 {loadingTxns &&
                   <LoadingPanel className="fill" />}
                 <TokenTxsTable transactions={transactions} type={tokenInfo.type} tabType="token"
-                  tokenMap={{ [tokenInfo.contract_address]: { name: tokenInfo.name, decimals: tokenInfo.decimals } }} />
+                  tokenMap={{ [tokenInfo.contract_address]: { name: tokenInfo.name, decimals: tokenInfo.decimals } }}
+                  handleHashScroll={handleHashScroll} />
               </div>
               <Pagination
                 size={'lg'}
@@ -270,7 +295,7 @@ const TokenDetails = ({ match, location }) => {
               <HolderTable holders={holders} totalSupply={tokenInfo.max_total_supply} decimals={tokenInfo.decimals} />
             </TabPanel> */}
             <TabPanel>
-              <ReadContract address={match.params.contractAddress} />
+              <ReadContract address={match.params.contractAddress} handleHashScroll={handleHashScroll} />
             </TabPanel>
             <TabPanel>
               <h2>Write Contract</h2>

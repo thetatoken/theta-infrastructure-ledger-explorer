@@ -8,7 +8,7 @@ import React from 'react';
 // import map from 'lodash/map';
 
 const Item = props => {
-  const { item } = props;
+  const { item, handleHashScroll } = props;
   // const { tokenId, abi, address } = props;
   // const [item, setItem] = useState();
   // useEffect(() => {
@@ -76,11 +76,16 @@ const Item = props => {
   //   }
   //   fetchUrl();
   // }, [tokenId, abi, address])
+  function handleOnLoad() {
+    if (handleHashScroll) {
+      handleHashScroll();
+    }
+  }
 
   return typeof item === 'object' ? (
     <div className="sc-item">
       <div className="sc-item__column">
-        <img className="sc-item__image" src={item.image}></img>
+        <img className="sc-item__image" src={item.image} onLoad={handleOnLoad}></img>
       </div>
       <div className="sc-item__column">
         {item.name && item.name.length > 0 &&

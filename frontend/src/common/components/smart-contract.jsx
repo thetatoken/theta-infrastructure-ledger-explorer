@@ -4,19 +4,27 @@ import SmartContractCode from './smart-contract-code';
 import ReadContract from './read-contract';
 import { smartContractService } from 'common/services/smartContract';
 import get from 'lodash/get';
+import history from 'common/history'
+
+const tabNames = ['Code', 'ReadContract', 'WriteContract'];
 
 export default class SmartContract extends React.PureComponent {
   _isMounted = true;
 
   constructor(props) {
     super(props)
+    let tabName = this.props.urlHash.replace("#", "").split('-')[1];
+    console.log('smart contract tabname:', tabName);
     this.state = {
       smartContract: null,
       isVerified: false,
       isReleasesReady: false,
       isLoading: false,
-      tabIndex: 0
+      tabIndex: tabNames.indexOf(tabName) === -1 ? 0 : tabNames.indexOf(tabName)
     }
+  }
+  getDefaultTabIndex() {
+
   }
   componentDidMount() {
     this.fetchSmartContract(this.props.address)
@@ -34,7 +42,7 @@ export default class SmartContract extends React.PureComponent {
       return;
     }
     const self = this;
-    this.setState({ isLoading: true, tabIndex: 0 })
+    this.setState({ isLoading: true })
     smartContractService.getOneByAddress(address)
       .then(res => {
         if (!self._isMounted) return;
@@ -60,6 +68,9 @@ export default class SmartContract extends React.PureComponent {
             break;
         }
         this.setState({ isLoading: false })
+        if (this.props.handleHashScroll) {
+          this.props.handleHashScroll();
+        }
       }).catch(err => {
         console.log(err);
       })
@@ -84,8 +95,9 @@ export default class SmartContract extends React.PureComponent {
 
     return (stateMutability === "view" || stateMutability === "pure" || constant === true);
   }
-  setTabIndex = index => {
+  setTabIndex = (index) => {
     this.setState({ tabIndex: index })
+    history.replace(`#Contract-${tabNames[index]}`);
   }
   render() {
     const { address } = this.props;

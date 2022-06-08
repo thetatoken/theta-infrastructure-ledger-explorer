@@ -34,6 +34,9 @@ import { useIsMountedRef } from 'common/helpers/hooks';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
+let scrollTimes = 0;
+let maxScrollTimes = 1;
+
 export default class AccountDetails extends React.Component {
   _isMounted = true;
 
@@ -68,7 +71,8 @@ export default class AccountDetails extends React.Component {
       hasTNT20: false,
       hasInternalTxs: false,
       hasToken: false,
-      tokenBalance: INITIAL_TOKEN_BALANCE
+      tokenBalance: INITIAL_TOKEN_BALANCE,
+      tabNames: []
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
@@ -127,7 +131,7 @@ export default class AccountDetails extends React.Component {
       txs_counter: {}
     }
   }
-  componentDidUpdate(preProps) {
+  componentDidUpdate(preProps, preState) {
     if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
       this.setState({
         hasOtherTxs: true,
@@ -141,6 +145,44 @@ export default class AccountDetails extends React.Component {
         tokenBalance: INITIAL_TOKEN_BALANCE
       })
       this.fetchData(this.props.match.params.accountAddress);
+    }
+    if (preState.account !== this.state.account
+      || preState.transactions !== this.state.transactions
+      || preState.hasInternalTxs !== this.state.hasInternalTxs
+      || preState.hasTNT20 !== this.state.hasTNT20
+      || preState.hasTNT721 !== this.state.hasTNT721) {
+      console.log('account', preState.account !== this.state.account);
+      console.log('transactions', preState.transactions !== this.state.transactions);
+      console.log('hasInternalTxs', preState.hasInternalTxs !== this.state.hasInternalTxs);
+      console.log('hasTNT20', preState.hasTNT20 !== this.state.hasTNT20);
+      console.log('hasTNT721', preState.hasTNT721 !== this.state.hasTNT721);
+      let tabNames = [];
+      const { transactions, account, hasInternalTxs, hasTNT20, hasTNT721 } = this.state;
+      if (transactions && transactions.length > 0) {
+        tabNames.push('Transactions');
+      }
+      if (account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470') {
+        tabNames.push('Contract');
+      }
+      if (hasInternalTxs) {
+        tabNames.push('InternalTxns')
+      }
+      if (hasTNT20) {
+        tabNames.push('TNT20TokenTxns');
+      }
+      if (hasTNT721) {
+        tabNames.push('TNT721TokenTxns')
+      }
+      let tabName = this.props.location.hash.replace("#", "").split('-')[0];
+
+      let tabIndex = tabNames.indexOf(tabName) === -1 ? 0 : tabNames.indexOf(tabName);
+      if (tabName) {
+        maxScrollTimes++;
+      } else {
+        maxScrollTimes = 0;
+      }
+      this.handleHashScroll();
+      this.setState({ tabNames, tabIndex });
     }
   }
 
@@ -429,7 +471,9 @@ export default class AccountDetails extends React.Component {
     this.setState({ hasRefreshBtn: false });
   }
   setTabIndex = index => {
+    let tabName = this.state.tabNames[index];
     this.setState({ tabIndex: index })
+    history.replace(`#${tabName}`);
   }
   setHasToken = hasToken => {
     this.setState({ hasToken });
@@ -464,12 +508,20 @@ export default class AccountDetails extends React.Component {
       }
     }
   }
+  handleHashScroll = () => {
+    let tabName = this.props.location.hash.replace("#", "").split('-')[0];
+    if (tabName && this.tabRef && scrollTimes < maxScrollTimes) {
+      setTimeout(() => this.tabRef.scrollIntoView({ behavior: "smooth" }));
+      scrollTimes++;
+    }
+  }
   render() {
     const { account, transactions, currentPage, totalPages, errorType, loading_txns, tokenBalance,
       hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
       typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs, accountTNS, beneficiaryTNS } = this.state;
     const { accountAddress } = this.props.match.params;
+    const { location } = this.props;
     return (
       <div className="content account">
         <div className="page-title account">Account Detail</div>
@@ -509,6 +561,7 @@ export default class AccountDetails extends React.Component {
           </div>
         }
         <TDropStakeTable address={accountAddress} />
+        <div ref={e => { this.tabRef = e }}></div>
         <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
             {transactions && transactions.length > 0 && <Tab>Transactions</Tab>}
@@ -519,7 +572,7 @@ export default class AccountDetails extends React.Component {
             {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
             {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
           </TabList>
-          {transactions && transactions.length > 0 && < TabPanel >
+          {transactions && transactions.length > 0 && <TabPanel>
             {!transactions && loading_txns &&
               <LoadingPanel />}
             {transactions && transactions.length > 0 &&
@@ -588,17 +641,17 @@ export default class AccountDetails extends React.Component {
           </TabPanel>}
           {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
             <TabPanel>
-              <SmartContract address={account.address} />
+              <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
             </TabPanel>
           }
           {hasInternalTxs && <TabPanel>
-            <TokenTab type="TFUEL" address={account.address} />
+            <TokenTab type="TFUEL" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
           {hasTNT20 && <TabPanel>
-            <TokenTab type="TNT-20" address={account.address} />
+            <TokenTab type="TNT-20" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
           {hasTNT721 && <TabPanel>
-            <TokenTab type="TNT-721" address={account.address} />
+            <TokenTab type="TNT-721" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
         </Tabs>
       </div >);
@@ -656,7 +709,7 @@ const AddressTNS = ({ hash, tns }) => {
 
 
 const TokenTab = props => {
-  const { type, address } = props;
+  const { type, address, handleHashScroll } = props;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loadingTxns, setLoadingTxns] = useState(true);
@@ -730,7 +783,7 @@ const TokenTab = props => {
     <div>
       {loadingTxns &&
         <LoadingPanel className="fill" />}
-      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} tokenMap={tokenMap} />}
+      {!loadingTxns && <TokenTxsTable transactions={transactions} type={type} address={address} tokenMap={tokenMap} handleHashScroll={handleHashScroll} />}
     </div>
     <Pagination
       size={'lg'}

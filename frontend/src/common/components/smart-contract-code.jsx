@@ -265,7 +265,7 @@ const CodeViewer = props => {
                 <div>
                   <b>{contract.optimizer === 'enabled' ? 'Yes' : 'No'}</b> with
                   <b>
-                    {contract.optimizer === 'enabled' ? contract.optimizerRuns ? ' '+ contract.optimizerRuns : ' 200' : ' 0'}
+                    {contract.optimizer === 'enabled' ? contract.optimizerRuns ? ' ' + contract.optimizerRuns : ' 200' : ' 0'}
                   </b> runs
                 </div>
               </div>
