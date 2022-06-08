@@ -507,6 +507,7 @@ const SmartContract = (props) => {
   useEffect(() => {
     const tabName = urlHash.replace("#", "").split('-')[0];
     setTabIndex(tabNames.indexOf(tabName) > -1 ? tabNames.indexOf(tabName) : 0);
+    handleHashScroll();
   }, [])
 
   // handle logs
@@ -525,6 +526,7 @@ const SmartContract = (props) => {
   // handle tokens and tokenInfoMap
   useEffect(() => {
     if (logs.length === 0) return;
+    handleHashScroll();
     const tokenArr = [];
     const addressMap = {};
     logs.forEach(log => {
