@@ -20,6 +20,7 @@ import BodyTag from 'common/components/body-tag';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Item from 'common/components/tnt721-item';
 import { useIsMountedRef } from 'common/helpers/hooks';
+import history from 'common/history'
 
 import { ethers } from "ethers";
 import smartContractApi from 'common/services/smart-contract-api';
@@ -210,7 +211,7 @@ export default class TransactionExplorer extends React.Component {
 
             {transaction.type === TxnTypes.SMART_CONTRACT &&
               <SmartContract transaction={transaction} price={price} abi={[]} abiMap={abiMap}
-                handleToggleDetailsClick={this.handleToggleDetailsClick} />}
+                handleToggleDetailsClick={this.handleToggleDetailsClick} urlHash={this.props.location.hash} />}
 
             {transaction.type === TxnTypes.WITHDRAW_STAKE &&
               <WithdrawStake transaction={transaction} price={price} />}
@@ -467,7 +468,8 @@ const StakeRewardDistribution = ({ transaction, price }) => {
       </tbody>
     </table>);
 }
-const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap }) => {
+const SmartContract = (props) => {
+  const { transaction, handleToggleDetailsClick, price, abiMap, urlHash } = props;
   const [tabIndex, setTabIndex] = useState(0);
   const [feeSplit, setFeeSplit] = useState(null);
   const [tfuelSplit, setTfuelSplit] = useState(null);
@@ -477,6 +479,8 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
   const [tokenInfoMap, setTokenInfoMap] = useState();
   const [logs, setLogs] = useState([]);
   const [contractTns, setContractTns] = useState(null);
+  const tabRef = useRef();
+  const tabNames = ['Overview', 'Logs'];
 
   const isMountedRef = useIsMountedRef();
   let { data, receipt } = transaction;
@@ -487,6 +491,24 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
     setContractTns(x)
   });
   let receiptAddress = err ? <span className="text-disabled">{contractAddress}</span> : <AddressTNS hash={contractAddress} tns={contractTns} />;
+
+  function handleHashScroll() {
+    let tabName = urlHash.replace("#", "").split('-')[0];
+    if (tabName && tabRef.current) {
+      tabRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+
+  function handleSelectTab(index) {
+    setTabIndex(index);
+    history.replace(`#${tabNames[index]}`);
+  }
+
+  useEffect(() => {
+    const tabName = urlHash.replace("#", "").split('-')[0];
+    setTabIndex(tabNames.indexOf(tabName) > -1 ? tabNames.indexOf(tabName) : 0);
+  }, [])
+
   // handle logs
   useEffect(() => {
     if (Object.keys(abiMap).length === 0) return;
@@ -649,12 +671,13 @@ const SmartContract = ({ transaction, handleToggleDetailsClick, price, abiMap })
           <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} />
         </div>
       </>} */}
-      <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} />
+      <Items abiMap={abiMap} logs={logs} tokenInfoMap={tokenInfoMap} handleHashScroll={handleHashScroll} />
       <div className="details-header">
         <div className={cx("txn-type", TxnClasses[transaction.type])}>{type(transaction)}</div>
         <button className="btn tx raw" onClick={handleToggleDetailsClick}>view raw txn</button>
       </div>
-      <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={setTabIndex}>
+      <div ref={tabRef}></div>
+      <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={handleSelectTab}>
         <TabList>
           <Tab>Overview</Tab>
           <Tab disabled={logs.length == 0} >{`Logs(${logs.length})`}</Tab>
@@ -909,7 +932,7 @@ const LogData = ({ data, decode }) => {
 }
 
 const Items = props => {
-  const { logs, abiMap, tokenInfoMap } = props;
+  const { logs, abiMap, tokenInfoMap, handleHashScroll } = props;
   const [filteredLogs, setFiltedLogs] = useState([]);
   const [isHidden, setIsHidden] = useState(true);
   useEffect(() => {
@@ -947,6 +970,7 @@ const Items = props => {
             abi={abiMap ? abiMap[address] : []}
             item={tokenInfoMap ? tokenInfoMap[address] : {}}
             key={i}
+            handleHashScroll={handleHashScroll}
           />
         })
       }
