@@ -3,9 +3,9 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
-let startTime = { theta: +new Date(), tfuel: +new Date() };
+let startTime = { theta: +new Date(), tfuel: +new Date(), eenp: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
-let cacheData = { theta: undefined, tfuel: undefined };
+let cacheData = { theta: undefined, tfuel: undefined, eenp: undefined };
 var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
@@ -132,6 +132,40 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistor
       res.status(400).send('Error occurs:', e);
     }
   })
+
+  router.get("/stake/accounts", (req, res) => {
+    let { type = 'eenp' } = req.query;
+    console.log(`Querying total ${type} account list.`);
+    if (type !== 'eenp') {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    let cur = +new Date();
+    if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
+      const data = cacheData[type];
+      if (data.type === 'stakeAccountList') {
+        res.status(200).send(data);
+      } else if (data.type === 'error_not_found') {
+        res.status(404).send(data);
+      }
+      return;
+    }
+    startTime[type] = cur;
+    stakeDao.getAccountsByTypeAsync(type)
+      .then(info => {
+        const data = {
+          type: "stakeAccountList",
+          body: {
+            type,
+            accountList: info
+          }
+        }
+        cacheData[type] = data;
+        res.status(200).send(data);
+      }).catch(error => {
+        res.status(400).send(error.message);
+      })
+  });
 
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');

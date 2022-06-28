@@ -138,6 +138,13 @@ exports.query = function (collectionName, queryObject, callback) {
     callback(err, res);
   });
 }
+exports.distinct = function (collectionName, field, queryObject, callback) {
+  var collection = _db.collection(collectionName);
+  collection.distinct(field, queryObject, function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  })
+}
 exports.queryWithProjection = function (collectionName, queryObj, projectionObj, callback) {
   var collection = _db.collection(collectionName);
   collection.find(queryObj).project(projectionObj).toArray(function (err, res) {

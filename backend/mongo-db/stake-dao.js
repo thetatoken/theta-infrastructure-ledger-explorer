@@ -189,4 +189,15 @@ module.exports = class stakeDAO {
       callback(err, res);
     })
   }
+  getAccountsByType(type, callback) {
+    const field = 'holder';
+    const queryObject = { 'type': type };
+    this.client.distinct(this.stakeInfoCollection, field, queryObject, function (err, res) {
+      if (err) {
+        console.log('Stake dao getAccountsByType ERR - ', err, type);
+        callback(err);
+      }
+      callback(err, res)
+    })
+  }
 }
