@@ -51,10 +51,10 @@ module.exports = class TokenHolderDAO {
     this.client.remove(this.collection, queryObject, callback);
   }
 
-  getTopHolders(address, tokenId, limit, callback) {
-    const queryObject = { contract_address: address };
-    if (tokenId != null) queryObject.token_id = tokenId;
-    const sortObject = { amount: -1 };
-    this.client.getTopHolders(this.collection, queryObject, sortObject, 0, limit, callback);
-  }
+  // getTopHolders(address, tokenId, limit, callback) {
+  //   const queryObject = { contract_address: address };
+  //   if (tokenId != null) queryObject.token_id = tokenId;
+  //   const sortObject = { amount: -1 };
+  //   this.client.getTopHolders(this.collection, queryObject, sortObject, 0, limit, callback);
+  // }
 }

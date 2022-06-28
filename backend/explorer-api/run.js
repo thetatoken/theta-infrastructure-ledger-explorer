@@ -222,7 +222,7 @@ function main() {
       // accounting router
       accountingRouter(app, accountingDao)
       // smart contract router
-      smartContractRouter(app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao, rpc)
+      smartContractRouter(app, smartContractDao, transactionDao, accountTxDao, tokenDao, tokenSummaryDao, tokenHolderDao)
       // active account router
       activeActRouter(app, activeActDao);
       // reward distribution router
