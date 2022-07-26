@@ -58,6 +58,7 @@ module.exports = class TransactionDAO {
       callback(err, res);
     });
   }
+
   getTransactions(pageNumber, limitNumber, diff, callback) {
     const queryObject = { 'status': 'finalized' };
     const sortObject = { 'number': diff === null ? -1 : 1 };
@@ -66,11 +67,18 @@ module.exports = class TransactionDAO {
     this.client.getRecords(this.transactionInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
   }
 
+  getBriefTransactions(pageNumber, limitNumber, callback) {
+    const queryObject = { 'status': 'finalized' };
+    const sortObject = { 'number': -1 };
+    const projectionObj = { number: 1, type: 1, hash: 1, _id: 0 }
+    this.client.getRecordsWithProjection(this.transactionInfoCollection, queryObject, sortObject, projectionObj, pageNumber, limitNumber, callback);
+  }
+
   getTransactionsByRange(min, max, callback) {
     const queryObject = { 'number': { $gte: min, $lte: max }, 'status': 'finalized' };
     this.client.query(this.transactionInfoCollection, queryObject, callback);
   }
-  
+
   getTransactionByPk(pk, callback) {
     let self = this;
     const redis_key = `tx_id:${pk}`;

@@ -258,7 +258,7 @@ function pushTopBlocks() {
       var query_block_height_min = Math.max(0, query_block_height_max - numberOfBlocks + 1); // pushing 50 blocks initially
       // console.log('Querying blocks from ' + query_block_height_min.toString() + ' to ' + query_block_height_max.toString())
       //return blockDao.getBlockAsync(123) 
-      return blockDao.getBlocksByRangeAsync(query_block_height_min, query_block_height_max)
+      return blockDao.getBriefBlocksByRangeAsync(query_block_height_min, query_block_height_max)
     })
     .then(function (blockInfoList) {
       io.sockets.emit('PUSH_TOP_BLOCKS', { type: 'block_list', body: blockInfoList });
@@ -268,7 +268,7 @@ function pushTopBlocks() {
 }
 function pushTopTransactions() {
   const numberOfTransactions = 5;
-  transactionDao.getTransactionsAsync(0, numberOfTransactions, null)
+  transactionDao.getBriefTransactionsAsync(0, numberOfTransactions)
     .then(function (transactionInfoList) {
       io.sockets.emit('PUSH_TOP_TXS', { type: 'transaction_list', body: transactionInfoList });
     });

@@ -176,6 +176,14 @@ exports.getRecords = function (collectionName, queryObject, sortObject, pageNume
   });
 }
 
+exports.getRecordsWithProjection = function (collectionName, queryObject, sortObject, projectObject, pageNumebr, limitNumber, callback) {
+  var collection = _db.collection(collectionName);
+  collection.find(queryObject).sort(sortObject).skip(pageNumebr * limitNumber).limit(limitNumber).project(projectObject).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
+
 exports.removeAll = function (collectionName, callback) {
   if (collectionName === 'vcp') {
     var collection = _db.collection(collectionName);

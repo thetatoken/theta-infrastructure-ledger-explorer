@@ -147,6 +147,14 @@ module.exports = class BlockDAO {
     }
   }
 
+  getBriefBlocksByRange(min, max, callback) {
+    const queryObject = { '_id': { $gte: min, $lte: max } };
+    const projectionObj = { height: 1, num_txs: 1, hash: 1, _id: 0 }
+    this.client.queryWithProjection(this.blockInfoCollection, queryObject, projectionObj, function (error, recordList) {
+      callback(error, recordList)
+    })
+  }
+
   getInfoListByTime(start, end, callback) {
     let self = this;
     const redis_key = 'block_time' + start + '-' + end;
