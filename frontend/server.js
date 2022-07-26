@@ -14,8 +14,9 @@ var compiler = webpack(config);
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
-
+app.use(express.static('public', {
+  maxAge: "604800"
+}));
 
 // healthy check from ELB 
 app.get('/ping', function (req, res) {
@@ -52,3 +53,15 @@ h2.listen(port, function (err) {
   }
   console.log(`Listening at port: ${port}`);
 });
+
+/**
+var http = require('http').createServer(app);
+
+http.listen(port, function (err) {
+  if (err) {
+    console.log(err);
+    return;
+  }
+  console.log(`Listening at port: ${port}`);
+});
+ */
