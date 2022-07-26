@@ -22,8 +22,8 @@ export default class BlockOverviewTable extends React.Component {
     truncate: 35,
   }
   static getDerivedStateFromProps(nextProps, prevState) {
-    if(nextProps.blocks && nextProps.blocks.length && nextProps.blocks !== prevState.blocks) {
-      return { blocks: nextProps.blocks};
+    if (nextProps.blocks && nextProps.blocks.length && nextProps.blocks !== prevState.blocks) {
+      return { blocks: nextProps.blocks };
     }
     return prevState;
   }
@@ -32,14 +32,18 @@ export default class BlockOverviewTable extends React.Component {
     const { updateLive } = this.props;
 
     // Initial the socket
-    if(updateLive && backendAddress) {
-      this.socket = socketClient(backendAddress);
-      this.socket.on('PUSH_TOP_BLOCKS', this.onSocketEvent)
+    if (updateLive && backendAddress) {
+      window.addEventListener("focus", this.onFocus);
+      window.addEventListener("blur", this.onBlur);
+      // Calls onFocus when the window first loads
+      this.onFocus();
     }
   }
   componentWillUnmount() {
-    if(this.socket) 
+    if (this.socket)
       this.socket.disconnect();
+    window.removeEventListener("focus", this.onFocus);
+    window.removeEventListener("blur", this.onBlur);
   }
   onSocketEvent(data) {
     if (data.type == 'block_list') {
@@ -51,6 +55,23 @@ export default class BlockOverviewTable extends React.Component {
     history.push(`/blocks/${height}`);
   }
 
+  // User has switched back to the tab
+  onFocus = () => {
+    if (this.socket) return;
+
+    const { backendAddress } = this.state;
+    this.socket = socketClient(backendAddress);
+    this.socket.on('PUSH_TOP_BLOCKS', this.onSocketEvent)
+  };
+
+  // User has switched away from the tab (AKA tab is hidden)
+  onBlur = () => {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+  };
+
   render() {
     const { className, includeDetails, truncate } = this.props;
     const { blocks } = this.state;
@@ -60,11 +81,11 @@ export default class BlockOverviewTable extends React.Component {
           <tr>
             <th className="height">Height</th>
             <th className="hash">Block Hash</th>
-            {includeDetails && 
-            <React.Fragment>
-              <th className="age">Age</th>
-              <th className="fee">TFuel Burnt</th>
-            </React.Fragment>}
+            {includeDetails &&
+              <React.Fragment>
+                <th className="age">Age</th>
+                <th className="fee">TFuel Burnt</th>
+              </React.Fragment>}
             <th className="txns ">Txns</th>
           </tr>
         </thead>
@@ -75,13 +96,13 @@ export default class BlockOverviewTable extends React.Component {
               return (
                 <tr key={b.height}>
                   <td className="height">{b.height}</td>
-                  <td className="hash overflow"><Link to={`/blocks/${b.height}`}>{ hash(b, truncate ? truncate : undefined) }</Link></td>
-                  {includeDetails && 
-                  <React.Fragment>
-                    <td className="age" title={date(b)}>{ age(b) }</td>
-                    <td className="fee"><div className="currency tfuel">{ totalTfuelBurnt(b) }</div></td>
-                  </React.Fragment>}
-                  <td className="txns">{ b.num_txs }</td>
+                  <td className="hash overflow"><Link to={`/blocks/${b.height}`}>{hash(b, truncate ? truncate : undefined)}</Link></td>
+                  {includeDetails &&
+                    <React.Fragment>
+                      <td className="age" title={date(b)}>{age(b)}</td>
+                      <td className="fee"><div className="currency tfuel">{totalTfuelBurnt(b)}</div></td>
+                    </React.Fragment>}
+                  <td className="txns">{b.num_txs}</td>
                 </tr>
               );
             })}

@@ -39,13 +39,17 @@ export default class TransactionTable extends React.Component {
 
     // Initial the socket
     if (updateLive && backendAddress) {
-      this.socket = socketClient(backendAddress);
-      this.socket.on('PUSH_TOP_TXS', this.onSocketEvent)
+      window.addEventListener("focus", this.onFocus);
+      window.addEventListener("blur", this.onBlur);
+      // Calls onFocus when the window first loads
+      this.onFocus();
     }
   }
   componentWillUnmount() {
     if (this.socket)
       this.socket.disconnect();
+    window.removeEventListener("focus", this.onFocus);
+    window.removeEventListener("blur", this.onBlur);
   }
   onSocketEvent(data) {
     if (data.type == 'transaction_list') {
@@ -56,6 +60,22 @@ export default class TransactionTable extends React.Component {
   handleRowClick = (hash) => {
     history.push(`/txs/${hash}`);
   }
+  // User has switched back to the tab
+  onFocus = () => {
+    if (this.socket) return;
+
+    const { backendAddress } = this.state;
+    this.socket = socketClient(backendAddress);
+    this.socket.on('PUSH_TOP_TXS', this.onSocketEvent)
+  };
+
+  // User has switched away from the tab (AKA tab is hidden)
+  onBlur = () => {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
+  };
 
   render() {
     const { className, includeDetails, truncate, account, price } = this.props;
