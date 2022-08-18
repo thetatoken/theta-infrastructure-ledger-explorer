@@ -23,6 +23,9 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
    - [Supply APIs](#supply-apis)
 		- [GetThetaAmount](#getthetaamount)
       - [GetTFuelAmount](#gettfuelamount)
+   - [Token APIs](#token-apis)
+		- [GetTokenSummary](#gettokensummary)
+      - [GetTokenTransactions](#gettokentransactions)
 
 ## Theta Explorer APIs
 
@@ -32,7 +35,7 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
 
 This API returns the details of the block being queried with height.
 
-**REST Uri**: /block/{height}
+**REST Uri**: /block/:height
 
 **Returns**
 
@@ -352,7 +355,7 @@ curl https://explorer.thetatoken.org:8443/api/blocks/top_blocks?pageNumber=1&lim
 
 This API returns the details of the transaction being queried with hash.
 
-**REST Uri**: /transaction/{hash}
+**REST Uri**: /transaction/:hash
 
 **Query Parameters**
 
@@ -412,7 +415,7 @@ This API returns the details of the transaction being queried with hash.
 
 ### GetTransactionsByRange
 
-This API returns a list of block of given the page number and limit number. 
+This API returns a list of transactions of given the page number and limit number. 
 
 **REST Uri**: /trancastions/range
 
@@ -424,7 +427,7 @@ This API returns a list of block of given the page number and limit number.
 **Returns**
 
 - currentPageNumber: the number of current page
-- totalPageNumber: the total number of 
+- totalPageNumber: the total number of pages
 - For each transaction it is similar to the returns of the GetTransaction API. Please [see above](#gettransaction).
 
 **Example**
@@ -496,7 +499,7 @@ curl https://explorer.thetatoken.org:8443/api/transactions/blockRange?blockStart
 
 This API returns the details of the account being queried with address.
 
-**REST Uri**: /account/{address}
+**REST Uri**: /account/:address
 
 **Query Parameters**
 
@@ -550,7 +553,7 @@ This API returns the details of the account being queried with address.
 **Returns**
 
 - currentPageNumber: the number of current page
-- totalPageNumber: the total number of 
+- totalPageNumber: the total number of pages
 - For each transaction it is similar to the returns of the GetTransaction API. Please [see above](#gettransaction).
 
 **Example**
@@ -775,5 +778,107 @@ curl https://explorer.thetatoken.org:8443/api/supply/tfuel
 // Result
 {
    "circulation_supply":5000000000
+}
+```
+
+## Token APIs
+
+### GetTokenSummary
+
+This API returns the summary info of one token.
+
+**REST Uri**: /tokenSummary/:address
+
+**Query Parameters**
+
+- address: the token's smart contract address
+
+**Returns**
+
+- contract_address: the contract address of the token
+- holders: the total number of the token holders
+- max_total_supply: the total supply of the token
+- name: the name of the token
+- total_transfers: the total transactions number of the token
+- type: the type of the token(TNT-20/TNT-721)
+
+**Example**
+```
+// Request 
+curl https://explorer.thetatoken.org:8443/api/tokenSummary/0x5d0004fe2e0ec6d002678c7fa01026cabde9e793
+
+// Result
+{
+   "type": "token_info",
+   "body": {
+      contract_address: "0x5d0004fe2e0ec6d002678c7fa01026cabde9e793",
+      holders: 837,
+      max_total_supply: "2903",
+      name: "TPMC Egg",
+      total_transfers: 3207,
+      type: "TNT-721"
+   }
+}
+```
+
+### GetTokenTransactions
+
+This API returns a list of token transactions of given the token address, page number and limit number. 
+
+**REST Uri**: /token/:address
+
+**Query Parameters**
+
+- address: the token's smart contract address
+- pageNumber: the page number, 0 stands for the latest
+- limit: the limit size of each page
+- token_id: the token id(optional, only applied for TNT-721 tokens)
+
+**Returns**
+
+- currentPageNumber: the number of current page
+- totalPageNumber: the total number of pages
+- tokenTransaction: json representation of the token transaction
+   - contract_address: the contract address of the token
+   - from: the sender's account address of the transaction
+   - hash: the hash of the transaction
+   - name: the name of the token
+   - timestamp: the timestamp of the transaction
+   - to: the receiver's account address of the transaction
+   - token_id: the token id
+   - type: the type of the token(TNT-20/TNT-721)
+   - value: the number of tokens included in the transaction
+
+**Example**
+```
+// Request 
+curl https://explorer.thetatoken.org:8443/api/token/0x5d0004fe2e0ec6d002678c7fa01026cabde9e793?pageNumber=1&limit=20
+
+// Result
+{
+   "type": "token_info",
+   currentPageNumber: 1
+   totalPageNumber: 161,
+   "body": [{
+      contract_address: "0x5d0004fe2e0ec6d002678c7fa01026cabde9e793",
+      from: "0x70dea7940584a2f62476e2dc0b9a017e7287a945",
+      hash: "0xd28ac9d57b01d9f8c7586a9efd13bcbfc68775a789b2222dbc16fb6a5983b346",
+      name: null,
+      timestamp: "1660853966",
+      to: "0x501077f68d8261495f8f179f75d52a9c0f39ae94",
+      token_id: "1001",
+      type: "TNT-721",
+      value: 1,
+   },{
+      contract_address: "0x5d0004fe2e0ec6d002678c7fa01026cabde9e793"
+      from: "0x4e97bf49b538a9469d6ad0576f46543fd4b16c2e"
+      hash: "0xf5671192e6d5b7f67538af90a59571f4ac3f47ff557fc279575a2920049df5e6"
+      name: null
+      timestamp: "1660820162"
+      to: "0x20ae1265e06163d1bd197824170d62a458ebf273"
+      token_id: "531"
+      type: "TNT-721"
+      value: 1
+   }, ...]
 }
 ```
