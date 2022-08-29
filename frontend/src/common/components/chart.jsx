@@ -1,53 +1,69 @@
 import React from "react";
-import Chart from "chart.js";
+import Chart from 'chart.js/auto';
+import 'chartjs-adapter-moment';
 import history from 'common/history'
 import cx from 'classnames';
 
-
-const getLineOptions = (type, data, labels, clickType) => {
+const getLineOptions = (type, data, labels, ctx) => {
+  let gradient = ctx.createLinearGradient(0, 0, 0, 110);
+  gradient.addColorStop(0, 'rgba(37,196,228,.25)');
+  gradient.addColorStop(1, 'rgba(37,196,228,0)');
   return {
     type: type,
     data: {
       datasets: [{
         data: data,
-        backgroundColor: "transparent",
         borderColor: '#25c4e4',
-        borderWidth: '1',
-        pointBackgroundColor: '#1b1f2a'
+        borderWidth: 1,
+        pointBackgroundColor: 'rgba(37,196,228,.75)',
+        fill: 'start',
+        backgroundColor: gradient,
+        // radius: 0
       }],
-      labels: labels
+      labels: labels,
     },
     options: {
       maintainAspectRatio: false,
       responsive: true,
       cutoutPercentage: 75,
-      title: {
-        display: false,
+      plugins: {
+        title: {
+          display: false,
+        },
+        legend: {
+          display: false,
+        },
+        animation: {
+          animateScale: true,
+          animateRotate: true
+        },
+        tooltips: {
+          callbacks: {
+            label: function (tooltipItem, data) {
+              const { index, datasetIndex } = tooltipItem;
+              var label = data.datasets[datasetIndex].data[index] || '';
+              // if (label) {
+              //   label += ': ' + data.labels[index];
+              // }
+              return label;
+            }
+          }
+        },
       },
-      legend: {
-        display: false,
-      },
-      animation: {
-        animateScale: true,
-        animateRotate: true
+      elements: {
+        line: {
+          tension: 0.4
+        },
+        point: {
+          radius: 2,
+          borderWidth: 0
+        }
       },
       onClick: (e) => {
 
       },
-      tooltips: {
-        callbacks: {
-          label: function (tooltipItem, data) {
-            const { index, datasetIndex } = tooltipItem;
-            var label = data.datasets[datasetIndex].data[index] || '';
-            // if (label) {
-            //   label += ': ' + data.labels[index];
-            // }
-            return label;
-          }
-        }
-      },
       scales: {
-        xAxes: [{
+        x: {
           type: 'time',
           time: {
             unit: 'week'
@@ -55,15 +71,15 @@ const getLineOptions = (type, data, labels, clickType) => {
           gridLines: {
             display: false
           }
-        }],
-        yAxes: [{
+        },
+        y: {
           ticks: {
             maxTicksLimit: 3
           },
           gridLines: {
             display: false
           }
-        }]
+        }
       }
     }
   }
@@ -86,10 +102,10 @@ export default class ThetaChart extends React.PureComponent {
   componentDidMount() {
     const { chartType, labels, data, clickType } = this.props;
     const chartRef = chartType === 'line' ? this.line.current.getContext("2d") : this.doughnut.current.getContext("2d");
-    const options = chartType === 'line' ? getLineOptions(chartType, data, labels, clickType) : this.getInitialOptions(chartType, data, labels, clickType);
+    const options = chartType === 'line' ? getLineOptions(chartType, data, labels, chartRef) : this.getInitialOptions(chartType, data, labels, clickType);
     this.chart = new Chart(chartRef, options);
-    Chart.defaults.global.defaultFontColor = '#8A8FB5';
-    Chart.defaults.global.defaultFontFamily = 'Alwyn';
+    // Chart.defaults.global.defaultFontColor = '#8A8FB5';
+    // Chart.defaults.global.defaultFontFamily = 'Alwyn';
   }
   componentDidUpdate(preProps) {
     if (preProps.labels !== this.props.labels) {
@@ -113,19 +129,45 @@ export default class ThetaChart extends React.PureComponent {
             '#F1424D',
             '#A5ACB9'
           ],
-          borderWidth: 0
+          borderWidth: 0,
+          cutout: '75%'
         }],
         labels: labels
       },
       options: {
         responsive: true,
-        cutoutPercentage: 75,
-        title: {
-          display: false,
+        maintainAspectRatio: false,
+        aspectRatio: 1,
+        plugins: {
+          title: {
+            display: false,
+          },
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem, data) {
+                const { datasetIndex, label, dataset } = tooltipItem;
+                console.log('tooltipItem:', tooltipItem);
+                if (type !== 'line') {
+                  var newLabel = dataset.data[datasetIndex] || '';
+                  if (newLabel) {
+                    newLabel += '% ' + label;
+                  }
+                  return newLabel;
+                } else {
+                  var newLabel = dataset.data[datasetIndex] || '';
+                  if (newLabel) {
+                    newLabel += ': ' + label;
+                  }
+                  return newLabel;
+                }
+              }
+            }
+          }
         },
-        legend: {
-          display: false,
-        },
+
         animation: {
           animateScale: true,
           animateRotate: true
@@ -148,26 +190,6 @@ export default class ThetaChart extends React.PureComponent {
               break;
           }
         },
-        tooltips: {
-          callbacks: {
-            label: function (tooltipItem, data) {
-              const { index, datasetIndex } = tooltipItem;
-              if (type !== 'line') {
-                var label = data.datasets[datasetIndex].data[index] || '';
-                if (label) {
-                  label += '% ' + data.labels[index];
-                }
-                return label;
-              } else {
-                var label = data.datasets[datasetIndex].data[index] || '';
-                if (label) {
-                  label += ': ' + data.labels[index];
-                }
-                return label;
-              }
-            }
-          }
-        }
       }
     }
   }

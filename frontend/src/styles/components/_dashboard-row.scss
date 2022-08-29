@@ -160,10 +160,13 @@
         margin-left: 5%;
         &.tfuel {
           margin-left: -5%;
+          margin-bottom: 25px;
         }
         .chart {
           width: 100%;
-          margin: 5% 0 0 0;
+          height: 85%;
+          margin: 10px 0;
+          // margin: 5% 0 0 25%;
         }
       }
       &.row {
