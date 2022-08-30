@@ -1,10 +1,15 @@
-
+.theta-header-wrap {
+  background-color: $color-dark-black;
+  width: 100%;
+}
 .theta-header {
   @include row($justify: space-between, $align: flex-start);
   max-width: 1100px;
-  width: 90%;
+  width: 100%;
+  height: 50px;
   margin: 0 auto 0;
-  padding: 1.5rem 0 0;
+  padding: 9px 0;
+  color: $color-font-light;
 
   a {
     text-decoration: none;
@@ -16,36 +21,103 @@
 
     .theta-logo {
       flex: 0 0 7.25rem;
-      height: 2.5rem;
-      margin: 0 7% 0 0;
+      height: 2rem;
+      margin: 0 12px 0 0;
 
-      background: url("/images/logo_theta-explorer@2x.png");
-      @include backgroundImage($url: "/images/logo_theta-explorer@2x.png");
+      background: url("/images/logo_theta-matachain@2x.png");
+      @include backgroundImage($url: "/images/logo_theta-matachain@2x.png");
     }
 
     a.nav-item {
       font-family: $font-title;
       font-weight: $weight-bold;
-      padding: .65rem;
-      margin-right: 2%;
-      
-      color: $color-font-main;
-      font-size: 1rem;
-      line-height: 1rem;
-      letter-spacing: 3px;
+      padding: 0.65rem;
+      margin-right: 0;
 
-      background: white;
+      color: $color-font-light;
+      font-size: 11px;
+      line-height: 11px;
+      letter-spacing: 2.75px;
+
+      background: $color-font-light;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       position: relative;
       white-space: nowrap;
       overflow: hidden;
 
-      &:hover{
+      &::selection {
+        -webkit-text-fill-color: $color-white;
+      }
+
+      &:hover {
         @include linearHorizontalGradient($color-blue, $color-green);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
+    }
+  }
+
+  .nav-icons {
+    display: flex;
+    align-items: center;
+    margin-left: 50px;
+
+    &__link {
+      margin-right: 20px;
+
+      &--icon {
+        height: 14px;
+        width: 14px;
+        opacity: 0.65;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        &.twitter {
+          background-image: url("/images/icons/icon_twitter.png");
+        }
+        &.reddit {
+          background-image: url("/images/icons/icon_reddit.png");
+        }
+        &.github {
+          background-image: url("/images/icons/icon_github.png");
+        }
+        &.discord {
+          background-image: url("/images/icons/icon_discord.png");
+        }
+      }
+    }
+  }
+
+  .nav-select {
+    height: 100%;
+
+    &__button {
+      width: 290px;
+      height: 34px;
+      color: $color-blue;
+      border: 1px solid rgba($color-blue, .75);
+      border-radius: 6px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      margin-top: -1px;
+      cursor: pointer;
+      &:hover {
+        border-color: $color-blue;
+      }
+    }
+    .select-arrow-down {
+      height: 7px;
+      width: 12px;
+      background-image: url("/images/icons/select-arrow-down.png");
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
     }
   }
 
@@ -61,7 +133,7 @@
     .search-select {
       width: 7rem;
       margin: 0 10px;
-      
+
       &::after {
         content: "";
         width: 0;
@@ -85,18 +157,17 @@
     .search-button {
       height: 30px;
       width: 20px;
-      border-radius: 0.25rem .25rem .25rem 0.25rem;
+      border-radius: 0.25rem 0.25rem 0.25rem 0.25rem;
       display: flex;
       align-items: center;
       cursor: pointer;
       // @include linearVerticalGradient($th-blue, $th-green);
 
-      &:hover{
+      &:hover {
         @include linearVerticalGradient($color-blue, $color-green);
       }
     }
 
-    
     .svg-icon {
       width: 80%;
       height: 80%;
@@ -116,47 +187,57 @@
     }
   }
 
-  
-  @include breakpoint('tablet-wide', max) {
-    .nav-search .search-input { width: 10rem; }
-    .nav-search .search-select { width: 5rem; }
-    .nav .theta-logo { 
+  @include breakpoint("tablet-wide", max) {
+    .nav-search .search-input {
+      width: 10rem;
+    }
+    .nav-search .search-select {
+      width: 5rem;
+    }
+    .nav .theta-logo {
       margin-right: 3%;
     }
-    .nav a.nav-item{
+    .nav a.nav-item {
       margin-right: 1%;
       letter-spacing: 0;
     }
   }
-  @include breakpoint('tablet', max) {
+  @include breakpoint("tablet", max) {
     display: block;
-    .flex-spacer { display: none; }
+    .flex-spacer {
+      display: none;
+    }
 
     .nav-search {
       width: 80%;
       margin: 3rem auto 0;
       @include row($justify: center);
-      .search-input { width: 80%; }
-      .search-select { width: 7rem; }
+      .search-input {
+        width: 80%;
+      }
+      .search-select {
+        width: 7rem;
+      }
     }
   }
-  @include breakpoint('phablet', max) {
+  @include breakpoint("phablet", max) {
     width: 95%;
-    .nav .theta-logo { 
+    .nav .theta-logo {
       margin-right: 3%;
-      flex: 0 0 6rem; 
+      flex: 0 0 6rem;
     }
-    .nav-search { margin: 0.5rem auto 0; }
-    .nav a.nav-item{
+    .nav-search {
+      margin: 0.5rem auto 0;
+    }
+    .nav a.nav-item {
       letter-spacing: 0;
       margin-right: 1%;
     }
   }
-  @include breakpoint('phone-small', max) {
-    .nav a.nav-item{
+  @include breakpoint("phone-small", max) {
+    .nav a.nav-item {
       font-size: 0.8rem;
       line-height: 0.8rem;
     }
   }
 }
-
