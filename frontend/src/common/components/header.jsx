@@ -43,12 +43,14 @@ export default class Header extends React.Component {
     }
   }
   render() {
+    const isMetaChain = history.location.pathname.includes('metachain')
+    console.log('history:', history, '. isMetaChain:', isMetaChain);
     return (
       <div className="theta-header-wrap">
         <div className="theta-header">
           <div className="nav">
-            <Link to="/" className="theta-logo"></Link>
-            <a href="https://explorer.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">METACHAIN</a>
+            <Link to="/metachain" className="theta-logo"></Link>
+            {isMetaChain && <a href="https://explorer.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">METACHAIN</a>}
             <a href="https://wallet.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">WALLET</a>
             <a href="https://docs.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">DOCS</a>
             <a href="https://www.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">LEARN MORE</a>

@@ -48,7 +48,7 @@ export default class Dashboard extends React.PureComponent {
   }
   render() {
     const { thetaInfo, tfuelInfo } = this.state;
-    const { backendAddress } = this.props;
+    const { backendAddress, type } = this.props;
     return (
       <div className="content home">
         <div className="dashboard-wrap">
@@ -56,7 +56,42 @@ export default class Dashboard extends React.PureComponent {
           <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
           <DashboardRow />
         </div>
-        <div className="overview">
+        {type === 'metachain' ? <>
+          <div className="chain-overview">
+            <div className="chain-overview__title"> MAIN CHAIN</div>
+            <div className="chain-overview__chains">
+              <Link className="chain-overview__chain" to="/">
+                <div className="chain-overview__chain--logo">
+                  <div className="chain-logo theta"></div>
+                </div>
+                <div className="chain-overview__chain--description">
+                  One sentence description of the Theta Main Chain
+                </div>
+              </Link>
+            </div>
+          </div>
+          <div className="chain-overview">
+            <div className="chain-overview__title">SUBCHAINS</div>
+            <div className="chain-overview__chains">
+              <Link className="chain-overview__chain" to="/">
+                <div className="chain-overview__chain--logo">
+                  <div className="chain-logo replay"></div>
+                </div>
+                <div className="chain-overview__chain--description">
+                  One sentence description of subchain #1
+                </div>
+              </Link>
+              <Link className="chain-overview__chain" to="/">
+                <div className="chain-overview__chain--logo">
+                  <div className="chain-logo replay"></div>
+                </div>
+                <div className="chain-overview__chain--description">
+                  One sentence description of subchain #2
+                </div>
+              </Link>
+            </div>
+          </div>
+        </> : <div className="overview">
           <div>
             <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
             <BlocksTable
@@ -67,7 +102,6 @@ export default class Dashboard extends React.PureComponent {
               truncate={50} />
             <Link to="/blocks" className="more">View More</Link>
           </div>
-
           <div>
             <h2 className="page-title transactions"><Link to="/txs">Transactions</Link></h2>
             <TransactionsTable
@@ -77,8 +111,7 @@ export default class Dashboard extends React.PureComponent {
               truncate={40} />
             <Link to="/txs" className="more">View More</Link>
           </div>
-
-        </div>
+        </div>}
       </div>
     );
   }

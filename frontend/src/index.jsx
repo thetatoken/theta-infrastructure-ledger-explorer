@@ -32,11 +32,12 @@ render(
         <Route path='/address/:accountAddress' component={AccountDetails} />
         <Route path='/stakes/tfuel' component={() => <Stakes stakeCoinType='tfuel' />} />
         <Route path='/stakes' component={() => <Stakes stakeCoinType='theta' />} />
-        
+
         {/* Note: Disabled token feature */}
         <Route path='/token/:contractAddress' component={TokenDetails} />
 
         {/* <Route path='/tmp-internal-check' component={Check} />*/}
+        <Route path='/metachain' component={() => <Home backendAddress={backendSocketAddress} type={'metachain'} />} />
         <Route path='/' component={() => <Home backendAddress={backendSocketAddress} />} />
       </Switch>
     </App>
