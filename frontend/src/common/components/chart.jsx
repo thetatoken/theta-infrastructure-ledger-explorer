@@ -149,7 +149,6 @@ export default class ThetaChart extends React.PureComponent {
             callbacks: {
               label: function (tooltipItem, data) {
                 const { datasetIndex, label, dataset } = tooltipItem;
-                console.log('tooltipItem:', tooltipItem);
                 if (type !== 'line') {
                   var newLabel = dataset.data[datasetIndex] || '';
                   if (newLabel) {
