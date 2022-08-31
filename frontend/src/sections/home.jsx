@@ -7,6 +7,7 @@ import BlocksTable from "common/components/blocks-table";
 import TokenDashboard from "common/components/token-dashboard";
 import DashboardRow from "common/components/dashboard-row";
 import { priceService } from 'common/services/price';
+import DappCard from "../common/components/dapp-card";
 
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
@@ -91,27 +92,43 @@ export default class Dashboard extends React.PureComponent {
               </Link>
             </div>
           </div>
-        </> : <div className="overview">
-          <div>
-            <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
-            <BlocksTable
-              updateLive={true}
-              backendAddress={backendAddress}
-              truncateHash={true}
-              includeDetails={false}
-              truncate={50} />
-            <Link to="/blocks" className="more">View More</Link>
+        </> : <>
+          <div className="dapps">
+            <div className="dapps__title">
+              DAPPS ON THETA MAIN CHAIN
+            </div>
+            <div className="dapps__container">
+              <DappCard info={{ name: 'tdrop', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
+              <DappCard info={{ name: 'replay', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
+              <DappCard info={{ name: 'voltswap', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
+              <DappCard info={{ name: 'pentheta', nft_volume: '2,403' }} />
+              <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Lorem ipsum dolor sit amet consectetuer adipiscing." }} />
+            </div>
+            <div className="dapps__footer">
+              <Link to="/" className="more">View More</Link>
+            </div>
           </div>
-          <div>
-            <h2 className="page-title transactions"><Link to="/txs">Transactions</Link></h2>
-            <TransactionsTable
-              updateLive={true}
-              backendAddress={backendAddress}
-              includeDetails={false}
-              truncate={40} />
-            <Link to="/txs" className="more">View More</Link>
-          </div>
-        </div>}
+          <div className="overview">
+            <div>
+              <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
+              <BlocksTable
+                updateLive={true}
+                backendAddress={backendAddress}
+                truncateHash={true}
+                includeDetails={false}
+                truncate={50} />
+              <Link to="/blocks" className="more">View More</Link>
+            </div>
+            <div>
+              <h2 className="page-title transactions"><Link to="/txs">Transactions</Link></h2>
+              <TransactionsTable
+                updateLive={true}
+                backendAddress={backendAddress}
+                includeDetails={false}
+                truncate={40} />
+              <Link to="/txs" className="more">View More</Link>
+            </div>
+          </div></>}
       </div>
     );
   }

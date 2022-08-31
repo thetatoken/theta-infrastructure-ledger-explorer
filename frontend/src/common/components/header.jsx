@@ -6,6 +6,9 @@ import tns from 'libs/tns';
 export default class Header extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isMetaChain: history.location.pathname.includes('metachain')
+    };
     this.searchInput = React.createRef();
     this.searchType = React.createRef();
     this.handleSearch = this.handleSearch.bind(this);
@@ -42,8 +45,11 @@ export default class Header extends React.Component {
       this.handleSearch();
     }
   }
+  componentDidMount() {
+    history.listen((location) => this.setState({ isMetaChain: location.pathname.includes('metachain') }));
+  }
   render() {
-    const isMetaChain = history.location.pathname.includes('metachain')
+    const { isMetaChain } = this.state;
     return (
       <>
         <div className="theta-header-wrap">
@@ -84,9 +90,9 @@ export default class Header extends React.Component {
         </div>
         {!isMetaChain && <div className="chain-header-wrap theta">
           <div className="chain-header">
-            <div className="chain-header__name">
+            <Link className="chain-header__name" to="/">
               THETA MAIN CHAIN
-            </div>
+            </Link>
             <div className="chain-header__navbar">
               <Link to="/blocks" className="nav-item">BLOCKS</Link>
               <Link to="/txs" className="nav-item">TRANSACTIONS</Link>

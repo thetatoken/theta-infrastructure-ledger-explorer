@@ -52,6 +52,14 @@ export function priceCoin(weiAmount, price) {
   });
 }
 
+export function getPrice(price) {
+  return '$' + BigNumber(price).decimalPlaces(4).toFormat({
+    decimalSeparator: '.',
+    groupSeparator: ',',
+    groupSize: 3,
+  });
+}
+
 export function sumCoin(weiAmountA, weiAmountB) {
   return BigNumber.sum(new BigNumber(weiAmountA), new BigNumber(weiAmountB));
 }

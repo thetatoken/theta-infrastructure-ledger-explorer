@@ -197,12 +197,16 @@
   color: $color-font-light;
 
   &__name {
-    color: $color-theta-blue-light;
+    color: $color-theta-blue-light !important;
+    // background-color: $color-theta-blue-light;
     letter-spacing: 2.25px;
     font-size: 15px;
     font-weight: $weight-bold;
     line-height: 32px;
     padding-left: 7px;
+    // &:hover {
+    //   color: $color-white !important;
+    // }
   }
   &__navbar {
     display: flex;
@@ -230,7 +234,7 @@
       &::selection {
         -webkit-text-fill-color: $color-white;
       }
-      
+
       &:hover {
         @include linearHorizontalGradient($color-blue, $color-green);
         -webkit-background-clip: text;
@@ -250,7 +254,7 @@
         background-color: $color-white;
         border-radius: 6px 0 0 6px;
         padding-left: 15px;
-        
+
         &::placeholder {
           color: $color-light;
         }
