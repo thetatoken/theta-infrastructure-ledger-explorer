@@ -136,5 +136,8 @@
     height: 40px;
     font-size: 10px;
     color: $color-font-light;
+    &:hover {
+      color: $color-theta-blue;
+    }
   }
 }

@@ -56,8 +56,8 @@ export default class Header extends React.Component {
           <div className="theta-header">
             <div className="nav">
               <Link to="/metachain" className="theta-logo"></Link>
-              {isMetaChain && <a href="https://explorer.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">METACHAIN</a>}
-              <a href="https://wallet.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">WALLET</a>
+              <a href="https://explorer.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">METACHAIN</a>
+              <a href="https://www.thetatoken.org/wallet" className="nav-item" target="_blank" rel="noreferrer">WALLET</a>
               <a href="https://docs.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">DOCS</a>
               <a href="https://www.thetatoken.org/" className="nav-item" target="_blank" rel="noreferrer">LEARN MORE</a>
               <div className="nav-icons">

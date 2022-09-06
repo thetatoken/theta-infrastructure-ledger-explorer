@@ -29,7 +29,7 @@ const DAppCard = (props) => {
       </div>}
       {info.description && <div className="dapp-card__description">{info.description}</div>}
     </div>
-    <div className="dapp-card__footer">LEARN MORE</div>
+    <a className="dapp-card__footer" href={info.link} target="_blank" rel="noreferrer">LEARN MORE</a>
   </div>
 }
 

@@ -8,6 +8,7 @@ import TokenDashboard from "common/components/token-dashboard";
 import DashboardRow from "common/components/dashboard-row";
 import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
+import { ChainList } from 'common/constants';
 
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
@@ -50,6 +51,7 @@ export default class Dashboard extends React.PureComponent {
   render() {
     const { thetaInfo, tfuelInfo } = this.state;
     const { backendAddress, type } = this.props;
+
     return (
       <div className="content home">
         <div className="dashboard-wrap">
@@ -61,35 +63,31 @@ export default class Dashboard extends React.PureComponent {
           <div className="chain-overview">
             <div className="chain-overview__title"> MAIN CHAIN</div>
             <div className="chain-overview__chains">
-              <Link className="chain-overview__chain" to="/">
-                <div className="chain-overview__chain--logo">
-                  <div className="chain-logo theta"></div>
-                </div>
-                <div className="chain-overview__chain--description">
-                  One sentence description of the Theta Main Chain
-                </div>
-              </Link>
+              {ChainList.mainChain.map((chain, i) => {
+                return <Link className="chain-overview__chain" to="/" key={i}>
+                  <div className="chain-overview__chain--logo">
+                    <div className={`chain-logo ${chain.logoName}`}></div>
+                  </div>
+                  <div className="chain-overview__chain--description">
+                    {chain.description}
+                  </div>
+                </Link>
+              })}
             </div>
           </div>
           <div className="chain-overview">
             <div className="chain-overview__title">SUBCHAINS</div>
             <div className="chain-overview__chains">
-              <Link className="chain-overview__chain" to="/">
-                <div className="chain-overview__chain--logo">
-                  <div className="chain-logo replay"></div>
-                </div>
-                <div className="chain-overview__chain--description">
-                  One sentence description of subchain #1
-                </div>
-              </Link>
-              <Link className="chain-overview__chain" to="/">
-                <div className="chain-overview__chain--logo">
-                  <div className="chain-logo replay"></div>
-                </div>
-                <div className="chain-overview__chain--description">
-                  One sentence description of subchain #2
-                </div>
-              </Link>
+              {ChainList.subChain.map((chain, i) => {
+                return <Link className="chain-overview__chain" to="/" key={i}>
+                  <div className="chain-overview__chain--logo">
+                    <div className={`chain-logo ${chain.logoName}`}></div>
+                  </div>
+                  <div className="chain-overview__chain--description">
+                    {chain.description}
+                  </div>
+                </Link>
+              })}
             </div>
           </div>
         </> : <>
@@ -98,14 +96,14 @@ export default class Dashboard extends React.PureComponent {
               DAPPS ON THETA MAIN CHAIN
             </div>
             <div className="dapps__container">
-              <DappCard info={{ name: 'tdrop', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
-              <DappCard info={{ name: 'replay', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
-              <DappCard info={{ name: 'voltswap', price: '0.0079', market_cap: '79776454', volume: '345978' }} />
-              <DappCard info={{ name: 'pentheta', nft_volume: '2,403' }} />
-              <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Lorem ipsum dolor sit amet consectetuer adipiscing." }} />
+              <DappCard info={{ name: 'tdrop', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://www.thetadrop.com/" }} />
+              <DappCard info={{ name: 'replay', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://imaginereplay.com/" }} />
+              <DappCard info={{ name: 'voltswap', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://info.voltswap.finance/#/home?network=theta/" }} />
+              <DappCard info={{ name: 'pentheta', nft_volume: '2,403', link: "https://opentheta.io/" }} />
+              <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Lorem ipsum dolor sit amet consectetuer adipiscing.", link: "https://thetaboard.io/" }} />
             </div>
             <div className="dapps__footer">
-              <Link to="/" className="more">View More</Link>
+              <a href="https://www.thetatoken.org/ecosystem" target="_blank" rel="noreferrer" className="more">View More</a>
             </div>
           </div>
           <div className="overview">
