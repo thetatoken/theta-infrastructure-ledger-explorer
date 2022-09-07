@@ -247,13 +247,49 @@
       align-items: center;
       color: $color-font-body;
       margin-left: 20px;
+      &:focus-within {
+        .search-input {
+          border: 2px solid $color-blue;
+          border-right: 0;
+        }
+        .search-button {
+          border: 2px solid $color-blue;
+          border-left: 0;
+        }
+        .svg-icon path,
+        .svg-icon polygon,
+        .svg-icon rect,
+        .svg-icon circle {
+          fill: $color-blue;
+        }
+
+        &.error {
+          .search-input {
+            border: 2px solid $color-red;
+            border-right: 0;
+          }
+          .search-button {
+            border: 2px solid $color-red;
+            border-left: 0;
+          }
+          .svg-icon path,
+          .svg-icon polygon,
+          .svg-icon rect,
+          .svg-icon circle {
+            fill: $color-red;
+          }
+        }
+      }
 
       .search-input {
         width: 330px;
         color: $color-light;
         background-color: $color-white;
         border-radius: 6px 0 0 6px;
-        padding-left: 15px;
+        padding: 6px;
+        padding-left: 13px;
+        border: 2px solid transparent;
+        border-right: 0;
 
         &::placeholder {
           color: $color-light;
@@ -286,13 +322,14 @@
 
       .search-button {
         height: 32px;
-        // width: 25px;
         border-radius: 0 6px 6px 0;
         display: flex;
         align-items: center;
         cursor: pointer;
         background-color: $color-white;
         padding: 0 12px;
+        border: 2px solid transparent;
+        border-left: 0;
       }
 
       .svg-icon {

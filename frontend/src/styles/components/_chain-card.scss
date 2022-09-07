@@ -1,0 +1,103 @@
+.chain-card-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hide;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.chain-card-container {
+  height: 100%;
+  width: 100%;
+  max-width: 1100px;
+  position: relative;
+
+  .search-button {
+    height: 32px;
+    // width: 25px;
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background-color: $color-input-background;
+    padding: 0 5px;
+  }
+
+  .svg-icon {
+    width: 16px;
+    height: 24px;
+    display: block;
+    margin: auto;
+  }
+
+  .svg-icon path,
+  .svg-icon polygon,
+  .svg-icon rect {
+    fill: $color-input-placeholder;
+  }
+
+  .svg-icon circle {
+    stroke: $color-input-placeholder;
+    stroke-width: 1;
+  }
+
+  .search-wrap {
+    width: 100%;
+    display: flex;
+    padding: 8px;
+    input {
+      flex: 1;
+      border-radius: 6px 0 0 6px;
+    }
+  }
+}
+
+.chain-card {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  border: 1px solid $color-blue;
+  border-radius: 6px;
+  padding: 8px;
+  padding-bottom: 16px;
+  background: $color-page;
+  width: 330px;
+
+  &__chain {
+    padding: 8px 0;
+    display: flex;
+    // color: $color-font-light;
+  }
+
+  &__chain-list {
+    padding: 8px;
+    padding-bottom: 0;
+    font-size: 12px;
+    &--name {
+      padding: 8px 0;
+      color: $color-font-light;
+    }
+  }
+}
+
+.chain-logo-brief {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+}
+
+.chain-name {
+  font-size: 16px;
+  font-weight: $weight-bold;
+  color: $color-white;
+}

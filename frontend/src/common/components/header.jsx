@@ -2,19 +2,47 @@ import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
 import tns from 'libs/tns';
+import ChainCard from "./chain-card";
+import { validateHex } from "../helpers/utils";
 
 export default class Header extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isMetaChain: history.location.pathname.includes('metachain')
+      isMetaChain: history.location.pathname.includes('metachain'),
+      isOpen: false,
+      hasError: false
     };
     this.searchInput = React.createRef();
     this.searchType = React.createRef();
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleOnClose = this.handleOnClose.bind(this);
+    this.handleOnChange = this.handleOnChange.bind(this);
   }
   async handleSearch() {
     const value = this.searchInput.value;
+    if (value.endsWith(".theta")) {
+      const address = await tns.getAddress(value);
+      history.push(`/account/${address ? address : value}`);
+      this.searchInput.value = '';
+      return;
+    }
+    if (validateHex(value, 40)) {
+      history.push(`/account/${value}`);
+      this.searchInput.value = '';
+      return;
+    }
+    if (validateHex(value, 64)) {
+      history.push(`/txs/${value}`);
+      this.searchInput.value = '';
+      return;
+    }
+    if (!isNaN(value)) {
+      history.push(`/blocks/${value}`);
+      this.searchInput.value = '';
+      return;
+    }
+    return;
     switch (this.searchType.value) {
       case 'address':
         if (value !== '') {
@@ -40,16 +68,32 @@ export default class Header extends React.Component {
         break;
     }
   }
+  handleOnChange(e) {
+    const { hasError } = this.state;
+    let value = e.target.value;
+    console.log('value:', isNaN(value));
+    if (value.endsWith(".theta") || validateHex(value, 40) || validateHex(value, 64) || !isNaN(value)) {
+      if (hasError) {
+        this.setState({ hasError: false })
+      }
+      return;
+    }
+    this.setState({ hasError: true });
+  }
   handleEnterKey(e) {
     if (e.key === 'Enter') {
       this.handleSearch();
     }
   }
+  handleOnClose() {
+    this.setState({ isOpen: false })
+  }
   componentDidMount() {
     history.listen((location) => this.setState({ isMetaChain: location.pathname.includes('metachain') }));
   }
   render() {
-    const { isMetaChain } = this.state;
+    const { isMetaChain, isOpen, hasError } = this.state;
+
     return (
       <>
         <div className="theta-header-wrap">
@@ -80,7 +124,7 @@ export default class Header extends React.Component {
               </div>
             </div>
             <div className="nav-select">
-              <div className="nav-select__button">
+              <div className="nav-select__button" onClick={() => this.setState({ isOpen: true })}>
                 Go to chain
                 <div className="select-arrow-down"></div>
               </div>
@@ -97,8 +141,8 @@ export default class Header extends React.Component {
               <Link to="/blocks" className="nav-item">BLOCKS</Link>
               <Link to="/txs" className="nav-item">TRANSACTIONS</Link>
               <Link to="/stakes" className="nav-item">STAKES</Link>
-              <div className="nav-search">
-                <input type="text" className="search-input" placeholder="address/block/tx search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} />
+              <div className={`nav-search ${hasError ? 'error' : ''}`}>
+                <input type="text" className="search-input" placeholder="address/block/tx search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} onChange={this.handleOnChange} />
                 <div className="search-button" onClick={this.handleSearch}>
                   <svg className="svg-icon" viewBox="0 0 20 20">
                     <path fill="none" d="M19.129,18.164l-4.518-4.52c1.152-1.373,1.852-3.143,1.852-5.077c0-4.361-3.535-7.896-7.896-7.896
@@ -111,6 +155,7 @@ export default class Header extends React.Component {
             </div>
           </div>
         </div>}
+        {isOpen && <ChainCard onClose={this.handleOnClose} />}
       </>
     );
   }
