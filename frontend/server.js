@@ -15,7 +15,7 @@ app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static('public', {
-  maxAge: "604800"
+  maxAge: "3600000"
 }));
 
 // healthy check from ELB 
