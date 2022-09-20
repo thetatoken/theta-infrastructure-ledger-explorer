@@ -223,6 +223,10 @@ function setupGetBlockCronJob(mongoClient, networkId) {
 
   readTxHistoryJob.Initialize(transactionDao, txHistoryDao);
   schedule.scheduleJob('Record Transaction History', '0 0 0 * * *', 'America/Tijuana', readTxHistoryJob.Execute);
+  setTimeout(async function run() {
+    await readTxHistoryJob.Check();
+    setTimeout(run, 1000 * 60 * 10);
+  }, 1000);
 
   accountingJob.InitializeForTFuelPrice(accountingDao, config.accounting.coinmarketcapApiKey, config.accounting.walletAddresses);
   schedule.scheduleJob('Record TFuel Price', '0 0 0 * * *', 'Etc/GMT', accountingJob.RecordTFuelPrice); // GMT mid-night
