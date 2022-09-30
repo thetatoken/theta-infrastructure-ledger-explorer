@@ -17,7 +17,8 @@ export const TxnTypes = {
   DEPOSIT_STAKE: 8,
   WITHDRAW_STAKE: 9,
   DEPOSIT_STAKE_TX_V2: 10,
-  STAKE_REWARD_DISTRIBUTION: 11
+  STAKE_REWARD_DISTRIBUTION: 11,
+  SUBCHAIN_VALIDATOR_SET_UPDATE: 201
 }
 
 export const TxnTypeText = {
@@ -32,7 +33,8 @@ export const TxnTypeText = {
   '8': 'Deposit Stake',
   '9': 'Withdraw Stake',
   '10': 'Deposit Stake',
-  '11': 'Stake Reward Distribution'
+  '11': 'Stake Reward Distribution',
+  '201': 'Subchain Validator Set Update'
 }
 
 export const TypeOptions = Object.keys(TxnTypeText)
@@ -51,7 +53,8 @@ export const TxnClasses = {
   '8': 'deposit-stake',
   '9': 'withdraw-stake',
   '10': 'deposit-stake',
-  '11': 'stake-reward-distribution'
+  '11': 'stake-reward-distribution',
+  '201': 'subchain-validator-set-update'
 }
 
 export const TxnStatus = {

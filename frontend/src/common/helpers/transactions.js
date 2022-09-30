@@ -27,7 +27,7 @@ export function from(txn, trunc = null, address = null, set = null) {
       path = 'data.source.address';
     } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
       path = 'data.initiator.address';
-    } else if (txn.type === TxnTypes.COINBASE) {
+    } else if (txn.type === TxnTypes.COINBASE || txn.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE) {
       path = 'data.proposer.address';
     } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
       path = 'data.source.address'
@@ -74,6 +74,12 @@ export function to(txn, trunc = null, address = null) {
     path = 'data.to.address'
   } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
     path = 'data.beneficiary.address'
+  } else if(txn.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE){
+    const validators = get(txn, 'data.Validators');
+    isSelf = validators.some(validator => {
+      return validator.Address === address;
+    })
+    path = 'data.outputs[0].address';
   } else {
     const outputs = get(txn, 'data.outputs');
     isSelf = outputs.some(output => {

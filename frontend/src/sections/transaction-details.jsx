@@ -225,6 +225,9 @@ export default class TransactionExplorer extends React.Component {
             {transaction.type === TxnTypes.STAKE_REWARD_DISTRIBUTION &&
               <StakeRewardDistribution transaction={transaction} price={price} />}
 
+            {transaction.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE &&
+              <SubchainValidatorSetUpdate transaction={transaction} price={price} />}
+
             {showRaw &&
               <JsonView
                 json={transaction}
@@ -263,6 +266,15 @@ const Amount = ({ coins, price }) => {
 
 const Address = ({ hash, truncate = null }) => {
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
+}
+
+const StakeAmount = ({ stake, price }) => {
+  return (
+  <div className="currency theta">
+    {formatCoin(stake)} Theta
+    <div className='price'>{`[\$${priceCoin(stake, price['Theta'])} USD]`}</div>
+    <div></div>
+  </div>);
 }
 
 const AddressTNS = ({ hash, tns, truncate = null }) => {
@@ -413,6 +425,30 @@ const Coinbase = ({ transaction, price }) => {
         <DetailsRow label="Amount" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} />)} />
       </tbody>
     </table>);
+}
+
+const SubchainValidatorSetUpdate = ({transaction, price}) => {
+  let { data } = transaction;
+  return (
+    <table className="details txn-details">
+      <tbody>
+        <DetailsRow label="Proposer" data={<Address hash={get(data, 'Proposer.address')} />}></DetailsRow>
+        <DetailsRow label="Stake" data={map(data.Validators, (validator, i) => <ValidatorSet key={i} validator={validator} price={price} />)} />
+      </tbody>
+    </table>);
+}
+
+const ValidatorSet = ({validator, price, isSingle}) => {
+  const isPhone = window.screen.width <= 560;
+  const isSmallPhone = window.screen.width <= 320;
+  const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
+  return (
+    <div className={cx("coinbase-output", { "single": isSingle })}>
+      <div>
+        <StakeAmount stake={validator.Stake} price={price} />
+      </div>
+      <AddressTNS hash={validator.Address} truncate={truncate} />
+    </div>);
 }
 
 const WithdrawStake = ({ transaction, price }) => {
