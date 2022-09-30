@@ -23,6 +23,7 @@ var transactionDao = null;
 var accountDao = null;
 var accountTxDao = null;
 var stakeDao = null;
+var subStakeDao = null;
 var checkpointDao = null;
 var smartContractDao = null;
 var dailyAccountDao = null;
@@ -37,6 +38,7 @@ var latestBlockHeight = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 var cacheEnabled = false;
+var chainType = 'mainchain';
 
 var stakeBlockHeight = 0;
 var stakeTimestamp = 0;
@@ -48,13 +50,14 @@ var startTime;
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
   rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, tokenSummaryDaoInstance,
-  tokenHolderDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
   stakeDao = stakeDaoInstance;
+  subStakeDao = subStakeDaoInstance;
   checkpointDao = checkpointDaoInstance;
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
@@ -66,6 +69,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
+  chainType = chainTypeConfig || 'mainchain';
 }
 
 exports.Execute = async function (networkId) {
@@ -125,11 +129,16 @@ exports.Execute = async function (networkId) {
             stakeTimestamp = +new Date()
           }
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString(), 'include_eth_tx_hashes': true }]));
-          getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
-          getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
-          getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': i.toString() }]));
           getRewardAsyncList.push(rpc.getStakeRewardDistributionAsync([{ 'height': i.toString() }]));
         }
+        if (chainType === 'mainchain') {
+          getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+          getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+          getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+        } else {
+          getStakeAsyncList.push(rpc.GetValidatorSetByHeight([{ 'height': targetCrawlHeight.toString() }]));
+        }
+
         return Promise.all(getBlockAsyncList.concat(getStakeAsyncList).concat(getRewardAsyncList))
       } else {
         Logger.error('Block crawling is up to date.');
@@ -146,6 +155,8 @@ exports.Execute = async function (networkId) {
         var upsertGcpAsyncList = [];
         var updateEenpAsyncList = [];
         var upsertEenpAsyncList = [];
+        var updateVsAsyncList = [];
+        var upsertVsAsyncList = [];
         var updateRewardAsyncList = [];
         var upsertRewardAsyncList = [];
         var insertStakeHistoryList = [];
@@ -212,6 +223,13 @@ exports.Execute = async function (networkId) {
                 })
               })
               upsertRewardAsyncList.push(rewardHelper.updateRewardDistributions(updateRewardAsyncList, rewardDistributionDao, cacheEnabled))
+            } else if (result.result.BlockHashValidatorSetPairs) {
+              result.result.BlockHashValidatorSetPairs.forEach(pair => {
+                pair.ValidatorSet.Validators.forEach(s => {
+                  updateVsAsyncList.push(s);
+                })
+              })
+              upsertVsAsyncList.push(subStakeDao.updateStakesAsync(updateVsAsyncList, 'vs'));
             } else {  //handle block response
               var txs = result.result.transactions;
               const blockInfo = {
@@ -299,7 +317,7 @@ exports.Execute = async function (networkId) {
         Logger.log(`Number of upsert TOKEN txs: ${updateTokenList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
           upsertTransactionAsyncList, upsertCheckpointAsyncList, upsertEenpAsyncList, upsertRewardAsyncList,
-          txHelper.updateFees(validTransactionList, progressDao), updateTokenList)
+          txHelper.updateFees(validTransactionList, progressDao), updateTokenList, upsertVsAsyncList)
       }
     })
     .then(() => {

@@ -77,7 +77,16 @@ exports.getEenpByHeight = function (params, callback) {
   }
   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
 }
-exports.getPendingTxs = function (params, callback){
+exports.GetValidatorSetByHeight = function (params, callback) {
+  body = {
+    jsonrpc: '2.0',
+    method: 'theta.GetValidatorSetByHeight',
+    params: params,
+    id: RandomIdGenerator()
+  }
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+}
+exports.getPendingTxs = function (params, callback) {
   body = {
     jsonrpc: '2.0',
     method: 'theta.GetPendingTransactions',

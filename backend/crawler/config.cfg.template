@@ -37,5 +37,6 @@
     },
     "maxBlockPerCrawl": 2,
     "retrieveTokenStartHeight": 0,
-    "defaultThetaChainID": "testnet"
+    "defaultThetaChainID": "testnet",
+    "chainType": "mainchain"
 }

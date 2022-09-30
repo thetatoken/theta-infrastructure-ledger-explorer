@@ -10,6 +10,7 @@ var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
 var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
+var subStakeDaoLib = require('../mongo-db/sub-stake-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
 var checkpointDaoLib = require('../mongo-db/checkpoint-dao.js');
@@ -80,7 +81,7 @@ function main() {
   }
   Theta.chainId = config.defaultThetaChainID;
   Logger.log('Theta.chainId:', Theta.chainId);
-  
+
   redisConfig = config.redis;
   Logger.log("redisConfig:", redisConfig)
   cacheEnabled = config.nodeCache && config.nodeCache.enabled;
@@ -168,6 +169,9 @@ function setupGetBlockCronJob(mongoClient, networkId) {
   stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
   bluebird.promisifyAll(stakeDao);
 
+  subStakeDao = new subStakeDaoLib(__dirname, mongoClient, redis);
+  bluebird.promisifyAll(subStakeDao);
+
   txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(txHistoryDao);
 
@@ -215,7 +219,7 @@ function setupGetBlockCronJob(mongoClient, networkId) {
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao,
     checkpointDao, smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, tokenDao,
-    tokenSummaryDao, tokenHolderDao, cacheEnabled, config.maxBlockPerCrawl);
+    tokenSummaryDao, tokenHolderDao, subStakeDao, cacheEnabled, config.maxBlockPerCrawl, config.chainType);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(networkId);
     setTimeout(run, 1000);
