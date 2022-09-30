@@ -26,7 +26,7 @@ module.exports = class subStakeDAO {
     await this.removeRecordsAsync(type);
     for (let candidate of candidateList) {
       const stakeInfo = {
-        '_id': id,
+        '_id': candidate.Address + '_' + type,
         'address': candidate.Address,
         'stake': candidate.Stake,
         'type': type

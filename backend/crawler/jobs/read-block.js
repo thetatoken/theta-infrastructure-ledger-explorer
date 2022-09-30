@@ -136,7 +136,7 @@ exports.Execute = async function (networkId) {
           getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
           getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
         } else {
-          getStakeAsyncList.push(rpc.GetValidatorSetByHeight([{ 'height': targetCrawlHeight.toString() }]));
+          getStakeAsyncList.push(rpc.GetValidatorSetByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
         }
 
         return Promise.all(getBlockAsyncList.concat(getStakeAsyncList).concat(getRewardAsyncList))
