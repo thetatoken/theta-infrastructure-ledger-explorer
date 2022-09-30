@@ -198,15 +198,12 @@
 
   &__name {
     color: $color-theta-blue-light !important;
-    // background-color: $color-theta-blue-light;
     letter-spacing: 2.25px;
     font-size: 15px;
     font-weight: $weight-bold;
     line-height: 32px;
     padding-left: 7px;
-    // &:hover {
-    //   color: $color-white !important;
-    // }
+    text-transform: uppercase;
   }
   &__navbar {
     display: flex;

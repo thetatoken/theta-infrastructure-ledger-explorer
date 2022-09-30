@@ -10,6 +10,19 @@ const config = {
         port: 2096
     },
     defaultThetaChainID: NetworkUrlOfChainId[host],
-    ethRPCEndpoint: EthRPCEndpoints[host]
+    ethRPCEndpoint: EthRPCEndpoints[host],
+    chainInfo: {
+        mainchain: {
+            name: 'Theta Testnet Main Chain',
+            discription: 'One sentence description of Theta Testnet Main Chain',
+            host: 'https://localhost'
+        },
+        subchains: [{
+            name: 'Theta Testnet SubChain #1',
+            discription: 'One sentence description of subchain #1',
+            host: 'https://localhost'
+        }]
+    },
+    chainName: 'Theta Testnet Main Chain'
 };
 export default config;

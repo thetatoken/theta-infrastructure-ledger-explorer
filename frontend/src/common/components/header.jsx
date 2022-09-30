@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import tns from 'libs/tns';
 import ChainCard from "./chain-card";
 import { validateHex } from "../helpers/utils";
+import config from "../../config";
 
 export default class Header extends React.Component {
   constructor(props) {
@@ -41,31 +42,6 @@ export default class Header extends React.Component {
       history.push(`/blocks/${value}`);
       this.searchInput.value = '';
       return;
-    }
-    return;
-    switch (this.searchType.value) {
-      case 'address':
-        if (value !== '') {
-          if (value.endsWith(".theta")) {
-            const address = await tns.getAddress(value);
-            history.push(`/account/${address ? address : value}`);
-            this.searchInput.value = '';
-          } else {
-            history.push(`/account/${value}`);
-            this.searchInput.value = '';
-          }
-        }
-        break;
-      case 'block':
-        history.push(`/blocks/${value}`);
-        this.searchInput.value = '';
-        break;
-      case 'transaction':
-        history.push(`/txs/${value}`);
-        this.searchInput.value = '';
-        break;
-      default:
-        break;
     }
   }
   handleOnChange(e) {
@@ -135,7 +111,7 @@ export default class Header extends React.Component {
         {!isMetaChain && <div className="chain-header-wrap theta">
           <div className="chain-header">
             <Link className="chain-header__name" to="/">
-              THETA MAIN CHAIN
+              {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </Link>
             <div className="chain-header__navbar">
               <Link to="/blocks" className="nav-item">BLOCKS</Link>

@@ -9,6 +9,7 @@ import DashboardRow from "common/components/dashboard-row";
 import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
 import { ChainList } from 'common/constants';
+import config from '../config';
 
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
@@ -93,7 +94,7 @@ export default class Dashboard extends React.PureComponent {
         </> : <>
           <div className="dapps">
             <div className="dapps__title">
-              DAPPS ON THETA MAIN CHAIN
+              DAPPS ON {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </div>
             <div className="dapps__container">
               <DappCard info={{ name: 'tdrop', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://www.thetadrop.com/" }} />
