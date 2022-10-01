@@ -5,6 +5,10 @@ import { formatCoin } from 'common/helpers/utils';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
 import tns from 'libs/tns';
+import config from "../../config";
+import { ChainType } from "../constants";
+
+const isSubChain = config.chainType === ChainType.SUBCHAIN;
 
 const TRUNC = 20;
 const TitleMap = {
@@ -73,7 +77,7 @@ export default class StakesTable extends React.Component {
     const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
     let colSpan = type === 'node' ? 5 : 3;
     const titleKey = `${stakeCoinType}_${type || ""}`;
-    const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
+    const currencyUnit = isSubChain ? '' : stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
       <div className="stakes half">
         <div className="title">{TitleMap[`${titleKey}`]}</div>
