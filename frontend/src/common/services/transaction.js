@@ -17,7 +17,10 @@ export const transactionsService = {
   getTransactionsByPage(pageNumber, limit = 10) {
     return apiService.get('transactions/range', { params: { pageNumber, limit } });
   },
-  getTotalTransactionNumber(hour) {
+  getTotalTransactionNumber(hour, uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}transactions/number/${hour}`);
+    }
     return apiService.get(`transactions/number/${hour}`);
   },
   // getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50, includeService = true) {
@@ -31,7 +34,7 @@ export const transactionsService = {
   getTransactionsByAddress(address, pageNumber = 1, limitNumber = 50, types = -1) {
     let isEqualType = false;
     let type = -1; //Return all types
-    if(types !== -1) {
+    if (types !== -1) {
       isEqualType = true;
       types = JSON.stringify(types);
     }

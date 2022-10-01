@@ -13,10 +13,16 @@ export const accountService = {
     }
     return apiService.get(`accountTx/history/${address}`, { params: { startDate, endDate } });
   },
-  getTotalWallets() {
+  getTotalWallets(uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}account/total/number`, {})
+    }
     return apiService.get(`account/total/number`, {})
   },
-  getDailyActiveWallets() {
+  getDailyActiveWallets(uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}activeAccount/latest`, {})
+    }
     return apiService.get(`activeAccount/latest`, {})
   }
 };

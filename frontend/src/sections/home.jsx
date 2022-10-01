@@ -10,6 +10,7 @@ import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
 import { ChainList } from 'common/constants';
 import config from '../config';
+import { ChainType } from "../common/constants";
 
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
@@ -79,19 +80,19 @@ export default class Dashboard extends React.PureComponent {
             <div className="chain-overview__title">SUBCHAINS</div>
             <div className="chain-overview__chains">
               {chainInfo.subchains.map((chain, i) => {
-                return <Link className="chain-overview__chain" to={chain.host} key={i}>
+                return <a className="chain-overview__chain" href={chain.host} key={i}>
                   <div className="chain-overview__chain--logo">
                     <div className={`chain-logo ${chain.logoName}`}></div>
                   </div>
                   <div className="chain-overview__chain--description">
                     {chain.description}
                   </div>
-                </Link>
+                </a>
               })}
             </div>
           </div>
         </> : <>
-          <div className="dapps">
+          {config.chainType !== ChainType.SUBCHAIN && <div className="dapps">
             <div className="dapps__title">
               DAPPS ON {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </div>
@@ -105,7 +106,7 @@ export default class Dashboard extends React.PureComponent {
             <div className="dapps__footer">
               <a href="https://www.thetatoken.org/ecosystem" target="_blank" rel="noreferrer" className="more">View More</a>
             </div>
-          </div>
+          </div>}
           <div className="overview">
             <div>
               <h2 className="page-title blocks"><Link to="/blocks">Blocks</Link></h2>
