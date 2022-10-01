@@ -10,7 +10,12 @@ import ThetaChart from 'common/components/chart';
 import Detail from 'common/components/dashboard-detail';
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
+import config from "../../config";
 
+const host = window.location.host;
+const isMetaChain = host.match(/metachain-explorer/gi) !== null;
+const { mainchain } = config.chainInfo;
+const uri = isMetaChain ? mainchain.host + ':' + mainchain.restApiPort + '/api/' : null;
 export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -35,7 +40,7 @@ export default class TokenDashboard extends React.PureComponent {
     }
   }
   getTransactionHistory() {
-    transactionsService.getTransactionHistory()
+    transactionsService.getTransactionHistory(uri)
       .then(res => {
         const txHistory = get(res, 'data.body.data');
         let txTs = [];
@@ -51,7 +56,7 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   getAllStakes() {
-    stakeService.getAllStake(['eenp', 'vcp', 'gcp'])
+    stakeService.getAllStake(['eenp', 'vcp', 'gcp'], uri)
       .then(res => {
         const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => {
@@ -103,7 +108,7 @@ export default class TokenDashboard extends React.PureComponent {
   }
   getTotalStaked() {
     const { type } = this.props;
-    stakeService.getTotalStake(type)
+    stakeService.getTotalStake(type, uri)
       .then(async res => {
         const stake = get(res, 'data.body');
         let wtfuelTotalSupply = 0
