@@ -97,11 +97,10 @@ export default class Dashboard extends React.PureComponent {
               DAPPS ON {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </div>
             <div className="dapps__container">
-              <DappCard info={{ name: 'tdrop', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://www.thetadrop.com/" }} />
-              <DappCard info={{ name: 'replay', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://imaginereplay.com/" }} />
-              <DappCard info={{ name: 'voltswap', price: '0.0079', market_cap: '79776454', volume: '345978', link: "https://info.voltswap.finance/#/home?network=theta/" }} />
-              <DappCard info={{ name: 'pentheta', nft_volume: '2,403', link: "https://opentheta.io/" }} />
-              <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Lorem ipsum dolor sit amet consectetuer adipiscing.", link: "https://thetaboard.io/" }} />
+              <DappCard info={{ name: 'tdrop', price: '0.0052', market_cap: '51276051', volume: '207719', link: "https://www.thetadrop.com/" }} />
+              <DappCard info={{ name: 'voltswap', description: "VoltSwap is a community-driven DEX on the Theta Blockchain, which allows users to swap a variety of tokens, earn APY, and maximize yields.", link: "https://info.voltswap.finance/#/home?network=theta/" }} />
+              <DappCard info={{ name: 'pentheta', description: 'OpenTheta is an independent NFT marketplace on the Theta blockchain to discover and collect digital assets.', link: "https://opentheta.io/" }} />
+              <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Theta Name Service (TNS) is a distributed, open, and extensible naming system based on the Theta blockchain.", link: "https://thetaboard.io/" }} />
             </div>
             <div className="dapps__footer">
               <a href="https://www.thetatoken.org/ecosystem" target="_blank" rel="noreferrer" className="more">View More</a>

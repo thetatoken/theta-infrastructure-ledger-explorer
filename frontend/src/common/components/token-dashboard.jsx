@@ -159,8 +159,8 @@ export default class TokenDashboard extends React.PureComponent {
     const icon = type + 'wei';
     const token = type.toUpperCase();
     const isTheta = type === 'theta';
-    const txHistoryTitle = isMetaChain ? 'THETA METACHAIN TRANSACTION HISTORY (14 DAYS)' :
-      "THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)";
+    const txHistoryTitle = isMetaChain ? 'THETA METACHAIN TRANSACTION HISTORY (14 DAYS)' : isSubChain ?
+      "THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)" : "SUBCHAIN TRANSACTION HISTORY (14 DAYS)";
     const isSubChain = config.chainType === ChainType.SUBCHAIN;
     return (
       <React.Fragment>
