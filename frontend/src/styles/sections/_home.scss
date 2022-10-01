@@ -58,12 +58,16 @@
       align-items: center;
       justify-content: space-between;
       margin-top: 30px;
+      @include breakpoint("phablet", max) {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     }
 
     &__footer {
       display: flex;
       justify-content: center;
-      
+
       .more {
         margin-top: 27px;
         font-size: 14px;
@@ -128,6 +132,16 @@
         height: 100%;
         width: 90px;
         margin-right: 110px;
+      }
+
+      @include breakpoint("phablet", max) {
+        min-height: 60px;
+        height: auto;
+        align-items: center;
+        &--logo {
+          margin-right: 10px;
+          height: 20px;
+        }
       }
     }
   }

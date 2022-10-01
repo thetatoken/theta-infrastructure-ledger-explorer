@@ -147,4 +147,9 @@
       color: $color-theta-blue;
     }
   }
+
+  @include breakpoint("phablet", max) {
+    width: 150px;
+    margin: 10px;
+  }
 }
