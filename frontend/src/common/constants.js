@@ -37,6 +37,12 @@ export const TxnTypeText = {
   '201': 'Subchain Validator Set Update'
 }
 
+export const ChainType = {
+  SUBCHAIN: 'SUBCHAIN',
+  MAINCHAIN: 'MAINCHAIN',
+  METACHAIN: 'METACHAIN'
+}
+
 export const TypeOptions = Object.keys(TxnTypeText)
   .map(key => ({ value: key, label: TxnTypeText[key] }))
   .filter(o => o.value !== '8')

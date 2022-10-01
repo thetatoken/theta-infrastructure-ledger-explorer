@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { ChainList } from "common/constants";
 import cx from 'classnames';
+import config from "../../config";
 
 const ChainCard = (props) => {
-  const [mainChain, setMainChain] = useState(ChainList.mainChain);
-  const [subChain, setSubChain] = useState(ChainList.subChain);
+  const { chainInfo } = config;
+  const [mainChain, setMainChain] = useState([chainInfo.mainchain]);
+  const [subChain, setSubChain] = useState(chainInfo.subchains);
 
   const handleOnChange = (e) => {
     const filter = e.target.value;
-    setMainChain(ChainList.mainChain.filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
-    setSubChain(ChainList.subChain.filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
+    setMainChain([chainInfo.mainchain].filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
+    setSubChain(chainInfo.subchains.filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
   }
   return <div className="chain-card-wrap" onClick={props.onClose}>
     <div className="chain-card-container">

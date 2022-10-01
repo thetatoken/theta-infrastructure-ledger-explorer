@@ -52,6 +52,7 @@ export default class Dashboard extends React.PureComponent {
   render() {
     const { thetaInfo, tfuelInfo } = this.state;
     const { backendAddress, type } = this.props;
+    const { chainInfo } = config;
 
     return (
       <div className="content home">
@@ -64,23 +65,21 @@ export default class Dashboard extends React.PureComponent {
           <div className="chain-overview">
             <div className="chain-overview__title"> MAIN CHAIN</div>
             <div className="chain-overview__chains">
-              {ChainList.mainChain.map((chain, i) => {
-                return <Link className="chain-overview__chain" to="/" key={i}>
-                  <div className="chain-overview__chain--logo">
-                    <div className={`chain-logo ${chain.logoName}`}></div>
-                  </div>
-                  <div className="chain-overview__chain--description">
-                    {chain.description}
-                  </div>
-                </Link>
-              })}
+              <a className="chain-overview__chain" href={chainInfo.mainchain.host}>
+                <div className="chain-overview__chain--logo">
+                  <div className={`chain-logo ${chainInfo.mainchain.logoName}`}></div>
+                </div>
+                <div className="chain-overview__chain--description">
+                  {chainInfo.mainchain.description}
+                </div>
+              </a>
             </div>
           </div>
           <div className="chain-overview">
             <div className="chain-overview__title">SUBCHAINS</div>
             <div className="chain-overview__chains">
-              {ChainList.subChain.map((chain, i) => {
-                return <Link className="chain-overview__chain" to="/" key={i}>
+              {chainInfo.subchains.map((chain, i) => {
+                return <Link className="chain-overview__chain" to={chain.host} key={i}>
                   <div className="chain-overview__chain--logo">
                     <div className={`chain-logo ${chain.logoName}`}></div>
                   </div>
