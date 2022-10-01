@@ -9,8 +9,10 @@ import { sumCoin } from 'common/helpers/utils';
 import StakesTable from "../common/components/stakes-table";
 import BigNumber from 'bignumber.js';
 import tns from 'libs/tns';
+import config from "../config";
+import { ChainType } from "../common/constants";
 
-
+const isSubChain = config.chainType === ChainType.SUBCHAIN;
 export default class Stakes extends React.Component {
   _isMounted = true;
 
@@ -38,7 +40,7 @@ export default class Stakes extends React.Component {
     const self = this;
     rewardDistributionService.getAllRewardDistribution()
       .then(res => {
-        if(!self._isMounted) return;
+        if (!self._isMounted) return;
         const list = get(res, 'data.body')
         let map = new Map();
         list.forEach(s => {
@@ -55,7 +57,7 @@ export default class Stakes extends React.Component {
     const self = this;
     stakeService.getAllStake(types)
       .then(res => {
-        if(!self._isMounted) return;
+        if (!self._isMounted) return;
         const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => { return sumCoin(sum, info.withdrawn ? 0 : info.amount) }, 0);
         let holderObj = stakeList.reduce((map, obj) => {
@@ -111,7 +113,7 @@ export default class Stakes extends React.Component {
         console.log(err);
       });
   }
-  setStakesTns = async(stakes, addrKey, stateKey) => {
+  setStakesTns = async (stakes, addrKey, stateKey) => {
     const slicedStakes = stakes.slice(0, 21).map((x) => x[addrKey]);
     const domainNames = await tns.getDomainNames(slicedStakes);
     stakes.map((x) => { x.tns = x[addrKey] ? domainNames[x[addrKey]] : null });
@@ -125,17 +127,26 @@ export default class Stakes extends React.Component {
     const { holders, percentage, sortedStakesByHolder, sortedStakesBySource, totalStaked } = this.state;
     let isTablet = window.screen.width <= 768;
     const truncate = isTablet ? 10 : 20;
-    const title = `TOTAL ${stakeCoinType === 'tfuel' ? 'TFUEL' : 'THETA'} STAKED`;
-    const legend = stakeCoinType === 'tfuel' ? 'TFUEL NODES' : 'THETA NODES';
+    const title = `TOTAL ${isSubChain ? 'SUBCHAIN VALIDATOR' :
+      stakeCoinType === 'tfuel' ? 'TFUEL' : 'THETA'} STAKED`;
+    const legend = isSubChain ? 'SUBCHAIN VALIDATOR' :
+      stakeCoinType === 'tfuel' ? 'TFUEL NODES' : 'THETA NODES';
+    console.log('holders:', holders);
+    console.log('percentage:', percentage);
     return (
       <div className="content stakes">
         <div className="page-title stakes">{title}</div>
         <div className="chart-container">
-          <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'account'} />
+          {
+            isSubChain ?
+              <ThetaChart chartType={'doughnut'} labels={['0x2e833968e5bb786ae419c4d13189fb081cc43bab']} data={[100]} clickType={'account'} />
+              : <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'account'} />
+          }
+
         </div>
         <div className="legend">
           {legend}
-          <div className="stake-switch-container">
+          {!isSubChain && <div className="stake-switch-container">
             STAKED TOKEN
             <Link to={stakeCoinType === 'theta' ? "/stakes/tfuel" : "/stakes/theta"}>
               <label className="stake-switch">
@@ -143,14 +154,20 @@ export default class Stakes extends React.Component {
                 <span className="slider"></span>
               </label>
             </Link>
+          </div>}
+        </div>
+        {isSubChain ?
+          <div className="table-container subchain">
+            <StakesTable stakeCoinType={"validatorSet"}
+              stakes={[{ 'amount': 1e+23, 'source': '0x2e833968e5bb786ae419c4d13189fb081cc43bab' }]}
+              totalStaked={1e+23} truncate={truncate} />
+          </div> : <div className="table-container">
+            <StakesTable type='wallet' stakeCoinType={stakeCoinType} stakes={sortedStakesBySource}
+              totalStaked={totalStaked} truncate={truncate} />
+            <StakesTable type='node' stakeCoinType={stakeCoinType} stakes={sortedStakesByHolder}
+              totalStaked={totalStaked} truncate={truncate} />
           </div>
-        </div>
-        <div className="table-container">
-          <StakesTable type='wallet' stakeCoinType={stakeCoinType} stakes={sortedStakesBySource}
-            totalStaked={totalStaked} truncate={truncate} />
-          <StakesTable type='node' stakeCoinType={stakeCoinType} stakes={sortedStakesByHolder}
-            totalStaked={totalStaked} truncate={truncate} />
-        </div>
+        }
       </div>
     );
   }

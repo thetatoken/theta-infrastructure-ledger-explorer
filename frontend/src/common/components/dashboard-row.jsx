@@ -18,7 +18,6 @@ const DashboardRow = () => {
   const [txnNum, setTxnNum] = useState(0);
   useEffect(() => {
     let flag = true;
-    console.log('isMetaChain:', isMetaChain);
     if (!isMetaChain) {
       accountService.getTotalWallets()
         .then(res => {
@@ -57,12 +56,9 @@ const DashboardRow = () => {
     }
 
     async function fetchData() {
-      console.log('fetch data');
       try {
         let uri = config.chainInfo.mainchain.host + ":" + config.chainInfo.mainchain.restApiPort + '/api/';
-        console.log('uri:', uri)
         let res = await accountService.getTotalWallets(uri);
-        console.log('res:', res);
         let aNum = get(res, 'data.total_number_account');
         res = await accountService.getDailyActiveWallets(uri);
         let wNum = get(res, 'data.body.amount');
@@ -81,7 +77,6 @@ const DashboardRow = () => {
           res = await transactionsService.getTotalTransactionNumber(24, uri);
           tNum += get(res, 'data.body.total_num_tx');
         }
-        console.log(aNum, bNum, wNum, tNum);
         if (!flag) return;
         setTotalWallet(aNum);
         setDailyActiveAccount(wNum);

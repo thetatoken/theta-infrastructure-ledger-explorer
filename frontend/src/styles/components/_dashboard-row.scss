@@ -158,6 +158,9 @@
     &.pie-charts {
       display: flex;
       border-left: 1px solid rgba($color-font-light, 0.2);
+      &.subchain {
+        justify-content: center;
+      }
     }
     .chart-container {
       padding-left: 10px;

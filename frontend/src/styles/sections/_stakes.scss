@@ -14,6 +14,10 @@
   .table-container{
     display: flex;
     justify-content: space-between;
+
+    &.subchain {
+      justify-content: center;
+    }
     .stakes.half{
       margin-top: 30px;
     }

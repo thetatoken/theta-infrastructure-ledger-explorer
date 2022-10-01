@@ -11,7 +11,8 @@ const TitleMap = {
   'theta_wallet': 'TOP THETA STAKING WALLETS',
   'theta_node': 'TOP VALIDATOR / GUARDIAN NODES',
   'tfuel_wallet': 'TOP TFUEL STAKING WALLETS',
-  'tfuel_node': 'TOP ELITE EDGE NODES'
+  'tfuel_node': 'TOP ELITE EDGE NODES',
+  "validatorSet_": "TOP VALIDATOR SET WALLETS"
 }
 const NodeMap = {
   'vcp': 'Validator',
@@ -71,7 +72,7 @@ export default class StakesTable extends React.Component {
     const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
     const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
     let colSpan = type === 'node' ? 5 : 3;
-    const titleKey = `${stakeCoinType}_${type}`;
+    const titleKey = `${stakeCoinType}_${type || ""}`;
     const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
       <div className="stakes half">
