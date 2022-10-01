@@ -61,7 +61,7 @@ module.exports = class priceDAO {
     }
 
     function query() {
-      const queryObject = { '_id': { $in: ['THETA', 'TFUEL'] } };
+      const queryObject = { '_id': { $in: ['THETA', 'TFUEL', 'TDROP'] } };
       self.client.query(self.priceInfoCollection, queryObject, function (error, recordList) {
         if (error) {
           console.log('Price dao getPrice ERR -', error);

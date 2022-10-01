@@ -2,9 +2,9 @@
 
 exports.updatePrice = function (priceDao, config) {
   const rp = require('request-promise');
-  const { key, thetaId, tfuelId } = config;
-  const ids = thetaId + ',' + tfuelId;
-  console.log(`key, ids:`, key, thetaId, tfuelId, ids);
+  const { key, thetaId, tfuelId, tdropId } = config;
+  const ids = thetaId + ',' + tfuelId + ',' + tdropId;
+  console.log(`key, ids:`, key, thetaId, tfuelId, tdropId, ids);
 
   const requestOptions = {
     method: 'GET',
@@ -28,7 +28,7 @@ exports.updatePrice = function (priceDao, config) {
         "name": info.symbol,
         'price': info.quote['USD'].price,
         'volume_24h': info.quote['USD'].volume_24h,
-        'market_cap': info.quote['USD'].market_cap,
+        'market_cap': info.quote['USD'].market_cap ? info.quote['USD'].market_cap : info.quote['USD'].price * info.total_supply,
         'total_supply': info.total_supply,
         'circulating_supply': info.circulating_supply,
         'last_updated': new Date().toISOString()

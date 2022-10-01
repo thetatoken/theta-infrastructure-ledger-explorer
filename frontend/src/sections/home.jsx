@@ -17,7 +17,8 @@ export default class Dashboard extends React.PureComponent {
     super(props);
     this.state = {
       thetaInfo: null,
-      tfuelInfo: null
+      tfuelInfo: null,
+      tdropInfo: null
     };
   }
   componentDidMount() {
@@ -27,15 +28,16 @@ export default class Dashboard extends React.PureComponent {
     priceService.getAllprices()
       .then(async res => {
         const prices = get(res, 'data.body');
-        let thetaInfo, tfuelInfo;
+        let thetaInfo, tfuelInfo, tdropInfo;
         prices.forEach(info => {
           if (info._id === 'THETA') thetaInfo = info;
           else if (info._id === 'TFUEL') tfuelInfo = info;
+          else if (info._id === 'TDROP') tdropInfo = info;
         })
         try {
           let res = await priceService.getTfuelSupply();
           tfuelInfo.circulating_supply = get(res, 'data.circulation_supply')
-          this.setState({ thetaInfo, tfuelInfo })
+          this.setState({ thetaInfo, tfuelInfo, tdropInfo })
         } catch (err) {
           console.log(err);
         }
@@ -51,7 +53,7 @@ export default class Dashboard extends React.PureComponent {
     }, 1000);
   }
   render() {
-    const { thetaInfo, tfuelInfo } = this.state;
+    const { thetaInfo, tfuelInfo, tdropInfo } = this.state;
     const { backendAddress, type } = this.props;
     const { chainInfo } = config;
 
@@ -97,7 +99,7 @@ export default class Dashboard extends React.PureComponent {
               DAPPS ON {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </div>
             <div className="dapps__container">
-              <DappCard info={{ name: 'tdrop', price: '0.0052', market_cap: '51276051', volume: '207719', link: "https://www.thetadrop.com/" }} />
+              <DappCard info={{ name: 'tdrop', price: (get(tdropInfo, 'price') || 0).toFixed(4) || '0.0052', market_cap: (get(tdropInfo, 'market_cap') || 0).toFixed(0), volume: (get(tdropInfo, 'volume_24h') || 0).toFixed(0), link: "https://www.thetadrop.com/" }} />
               <DappCard info={{ name: 'voltswap', description: "VoltSwap is a community-driven DEX on the Theta Blockchain, which allows users to swap a variety of tokens, earn APY, and maximize yields.", link: "https://v1.voltswap.finance/" }} />
               <DappCard info={{ name: 'pentheta', description: 'OpenTheta is an independent NFT marketplace on the Theta blockchain to discover and collect digital assets.', link: "https://opentheta.io/" }} />
               <DappCard info={{ name: 'metapass', description: "Metapass allows you to create events and sell NFT tickets on Theta. True event ticket ownership secured by the Theta blockchain.", link: "https://www.metapass.world/" }} />
