@@ -98,7 +98,7 @@ export default class Dashboard extends React.PureComponent {
             </div>
             <div className="dapps__container">
               <DappCard info={{ name: 'tdrop', price: '0.0052', market_cap: '51276051', volume: '207719', link: "https://www.thetadrop.com/" }} />
-              <DappCard info={{ name: 'voltswap', description: "VoltSwap is a community-driven DEX on the Theta Blockchain, which allows users to swap a variety of tokens, earn APY, and maximize yields.", link: "https://info.voltswap.finance/#/home?network=theta/" }} />
+              <DappCard info={{ name: 'voltswap', description: "VoltSwap is a community-driven DEX on the Theta Blockchain, which allows users to swap a variety of tokens, earn APY, and maximize yields.", link: "https://v1.voltswap.finance/" }} />
               <DappCard info={{ name: 'pentheta', description: 'OpenTheta is an independent NFT marketplace on the Theta blockchain to discover and collect digital assets.', link: "https://opentheta.io/" }} />
               <DappCard info={{ name: 'metapass', description: "Metapass allows you to create events and sell NFT tickets on Theta. True event ticket ownership secured by the Theta blockchain.", link: "https://www.metapass.world/" }} />
               <DappCard info={{ name: 'tns', team: 'thetaboard', description: "Theta Name Service (TNS) is a distributed, open, and extensible naming system based on the Theta blockchain.", link: "https://thetaboard.io/" }} />
