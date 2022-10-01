@@ -52,6 +52,13 @@
       text-transform: uppercase;
       font-weight: $weight-bold;
     }
+
+    &.metapass {
+      height: 35px;
+      width: 130px;
+      margin-bottom: -10px;
+      background-image: url("/images/logos/logo-metapass.svg");
+    }
   }
 
   &__content {
