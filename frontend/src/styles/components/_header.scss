@@ -95,10 +95,7 @@
       }
     }
     @include breakpoint("phablet", max) {
-      margin-left: 10px;
-      &__link {
-        margin-right: 5px;
-      }
+      display: none;
     }
   }
 

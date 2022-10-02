@@ -12,6 +12,10 @@ import { ChainList } from 'common/constants';
 import config from '../config';
 import { ChainType } from "../common/constants";
 
+const host = window.location.host;
+const isMetaChain = host.match(/metachain-explorer/gi) !== null;
+const { mainchain } = config.chainInfo;
+const uri = isMetaChain ? mainchain.host + ':' + mainchain.restApiPort + '/api/' : null;
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -35,7 +39,7 @@ export default class Dashboard extends React.PureComponent {
           else if (info._id === 'TDROP') tdropInfo = info;
         })
         try {
-          let res = await priceService.getTfuelSupply();
+          let res = await priceService.getTfuelSupply(uri);
           tfuelInfo.circulating_supply = get(res, 'data.circulation_supply')
           this.setState({ thetaInfo, tfuelInfo, tdropInfo })
         } catch (err) {
