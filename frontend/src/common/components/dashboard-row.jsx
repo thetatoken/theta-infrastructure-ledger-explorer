@@ -11,7 +11,7 @@ import config from "../../config";
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
 
-const DashboardRow = () => {
+const DashboardRow = ({ isSubChain }) => {
   const [totalWallet, setTotalWallet] = useState(0);
   const [dailyActiveAccount, setDailyActiveAccount] = useState(0);
   const [blockNum, setBlockNum] = useState(0);
@@ -90,7 +90,7 @@ const DashboardRow = () => {
     return () => flag = false;
   }, [])
 
-  return <div className="dashboard-row half">
+  return <div className={`dashboard-row half ${isSubChain ? 'subchain' : ''}`}>
     <div className="column"></div>
     <div className="column last">
       <Detail title={'24H BLOCKS / TRANSACTIONS'} value={`${formatNumber(blockNum)} / ${formatNumber(txnNum)}`} />
@@ -101,7 +101,7 @@ const DashboardRow = () => {
     <div className="column">
       <Detail title={'DAILY ACTIVE WALLETS'} value={formatNumber(dailyActiveAccount)} />
     </div>
-
+    <div className="column"></div>
   </div>
 }
 export default React.memo(DashboardRow);

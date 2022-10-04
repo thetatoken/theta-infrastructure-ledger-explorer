@@ -6,6 +6,7 @@ import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
 import TokenDashboard from "common/components/token-dashboard";
 import DashboardRow from "common/components/dashboard-row";
+import SubchainChart from "common/components/subchain-chart";
 import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
 import { ChainList } from 'common/constants';
@@ -64,9 +65,12 @@ export default class Dashboard extends React.PureComponent {
     return (
       <div className="content home">
         <div className="dashboard-wrap">
-          <TokenDashboard type='theta' tokenInfo={thetaInfo} />
-          <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
-          <DashboardRow />
+          {(config.chainType !== ChainType.SUBCHAIN || type === 'metachain') && <>
+            <TokenDashboard type='theta' tokenInfo={thetaInfo} />
+            <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
+          </>}
+          <DashboardRow isSubChain={config.chainType === ChainType.SUBCHAIN && type !== 'metachain'}/>
+          {config.chainType === ChainType.SUBCHAIN && type !== 'metachain' && <SubchainChart></SubchainChart>}
         </div>
         {type === 'metachain' ? <>
           <div className="chain-overview">

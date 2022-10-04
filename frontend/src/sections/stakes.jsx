@@ -13,6 +13,14 @@ import config from "../config";
 import { ChainType } from "../common/constants";
 
 const isSubChain = config.chainType === ChainType.SUBCHAIN;
+const stakes = [{ 'amount': '108038964603624249002532', 'source': '0x372D9d124D9B2B5598109009525533578aDF9d45' },
+{ 'amount': '100000000000000000000000', 'source': '0x2E833968E5bB786Ae419c4d13189fB081Cc43bab' },
+{ 'amount': '91240996960566334409422', 'source': '0x2f63946ff190Bd82E053fFF553ef208FbDEB2e67' },
+{ 'amount': '601391620209164005508', 'source': '0x11Ac5dCCEa0603a24E10B6f017C7c3285D46CE8e' }]
+const sum = stakes.reduce((s, o) => s.plus(new BigNumber(o.amount)), new BigNumber(0));
+const stakeLabels = stakes.map(o => o.source);
+const stakeData = stakes.map(o => new BigNumber(o.amount).dividedBy(sum / 100).toFixed(2))
+
 export default class Stakes extends React.Component {
   _isMounted = true;
 
@@ -131,15 +139,14 @@ export default class Stakes extends React.Component {
       stakeCoinType === 'tfuel' ? 'TFUEL' : 'THETA'} STAKED`;
     const legend = isSubChain ? 'SUBCHAIN VALIDATOR' :
       stakeCoinType === 'tfuel' ? 'TFUEL NODES' : 'THETA NODES';
-    console.log('holders:', holders);
-    console.log('percentage:', percentage);
+
     return (
       <div className="content stakes">
         <div className="page-title stakes">{title}</div>
         <div className="chart-container">
           {
             isSubChain ?
-              <ThetaChart chartType={'doughnut'} labels={['0x2e833968e5bb786ae419c4d13189fb081cc43bab']} data={[100]} clickType={'account'} />
+              <ThetaChart chartType={'doughnut'} labels={stakeLabels} data={stakeData} clickType={'account'} />
               : <ThetaChart chartType={'doughnut'} labels={holders} data={percentage} clickType={'account'} />
           }
 
@@ -159,8 +166,8 @@ export default class Stakes extends React.Component {
         {isSubChain ?
           <div className="table-container subchain">
             <StakesTable stakeCoinType={"validatorSet"}
-              stakes={[{ 'amount': 1e+23, 'source': '0x2e833968e5bb786ae419c4d13189fb081cc43bab' }]}
-              totalStaked={1e+23} truncate={truncate} />
+              stakes={stakes}
+              totalStaked={sum} truncate={truncate} />
           </div> : <div className="table-container">
             <StakesTable type='wallet' stakeCoinType={stakeCoinType} stakes={sortedStakesBySource}
               totalStaked={totalStaked} truncate={truncate} />
