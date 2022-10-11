@@ -32,13 +32,13 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
 
 exports.Execute = async function (networkId, retrieveStartHeight, flag) {
   try {
-    const txList = transactionDao.getTransactionsByTypeAsync(201);
+    const txList = await transactionDao.getTransactionsByTypeAsync(201);
     for (let tx of txList) {
       await updateAccountByAddress(tx.data.Proposer.address, accountDao, tx.type);
       await updateAccountMaps(tx.data.Proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
       for (let validator of tx.data.Validators) {
         await updateAccountByAddress(validator.Address, accountDao, tx.type);
-        await updateAccountMaps(validator.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+        await updateAccountMaps(validator.Address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
       }
     }
   } catch (e) {
