@@ -658,7 +658,7 @@ export default class AccountDetails extends React.Component {
             <TokenTab type="TNT-721" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
           {hasXChainTxs && <TabPanel>
-            <TokenTab type="XCHAIN_TUFEL" address={account.address} handleHashScroll={this.handleHashScroll} />
+            <TokenTab type="XCHAIN_TFUEL" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
         </Tabs>
       </div >);

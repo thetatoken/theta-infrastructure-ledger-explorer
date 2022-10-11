@@ -95,16 +95,18 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
     // Logger.log('Info map:', infoMap);
     let logs = get(tx, 'receipt.Logs');
     logs = JSON.parse(JSON.stringify(logs));
-    // Only log of transfer event remains
+    // // Only log of transfer event remains
+    // Only log of TFuelVoucherMinted event remains
     logs = logs.map(obj => {
       obj.data = getHex(obj.data);
       return obj;
     })
     logs = decodeLogs(logs, infoMap);
     for (let [i, log] of logs.entries()) {
-      if (get(log, 'address') === get(tx, 'receipt.ContractAddress')) {
-        continue;
-      }
+      // Check for TRANSFER event
+      // if (get(log, 'address') === get(tx, 'receipt.ContractAddress')) {
+      //   continue;
+      // }
       switch (get(log, 'topics[0]')) {
         case EventHashMap.TFUEL_SPLIT:
           if (typeof get(log, 'decode') !== "object") {
@@ -185,9 +187,15 @@ function _getOtherContractAddressSet(tx) {
   if (!logs) return [];
   let set = new Set();
   logs.forEach(log => {
-    if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+    // if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+    //   const address = get(log, 'address');
+    //   if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
+    //     set.add(get(log, 'address'))
+    //   }
+    // } 
+    if (get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
       const address = get(log, 'address');
-      if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
+      if (address !== undefined && address !== ZeroAddress) {
         set.add(get(log, 'address'))
       }
     }
