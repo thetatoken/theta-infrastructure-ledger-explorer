@@ -121,7 +121,7 @@ export default class Header extends React.Component {
               <Link to="/txs" className="nav-item">TRANSACTIONS</Link>
               <Link to="/stakes" className="nav-item">STAKES</Link>
               <div className={`nav-search ${hasError ? 'error' : ''}`}>
-                <input type="text" className="search-input" placeholder="address/block/tx search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} onChange={this.handleOnChange} />
+                <input type="text" className="search-input" placeholder="address/block height/tx hash search" ref={input => this.searchInput = input} onKeyPress={e => this.handleEnterKey(e)} onChange={this.handleOnChange} />
                 <div className="search-button" onClick={this.handleSearch}>
                   <svg className="svg-icon" viewBox="0 0 20 20">
                     <path fill="none" d="M19.129,18.164l-4.518-4.52c1.152-1.373,1.852-3.143,1.852-5.077c0-4.361-3.535-7.896-7.896-7.896

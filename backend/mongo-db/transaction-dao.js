@@ -188,4 +188,8 @@ module.exports = class TransactionDAO {
       })
     }
   }
+  getTransactionsByType(type, callback) {
+    const queryObject = { 'type': type };
+    this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, callback);
+  }
 }

@@ -4,6 +4,7 @@ var Logger = require('../helper/logger');
 var { decodeLogs, checkTnt721, checkTnt20, checkAndInsertToken } = require('../helper/smart-contract');
 var { getHex } = require('../helper/utils');
 var { ethers } = require("ethers");
+import { updateAccountByAddress, updateAccountMaps } from '../helper/account';
 
 var progressDao = null;
 var blockDao = null;
@@ -29,6 +30,21 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
 }
 
 exports.Execute = async function (networkId, retrieveStartHeight, flag) {
+  try {
+    const txList = transactionDao.getTransactionsByTypeAsync(201);
+    for (let tx of txList) {
+      await updateAccountByAddress(tx.data.Proposer.address, accountDao, tx.type);
+      await updateAccountMaps(tx.data.Proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+      for (let validator of tx.data.Validators) {
+        await updateAccountByAddress(validator.Address, accountDao, tx.type);
+        await updateAccountMaps(validator.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+      }
+    }
+  } catch (e) {
+    Logger.log('Error occurs while updating token and token progress:', e.message);
+  }
+  flag.result = false;
+  return;
   if (!retrieveStartHeight) {
     flag.result = false;
     return;
