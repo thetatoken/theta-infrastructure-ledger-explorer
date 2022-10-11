@@ -25,8 +25,8 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
           {tabType !== "token" && <th className="icon"></th>}
           <th className="to">To</th>
           {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
-          {(type === 'TNT-20' || type === 'TFUEL') && <th className="quantity">Quantity</th>}
-          {type !== 'TFUEL' && tabType !== 'token' && <th>Token</th>}
+          {(type === 'TNT-20' || type === 'TFUEL' || type === 'XCHAIN_TFUEL') && <th className="quantity">Quantity</th>}
+          {type !== 'TFUEL' && type !== 'XCHAIN_TFUEL' && tabType !== 'token' && <th>Token</th>}
         </tr>
       </thead>
       <tbody>
@@ -50,13 +50,13 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                 {type === 'TNT-721' && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
                 </td>}
-                {type === 'TFUEL' && <td className="quantity">
+                {type === 'TFUEL' || type === 'XCHAIN_TFUEL' && <td className="quantity">
                   <div className="currency tfuel">
                     {formatCoin(txn.value, 2)}
                   </div>
                 </td>}
                 {type === 'TNT-20' && <td className="quantity">{quantity}</td>}
-                {type !== 'TFUEL' && tabType !== 'token' && <TokenName name={name} address={txn.contract_address} />}
+                {type !== 'TFUEL' && type !== 'XCHAIN_TFUEL' && tabType !== 'token' && <TokenName name={name} address={txn.contract_address} />}
 
               </React.Fragment>
             </tr>);
