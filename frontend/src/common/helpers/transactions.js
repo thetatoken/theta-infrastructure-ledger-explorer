@@ -27,7 +27,7 @@ export function from(txn, trunc = null, address = null, set = null) {
       path = 'data.source.address';
     } else if (txn.type === TxnTypes.SPLIT_CONTRACT) {
       path = 'data.initiator.address';
-    } else if (txn.type === TxnTypes.COINBASE || txn.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE) {
+    } else if (txn.type === TxnTypes.COINBASE) {
       path = 'data.proposer.address';
     } else if (txn.type === TxnTypes.DEPOSIT_STAKE || txn.type === TxnTypes.DEPOSIT_STAKE_TX_V2) {
       path = 'data.source.address'
