@@ -186,6 +186,22 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           tokenArr.push(newToken);
           insertList.push(_checkAndInsertToken(newToken, tokenDao))
           break;
+        case EventHashMap.TFUEL_VOUCHER_MINTED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i + '_0',
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[1]').toLowerCase(),
+              value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
         default:
           break;
       }

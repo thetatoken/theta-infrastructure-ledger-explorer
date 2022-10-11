@@ -204,6 +204,16 @@ export const CommonEventABIs = {
     { indexed: false, name: 'approved', type: 'bool' }],
     name: 'ApprovalForAll',
     type: 'event'
+  }],
+  "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
+    "name": "TFuelVoucherMinted",
+    "type": "event"
   }]
 }
 

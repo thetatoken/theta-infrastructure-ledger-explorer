@@ -19,7 +19,8 @@ exports.ZeroTxAddress = '0x00000000000000000000000000000000000000000000000000000
 
 exports.EventHashMap = {
   TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-  TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457"
+  TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457",
+  TFUEL_VOUCHER_MINTED: '0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5'
 }
 
 exports.CommonEventABIs = {
@@ -31,5 +32,15 @@ exports.CommonEventABIs = {
     { indexed: false, internalType: "uint256", name: "platformFee", type: "uint256" }],
     name: "TFuelSplit",
     type: "event"
+  }],
+  "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
+    "name": "TFuelVoucherMinted",
+    "type": "event"
   }]
 }

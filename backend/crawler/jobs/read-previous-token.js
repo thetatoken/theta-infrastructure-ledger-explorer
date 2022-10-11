@@ -4,7 +4,6 @@ var Logger = require('../helper/logger');
 var { decodeLogs, checkTnt721, checkTnt20, checkAndInsertToken } = require('../helper/smart-contract');
 var { getHex } = require('../helper/utils');
 var { ethers } = require("ethers");
-var { updateAccountByAddress, updateAccountMaps } = require('../helper/account');
 
 var progressDao = null;
 var blockDao = null;
@@ -31,21 +30,6 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
 }
 
 exports.Execute = async function (networkId, retrieveStartHeight, flag) {
-  try {
-    const txList = await transactionDao.getTransactionsByTypeAsync(201);
-    for (let tx of txList) {
-      await updateAccountByAddress(tx.data.Proposer.address, accountDao, tx.type);
-      await updateAccountMaps(tx.data.Proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
-      for (let validator of tx.data.Validators) {
-        await updateAccountByAddress(validator.Address, accountDao, tx.type);
-        await updateAccountMaps(validator.Address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
-      }
-    }
-  } catch (e) {
-    Logger.log('Error occurs while updating token and token progress:', e.message);
-  }
-  flag.result = false;
-  return;
   if (!retrieveStartHeight) {
     flag.result = false;
     return;
@@ -60,7 +44,7 @@ exports.Execute = async function (networkId, retrieveStartHeight, flag) {
   }
   Logger.log('Read previous token height:', height);
   // if (height < 13123789) { // for mainnet
-  if (height < 7952047) {
+  if (height < 1) {
     flag.result = false;
     return;
   }
@@ -170,6 +154,22 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           }
           tokenArr.push(newToken);
           insertList.push(checkAndInsertToken(newToken, tokenDao))
+          break;
+        case EventHashMap.TFUEL_VOUCHER_MINTED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i + '_0',
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[1]').toLowerCase(),
+              value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
           break;
         default:
           break;
