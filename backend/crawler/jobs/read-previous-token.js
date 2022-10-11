@@ -4,7 +4,7 @@ var Logger = require('../helper/logger');
 var { decodeLogs, checkTnt721, checkTnt20, checkAndInsertToken } = require('../helper/smart-contract');
 var { getHex } = require('../helper/utils');
 var { ethers } = require("ethers");
-import { updateAccountByAddress, updateAccountMaps } from '../helper/account';
+var { updateAccountByAddress, updateAccountMaps } = require('../helper/account');
 
 var progressDao = null;
 var blockDao = null;
@@ -17,7 +17,7 @@ var tokenHolderDao = null;
 var tokenSummaryDao = null;
 
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, smartContractDaoInstance, tokenDaoInstance, tokenHolderDaoInstance, tokenSummaryDaoInstance) {
+  accountTxDaoInstance, smartContractDaoInstance, tokenDaoInstance, tokenHolderDaoInstance, tokenSummaryDaoInstance, dailyAccountDaoInstance) {
   progressDao = progressDaoInstance;
   blockDao = blockDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -27,6 +27,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   tokenDao = tokenDaoInstance;
   tokenHolderDao = tokenHolderDaoInstance;
   tokenSummaryDao = tokenSummaryDaoInstance;
+  dailyAccountDao = dailyAccountDaoInstance;
 }
 
 exports.Execute = async function (networkId, retrieveStartHeight, flag) {
