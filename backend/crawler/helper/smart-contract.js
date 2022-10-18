@@ -200,7 +200,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
               timestamp: tx.timestamp,
             }
             tokenArr.push(xTfuelInfo);
-            insertList.push(checkAndInsertToken(xTfuelInfo, tokenDao))
+            insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
           }
           break;
         default:
