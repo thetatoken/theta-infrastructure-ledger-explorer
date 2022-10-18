@@ -133,8 +133,8 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
       obj.data = getHex(obj.data);
       return obj;
     })
-    Logger.log('logs in updateTokenNew:', logs)
     logs = _decodeLogs(logs, infoMap);
+    Logger.log('logs in updateTokenNew:', JSON.stringify(logs))
     for (let [i, log] of logs.entries()) {
       switch (get(log, 'topics[0]')) {
         case EventHashMap.TFUEL_SPLIT:
@@ -189,8 +189,9 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
         case EventHashMap.TFUEL_VOUCHER_MINTED:
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
+            Logger.log('Decoded TFUEL_VOUCHER_MINTED Log:', JSON.stringify(log));
             let xTfuelInfo = {
-              _id: tx.hash.toLowerCase() + i + '_0',
+              _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
               from: get(log, 'decode.result[1]').toLowerCase(),
               to: get(log, 'decode.result[1]').toLowerCase(),
