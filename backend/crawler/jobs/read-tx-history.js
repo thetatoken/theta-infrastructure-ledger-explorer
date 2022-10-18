@@ -11,7 +11,7 @@ exports.Initialize = function (transactionDaoInstance, txHistoryDaoInstance) {
 exports.Execute = function () {
   txHistoryDao.getAllTxHistoryAsync()
     .then(async res => {
-      txHistoryDao.removeAllAsync();
+      await txHistoryDao.removeAllAsync();
       res.sort((a, b) => { return a.timestamp - b.timestamp }).shift();
       const num = await transactionDao.getTotalNumberByHourAsync(24);
       res.push({ timestamp: (new Date().getTime() / 1000).toFixed(), number: num });
@@ -28,10 +28,39 @@ exports.Execute = function () {
           for (let i = 0; i < 14; i++) {
             const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
             txHistoryDao.insertAsync({ timestamp: (new Date().getTime() / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
-            // records.push({ timestamp: (new Date().getTime() / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp })
             tmp = num;
           }
           Logger.log(records);
+        }
+      }
+    })
+}
+
+exports.Check = function () {
+  const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
+    new Date().setUTCHours(7, 0, 0, 0) / 1000 - 60 * 60 * 24 : new Date().setUTCHours(7, 0, 0, 0);
+  txHistoryDao.getAllTxHistoryAsync()
+    .then(async res => {
+      console.log('res length:', res.length);
+      if (res.length === 14) return;
+      Logger.log('Tx History less than 14 reocrds. Reset Records.');
+      await txHistoryDao.removeAllAsync();
+      let tmp = 0;
+      for (let i = 0; i < 14; i++) {
+        const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
+        txHistoryDao.insertAsync({ timestamp: (iniTime - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
+        tmp = num;
+      }
+    }).catch(async err => {
+      Logger.log('Tx history check err:', err)
+      if (err) {
+        if (err.message.includes('NOT_FOUND')) {
+          let tmp = 0;
+          for (let i = 0; i < 14; i++) {
+            const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
+            txHistoryDao.insertAsync({ timestamp: (iniTime - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
+            tmp = num;
+          }
         }
       }
     })

@@ -292,7 +292,7 @@ export async function fetchWTFuelTotalSupply() {
     return type;
   });
 
-  const address = "0x4dc08b15ea0e10b96c41aec22fab934ba15c983e";
+  const address = "0x4dc08b15ea0e10b96c41aec22fab934ba15c983e"; //mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
@@ -323,6 +323,64 @@ export async function fetchWTFuelTotalSupply() {
     return balance.toString();
   } catch (e) {
     console.log('error occurs in fetchWTFuelTotalSupply:', e.message);
+    return 0;
+  }
+}
+
+export async function fetchWThetaTotalSupply() {
+  const totalSupplyAbi = [{
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }]
+
+  const functionData = totalSupplyAbi[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(totalSupplyAbi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+
+  // const address = "0x90e6ca1087a2340da858069cb8d78d595e4ac798"; //testnet
+  const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance.toString();
+  } catch (e) {
+    console.log('error occurs in fetchWThetaTotalSupply:', e.message);
     return 0;
   }
 }
