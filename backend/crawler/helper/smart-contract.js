@@ -480,7 +480,7 @@ function _getContractAddressSetByTxs(txs) {
     let logs = get(tx, 'receipt.Logs');
     if (!logs) continue;
     logs.forEach(log => {
-      if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+      if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
         const address = get(log, 'address');
         if (address !== undefined && address !== ZeroAddress) {
           set.add(get(log, 'address'))
