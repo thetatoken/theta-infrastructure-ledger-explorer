@@ -2,7 +2,7 @@ import React from "react";
 import get from 'lodash/get';
 import cx from 'classnames';
 
-import { formatNumber, formatCurrency, sumCoin, fetchWTFuelTotalSupply } from 'common/helpers/utils';
+import { formatNumber, formatCurrency, sumCoin, fetchWTFuelTotalSupply, fetchWThetaTotalSupply } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
 import { blocksService } from 'common/services/block';
@@ -21,8 +21,8 @@ export default class TokenDashboard extends React.PureComponent {
       txTs: [],
       txNumber: [],
       nodeNum: 0,
-      tfuelStaked: 0,
-      wtfuelLocaked: 0
+      tokenStaked: 0,
+      tokenLocked: 0
     };
   }
   componentDidMount() {
@@ -106,20 +106,22 @@ export default class TokenDashboard extends React.PureComponent {
     stakeService.getTotalStake(type)
       .then(async res => {
         const stake = get(res, 'data.body');
-        let wtfuelTotalSupply = 0
-        if (type === 'tfuel') {
-          try {
-            wtfuelTotalSupply = await fetchWTFuelTotalSupply();
-          } catch (e) {
-            console.log('Error in fetch WTFuel total supply. Err:', e.message);
+        let tokenTotalSupply = 0
+        try {
+          if (type === 'tfuel') {
+            tokenTotalSupply = await fetchWTFuelTotalSupply();
+          } else if (type === 'theta') {
+            tokenTotalSupply = await fetchWThetaTotalSupply();
           }
+        } catch (e) {
+          console.log('Error in fetch WTFuel total supply. Err:', e.message);
         }
-        const totalStaked = BigNumber.sum(stake.totalAmount, wtfuelTotalSupply);
+        const totalStaked = BigNumber.sum(stake.totalAmount, tokenTotalSupply);
         this.setState({
           totalStaked: totalStaked,
           nodeNum: stake.totalNodes,
-          tfuelStaked: stake.totalAmount,
-          wtfuelLocaked: wtfuelTotalSupply
+          tokenStaked: stake.totalAmount,
+          tokenLocked: tokenTotalSupply
         });
       })
       .catch(err => {
@@ -127,7 +129,7 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   render() {
-    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum, tfuelStaked, wtfuelLocaked } = this.state;
+    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum, tokenStaked, tokenLocked } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -148,11 +150,10 @@ export default class TokenDashboard extends React.PureComponent {
           </div>
           <div className="column">
             <Detail title={isTheta ? 'TOTAL STAKED NODES' : 'TOTAL ELITE NODES'} value={nodeNum} />
-            <Detail title={isTheta ? 'THETA STAKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
+            <Detail title={isTheta ? 'THETA STAKED+LOCKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
               value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />}
-              className={isTheta ? '' : "tooltip"}
-              tooltipText={isTheta ? <></> :
-                <TFuelTooltip totalSupply={tokenInfo.circulating_supply} staked={tfuelStaked} locked={wtfuelLocaked} />} />
+              className="tooltip"
+              tooltipText={<TokenTooltip totalSupply={tokenInfo.circulating_supply} staked={tokenStaked} locked={tokenLocked} type={type} />} />
           </div>
           <div className="column pie-charts">
             {type === 'tfuel' ?
@@ -196,16 +197,16 @@ const StakedPercent = ({ staked, totalSupply }) => {
   );
 }
 
-const TFuelTooltip = ({ staked, locked, totalSupply }) => {
+const TokenTooltip = ({ staked, locked, totalSupply, type }) => {
   return <div className="tooltip--text">
     <div>
-      TFUEL STAKED:
+      {type} STAKED:
       <span>
         {`${new BigNumber(staked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
       </span>
     </div>
     <div>
-      WTFUEL LOCKED:
+      W{type} LOCKED:
       <span>
         {`${new BigNumber(locked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
       </span>

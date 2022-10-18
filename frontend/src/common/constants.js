@@ -111,6 +111,7 @@ export const Networks = {
 export const NetworkUrlOfChainId = {
   'https://explorer.thetatoken.org': Networks.THETA_MAINNET,
   'https://beta-explorer.thetatoken.org': Networks.THETA_TESTNET,
+  'https://testnet-explorer.thetatoken.org': Networks.THETA_TESTNET,
   'https://guardian-testnet-explorer-amber.thetatoken.org': Networks.THETA_TESTNET_AMBER,
   'https://guardian-testnet-explorer.thetatoken.org': Networks.THETA_TESTNET_SAPPHIRE,
   'https://smart-contracts-sandbox-explorer.thetatoken.org': Networks.THETA_PRIVATENET,
@@ -120,6 +121,7 @@ export const NetworkUrlOfChainId = {
 export const EthRPCEndpoints = {
   'https://explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
   'https://beta-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
+  'https://testnet-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
   'https://localhost': "http://localhost:18888/rpc",
 }
 
