@@ -17,13 +17,11 @@ const DashboardRow = ({ }) => {
     fetchData();
 
     async function fetchData() {
-      let decimals = await fetchTokenDecimals();
-      console.log('decimals:', decimals);
+      let decimals = await fetchAbi([CommonFunctionABIs.decimals]);
       setDecimals(decimals);
-      let totalSupply = await fetchTokenTotalSupply();
-      console.log('totalSupply:', totalSupply);
+      let totalSupply = await fetchAbi([CommonFunctionABIs.totalSupply]);
       setTotalSupply(totalSupply);
-      let symbol = await fetchTokenSymbol();
+      let symbol = await fetchAbi([CommonFunctionABIs.symbol]);
       setSymbol(symbol);
     }
     return () => flag = false;
