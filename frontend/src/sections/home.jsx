@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import TransactionsTable from "common/components/transactions-table";
 import BlocksTable from "common/components/blocks-table";
 import TokenDashboard from "common/components/token-dashboard";
+import SubchainTokenDashboard from "../common/components/subchain-token-dashboard";
 import DashboardRow from "common/components/dashboard-row";
 import SubchainChart from "common/components/subchain-chart";
 import { priceService } from 'common/services/price';
@@ -61,16 +62,17 @@ export default class Dashboard extends React.PureComponent {
     const { thetaInfo, tfuelInfo, tdropInfo } = this.state;
     const { backendAddress, type } = this.props;
     const { chainInfo } = config;
-
+    const isSubChain = config.chainType === ChainType.SUBCHAIN && type !== 'metachain';
     return (
       <div className="content home">
         <div className="dashboard-wrap">
-          {(config.chainType !== ChainType.SUBCHAIN || type === 'metachain') && <>
+          {!isSubChain && <>
             <TokenDashboard type='theta' tokenInfo={thetaInfo} />
             <TokenDashboard type='tfuel' tokenInfo={tfuelInfo} />
           </>}
-          <DashboardRow isSubChain={config.chainType === ChainType.SUBCHAIN && type !== 'metachain'}/>
-          {config.chainType === ChainType.SUBCHAIN && type !== 'metachain' && <SubchainChart></SubchainChart>}
+          {isSubChain && <SubchainTokenDashboard />}
+          <DashboardRow isSubChain={isSubChain} />
+          {isSubChain && <SubchainChart></SubchainChart>}
         </div>
         {type === 'metachain' ? <>
           <div className="chain-overview">

@@ -29,7 +29,6 @@ const SubchainChart = ({ }) => {
             txTs.push(new Date(info.timestamp * 1000));
             txNum.push(info.number);
           })
-          console.log('txNum in res:', txNum);
           setTxTs(txTs);
           setTxNumber(txNum);
         })

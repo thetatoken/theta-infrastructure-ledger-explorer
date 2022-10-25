@@ -3,10 +3,14 @@ import { ethers } from "ethers";
 import get from 'lodash/get';
 import map from 'lodash/map';
 
-import { WEI, CommonEventABIs } from 'common/constants';
+import { WEI, CommonEventABIs, EthRPCEndpoints, NetworkUrlOfChainId } from 'common/constants';
+
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm'
+import config from '../../config.js'
+
+console.log('config:', config);
 
 export function truncateMiddle(str, maxLength = 20, separator = '...') {
   if (str && str.length <= 20)
@@ -381,6 +385,234 @@ export async function fetchWThetaTotalSupply() {
     return balance.toString();
   } catch (e) {
     console.log('error occurs in fetchWThetaTotalSupply:', e.message);
+    return 0;
+  }
+}
+
+export async function fetchTokenTotalSupply() {
+  const totalSupplyAbi = [{
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }]
+
+  const functionData = totalSupplyAbi[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(totalSupplyAbi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+
+  const address = "0x371cb5b1c56a6b50b944eee5910aac32723b5adc"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+    console.log('result:', result);
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance.toString();
+  } catch (e) {
+    console.log('error occurs in fetchTokenTotalSupply:', e.message);
+    return 0;
+  }
+}
+
+export async function fetchTokenDecimals() {
+  const decimalsAbi = [{
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "name": "", "type": "uint8" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }]
+
+  const functionData = decimalsAbi[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(decimalsAbi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+
+  const address = "0x371cb5b1c56a6b50b944eee5910aac32723b5adc"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+    console.log('result:', result);
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance.toString();
+  } catch (e) {
+    console.log('error occurs in fetchTokenDecimals:', e.message);
+    return 0;
+  }
+}
+
+export async function fetchTokenSymbol() {
+  const symbolAbi = [{
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "name": "", "type": "string" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }]
+
+  const functionData = symbolAbi[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(symbolAbi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+
+  const address = "0x371cb5b1c56a6b50b944eee5910aac32723b5adc"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+    console.log('result:', result);
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance.toString();
+  } catch (e) {
+    console.log('error occurs in fetchTokenSymbol:', e.message);
+    return 0;
+  }
+}
+
+export async function fetchAbi(abi) {
+  const functionData = abi[0];
+  const inputValues = []
+
+  const iface = new ethers.utils.Interface(abi || []);
+  const senderSequence = 1;
+  const functionInputs = get(functionData, ['inputs'], []);
+  const functionOutputs = get(functionData, ['outputs'], []);
+  const functionSignature = iface.getSighash(functionData.name)
+
+  const inputTypes = map(functionInputs, ({ name, type }) => {
+    return type;
+  });
+
+  const address = "0x371cb5b1c56a6b50b944eee5910aac32723b5adc"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+
+  try {
+    var abiCoder = new ethers.utils.AbiCoder();
+    var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
+    const gasPrice = Theta.getTransactionFee(); //feeInTFuelWei;
+    const gasLimit = 2000000;
+    const data = functionSignature + encodedParameters;
+    const tx = Theta.unsignedSmartContractTx({
+      from: address,
+      to: address,
+      data: data,
+      value: 0,
+      transactionFee: gasPrice,
+      gasLimit: gasLimit
+    }, senderSequence);
+    const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
+    const callResponseJSON = await callResponse.json();
+    const result = get(callResponseJSON, 'result');
+    console.log('result:', result);
+    let outputValues = get(result, 'vm_return');
+    const outputTypes = map(functionOutputs, ({ name, type }) => {
+      return type;
+    });
+    outputValues = /^0x/i.test(outputValues) ? outputValues : '0x' + outputValues;
+
+    let balance = abiCoder.decode(outputTypes, outputValues)[0];
+    return balance.toString();
+  } catch (e) {
+    console.log('error occurs in fetchTokenSymbol:', e.message);
     return 0;
   }
 }

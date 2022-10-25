@@ -1,38 +1,38 @@
 const BASE_URL = "https://api-wallet.thetatoken.org";
 
 const DEFAULT_HEADERS = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'Content-Type': 'application/json',
 };
 
 //
 //Helpers
 //
 
-export function isResponseSuccessful(response){
-    let { status } = response;
+export function isResponseSuccessful(response) {
+  let { status } = response;
 
-    return (status === 200 || status === 201 || status === 202 || status === 204);
+  return (status === 200 || status === 201 || status === 202 || status === 204);
 }
 
 function objectToQueryString(object) {
-    if(!object){
-        return "";
-    }
+  if (!object) {
+    return "";
+  }
 
-    let queryString = Object.keys(object).map(function(key) {
-        let val = object[key];
-        if(val){
-            return encodeURIComponent(key) + '=' + encodeURIComponent(object[key]);
-        }
-    }).join('&');
+  let queryString = Object.keys(object).map(function (key) {
+    let val = object[key];
+    if (val) {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(object[key]);
+    }
+  }).join('&');
 
-    if(queryString.length > 0){
-        return "?" + queryString;
-    }
-    else{
-        return "";
-    }
+  if (queryString.length > 0) {
+    return "?" + queryString;
+  }
+  else {
+    return "";
+  }
 }
 
 //
@@ -78,8 +78,8 @@ function POST(path, headers, queryParams, body) {
 }
 
 export default class Api {
-  static callSmartContract(body, queryParams) {
-    let path = "/smart-contract/call";
+  static callSmartContract(body, queryParams, newPath) {
+    let path = newPath || "/smart-contract/call";
 
     return POST(path, null, queryParams, body);
   }

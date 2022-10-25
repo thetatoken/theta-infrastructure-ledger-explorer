@@ -199,8 +199,6 @@ export default class ThetaChart extends React.PureComponent {
   }
   render() {
     const { chartType, labels, data } = this.props;
-    if (chartType === 'line')
-      console.log('labels:', labels, '. Data:', data);
     return (
       <div className={cx("chart", chartType)}>
         {chartType === 'doughnut' && <canvas ref={this.doughnut} className="canvas doughnut" />}
