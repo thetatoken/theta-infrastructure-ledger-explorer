@@ -10,8 +10,6 @@ import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm'
 import config from '../../config.js'
 
-console.log('config:', config);
-
 export function truncateMiddle(str, maxLength = 20, separator = '...') {
   if (str && str.length <= 20)
     return str
@@ -424,7 +422,6 @@ export async function fetchAbi(abi) {
     const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
-    console.log('result:', result);
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
       return type;
