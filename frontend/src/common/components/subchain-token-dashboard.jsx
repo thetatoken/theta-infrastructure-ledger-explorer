@@ -10,6 +10,7 @@ const isMetaChain = host.match(/metachain-explorer/gi) !== null;
 
 const DashboardRow = ({ }) => {
   const [symbol, setSymbol] = useState("");
+  const [name, setName] = useState("");
   const [decimals, setDecimals] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
   useEffect(() => {
@@ -17,6 +18,8 @@ const DashboardRow = ({ }) => {
     fetchData();
 
     async function fetchData() {
+      let name = await fetchAbi([CommonFunctionABIs.name]);
+      setName(name);
       let decimals = await fetchAbi([CommonFunctionABIs.decimals]);
       setDecimals(decimals);
       let totalSupply = await fetchAbi([CommonFunctionABIs.totalSupply]);
@@ -30,13 +33,13 @@ const DashboardRow = ({ }) => {
   return <div className={`dashboard-row half subchain`}>
     <div className="column"></div>
     <div className="column last">
-      <Detail title={'TOKEN SYMBOL'} value={`${symbol}`} />
+      <Detail title={'GOV TOKEN NAME/SYMBOL'} value={`${name} / ${symbol}`} />
     </div>
     <div className="column">
-      <Detail title={'TOKEN DECIMALS'} value={decimals} />
+      <Detail title={'GOV TOKEN DECIMALS'} value={decimals} />
     </div>
     <div className="column">
-      <Detail title={'TOTAL SUPPLY'} value={formatQuantity(totalSupply, decimals)} />
+      <Detail title={'GOV TOTAL SUPPLY'} value={formatQuantity(totalSupply, decimals)} />
     </div>
     <div className="column"></div>
   </div>
