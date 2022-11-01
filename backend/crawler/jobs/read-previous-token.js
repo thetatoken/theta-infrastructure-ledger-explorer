@@ -14,9 +14,12 @@ var smartContractDao = null;
 var tokenDao = null;
 var tokenHolderDao = null;
 var tokenSummaryDao = null;
+var contractList = [];
+var contractMap = null;
 
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
-  accountTxDaoInstance, smartContractDaoInstance, tokenDaoInstance, tokenHolderDaoInstance, tokenSummaryDaoInstance, dailyAccountDaoInstance) {
+  accountTxDaoInstance, smartContractDaoInstance, tokenDaoInstance, tokenHolderDaoInstance, tokenSummaryDaoInstance,
+  dailyAccountDaoInstance, contractAddressMap) {
   progressDao = progressDaoInstance;
   blockDao = blockDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -27,6 +30,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   tokenHolderDao = tokenHolderDaoInstance;
   tokenSummaryDao = tokenSummaryDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
+  contractMap = contractAddressMap;
+  contractList = Object.keys(contractAddressMap).map(name => contractAddressMap[name]);
 }
 
 exports.Execute = async function (networkId, retrieveStartHeight, flag) {
@@ -135,6 +140,40 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           break;
         case EventHashMap.TRANSFER:
           const contractAddress = get(log, 'address');
+          if (contractAddress in contractList) {
+            let type = '';
+            switch (contractAddress) {
+              case contractMap.TNT20TokenBank:
+                type = 'XCHAIN_TNT20'
+                break;
+              case contractMap.TNT721TokenBank:
+                type = 'XCHAIN_TNT721'
+                break;
+              case contractMap.TNT1155TokenBank:
+                type = 'XCHAIN_TNT1155'
+                break;
+              default:
+                break;
+            }
+            log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+            const tokenId = get(log, 'decode.result.tokenId');
+            const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
+            const newToken = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: (get(log, 'decode.result[0]') || '').toLowerCase(),
+              to: (get(log, 'decode.result[1]') || '').toLowerCase(),
+              token_id: tokenId,
+              value,
+              name: get(infoMap, `${contractAddress}.name`),
+              type: type,
+              timestamp: tx.timestamp,
+              contract_address: contractAddress
+            }
+            tokenArr.push(newToken);
+            insertList.push(checkAndInsertToken(newToken, tokenDao))
+            continue;
+          }
           // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
           // this record will be hanlded in the contract verification
           if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {

@@ -42,5 +42,20 @@ exports.CommonEventABIs = {
     { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
     "name": "TFuelVoucherMinted",
     "type": "event"
+  }],
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'from', type: 'address' },
+    { indexed: true, name: 'to', type: 'address' },
+    { indexed: false, name: 'value', type: 'uint256' }],
+    name: 'Transfer',
+    type: 'event'
+  }, {
+    anonymous: false,
+    inputs: [{ indexed: true, name: 'from', type: 'address' },
+    { indexed: true, name: 'to', type: 'address' },
+    { indexed: true, name: 'tokenId', type: 'uint256' }],
+    name: 'Transfer',
+    type: 'event'
   }]
 }
