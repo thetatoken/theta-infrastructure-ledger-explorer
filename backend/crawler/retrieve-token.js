@@ -123,7 +123,7 @@ function setupGetBlockCronJob(mongoClient, networkId, retrieveStartHeight) {
   bluebird.promisifyAll(dailyAccountDao);
 
   readPreTokenCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao,
-    smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao, dailyAccountDao);
+    smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao, dailyAccountDao, config.contractAddressMap);
 
   setTimeout(async function run() {
     Logger.log('Start of Execute.');

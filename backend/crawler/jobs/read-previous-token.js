@@ -78,6 +78,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
   const insertList = [];
   for (let tx of txs) {
     let addressList = _getOtherContractAddressSet(tx);
+    console.log('address list length: ', addressList.length);
     if (addressList.length === 0) {
       continue;
     }
@@ -139,7 +140,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           }
           break;
         case EventHashMap.TRANSFER:
-          const contractAddress = get(log, 'address');
+          const contractAddress = get(log, 'address').toLowerCase();
           if (contractAddress in contractList) {
             let type = '';
             switch (contractAddress) {
@@ -226,18 +227,18 @@ function _getOtherContractAddressSet(tx) {
   if (!logs) return [];
   let set = new Set();
   logs.forEach(log => {
-    // if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+    if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+      // const address = get(log, 'address');
+      // if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
+      set.add(get(log, 'address'))
+      // }
+    }
+    // if (get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
     //   const address = get(log, 'address');
-    //   if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
+    //   if (address !== undefined && address !== ZeroAddress) {
     //     set.add(get(log, 'address'))
     //   }
-    // } 
-    if (get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
-      const address = get(log, 'address');
-      if (address !== undefined && address !== ZeroAddress) {
-        set.add(get(log, 'address'))
-      }
-    }
+    // }
   })
   return [...set];
 }
