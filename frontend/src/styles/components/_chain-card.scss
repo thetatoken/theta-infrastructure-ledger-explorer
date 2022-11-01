@@ -65,13 +65,17 @@
 .chain-card {
   position: absolute;
   top: 50px;
-  right: 93px;
+  right: 99px;
   border: 1px solid $color-blue;
   border-radius: 6px;
   padding: 8px;
   padding-bottom: 16px;
   background: $color-page;
   width: 330px;
+
+  &.right {
+    right: 0;
+  }
 
   &__chain {
     padding: 8px 0;

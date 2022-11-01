@@ -27,7 +27,7 @@ render(
 
 
 function Explorer() {
-  const [version, setVersion] = useState('3');
+  const [version, setVersion] = useState('4');
   function switchVersion() {
     setVersion(v => v === '3' ? '4' : '3');
   }

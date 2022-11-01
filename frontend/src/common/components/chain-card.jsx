@@ -13,9 +13,11 @@ const ChainCard = (props) => {
     setMainChain([chainInfo.mainchain].filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
     setSubChain(chainInfo.subchains.filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
   }
+
+  console.log('isMainChain:', props.isMainChain);
   return <div className="chain-card-wrap" onClick={props.onClose}>
     <div className="chain-card-container">
-      <div className={cx("chain-card")} onClick={e => e.stopPropagation()}>
+      <div className={cx("chain-card", { 'right': !props.isMainChain })} onClick={e => e.stopPropagation()}>
         <div className="chain-card__search">
           <div className="search-wrap">
             <input type="text" className="search-input" placeholder="Filter Chains..." onChange={handleOnChange} />

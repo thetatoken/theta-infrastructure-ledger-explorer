@@ -5,6 +5,7 @@ import tns from 'libs/tns';
 import ChainCard from "./chain-card";
 import { validateHex } from "../helpers/utils";
 import config from "../../config";
+import { ChainType } from 'common/constants';
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
@@ -110,10 +111,10 @@ export default class Header extends React.Component {
                   <div className="select-arrow-down"></div>
                 </div>
               </div>
-              <div className="version-switch" onClick={switchVersion}>
+              {config.chainType === ChainType.MAINCHAIN && <div className="version-switch" onClick={switchVersion}>
                 <div className="version-switch__logo" ></div>
                 Switch to old version
-              </div>
+              </div>}
             </div>
           </div>
           {!isMetaChain && <div className="chain-header-wrap theta">
@@ -139,7 +140,7 @@ export default class Header extends React.Component {
               </div>
             </div>
           </div>}
-          {isOpen && <ChainCard onClose={this.handleOnClose} />}
+          {isOpen && <ChainCard onClose={this.handleOnClose} isMainChain={config.chainType === ChainType.MAINCHAIN} />}
         </> : <div className="theta-header-v3">
           <div className="nav">
             <Link to="/" className="theta-logo"></Link>
@@ -166,10 +167,10 @@ export default class Header extends React.Component {
               </select>
             </div>
           </div>
-          <div className="version-switch" onClick={switchVersion}>
+          {config.chainType === ChainType.MAINCHAIN && <div className="version-switch" onClick={switchVersion}>
             <div className="version-switch__logo" ></div>
             Switch to new version
-          </div>
+          </div>}
         </div>}
       </>
     );
