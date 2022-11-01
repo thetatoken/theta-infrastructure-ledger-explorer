@@ -60,7 +60,7 @@ export default class Dashboard extends React.PureComponent {
   }
   render() {
     const { thetaInfo, tfuelInfo, tdropInfo } = this.state;
-    const { backendAddress, type } = this.props;
+    const { backendAddress, type, version } = this.props;
     const { chainInfo } = config;
     const isSubChain = config.chainType === ChainType.SUBCHAIN && type !== 'metachain';
     return (
@@ -104,7 +104,7 @@ export default class Dashboard extends React.PureComponent {
             </div>
           </div>
         </> : <>
-          {config.chainType !== ChainType.SUBCHAIN && <div className="dapps">
+          {config.chainType !== ChainType.SUBCHAIN && version === '4' && <div className="dapps">
             <div className="dapps__title">
               DAPPS ON {config.chainName || 'THETA TESTNET MAIN CHAIN'}
             </div>

@@ -6,7 +6,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  right: 0;
+  right: 100px;
   left: 0;
   z-index: 1;
   width: 100%;
@@ -65,7 +65,7 @@
 .chain-card {
   position: absolute;
   top: 50px;
-  right: 0;
+  right: 93px;
   border: 1px solid $color-blue;
   border-radius: 6px;
   padding: 8px;
