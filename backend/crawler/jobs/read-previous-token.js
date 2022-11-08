@@ -230,7 +230,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
               timestamp: tx.timestamp,
             }
             tokenArr.push(tokenInfo);
-            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
+            insertList.push(checkAndInsertToken(tokenInfo, tokenDao))
           }
           break;
         default:

@@ -24,8 +24,9 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
           <th className="from">From</th>
           {tabType !== "token" && <th className="icon"></th>}
           <th className="to">To</th>
-          {type === 'TNT-721' && <th className="tokenId">TokenId</th>}
-          {(type === 'TNT-20' || type === 'TFUEL' || type === 'XCHAIN_TFUEL' || type === 'XCHAIN_TNT20') && <th className="quantity">Quantity</th>}
+          {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <th className="tokenId">TokenId</th>}
+          {(type === 'TNT-20' || type === 'TFUEL' || type === 'XCHAIN_TFUEL' || type === 'XCHAIN_TNT20' || type === 'XCHAIN_TNT1155')
+            && <th className="quantity">Quantity</th>}
           {(type === 'TNT-721' || type === 'XCHAIN_TNT721') && <th>Token</th>}
         </tr>
       </thead>
@@ -50,7 +51,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
                   <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />
                 </td>
-                {(type === 'TNT-721' || type === 'XCHAIN_TNT721') && <td className="tokenId">
+                {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
                 </td>}
                 {type === 'TFUEL' || type === 'XCHAIN_TFUEL' && <td className="quantity">
@@ -58,8 +59,9 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                     {formatCoin(txn.value, 2)}
                   </div>
                 </td>}
-                {(type === 'TNT-20' || type === 'XCHAIN_TNT20') && <td className="quantity">{quantity}</td>}
-                {(type === 'TNT-721' || type === 'XCHAIN_TNT721') && <TokenName name={name} address={txn.contract_address} />}
+                {(type === 'TNT-20' || type === 'XCHAIN_TNT20' || type === 'XCHAIN_TNT1155') && <td className="quantity">{quantity}</td>}
+                {(type === 'TNT-721' || type === 'XCHAIN_TNT721') &&
+                  <TokenName name={name} address={txn.contract_address} />}
 
               </React.Fragment>
             </tr>);
