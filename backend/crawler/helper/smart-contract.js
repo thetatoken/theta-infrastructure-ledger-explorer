@@ -70,7 +70,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
         break;
       case EventHashMap.TRANSFER:
         const contractAddress = get(log, 'address');
-        if (contractAddress in contractList) {
+        if (contractList.indexOf(contractAddress) > -1) {
           let type = '';
           switch (contractAddress) {
             case contractMap.TNT20TokenBank:

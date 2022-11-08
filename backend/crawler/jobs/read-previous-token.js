@@ -141,7 +141,9 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           break;
         case EventHashMap.TRANSFER:
           const contractAddress = get(log, 'address').toLowerCase();
-          if (contractAddress in contractList) {
+          console.log('contractList:', JSON.stringify(contractList), '. contractAddress:', contractAddress);
+          console.log(contractList.indexOf(contractAddress) > -1);
+          if (contractList.indexOf(contractAddress) > -1) {
             let type = '';
             switch (contractAddress) {
               case contractMap.TNT20TokenBank:
@@ -218,7 +220,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
       }
     }
   }
-  Logger.log('tokenArr:', tokenArr);
+  Logger.log('tokenArr:', JSON.stringify(tokenArr));
   return Promise.all(insertList);
 }
 
