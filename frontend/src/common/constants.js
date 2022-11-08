@@ -214,6 +214,16 @@ export const CommonEventABIs = {
     { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
     "name": "TFuelVoucherMinted",
     "type": "event"
+  }],
+  "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "address", "name": "operator", "type": "address" },
+    { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+    { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "id", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }],
+    "name": "TransferSingle",
+    "type": "event"
   }]
 }
 

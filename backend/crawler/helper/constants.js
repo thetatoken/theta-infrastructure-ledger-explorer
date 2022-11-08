@@ -20,7 +20,8 @@ exports.ZeroTxAddress = '0x00000000000000000000000000000000000000000000000000000
 exports.EventHashMap = {
   TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
   TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457",
-  TFUEL_VOUCHER_MINTED: '0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5'
+  TFUEL_VOUCHER_MINTED: "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5",
+  TRANSFER_SINGLE: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62"
 }
 
 exports.CommonEventABIs = {
@@ -57,5 +58,15 @@ exports.CommonEventABIs = {
     { indexed: true, name: 'tokenId', type: 'uint256' }],
     name: 'Transfer',
     type: 'event'
+  }],
+  "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "address", "name": "operator", "type": "address" },
+    { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+    { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "id", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }],
+    "name": "TransferSingle",
+    "type": "event"
   }]
 }

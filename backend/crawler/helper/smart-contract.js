@@ -130,7 +130,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
         break;
     }
   }
-  Logger.log('tokenArr:', tokenArr);
+  Logger.log('tokenArr:', JSON.stringify(tokenArr));
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
@@ -198,6 +198,40 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           break;
         case EventHashMap.TRANSFER:
           const contractAddress = get(log, 'address');
+          if (contractList.indexOf(contractAddress) > -1) {
+            let type = '';
+            switch (contractAddress) {
+              case contractMap.TNT20TokenBank:
+                type = 'XCHAIN_TNT20'
+                break;
+              case contractMap.TNT721TokenBank:
+                type = 'XCHAIN_TNT721'
+                break;
+              case contractMap.TNT1155TokenBank:
+                type = 'XCHAIN_TNT1155'
+                break;
+              default:
+                break;
+            }
+            log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+            const tokenId = get(log, 'decode.result.tokenId');
+            const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
+            const newToken = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: (get(log, 'decode.result[0]') || '').toLowerCase(),
+              to: (get(log, 'decode.result[1]') || '').toLowerCase(),
+              token_id: tokenId,
+              value,
+              name: get(infoMap, `${contractAddress}.name`),
+              type: type,
+              timestamp: tx.timestamp,
+              contract_address: contractAddress
+            }
+            tokenArr.push(newToken);
+            insertList.push(checkAndInsertToken(newToken, tokenDao))
+            continue;
+          }
           // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
           // this record will be hanlded in the contract verification
           if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
@@ -235,6 +269,24 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
             }
             tokenArr.push(xTfuelInfo);
             insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TRANSFER_SINGLE:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TRANSFER_SINGLE);
+            Logger.log('Decoded TRANSFER_SINGLE Log:', JSON.stringify(log));
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase(),
+              token_id: get(log, 'decode.result[3]'),
+              value: get(log, 'decode.result[4]'),
+              type: 'XCHAIN_TNT1155',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
           }
           break;
         default:
@@ -515,7 +567,8 @@ function _getContractAddressSetByTxs(txs) {
     let logs = get(tx, 'receipt.Logs');
     if (!logs) continue;
     logs.forEach(log => {
-      if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
+      if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED
+        || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE) {
         const address = get(log, 'address');
         if (address !== undefined && address !== ZeroAddress) {
           set.add(get(log, 'address'))

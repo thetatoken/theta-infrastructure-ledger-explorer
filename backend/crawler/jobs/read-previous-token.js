@@ -215,6 +215,24 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
             insertList.push(checkAndInsertToken(xTfuelInfo, tokenDao))
           }
           break;
+        case EventHashMap.TRANSFER_SINGLE:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TRANSFER_SINGLE);
+            Logger.log('Decoded TRANSFER_SINGLE Log:', JSON.stringify(log));
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase(),
+              token_id: get(log, 'decode.result[3]'),
+              value: get(log, 'decode.result[4]'),
+              type: 'XCHAIN_TNT1155',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
+          }
+          break;
         default:
           break;
       }
@@ -229,7 +247,7 @@ function _getOtherContractAddressSet(tx) {
   if (!logs) return [];
   let set = new Set();
   logs.forEach(log => {
-    if (get(log, 'topics[0]') === EventHashMap.TRANSFER) {
+    if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE) {
       // const address = get(log, 'address');
       // if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
       set.add(get(log, 'address'))
