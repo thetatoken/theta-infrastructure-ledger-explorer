@@ -583,7 +583,7 @@ export default class AccountDetails extends React.Component {
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
-            {hasInterChainTxn && <Tab>InterChain Txns</Tab>}
+            {hasInterChainTxn && <Tab>Inter Chain Token Txns</Tab>}
             {hasXChainTxn && <Tab>Cross Chain Token Txns</Tab>}
           </TabList>
           {transactions && transactions.length > 0 && <TabPanel>
@@ -853,7 +853,7 @@ const TxsTab = props => {
   const handleSelect = index => {
     let tabName = tabNames[index];
     setTabIndex(index);
-    const prefix = type === 'interChain' ? "interChainTxns" : "CrossChainTxns";
+    const prefix = type === 'interChain' ? "InterChainTxns" : "CrossChainTxns";
     history.replace(`#${prefix}-${tabName}`);
   }
 
