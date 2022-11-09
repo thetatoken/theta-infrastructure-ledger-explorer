@@ -756,11 +756,15 @@ const TokenTab = props => {
       transactions.map((x) => x.from)
         .concat(transactions.map((x) => x.to))
     );
-    const domainNames = await tns.getDomainNames(uniqueAddresses);
-    transactions.map((transaction) => {
-      transaction.fromTns = transaction.from ? domainNames[transaction.from] : null;
-      transaction.toTns = transaction.to ? domainNames[transaction.to] : null;
-    });
+    try {
+      const domainNames = await tns.getDomainNames(uniqueAddresses);
+      transactions.map((transaction) => {
+        transaction.fromTns = transaction.from ? domainNames[transaction.from] : null;
+        transaction.toTns = transaction.to ? domainNames[transaction.to] : null;
+      });
+    } catch (e) {
+      console.log('error in getDomainNames:', e.message);
+    }
     if (!isMountedRef.current) return;
     setTransactions(transactions);
   }
