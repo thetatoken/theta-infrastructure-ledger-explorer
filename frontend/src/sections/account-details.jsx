@@ -653,15 +653,15 @@ export default class AccountDetails extends React.Component {
                   disabled={loading_txns} />
               </>}
           </TabPanel>}
-          {hasInterChainTxn && <TabPanel>
-            <TxsTab type='interChain' hasTxs={hasInternalTxs} hasTNT20={hasTNT20} hasTNT721={hasTNT721}
-              address={account.address} handleHashScroll={this.handleHashScroll} location={location} />
-          </TabPanel>}
           {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
             <TabPanel>
               <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
             </TabPanel>
           }
+          {hasInterChainTxn && <TabPanel>
+            <TxsTab type='interChain' hasTxs={hasInternalTxs} hasTNT20={hasTNT20} hasTNT721={hasTNT721}
+              address={account.address} handleHashScroll={this.handleHashScroll} location={location} />
+          </TabPanel>}
           {hasXChainTxn && <TabPanel>
             <TxsTab type='xChain' hasTxs={hasXChainTxs} hasTNT20={hasXChainTNT20} hasTNT721={hasXChainTNT721}
               hasTNT1155={hasXChainTNT1155} address={account.address} handleHashScroll={this.handleHashScroll}
