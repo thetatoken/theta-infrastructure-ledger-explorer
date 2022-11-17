@@ -13,6 +13,18 @@ export const stakeService = {
     }
     return apiService.get(`stake/totalAmount`, { params: { type } })
   },
+  getSubStakes(types, uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}subStake/all`, { params: { types } });
+    }
+    return apiService.get(`subStake/all`, { params: { types } });
+  },
+  getTotalSubStake(type, uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}subStake/totalAmount`, { params: { type } });
+    }
+    return apiService.get(`subStake/totalAmount`, { params: { type } })
+  },
   getStakeByAddress(address, types = ['vcp', 'gcp', 'eenp']) {
     if (!address) {
       throw Error('Missing argument');
