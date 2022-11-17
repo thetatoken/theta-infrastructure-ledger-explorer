@@ -169,11 +169,11 @@ export default class AccountDetails extends React.Component {
       if (transactions && transactions.length > 0) {
         tabNames.push('Transactions');
       }
-      if (hasInternalTxs || hasTNT20 || hasTNT721) {
-        tabNames.push('InterChainTxns');
-      }
       if (account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470') {
         tabNames.push('Contract');
+      }
+      if (hasInternalTxs || hasTNT20 || hasTNT721) {
+        tabNames.push('InterChainTxns');
       }
       if (hasXChainTxs || hasXChainTNT20 || hasXChainTNT721 || hasXChainTNT1155) {
         tabNames.push('CrossChainTxns');
