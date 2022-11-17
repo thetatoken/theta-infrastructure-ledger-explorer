@@ -5,8 +5,8 @@ var helper = require('../helper/utils');
 var axios = require("axios").default;
 let startTime = { theta: +new Date(), tfuel: +new Date(), eenp: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
-let cacheData = { theta: undefined, tfuel: undefined, eenp: undefined };
-var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config) => {
+let cacheData = { theta: undefined, tfuel: undefined, eenp: undefined, vs: undefined };
+var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -252,6 +252,71 @@ var stakeRouter = (app, stakeDao, blockDao, accountDao, progressDao, stakeHistor
           res.status(404).send(error.message)
         })
     }
+  });
+
+  router.get("/subStake/all", (req, res) => {
+    console.log('Querying all sub stake.');
+    let { types = ['vs'] } = req.query;
+    subStakeDao.getAllStakesByTypesAsync(types)
+      .then(stakeListInfo => {
+        const data = ({
+          type: 'stake',
+          body: stakeListInfo,
+        });
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
+  });
+
+  router.get("/subStake/totalAmount", (req, res) => {
+    let { type = 'vs' } = req.query;
+    console.log(`Querying total staked ${type} tokens.`);
+    if (type !== 'vs') {
+      res.status(400).send('Wrong parameter.');
+      return;
+    }
+    let cur = +new Date();
+    if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
+      const data = cacheData[type];
+      if (data.type === 'stakeTotalAmout') {
+        res.status(200).send(data);
+      } else if (data.type === 'error_not_found') {
+        res.status(404).send(data);
+      }
+      return;
+    }
+    startTime[type] = cur;
+    progressDao.getStakeProgressAsync(type)
+      .then(info => {
+        const data = ({
+          type: 'stakeTotalAmout',
+          body: { totalAmount: info.total_amount, totalNodes: info.holder_num, type: info.type },
+        });
+        cacheData[type] = data;
+        res.status(200).send(data);
+      })
+      .catch(error => {
+        if (error.message.includes('NOT_FOUND')) {
+          const err = ({
+            type: 'error_not_found',
+            error
+          });
+          cacheData[type] = err;
+          res.status(404).send(err);
+        } else {
+          console.log('ERR - ', error)
+        }
+      });
   });
 
   //the / route of router will get mapped to /api
