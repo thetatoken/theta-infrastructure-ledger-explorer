@@ -166,6 +166,7 @@ exports.Execute = async function (networkId) {
         var updateTokenList = [];
         var tokenTxs = [];
         var stakes = { vcp: [], gcp: [], eenp: [] };
+        var subStakes = { vs: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
@@ -224,12 +225,13 @@ exports.Execute = async function (networkId) {
               })
               upsertRewardAsyncList.push(rewardHelper.updateRewardDistributions(updateRewardAsyncList, rewardDistributionDao, cacheEnabled))
             } else if (result.result.BlockHashValidatorSetPairs) {
+              subStakes.vs = result.result.BlockHashValidatorSetPairs;
               result.result.BlockHashValidatorSetPairs.forEach(pair => {
                 pair.ValidatorSet.Validators.forEach(s => {
                   updateVsAsyncList.push(s);
                 })
               })
-              upsertVsAsyncList.push(subStakeDao.updateStakesAsync(updateVsAsyncList, 'vs'));
+              upsertVsAsyncList.push(stakeHelper.updateSubStakes(updateVsAsyncList, 'vs', subStakeDao, cacheEnabled));
             } else {  //handle block response
               var txs = result.result.transactions;
               const blockInfo = {
@@ -292,6 +294,9 @@ exports.Execute = async function (networkId) {
         if (stakes.vcp.length !== 0) {
           // Update total stake info
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
+        }
+        if (subStakes.vs.length !== 0) {
+          upsertVsAsyncList.push(stakeHelper.updateTotalSubStake(subStakes, progressDao));
         }
         if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {

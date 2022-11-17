@@ -13,6 +13,14 @@ var stakeKeysCache = {
   eenp: new Set()
 }
 
+var subStakeCache = {
+  vs: new Map()
+}
+
+var subStakeKeysCache = {
+  vs: new Map()
+}
+
 function shallowEqual(object1, object2) {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);
@@ -103,6 +111,7 @@ exports.updateStakes = async function (candidateList, type, stakeDao, cacheEnabl
   }
   await stakeDao.updateStakesAsync(candidateList, type);
 }
+
 exports.updateTotalStake = function (totalStake, progressDao) {
   let totalTheta = 0, totalTfuel = 0;
   let thetaHolders = new Set(), tfuelHolders = new Set();
@@ -167,4 +176,70 @@ const pathMap = {
   'vcp': 'Vcp.SortedCandidates',
   'gcp': 'Gcp.SortedGuardians',
   'eenp': 'EENs'
+}
+
+// Sub stake related
+
+exports.updateSubStakes = async function (candidateList, type, subStakeDao, cacheEnabled) {
+  if (cacheEnabled) {
+    await updateSubStakeWithCache(candidateList, type, subStakeDao);
+    return;
+  }
+  await subStakeDao.updateStakesAsync(candidateList, type);
+}
+
+async function updateSubStakeWithCache(candidateList, type, subStakeDao) {
+  let cacheKeyRef = subStakeKeysCache[`${type}`];
+  let cacheRef = subStakesCache[`${type}`];
+  if (cacheKeyRef.size === 0) {
+    await subStakeDao.removeRecordsAsync(type);
+  }
+  let updateSubStakeList = [];
+  let existKeys = new Set(cacheKeyRef);
+  for (let candidate of candidateList) {
+    const id = candidate.Address + '_' + type;
+    const stakeInfo = {
+      '_id': candidate.Address + '_' + type,
+      'address': candidate.Address,
+      'stake': candidate.Stake,
+      'type': type
+    }
+    if (existKeys.has(id)) {
+      existKeys.delete(id);
+      if (!shallowEqual(cacheRef.get(id), stakeInfo)) {
+        updateSubStakeList.push(stakeInfo);
+        cacheRef.set(id, stakeInfo);
+      }
+    } else {
+      updateSubStakeList.push(stakeInfo);
+      cacheKeyRef.add(id);
+      cacheRef.set(id, stakeInfo);
+    }
+  }
+  let deleteKeys = [...existKeys];
+  for (let stake of updateSubStakeList) {
+    await subStakeDao.insertAsync(stake);
+  }
+  Logger.log('updateSubStakeList length:', updateSubStakeList.length, 'type:', type)
+  Logger.log('delete keys length:', deleteKeys.length, 'type:', type);
+  await subStakeDao.removeRecordsByIdAsync(type, deleteKeys, false);
+  for (let key of deleteKeys) {
+    cacheRef.delete(key);
+    cacheKeyRef.delete(key);
+  }
+}
+
+exports.updateTotalSubStake = function (totalStake, progressDao) {
+  let totalToken = 0;
+  let tokenHolders = new Set();
+  totalStake.vs && totalStake.vs.forEach(pair => {
+    pair.ValidatorSet.Validators.forEach(s => {
+      tokenHolders.add(s.Address)
+      totalToken = helper.sumCoin(totalToken, s.Stake);
+    })
+  })
+
+  if (totalToken.toFixed() != 0) {
+    progressDao.upsertStakeProgressAsync('vs', totalToken.toFixed(), tokenHolders.size);
+  }
 }
