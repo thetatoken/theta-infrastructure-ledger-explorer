@@ -93,7 +93,7 @@ export default class StakesTable extends React.Component {
           </thead>
           <tbody className="stake-tb">
             {map(stakes.slice(0, curStakeLength), record => {
-              const address = type === 'node' ? record.holder : record.source;
+              const address = (type === 'node' ? record.holder : record.source) || record.address;
               return (
                 <tr key={address}>
                   <td className="address">
@@ -101,8 +101,8 @@ export default class StakesTable extends React.Component {
                   </td>
                   {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
-                  <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount, 0)}</div></td>
-                  <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
+                  <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount || record.stake, 0)}</div></td>
+                  <td className="staked-prct">{((record.amount || record.stake) / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
             })}
             {stakes.length > TRUNC &&
