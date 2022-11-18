@@ -603,25 +603,13 @@ export default class AccountDetails extends React.Component {
           {hasXChainTxn && <TabPanel>
             <TxsTab type='xChain' hasTxs={hasXChainTxs} hasTNT20={hasXChainTNT20} hasTNT721={hasXChainTNT721}
               hasTNT1155={hasXChainTNT1155} address={account.address} handleHashScroll={this.handleHashScroll}
-              location={location} />
+              location={location} txProps={{}} />
           </TabPanel>}
           {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
             <TabPanel>
               <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
             </TabPanel>
           }
-          {/* {hasInternalTxs && <TabPanel>
-            <TokenTab type="TFUEL" address={account.address} handleHashScroll={this.handleHashScroll} />
-          </TabPanel>}
-          {hasTNT20 && <TabPanel>
-            <TokenTab type="TNT-20" address={account.address} handleHashScroll={this.handleHashScroll} />
-          </TabPanel>}
-          {hasTNT721 && <TabPanel>
-            <TokenTab type="TNT-721" address={account.address} handleHashScroll={this.handleHashScroll} />
-          </TabPanel>}
-          {hasXChainTxs && <TabPanel>
-            <TokenTab type="XCHAIN_TFUEL" address={account.address} handleHashScroll={this.handleHashScroll} />
-          </TabPanel>} */}
         </Tabs>
       </div >);
   }
@@ -677,7 +665,7 @@ const AddressTNS = ({ hash, tns }) => {
 }
 
 
-const TokenTab = props => {
+const TokenTab = React.memo(props => {
   const { type, address, handleHashScroll } = props;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -765,9 +753,9 @@ const TokenTab = props => {
       onPageChange={handlePageChange}
       disabled={loadingTxns} />
   </>
-}
+})
 
-const TxsTab = props => {
+const TxsTab = React.memo(props => {
   const { type, hasTransaction, hasTxs, hasTNT20, hasTNT721, hasTNT1155, address, handleHashScroll, location, txProps } = props;
   const { currentPage, totalPages, loading_txns, hasOtherTxs, hasDownloadTx, hasStartDateErr, hasEndDateErr, isDownloading,
     hasRefreshBtn, typeOptions, transactions, startDate, endDate, handleInput, resetInput, downloadTrasanctionHistory,
@@ -894,4 +882,4 @@ const TxsTab = props => {
       <TokenTab type={type === 'intraChain' ? "TNT-1155" : "XCHAIN_TNT1155"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
   </Tabs>
-}
+})
