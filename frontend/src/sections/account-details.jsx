@@ -166,17 +166,14 @@ export default class AccountDetails extends React.Component {
       let tabNames = [];
       const { transactions, account, hasInternalTxs, hasTNT20, hasTNT721,
         hasXChainTxs, hasXChainTNT20, hasXChainTNT721, hasXChainTNT1155 } = this.state;
-      if (transactions && transactions.length > 0) {
-        tabNames.push('Transactions');
-      }
-      if (account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470') {
-        tabNames.push('Contract');
-      }
-      if (hasInternalTxs || hasTNT20 || hasTNT721) {
-        tabNames.push('InterChainTxns');
+      if (transactions && transactions.length > 0 || hasInternalTxs || hasTNT20 || hasTNT721) {
+        tabNames.push('IntraChainTxns');
       }
       if (hasXChainTxs || hasXChainTNT20 || hasXChainTNT721 || hasXChainTNT1155) {
         tabNames.push('CrossChainTxns');
+      }
+      if (account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470') {
+        tabNames.push('Contract');
       }
       let tabName = this.props.location.hash.replace("#", "").split('-')[0];
       let tabIndex = tabNames.indexOf(tabName) === -1 ? 0 : tabNames.indexOf(tabName);
@@ -290,7 +287,6 @@ export default class AccountDetails extends React.Component {
       .then(res => {
         if (!self._isMounted) return;
         const txs = get(res, 'data.body');
-        console.log('txs:', txs);
         if (!txs) {
           this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
           return
@@ -536,7 +532,7 @@ export default class AccountDetails extends React.Component {
       hasXChainTxs, hasXChainTNT20, hasXChainTNT721, hasXChainTNT1155, accountTNS, beneficiaryTNS, selectedTypes } = this.state;
     const { accountAddress } = this.props.match.params;
     const { location } = this.props;
-    const hasInterChainTxn = hasInternalTxs || hasTNT20 || hasTNT721;
+    const hasIntraChainTxn = hasInternalTxs || hasTNT20 || hasTNT721;
     const hasXChainTxn = hasXChainTxs || hasXChainTNT20 || hasXChainTNT721 || hasXChainTNT1155;
     return (
       <div className="content account">
@@ -581,20 +577,14 @@ export default class AccountDetails extends React.Component {
         <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
             {/* {transactions && transactions.length > 0 && <Tab>Transactions</Tab>} */}
+            {(transactions && transactions.length > 0 || hasIntraChainTxn) && <Tab>Intra-Chain Txns</Tab>}
+            {hasXChainTxn && <Tab>Cross-Chain Txns</Tab>}
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
-            {(transactions && transactions.length > 0 || hasInterChainTxn) && <Tab>Inter-Chain Token Txns</Tab>}
-            {hasXChainTxn && <Tab>Cross Chain Token Txns</Tab>}
           </TabList>
-
-          {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
-            <TabPanel>
-              <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
-            </TabPanel>
-          }
-          {(transactions && transactions.length > 0 || hasInterChainTxn) && <TabPanel>
-            <TxsTab type='interChain' hasTxs={hasInternalTxs} hasTNT20={hasTNT20} hasTNT721={hasTNT721}
+          {(transactions && transactions.length > 0 || hasIntraChainTxn) && <TabPanel>
+            <TxsTab type='intraChain' hasTxs={hasInternalTxs} hasTNT20={hasTNT20} hasTNT721={hasTNT721}
               address={account.address} handleHashScroll={this.handleHashScroll} location={location} hasTransaction={transactions && transactions.length > 0}
               txProps={{
                 currentPage, totalPages, loading_txns, hasOtherTxs, hasDownloadTx, hasStartDateErr, hasEndDateErr, isDownloading,
@@ -615,6 +605,11 @@ export default class AccountDetails extends React.Component {
               hasTNT1155={hasXChainTNT1155} address={account.address} handleHashScroll={this.handleHashScroll}
               location={location} />
           </TabPanel>}
+          {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
+            <TabPanel>
+              <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
+            </TabPanel>
+          }
           {/* {hasInternalTxs && <TabPanel>
             <TokenTab type="TFUEL" address={account.address} handleHashScroll={this.handleHashScroll} />
           </TabPanel>}
@@ -786,17 +781,17 @@ const TxsTab = props => {
       names.push('Transactions');
     }
     if (hasTxs) {
-      names.push(type === 'interChain' ? 'InternalTxns' : 'TFuelTxns');
+      names.push(type === 'intraChain' ? 'InternalTxns' : 'TFuelTxns');
     }
     if (hasTNT20) {
-      names.push(type === 'interChain' ? 'TNT20TokenTxns' : 'CrossChainTNT20Txns');
+      names.push(type === 'intraChain' ? 'TNT20TokenTxns' : 'CrossChainTNT20Txns');
     }
     if (hasTNT721) {
-      names.push(type === 'interChain' ? 'TNT721TokenTxns' : 'CrossChainTNT721Txns');
+      names.push(type === 'intraChain' ? 'TNT721TokenTxns' : 'CrossChainTNT721Txns');
     }
 
     if (hasTNT1155) {
-      names.push(type === 'interChain' ? 'TNT1155TokenTxns' : 'CrossChainTNT1155Txns')
+      names.push(type === 'intraChain' ? 'TNT1155TokenTxns' : 'CrossChainTNT1155Txns')
     }
 
     let tabName = location.hash.replace("#", "").split('-')[1];
@@ -807,14 +802,14 @@ const TxsTab = props => {
   const handleSelect = index => {
     let tabName = tabNames[index];
     setTabIndex(index);
-    const prefix = type === 'interChain' ? "InterChainTxns" : "CrossChainTxns";
+    const prefix = type === 'intraChain' ? "IntraChainTxns" : "CrossChainTxns";
     history.replace(`#${prefix}-${tabName}`);
   }
 
   return <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={handleSelect}>
     <TabList>
       {hasTransaction && <Tab>Transactions</Tab>}
-      {hasTxs && <Tab>{type === 'interChain' ? 'Internal Txns' : 'TFuel Txns'}</Tab>}
+      {hasTxs && <Tab>{type === 'intraChain' ? 'Internal Txns' : 'TFuel Txns'}</Tab>}
       {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
       {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
       {hasTNT1155 && <Tab>TNT1155 Token Txns</Tab>}
@@ -887,16 +882,16 @@ const TxsTab = props => {
         </>}
     </TabPanel>}
     {hasTxs && <TabPanel>
-      <TokenTab type={type === 'interChain' ? "TFUEL" : "XCHAIN_TFUEL"} address={address} handleHashScroll={handleHashScroll} />
+      <TokenTab type={type === 'intraChain' ? "TFUEL" : "XCHAIN_TFUEL"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
     {hasTNT20 && <TabPanel>
-      <TokenTab type={type === 'interChain' ? "TNT-20" : "XCHAIN_TNT20"} address={address} handleHashScroll={handleHashScroll} />
+      <TokenTab type={type === 'intraChain' ? "TNT-20" : "XCHAIN_TNT20"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
     {hasTNT721 && <TabPanel>
-      <TokenTab type={type === 'interChain' ? "TNT-721" : "XCHAIN_TNT721"} address={address} handleHashScroll={handleHashScroll} />
+      <TokenTab type={type === 'intraChain' ? "TNT-721" : "XCHAIN_TNT721"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
     {hasTNT1155 && <TabPanel>
-      <TokenTab type={type === 'interChain' ? "TNT-1155" : "XCHAIN_TNT1155"} address={address} handleHashScroll={handleHashScroll} />
+      <TokenTab type={type === 'intraChain' ? "TNT-1155" : "XCHAIN_TNT1155"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
   </Tabs>
 }
