@@ -80,8 +80,8 @@ export default class AccountDetails extends React.Component {
     };
     this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
     this.download = React.createRef();
-    this.startDate = React.createRef();
-    this.endDate = React.createRef();
+    this.startDateRef = React.createRef();
+    this.endDateRef = React.createRef();
     this.select = React.createRef();
     this.handleInput = this.handleInput.bind(this);
     this.resetInput = this.resetInput.bind(this);
@@ -290,6 +290,7 @@ export default class AccountDetails extends React.Component {
       .then(res => {
         if (!self._isMounted) return;
         const txs = get(res, 'data.body');
+        console.log('txs:', txs);
         if (!txs) {
           this.setState({ hasOtherTxs: false, currentPage: 1, totalPages: null, transactions: [] })
           return
@@ -389,12 +390,12 @@ export default class AccountDetails extends React.Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.match.params;
-    const startDate = (new Date(this.startDate.value).getTime() / 1000).toString();
-    const endDate = (new Date(this.endDate.value).getTime() / 1000).toString();
+    const startDate = (new Date(this.startDateRef.value).getTime() / 1000).toString();
+    const endDate = (new Date(this.endDateRef.value).getTime() / 1000).toString();
     let hasStartDateErr = false, hasEndDateErr = false;
-    if (this.startDate.value === '' || this.endDate.value === '') {
-      if (this.startDate.value === '') hasStartDateErr = true;
-      if (this.endDate.value === '') hasEndDateErr = true;
+    if (this.startDateRef.value === '' || this.endDateRef.value === '') {
+      if (this.startDateRef.value === '') hasStartDateErr = true;
+      if (this.endDateRef.value === '') hasEndDateErr = true;
       this.setState({ hasStartDateErr, hasEndDateErr })
       return
     }
@@ -439,16 +440,16 @@ export default class AccountDetails extends React.Component {
   }
   handleInput(type) {
     if (type === 'start') {
-      let date = new Date(this.startDate.value)
+      let date = new Date(this.startDateRef.current.value)
       date.setDate(date.getDate() + 7);
-      this.endDate.min = this.startDate.value;
+      this.endDateRef.current.min = this.startDateRef.current.value;
       let newDate = this.getDate(date);
-      this.endDate.max = newDate < today ? newDate : today;
+      this.endDateRef.current.max = newDate < today ? newDate : today;
     } else if (type === 'end') {
-      let date = new Date(this.endDate.value)
+      let date = new Date(this.endDateRef.current.value)
       date.setDate(date.getDate() - 7);
-      this.startDate.max = this.endDate.value;
-      this.startDate.min = this.getDate(date);
+      this.startDateRef.current.max = this.endDateRef.current.value;
+      this.startDateRef.current.min = this.getDate(date);
     }
     if (type === 'start' && !this.hasStartDateErr) this.setState({ hasStartDateErr: false })
     if (type === 'end' && !this.hasEndDateErr) this.setState({ hasEndDateErr: false })
@@ -462,12 +463,12 @@ export default class AccountDetails extends React.Component {
     return year + '-' + month + '-' + day;
   }
   resetInput() {
-    this.startDate.value = '';
-    this.startDate.max = today;
-    this.startDate.min = '';
-    this.endDate.value = '';
-    this.endDate.max = today;
-    this.endDate.min = '';
+    this.startDateRef.current.value = '';
+    this.startDateRef.current.max = today;
+    this.startDateRef.current.min = '';
+    this.endDateRef.current.value = '';
+    this.endDateRef.current.max = today;
+    this.endDateRef.current.min = '';
   }
   handleSelect = (selectedList, selectedItem) => {
     this.setState({
@@ -532,7 +533,7 @@ export default class AccountDetails extends React.Component {
       hasOtherTxs, hasThetaStakes, hasTfuelStakes, thetaHolderTxs, hasDownloadTx, thetaSourceTxs,
       tfuelHolderTxs, tfuelSourceTxs, price, hasStartDateErr, hasEndDateErr, isDownloading, hasRefreshBtn,
       typeOptions, rewardSplit, beneficiary, tabIndex, hasTNT20, hasTNT721, hasToken, hasInternalTxs,
-      hasXChainTxs, hasXChainTNT20, hasXChainTNT721, hasXChainTNT1155, accountTNS, beneficiaryTNS } = this.state;
+      hasXChainTxs, hasXChainTNT20, hasXChainTNT721, hasXChainTNT1155, accountTNS, beneficiaryTNS, selectedTypes } = this.state;
     const { accountAddress } = this.props.match.params;
     const { location } = this.props;
     const hasInterChainTxn = hasInternalTxs || hasTNT20 || hasTNT721;
@@ -579,88 +580,35 @@ export default class AccountDetails extends React.Component {
         <div ref={e => { this.tabRef = e }}></div>
         <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={this.setTabIndex}>
           <TabList>
-            {transactions && transactions.length > 0 && <Tab>Transactions</Tab>}
+            {/* {transactions && transactions.length > 0 && <Tab>Transactions</Tab>} */}
             {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
               <Tab>Contract</Tab>
             }
-            {hasInterChainTxn && <Tab>Inter-Chain Token Txns</Tab>}
+            {(transactions && transactions.length > 0 || hasInterChainTxn) && <Tab>Inter-Chain Token Txns</Tab>}
             {hasXChainTxn && <Tab>Cross Chain Token Txns</Tab>}
           </TabList>
-          {transactions && transactions.length > 0 && <TabPanel>
-            {!transactions && loading_txns &&
-              <LoadingPanel />}
-            {transactions && transactions.length > 0 &&
-              <>
-                <div className="actions">
-                  {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
-                    <>
-                      <div className="popup-row header">Choose the time period. Must within 7 days.</div>
-                      <div className="popup-row">
-                        <div className="popup-label">Start Date:</div>
-                        <input className="popup-input" type="date" ref={input => this.startDate = input} onChange={() => this.handleInput('start')} max={today}></input>
-                      </div>
-                      <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
-                      <div className="popup-row">
-                        <div className="popup-label">End Date: </div>
-                        <input className="popup-input" type="date" ref={input => this.endDate = input} onChange={() => this.handleInput('end')} max={today}></input>
-                      </div>
-                      <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
-                      <div className="popup-row buttons">
-                        <div className={cx("popup-reset", { disable: isDownloading })} onClick={this.resetInput}>Reset</div>
-                        <div className={cx("popup-download export", { disable: isDownloading })} onClick={this.downloadTrasanctionHistory}>Download</div>
-                        <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
-                      </div>
-                    </>
-                  </Popup>}
-                  <a ref={this.download}></a>
-                  {hasOtherTxs &&
-                    <div className="filter">
-                      {hasRefreshBtn && <span className="refresh" onClick={this.handleTxsRefresh}>&#x21bb;</span>}
-                      Display
-                      <Multiselect
-                        options={typeOptions || TypeOptions} // Options to display in the dropdown
-                        displayValue="label" // Property name to display in the dropdown options
-                        style={{
-                          multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
-                          searchBox: { maxHeight: '35px', overflow: 'hidden', padding: 0 },
-                          optionContainer: { background: '#1b1f2a' },
-                          inputField: { margin: 0, height: '100%', width: '100%' },
-                          chips: { display: 'none' }
-                        }}
-                        onSelect={this.handleSelect}
-                        onRemove={this.handleSelect}
-                        closeOnSelect={false}
-                        showCheckbox={true}
-                        avoidHighlightFirstOption={true}
-                        placeholder={`${this.state.selectedTypes.length} selected types`}
-                        selectedValues={this.state.selectedTypes}
-                      />
-                      Txs
-                    </div>
-                  }
 
-                </div>
-                <div>
-                  {loading_txns &&
-                    <LoadingPanel className="fill" />}
-                  <TransactionTable transactions={transactions} account={account} price={price} />
-                </div>
-                <Pagination
-                  size={'lg'}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={this.handlePageChange}
-                  disabled={loading_txns} />
-              </>}
-          </TabPanel>}
           {account.code && account.code !== '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470' &&
             <TabPanel>
               <SmartContract address={account.address} handleHashScroll={this.handleHashScroll} urlHash={location.hash} />
             </TabPanel>
           }
-          {hasInterChainTxn && <TabPanel>
+          {(transactions && transactions.length > 0 || hasInterChainTxn) && <TabPanel>
             <TxsTab type='interChain' hasTxs={hasInternalTxs} hasTNT20={hasTNT20} hasTNT721={hasTNT721}
-              address={account.address} handleHashScroll={this.handleHashScroll} location={location} />
+              address={account.address} handleHashScroll={this.handleHashScroll} location={location} hasTransaction={transactions && transactions.length > 0}
+              txProps={{
+                currentPage, totalPages, loading_txns, hasOtherTxs, hasDownloadTx, hasStartDateErr, hasEndDateErr, isDownloading,
+                hasRefreshBtn, typeOptions, transactions, selectedTypes, account, price,
+                startDate: this.startDateRef,
+                endDate: this.endDateRef,
+                handleInput: this.handleInput,
+                resetInput: this.resetInput,
+                downloadTrasanctionHistory: this.downloadTrasanctionHistory,
+                download: this.download,
+                handleTxsRefresh: this.handleTxsRefresh,
+                handlePropSelect: this.handleSelect,
+                handlePageChange: this.handlePageChange
+              }} />
           </TabPanel>}
           {hasXChainTxn && <TabPanel>
             <TxsTab type='xChain' hasTxs={hasXChainTxs} hasTNT20={hasXChainTNT20} hasTNT721={hasXChainTNT721}
@@ -825,12 +773,18 @@ const TokenTab = props => {
 }
 
 const TxsTab = props => {
-  const { type, hasTxs, hasTNT20, hasTNT721, hasTNT1155, address, handleHashScroll, location } = props;
+  const { type, hasTransaction, hasTxs, hasTNT20, hasTNT721, hasTNT1155, address, handleHashScroll, location, txProps } = props;
+  const { currentPage, totalPages, loading_txns, hasOtherTxs, hasDownloadTx, hasStartDateErr, hasEndDateErr, isDownloading,
+    hasRefreshBtn, typeOptions, transactions, startDate, endDate, handleInput, resetInput, downloadTrasanctionHistory,
+    download, handleTxsRefresh, handlePropSelect, selectedTypes, account, price, handlePageChange } = txProps;
   const [tabIndex, setTabIndex] = useState(0);
   const [tabNames, setTabNames] = useState([]);
 
   useEffect(() => {
     let names = [];
+    if (hasTransaction) {
+      names.push('Transactions');
+    }
     if (hasTxs) {
       names.push(type === 'interChain' ? 'InternalTxns' : 'TFuelTxns');
     }
@@ -859,12 +813,79 @@ const TxsTab = props => {
 
   return <Tabs className="theta-tabs" selectedIndex={tabIndex} onSelect={handleSelect}>
     <TabList>
+      {hasTransaction && <Tab>Transactions</Tab>}
       {hasTxs && <Tab>{type === 'interChain' ? 'Internal Txns' : 'TFuel Txns'}</Tab>}
       {hasTNT20 && <Tab>TNT20 Token Txns</Tab>}
       {hasTNT721 && <Tab>TNT721 Token Txns</Tab>}
       {hasTNT1155 && <Tab>TNT1155 Token Txns</Tab>}
     </TabList>
+    {hasTransaction && transactions && transactions.length > 0 && <TabPanel>
+      {!transactions && loading_txns &&
+        <LoadingPanel />}
+      {transactions && transactions.length > 0 &&
+        <>
+          <div className="actions">
+            {hasDownloadTx && <Popup trigger={<div className="download btn tx export">Export Transaction History (CSV)</div>} position="right center">
+              <>
+                <div className="popup-row header">Choose the time period. Must within 7 days.</div>
+                <div className="popup-row">
+                  <div className="popup-label">Start Date:</div>
+                  <input className="popup-input" type="date" ref={startDate} onChange={() => handleInput('start')} max={today}></input>
+                </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasStartDateErr })}>Input Valid Start Date</div>
+                <div className="popup-row">
+                  <div className="popup-label">End Date: </div>
+                  <input className="popup-input" type="date" ref={endDate} onChange={() => handleInput('end')} max={today}></input>
+                </div>
+                <div className={cx("popup-row err-msg", { 'disable': !hasEndDateErr })}>Input Valid End Date</div>
+                <div className="popup-row buttons">
+                  <div className={cx("popup-reset", { disable: isDownloading })} onClick={resetInput}>Reset</div>
+                  <div className={cx("popup-download export", { disable: isDownloading })} onClick={downloadTrasanctionHistory}>Download</div>
+                  <div className={cx("popup-downloading", { disable: !isDownloading })}>Downloading......</div>
+                </div>
+              </>
+            </Popup>}
+            <a ref={download}></a>
+            {hasOtherTxs &&
+              <div className="filter">
+                {hasRefreshBtn && <span className="refresh" onClick={handleTxsRefresh}>&#x21bb;</span>}
+                Display
+                <Multiselect
+                  options={typeOptions || TypeOptions} // Options to display in the dropdown
+                  displayValue="label" // Property name to display in the dropdown options
+                  style={{
+                    multiselectContainer: { width: "200px", marginLeft: '5px', marginRight: '5px' },
+                    searchBox: { maxHeight: '35px', overflow: 'hidden', padding: 0 },
+                    optionContainer: { background: '#1b1f2a' },
+                    inputField: { margin: 0, height: '100%', width: '100%' },
+                    chips: { display: 'none' }
+                  }}
+                  onSelect={handlePropSelect}
+                  onRemove={handlePropSelect}
+                  closeOnSelect={false}
+                  showCheckbox={true}
+                  avoidHighlightFirstOption={true}
+                  placeholder={`${selectedTypes.length} selected types`}
+                  selectedValues={selectedTypes}
+                />
+                Txs
+              </div>
+            }
 
+          </div>
+          <div>
+            {loading_txns &&
+              <LoadingPanel className="fill" />}
+            <TransactionTable transactions={transactions} account={account} price={price} />
+          </div>
+          <Pagination
+            size={'lg'}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            disabled={loading_txns} />
+        </>}
+    </TabPanel>}
     {hasTxs && <TabPanel>
       <TokenTab type={type === 'interChain' ? "TFUEL" : "XCHAIN_TFUEL"} address={address} handleHashScroll={handleHashScroll} />
     </TabPanel>}
