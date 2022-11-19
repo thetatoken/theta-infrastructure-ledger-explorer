@@ -401,7 +401,7 @@ export async function fetchAbi(abi) {
     return type;
   });
 
-  const address = "0x371cb5b1c56a6b50b944eee5910aac32723b5adc"; //testnet
+  const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; //testnet
   // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
 
   try {
