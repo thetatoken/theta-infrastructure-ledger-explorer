@@ -203,11 +203,28 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
             let xTfuelInfo = {
-              _id: tx.hash.toLowerCase() + i + '_0',
+              _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
-              from: get(log, 'decode.result[1]').toLowerCase(),
+              from: "mainchain",
               to: get(log, 'decode.result[1]').toLowerCase(),
               value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TFUEL_VOUCHER_BURNED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_BURNED);
+            Logger.log('Decoded TFUEL_VOUCHER_BURNED Log:', JSON.stringify(log));
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase() + '_mainchain',
+              value: get(log, 'decode.result[3]'),
               type: 'XCHAIN_TFUEL',
               timestamp: tx.timestamp,
             }
@@ -247,18 +264,14 @@ function _getOtherContractAddressSet(tx) {
   if (!logs) return [];
   let set = new Set();
   logs.forEach(log => {
-    if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE) {
+    // if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE) {
+    if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED
+      || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_BURNED) {
       // const address = get(log, 'address');
       // if (address !== undefined && address !== ZeroAddress && address !== get(tx, 'receipt.contractAddress')) {
       set.add(get(log, 'address'))
       // }
     }
-    // if (get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED) {
-    //   const address = get(log, 'address');
-    //   if (address !== undefined && address !== ZeroAddress) {
-    //     set.add(get(log, 'address'))
-    //   }
-    // }
   })
   return [...set];
 }

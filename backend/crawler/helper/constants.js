@@ -21,7 +21,8 @@ exports.EventHashMap = {
   TRANSFER: "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
   TFUEL_SPLIT: "0x8adc8f535d46b08a2d88aa746c6d751130fde18f5f2d59b755f134099ca01457",
   TFUEL_VOUCHER_MINTED: "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5",
-  TRANSFER_SINGLE: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62"
+  TRANSFER_SINGLE: "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62",
+  TFUEL_VOUCHER_BURNED: "0x40f1d475c2aa44f5c23193fab26a64d6aa4e09ab51898b10a3036baf82398ea1"
 }
 
 exports.CommonEventABIs = {
@@ -67,6 +68,16 @@ exports.CommonEventABIs = {
     { "indexed": false, "internalType": "uint256", "name": "id", "type": "uint256" },
     { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }],
     "name": "TransferSingle",
+    "type": "event"
+  }],
+  "0x40f1d475c2aa44f5c23193fab26a64d6aa4e09ab51898b10a3036baf82398ea1": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainVoucherOwner", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "burnedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherBurnNonce", "type": "uint256" }],
+    "name": "TFuelVoucherBurned",
     "type": "event"
   }]
 }

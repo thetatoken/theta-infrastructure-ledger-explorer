@@ -224,6 +224,16 @@ export const CommonEventABIs = {
     { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }],
     "name": "TransferSingle",
     "type": "event"
+  }],
+  "0x40f1d475c2aa44f5c23193fab26a64d6aa4e09ab51898b10a3036baf82398ea1": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainVoucherOwner", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "burnedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherBurnNonce", "type": "uint256" }],
+    "name": "TFuelVoucherBurned",
+    "type": "event"
   }]
 }
 

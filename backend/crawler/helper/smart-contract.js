@@ -261,9 +261,26 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
             let xTfuelInfo = {
               _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
-              from: get(log, 'decode.result[1]').toLowerCase(),
+              from: "mainchain",
               to: get(log, 'decode.result[1]').toLowerCase(),
               value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TFUEL_VOUCHER_BURNED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_BURNED);
+            Logger.log('Decoded TFUEL_VOUCHER_BURNED Log:', JSON.stringify(log));
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase() + '_mainchain',
+              value: get(log, 'decode.result[3]'),
               type: 'XCHAIN_TFUEL',
               timestamp: tx.timestamp,
             }
@@ -568,7 +585,7 @@ function _getContractAddressSetByTxs(txs) {
     if (!logs) continue;
     logs.forEach(log => {
       if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED
-        || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE) {
+        || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_BURNED) {
         const address = get(log, 'address');
         if (address !== undefined && address !== ZeroAddress) {
           set.add(get(log, 'address'))
