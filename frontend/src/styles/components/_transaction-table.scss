@@ -1,6 +1,6 @@
 table.data.txn-table {
   // border-collapse: separate;
-  .none{
+  .none {
     display: none;
   }
   thead tr .type {
@@ -13,30 +13,54 @@ table.data.txn-table {
     white-space: nowrap;
     width: 150px;
     &:before {
-      content: '';
+      content: "";
       display: inline-block;
       top: 4px;
       position: relative;
       width: 18px;
       height: 18px;
-      margin-right: .5rem;
+      margin-right: 0.5rem;
       background-position: center center;
       background-repeat: no-repeat;
       background-size: contain;
     }
   }
-  tr.coinbase .type:before { background-image: url('/images/icons/icon_coinbase@2x.png'); }
-  tr.transfer .type:before { background-image: url('/images/icons/icon_send@2x.png'); }
-  tr.service-payment .type:before { background-image: url('/images/icons/icon_servicepayment@2x.png'); }
-  tr.split-contract .type:before { background-image: url('/images/icons/icon_splitrule@2x.png'); }
-  tr.smart-contract .type:before { background-image: url('/images/icons/icon_smartcontract@2x.png'); }
-  tr.reserve .type:before { background-image: url('/images/icons/icon_reservefund@2x.png'); }
-  tr.release .type:before { background-image: url('/images/icons/icon_releasefund@2x.png'); }
-  tr.slash .type:before { background-image: url('/images/icons/icon_slash@2x.png'); }
-  tr.deposit-stake .type:before{ background-image: url('/images/icons/icon_deposit-stake-transaction@2x.png'); }
-  tr.withdraw-stake .type:before { background-image: url('/images/icons/icon_withdraw-stake-transaction@2x.png'); }
-  tr.update-validators .type:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
-  tr.stake-reward-distribution .type:before { background-image: url('/images/icons/icon_distribute-stake@2x.png'); }
+  tr.coinbase .type:before {
+    background-image: url("/images/icons/icon_coinbase@2x.png");
+  }
+  tr.transfer .type:before {
+    background-image: url("/images/icons/icon_send@2x.png");
+  }
+  tr.service-payment .type:before {
+    background-image: url("/images/icons/icon_servicepayment@2x.png");
+  }
+  tr.split-contract .type:before {
+    background-image: url("/images/icons/icon_splitrule@2x.png");
+  }
+  tr.smart-contract .type:before {
+    background-image: url("/images/icons/icon_smartcontract@2x.png");
+  }
+  tr.reserve .type:before {
+    background-image: url("/images/icons/icon_reservefund@2x.png");
+  }
+  tr.release .type:before {
+    background-image: url("/images/icons/icon_releasefund@2x.png");
+  }
+  tr.slash .type:before {
+    background-image: url("/images/icons/icon_slash@2x.png");
+  }
+  tr.deposit-stake .type:before {
+    background-image: url("/images/icons/icon_deposit-stake-transaction@2x.png");
+  }
+  tr.withdraw-stake .type:before {
+    background-image: url("/images/icons/icon_withdraw-stake-transaction@2x.png");
+  }
+  tr.update-validators .type:before {
+    background-image: url("/images/icons/icon_updatevalidators@2x.png");
+  }
+  tr.stake-reward-distribution .type:before {
+    background-image: url("/images/icons/icon_distribute-stake@2x.png");
+  }
 
   td {
     .value {
@@ -58,7 +82,7 @@ table.data.txn-table {
           margin-left: -140px;
           left: 50%;
           &:after {
-            content: '';
+            content: "";
             position: absolute;
             border-style: solid;
             top: 100%;
@@ -85,18 +109,20 @@ table.data.txn-table {
   td.block {
     color: $color-font-light;
   }
-  td.token, th.token{
+  td.token,
+  th.token {
     text-align: right;
-    &.left{
+    &.left {
       text-align: left;
       padding-left: 0;
     }
   }
-  td.dim a, td.token{
+  td.dim a,
+  td.token {
     color: $color-font-light;
-    & .tooltip{
+    & .tooltip {
       z-index: 100;
-      &--text{
+      &--text {
         width: 200px;
         visibility: hidden;
         position: absolute;
@@ -108,12 +134,12 @@ table.data.txn-table {
         line-height: 15px;
         color: $color-white;
         font-size: 12px;
-  
+
         bottom: calc(100% + 10px);
         left: 50%;
         margin-left: -105px;
-        &:after{
-          content: '';
+        &:after {
+          content: "";
           position: absolute;
           border-style: solid;
           top: 100%;
@@ -123,14 +149,17 @@ table.data.txn-table {
           border-width: 5px;
         }
       }
-      &:hover .tooltip--text{
-          visibility: visible;
+      &:hover .tooltip--text {
+        visibility: visible;
       }
     }
   }
+  td.dim {
+    color: $color-font-light;
+  }
   tr .icon {
     &:before {
-      content: '';
+      content: "";
       display: inline-block;
       position: relative;
       top: 2px;
@@ -142,47 +171,65 @@ table.data.txn-table {
     }
   }
 
-  tr .value{
-    @include breakpoint('phablet', max) {
-      .currency:before{
-        top: 0
+  tr .value {
+    @include breakpoint("phablet", max) {
+      .currency:before {
+        top: 0;
       }
     }
   }
-  tr .to.icon:before { background-image: url('/images/icons/stake-in@2x.png'); }
+  tr .to.icon:before {
+    background-image: url("/images/icons/stake-in@2x.png");
+  }
 
-  tr .from.icon:before { background-image: url('/images/icons/stake-out@2x.png'); }
+  tr .from.icon:before {
+    background-image: url("/images/icons/stake-out@2x.png");
+  }
 
-  tr .none.icon:before { 
+  tr .none.icon:before {
     width: 0;
     height: 0;
   }
 
-  @include breakpoint('tablet-wide', max) {
+  @include breakpoint("tablet-wide", max) {
     table-layout: fixed;
-    tr .age { @include hideColumn(); }
-    tr .block { width: 75px; }
+    tr .age {
+      @include hideColumn();
+    }
+    tr .block {
+      width: 75px;
+    }
     thead th,
     tbody td,
     tbody th {
       text-align: left;
-      padding: .5rem .5rem;
-      font-size: .875rem;
+      padding: 0.5rem 0.5rem;
+      font-size: 0.875rem;
     }
   }
-  @include breakpoint('tablet-wide', max) {
-    tr .to { @include hideColumn(); }
-    tr .from { @include hideColumn(); }
-    tr .icon { @include hideColumn(); }
-    tr .type { width: 150px; }
+  @include breakpoint("tablet-wide", max) {
+    tr .to {
+      @include hideColumn();
+    }
+    tr .from {
+      @include hideColumn();
+    }
+    tr .icon {
+      @include hideColumn();
+    }
+    tr .type {
+      width: 150px;
+    }
   }
-  @include breakpoint('phablet', max) {
-    tr .type:before { display: none; }
-    tr .type { 
-      white-space: normal; 
-      width: 110px; }
+  @include breakpoint("phablet", max) {
+    tr .type:before {
+      display: none;
+    }
+    tr .type {
+      white-space: normal;
+      width: 110px;
+    }
   }
-  @include breakpoint('phone-wide', max) {
-    
+  @include breakpoint("phone-wide", max) {
   }
 }

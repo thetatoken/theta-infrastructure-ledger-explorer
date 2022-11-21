@@ -33,7 +33,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
       <tbody>
         {map(transactions, (txn, i) => {
           const isXChain = type.includes("XCHAIN_")
-          const source = isXChain ? 'to' : !address ? 'none' : address === txn.from ? 'from' : 'to';
+          const source = isXChain ? (txn.to.length > 42 ? 'from' : 'to') : !address ? 'none' : address === txn.from ? 'from' : 'to';
           const name = get(tokenMap, `${txn.contract_address}.name`) || txn.name || "";
           const decimals = get(tokenMap, `${txn.contract_address}.decimals`);
           const quantity = decimals ? formatQuantity(txn.value, decimals) : txn.value;
@@ -43,13 +43,13 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
                 <td className={cx({ 'dim': source === 'to' }, "from")}>
-                  {isXChain ? 'MainChain' :
+                  {(isXChain && txn.to.length === 42) ? 'Main Chain' :
                     <AddressTNS hash={txn.from} tns={txn.fromTns} truncate={NUM_TRANSACTIONS} />}
-
                 </td>
                 {tabType !== "token" && <td className={cx(source, "icon")}></td>}
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
-                  <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />
+                  {(isXChain && txn.to.length > 42) ? 'Main Chain' :
+                    <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
