@@ -9,7 +9,6 @@ import get from 'lodash/get';
 import _truncate from 'lodash/truncate';
 import { formatCoin } from '../helpers/utils';
 
-
 const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenMap, handleHashScroll }) => {
   const NUM_TRANSACTIONS = type === 'TFUEL' ? 30 : 25;
   useEffect(() => {
@@ -32,8 +31,23 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
       </thead>
       <tbody>
         {map(transactions, (txn, i) => {
-          const isXChain = type.includes("XCHAIN_")
-          const source = isXChain ? (txn.to.length > 42 ? 'from' : 'to') : !address ? 'none' : address === txn.from ? 'from' : 'to';
+          const isXChain = type.includes("XCHAIN_");
+          let source = !address ? 'none' : address === txn.from ? 'from' : 'to';
+          if (isXChain) {
+            switch (type) {
+              case 'XCHAIN_TFUEL':
+                source = txn.to.length > 42 ? 'from' : 'to';
+                break;
+              case 'XCHAIN_TNT20':
+              case 'XCHAIN_TNT721':
+              case 'XCHAIN_TNT1155':
+                if (txn.to === "0x0000000000000000000000000000000000000000") source = 'from'
+                else if (txn.from === "0x0000000000000000000000000000000000000000") source = 'to'
+                break;
+              default:
+                break;
+            }
+          }
           const name = get(tokenMap, `${txn.contract_address}.name`) || txn.name || "";
           const decimals = get(tokenMap, `${txn.contract_address}.decimals`);
           const quantity = decimals ? formatQuantity(txn.value, decimals) : txn.value;
@@ -43,12 +57,12 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
                 <td className={cx({ 'dim': source === 'to' }, "from")}>
-                  {(isXChain && txn.to.length === 42) ? 'Main Chain' :
+                  {(isXChain && source === 'to') ? 'Main Chain' :
                     <AddressTNS hash={txn.from} tns={txn.fromTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {tabType !== "token" && <td className={cx(source, "icon")}></td>}
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
-                  {(isXChain && txn.to.length > 42) ? 'Main Chain' :
+                  {(isXChain && source === 'from') ? 'Main Chain' :
                     <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">
