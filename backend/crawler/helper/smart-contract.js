@@ -79,9 +79,6 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
             case contractMap.TNT721TokenBank:
               type = 'XCHAIN_TNT721'
               break;
-            case contractMap.TNT1155TokenBank:
-              type = 'XCHAIN_TNT1155'
-              break;
             default:
               break;
           }
@@ -136,6 +133,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
 }
 
 exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao, contractMap) {
+  const contractList = Object.keys(contractMap).map(name => contractMap[name]);
   let addressList = _getContractAddressSetByTxs(txs);
   Logger.log('addressList.length:', addressList.length, JSON.stringify(addressList));
   if (addressList.length === 0) {
@@ -197,6 +195,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TRANSFER:
+          Logger.log('In Transfer case.');
           const contractAddress = get(log, 'address');
           if (contractList.indexOf(contractAddress) > -1) {
             let type = '';
@@ -207,13 +206,12 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
               case contractMap.TNT721TokenBank:
                 type = 'XCHAIN_TNT721'
                 break;
-              case contractMap.TNT1155TokenBank:
-                type = 'XCHAIN_TNT1155'
-                break;
               default:
                 break;
             }
+            Logger.log('type:', type);
             log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+            Logger.log('log:', log);
             const tokenId = get(log, 'decode.result.tokenId');
             const value = tokenId !== undefined ? 1 : get(log, 'decode.result[2]');
             const newToken = {
@@ -229,7 +227,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
               contract_address: contractAddress
             }
             tokenArr.push(newToken);
-            console.log('newToken:', JSON.stringify(newToken));
+            Logger.log('newToken:', JSON.stringify(newToken));
             insertList.push(checkAndInsertToken(newToken, tokenDao))
             continue;
           }
