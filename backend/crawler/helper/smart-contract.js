@@ -137,7 +137,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
 
 exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao, contractMap) {
   let addressList = _getContractAddressSetByTxs(txs);
-  Logger.log('addressList.length:', addressList.length);
+  Logger.log('addressList.length:', addressList.length, JSON.stringify(addressList));
   if (addressList.length === 0) {
     return;
   }
@@ -229,6 +229,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
               contract_address: contractAddress
             }
             tokenArr.push(newToken);
+            console.log('newToken:', JSON.stringify(newToken));
             insertList.push(checkAndInsertToken(newToken, tokenDao))
             continue;
           }
@@ -311,7 +312,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
       }
     }
   }
-  Logger.log('tokenArr.length:', tokenArr.length);
+  Logger.log('tokenArr.length:', tokenArr.length, 'tokenArr:', JSON.stringify(tokenArr));
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
