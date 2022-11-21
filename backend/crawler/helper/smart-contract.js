@@ -98,7 +98,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
             contract_address: contractAddress
           }
           tokenArr.push(newToken);
-          insertList.push(checkAndInsertToken(newToken, tokenDao))
+          insertList.push(_checkAndInsertToken(newToken, tokenDao))
           continue;
         }
         // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
@@ -228,7 +228,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
             }
             tokenArr.push(newToken);
             Logger.log('newToken:', JSON.stringify(newToken));
-            insertList.push(checkAndInsertToken(newToken, tokenDao))
+            insertList.push(_checkAndInsertToken(newToken, tokenDao))
             continue;
           }
           // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
