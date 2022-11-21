@@ -219,7 +219,7 @@ function setupGetBlockCronJob(mongoClient, networkId) {
 
   readBlockCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao, stakeDao,
     checkpointDao, smartContractDao, dailyAccountDao, rewardDistributionDao, stakeHistoryDao, tokenDao,
-    tokenSummaryDao, tokenHolderDao, subStakeDao, cacheEnabled, config.maxBlockPerCrawl, config.chainType);
+    tokenSummaryDao, tokenHolderDao, subStakeDao, cacheEnabled, config.maxBlockPerCrawl, config.chainType, config.contractAddressMap);
   setTimeout(async function run() {
     await readBlockCronJob.Execute(networkId);
     setTimeout(run, 1000);

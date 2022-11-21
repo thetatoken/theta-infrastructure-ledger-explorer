@@ -42,6 +42,7 @@ var chainType = 'mainchain';
 
 var stakeBlockHeight = 0;
 var stakeTimestamp = 0;
+var contractMap = {};
 // dec
 var startTime;
 //------------------------------------------------------------------------------
@@ -50,7 +51,7 @@ var startTime;
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
   rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, tokenSummaryDaoInstance,
-  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig) {
+  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig, contractMapConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -70,6 +71,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
   chainType = chainTypeConfig || 'mainchain';
+  contractMap = contractMapConfig;
 }
 
 exports.Execute = async function (networkId) {
@@ -289,7 +291,7 @@ exports.Execute = async function (networkId) {
           }
         }
         if (tokenTxs.length !== 0) {
-          updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+          updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao, contractMap));
         }
         if (stakes.vcp.length !== 0) {
           // Update total stake info

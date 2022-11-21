@@ -135,7 +135,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   return Promise.all(insertList);
 }
 
-exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao) {
+exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao, contractMap) {
   let addressList = _getContractAddressSetByTxs(txs);
   Logger.log('addressList.length:', addressList.length);
   if (addressList.length === 0) {
