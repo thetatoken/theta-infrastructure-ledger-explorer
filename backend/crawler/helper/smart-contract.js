@@ -132,7 +132,10 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
   return Promise.all(insertList);
 }
 
-exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao, contractMap) {
+exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao,
+  tokenHolderDao, contractMap, chainType) {
+  const isMainChain = chainType === 'mainchain';
+  const xChainName = isMainChain ? 'subchain' : 'mainchain';
   const contractList = Object.keys(contractMap).map(name => contractMap[name]);
   let addressList = _getContractAddressSetByTxs(txs);
   Logger.log('addressList.length:', addressList.length, JSON.stringify(addressList));
@@ -260,7 +263,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
             let xTfuelInfo = {
               _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
-              from: "mainchain",
+              from: xChainName,
               to: get(log, 'decode.result[1]').toLowerCase(),
               value: get(log, 'decode.result[2]'),
               type: 'XCHAIN_TFUEL',
@@ -278,7 +281,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
               _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
               from: get(log, 'decode.result[1]').toLowerCase(),
-              to: get(log, 'decode.result[2]').toLowerCase() + '_mainchain',
+              to: get(log, 'decode.result[2]').toLowerCase() + '_' + xChainName,
               value: get(log, 'decode.result[3]'),
               type: 'XCHAIN_TFUEL',
               timestamp: tx.timestamp,
