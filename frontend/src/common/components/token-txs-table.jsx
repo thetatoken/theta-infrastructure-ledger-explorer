@@ -8,6 +8,11 @@ import map from 'lodash/map';
 import get from 'lodash/get';
 import _truncate from 'lodash/truncate';
 import { formatCoin } from '../helpers/utils';
+import config from '../../config';
+import { ChainType } from "../constants";
+
+const isSubChain = config.chainType === ChainType.SUBCHAIN;
+const xChainName = isSubChain ? 'Main Chain' : 'Sub Chain';
 
 const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenMap, handleHashScroll }) => {
   const NUM_TRANSACTIONS = type === 'TFUEL' ? 30 : 25;
@@ -57,12 +62,12 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
                 <td className={cx({ 'dim': source === 'to' }, "from")}>
-                  {(isXChain && source === 'to') ? 'Main Chain' :
+                  {(isXChain && source === 'to') ? xChainName :
                     <AddressTNS hash={txn.from} tns={txn.fromTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {tabType !== "token" && <td className={cx(source, "icon")}></td>}
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
-                  {(isXChain && source === 'from') ? 'Main Chain' :
+                  {(isXChain && source === 'from') ? xChainName :
                     <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">
