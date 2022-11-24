@@ -207,16 +207,6 @@ export const CommonEventABIs = {
     name: 'ApprovalForAll',
     type: 'event'
   }],
-  "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5": [{
-    "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
-    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
-    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
-    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
-    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
-    "name": "TFuelVoucherMinted",
-    "type": "event"
-  }],
   "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62": [{
     "anonymous": false,
     "inputs": [{ "indexed": true, "internalType": "address", "name": "operator", "type": "address" },
@@ -227,6 +217,16 @@ export const CommonEventABIs = {
     "name": "TransferSingle",
     "type": "event"
   }],
+  "0x80742bd15a2c8c4ad5d395bcf577073110e52f0c73bf980dfa9453c1d8c354e5": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
+    "name": "TFuelVoucherMinted",
+    "type": "event"
+  }],
   "0x40f1d475c2aa44f5c23193fab26a64d6aa4e09ab51898b10a3036baf82398ea1": [{
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
@@ -235,6 +235,92 @@ export const CommonEventABIs = {
     { "indexed": false, "internalType": "uint256", "name": "burnedAmount", "type": "uint256" },
     { "indexed": false, "internalType": "uint256", "name": "voucherBurnNonce", "type": "uint256" }],
     "name": "TFuelVoucherBurned",
+    "type": "event"
+  }],
+  "0x5ea3a5ca7f54881fdd7781894d69709e11027910f35647f9d4cc14e6872b6f72": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "unlockedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainVoucherBurnNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "tokenUnlockNonce", "type": "uint256" }],
+    "name": "TFuelTokenUnlocked",
+    "type": "event"
+  }],
+  "0xee1ecc2b21aa613cc77cd44823a68ef1168ce1f40c2eac1d68690baf955fdbd1": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainTokenSender", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "targetChainID", "type": "uint256" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "lockedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "tokenLockNonce", "type": "uint256" }],
+    "name": "TFuelTokenLocked",
+    "type": "event"
+  }],
+  "": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "voucherContract", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
+    "name": "TNT20VoucherMinted",
+    "type": "event"
+  }],
+  "": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainVoucherOwner", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "burnedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherBurnNonce", "type": "uint256" }],
+    "name": "TNT20VoucherBurned",
+    "type": "event"
+  }],
+  "0xe5d8852bc02bf44f2a49b2d7722fa497ff83b689a28de1253304d2bc43d7b1cb": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainTokenSender", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "targetChainID", "type": "uint256" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "lockedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "string", "name": "name", "type": "string" },
+    { "indexed": false, "internalType": "string", "name": "symbol", "type": "string" },
+    { "indexed": false, "internalType": "uint8", "name": "decimals", "type": "uint8" },
+    { "indexed": false, "internalType": "uint256", "name": "tokenLockNonce", "type": "uint256" }],
+    "name": "TNT20TokenLocked", "type": "event"
+  }],
+  "0x189b6301573b050cb7c350cae6d2d5c6262fda802e3b6cc69ee25eb35bdaa4eb": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "unlockedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainVoucherBurnNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "tokenUnlockNonce", "type": "uint256" }],
+    "name": "TNT20TokenUnlocked",
+    "type": "event"
+  }],
+  "0x5249cf5aa9f373a9fda5076a53abb87450615986fd25b4d701a153f8840eaf08": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "voucherContract", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "mintedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "sourceChainTokenLockNonce", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherMintNonce", "type": "uint256" }],
+    "name": "TNT20VoucherMinted",
+    "type": "event"
+  }],
+  "0x8cd7380d25c66046ede32c8a8089e2c5c5356ed48d6885bb3956f3a1bc4f030d": [{
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
+    { "indexed": false, "internalType": "address", "name": "sourceChainVoucherOwner", "type": "address" },
+    { "indexed": false, "internalType": "address", "name": "targetChainTokenReceiver", "type": "address" },
+    { "indexed": false, "internalType": "uint256", "name": "burnedAmount", "type": "uint256" },
+    { "indexed": false, "internalType": "uint256", "name": "voucherBurnNonce", "type": "uint256" }],
+    "name": "TNT20VoucherBurned",
     "type": "event"
   }]
 }

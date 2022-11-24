@@ -135,6 +135,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
 exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, tokenSummaryDao,
   tokenHolderDao, contractMap, chainType) {
   const isMainChain = chainType === 'mainchain';
+  const chainName = isMainChain ? 'mainchain' : 'subchain';
   const xChainName = isMainChain ? 'subchain' : 'mainchain';
   const contractList = Object.keys(contractMap).map(name => contractMap[name]);
   let addressList = _getContractAddressSetByTxs(txs);
@@ -171,6 +172,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
     logs = _decodeLogs(logs, infoMap);
     Logger.log('logs in updateTokenNew:', JSON.stringify(logs))
     for (let [i, log] of logs.entries()) {
+      const contractAddress = get(log, 'address');
       switch (get(log, 'topics[0]')) {
         case EventHashMap.TFUEL_SPLIT:
           if (typeof get(log, 'decode') !== "object") {
@@ -199,7 +201,6 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           break;
         case EventHashMap.TRANSFER:
           Logger.log('In Transfer case.');
-          const contractAddress = get(log, 'address');
           if (contractList.indexOf(contractAddress) > -1) {
             let type = '';
             switch (contractAddress) {
@@ -260,10 +261,11 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
             Logger.log('Decoded TFUEL_VOUCHER_MINTED Log:', JSON.stringify(log));
+            const chainId = get(log, 'decode.result[0]').split('/')[0];
             let xTfuelInfo = {
               _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
-              from: xChainName,
+              from: chainId,
               to: get(log, 'decode.result[1]').toLowerCase(),
               value: get(log, 'decode.result[2]'),
               type: 'XCHAIN_TFUEL',
@@ -277,17 +279,122 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_BURNED);
             Logger.log('Decoded TFUEL_VOUCHER_BURNED Log:', JSON.stringify(log));
+            const chainId = get(log, 'decode.result[0]').split('/')[0];
             let xTfuelInfo = {
               _id: tx.hash.toLowerCase() + i,
               hash: tx.hash.toLowerCase(),
               from: get(log, 'decode.result[1]').toLowerCase(),
-              to: get(log, 'decode.result[2]').toLowerCase() + '_' + xChainName,
+              to: get(log, 'decode.result[2]').toLowerCase() + '_' + chainId,
               value: get(log, 'decode.result[3]'),
               type: 'XCHAIN_TFUEL',
               timestamp: tx.timestamp,
             }
             tokenArr.push(xTfuelInfo);
             insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TFUEL_TOKEN_LOCKED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_TOKEN_LOCKED);
+            Logger.log('Decoded TFUEL_TOKEN_LOCKED Log:', JSON.stringify(log));
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[3]').toLowerCase() + '_' + get(log, 'decode.result[2]'),
+              value: get(log, 'decode.result[4]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TFUEL_TOKEN_UNLOCKED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TFUEL_TOKEN_UNLOCKED);
+            Logger.log('Decoded TFUEL_TOKEN_UNLOCKED Log:', JSON.stringify(log));
+            let xTfuelInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: xChainName,
+              to: get(log, 'decode.result[1]').toLowerCase(),
+              value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TFUEL',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(xTfuelInfo);
+            insertList.push(_checkAndInsertToken(xTfuelInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TNT20_VOUCHER_MINTED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TNT20_VOUCHER_MINTED);
+            Logger.log('Decoded TNT20_VOUCHER_MINTED Log:', JSON.stringify(log));
+            const chainId = get(log, 'decode.result[0]').split('/')[0];
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: chainId,
+              to: get(log, 'decode.result[1]').toLowerCase(),
+              value: get(log, 'decode.result[3]'),
+              type: 'XCHAIN_TNT20',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TNT20_VOUCHER_BURNED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TNT20_VOUCHER_BURNED);
+            Logger.log('Decoded TNT20_VOUCHER_BURNED Log:', JSON.stringify(log));
+            const chainId = get(log, 'decode.result[0]').split('/')[0];
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[2]').toLowerCase() + '_' + chainId,
+              value: get(log, 'decode.result[3]'),
+              type: 'XCHAIN_TNT20',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TNT20_TOKEN_LOCKED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TNT20_TOKEN_LOCKED);
+            Logger.log('Decoded TNT20_TOKEN_LOCKED Log:', JSON.stringify(log));
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: get(log, 'decode.result[1]').toLowerCase(),
+              to: get(log, 'decode.result[3]').toLowerCase() + '_' + get(log, 'decode.result[2]'),
+              value: get(log, 'decode.result[4]'),
+              type: 'XCHAIN_TNT20',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
+          }
+          break;
+        case EventHashMap.TNT20_TOKEN_UNLOCKED:
+          if (typeof get(log, 'decode') !== "object") {
+            log = decodeLogByAbiHash(log, EventHashMap.TNT20_TOKEN_UNLOCKED);
+            Logger.log('Decoded TNT20_TOKEN_UNLOCKED Log:', JSON.stringify(log));
+            let tokenInfo = {
+              _id: tx.hash.toLowerCase() + i,
+              hash: tx.hash.toLowerCase(),
+              from: xChainName,
+              to: get(log, 'decode.result[1]').toLowerCase(),
+              value: get(log, 'decode.result[2]'),
+              type: 'XCHAIN_TNT20',
+              timestamp: tx.timestamp,
+            }
+            tokenArr.push(tokenInfo);
+            insertList.push(_checkAndInsertToken(tokenInfo, tokenDao))
           }
           break;
         case EventHashMap.TRANSFER_SINGLE:
@@ -587,7 +694,8 @@ function _getContractAddressSetByTxs(txs) {
     if (!logs) continue;
     logs.forEach(log => {
       if (get(log, 'topics[0]') === EventHashMap.TRANSFER || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_MINTED
-        || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_BURNED) {
+        || get(log, 'topics[0]') === EventHashMap.TRANSFER_SINGLE || get(log, 'topics[0]') === EventHashMap.TFUEL_VOUCHER_BURNED
+        || get(log, 'topics[0]') === EventHashMap.TFUEL_TOKEN_LOCKED || get(log, 'topics[0]') === EventHashMap.TFUEL_TOKEN_UNLOCKED) {
         const address = get(log, 'address');
         if (address !== undefined && address !== ZeroAddress) {
           set.add(get(log, 'address'))
