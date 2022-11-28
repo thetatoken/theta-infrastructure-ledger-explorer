@@ -401,8 +401,8 @@ export async function fetchAbi(abi) {
     return type;
   });
 
-  const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; //testnet
-  // const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; //mainnet
+  // const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; //testnet
+  const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; //mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
