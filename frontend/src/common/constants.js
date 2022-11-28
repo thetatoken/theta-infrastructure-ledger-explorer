@@ -258,7 +258,7 @@ export const CommonEventABIs = {
     "name": "TFuelTokenLocked",
     "type": "event"
   }],
-  "": [{
+  "0x5249cf5aa9f373a9fda5076a53abb87450615986fd25b4d701a153f8840eaf08": [{
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
     { "indexed": false, "internalType": "address", "name": "targetChainVoucherReceiver", "type": "address" },
@@ -269,7 +269,7 @@ export const CommonEventABIs = {
     "name": "TNT20VoucherMinted",
     "type": "event"
   }],
-  "": [{
+  "0x8cd7380d25c66046ede32c8a8089e2c5c5356ed48d6885bb3956f3a1bc4f030d": [{
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
     { "indexed": false, "internalType": "address", "name": "sourceChainVoucherOwner", "type": "address" },

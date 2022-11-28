@@ -93,7 +93,7 @@ exports.CommonEventABIs = {
     "name": "TFuelVoucherBurned",
     "type": "event"
   }],
-  "0x5ea3a5ca7f54881fdd7781894d69709e11027910f35647f9d4cc14e6872b6f72": [{
+  "0xee1ecc2b21aa613cc77cd44823a68ef1168ce1f40c2eac1d68690baf955fdbd1": [{
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "string", "name": "denom", "type": "string" },
     { "indexed": false, "internalType": "address", "name": "sourceChainTokenSender", "type": "address" },
