@@ -11,6 +11,9 @@ var priceRouter = (app, priceDao, progressDao, config) => {
     priceDao.getPriceAsync()
       .then(async priceListInfo => {
         let isOutDated = false;
+        if (priceListInfo.length < 3) {
+          isOutDated = true;
+        }
         const time = new Date();
         priceListInfo.forEach(info => {
           const timestamp = new Date(info.last_updated).getTime()

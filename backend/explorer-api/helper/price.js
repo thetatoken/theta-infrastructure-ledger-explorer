@@ -36,6 +36,7 @@ exports.updatePrice = function (priceDao, config) {
       priceDao.upsertPriceAsync(price);
       res.push(price);
     })
+    console.log('update price res:', JSON.stringify(res));
     return res;
   }).catch((err) => {
     console.log('API call error:', err.message);
