@@ -38,7 +38,7 @@ exports.Execute = function () {
 
 exports.Check = function () {
   const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
-    new Date().setUTCHours(7, 0, 0, 0) / 1000 - 60 * 60 * 24 : new Date().setUTCHours(7, 0, 0, 0);
+    new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
   txHistoryDao.getAllTxHistoryAsync()
     .then(async res => {
       console.log('res length:', res.length);
