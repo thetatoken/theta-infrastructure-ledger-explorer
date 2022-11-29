@@ -18,7 +18,7 @@ var subStakeCache = {
 }
 
 var subStakeKeysCache = {
-  vs: new Map()
+  vs: new Set()
 }
 
 function shallowEqual(object1, object2) {
