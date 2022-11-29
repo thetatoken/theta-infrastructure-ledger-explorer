@@ -14,7 +14,6 @@ const ChainCard = (props) => {
     setSubChain(chainInfo.subchains.filter(o => o.name.toLowerCase().includes(filter.toLowerCase())));
   }
 
-  console.log('isMainChain:', props.isMainChain);
   return <div className="chain-card-wrap" onClick={props.onClose}>
     <div className="chain-card-container">
       <div className={cx("chain-card", { 'right': !props.isMainChain })} onClick={e => e.stopPropagation()}>
@@ -51,7 +50,6 @@ const ChainCard = (props) => {
               {subChain.length === 0 ? <div className="chain-card__chain">
                 No Result
               </div> : subChain.map((chain, i) => {
-                console.log('chain:', chain);
                 return <a className="chain-card__chain" key={i} href={chain.host}>
                   <div className={`chain-logo-brief ${chain.logoName}`}></div>
                   <div className="chain-name">{chain.name}</div>

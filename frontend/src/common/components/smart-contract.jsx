@@ -14,7 +14,6 @@ export default class SmartContract extends React.PureComponent {
   constructor(props) {
     super(props)
     let tabName = this.props.urlHash.replace("#", "").split('-')[1];
-    console.log('smart contract tabname:', tabName);
     this.state = {
       smartContract: null,
       isVerified: false,
