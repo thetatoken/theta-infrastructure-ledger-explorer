@@ -39,7 +39,7 @@ const ChainCard = (props) => {
                 No Result
               </div> : mainChain.map((chain, i) => {
                 return <a className="chain-card__chain" key={i} href={chain.host}>
-                  <div className={`chain-logo-brief`}></div>
+                  <div className={`chain-logo-brief ${chain.logoName}`}></div>
                   <div className="chain-name">{chain.name}</div>
                 </a>
               })}
@@ -51,8 +51,9 @@ const ChainCard = (props) => {
               {subChain.length === 0 ? <div className="chain-card__chain">
                 No Result
               </div> : subChain.map((chain, i) => {
+                console.log('chain:', chain);
                 return <a className="chain-card__chain" key={i} href={chain.host}>
-                  <div className={`chain-logo-brief`}></div>
+                  <div className={`chain-logo-brief ${chain.logoName}`}></div>
                   <div className="chain-name">{chain.name}</div>
                 </a>
               })}
