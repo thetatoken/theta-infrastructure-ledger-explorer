@@ -190,7 +190,7 @@ exports.updateSubStakes = async function (candidateList, type, subStakeDao, cach
 
 async function updateSubStakeWithCache(candidateList, type, subStakeDao) {
   let cacheKeyRef = subStakeKeysCache[`${type}`];
-  let cacheRef = subStakesCache[`${type}`];
+  let cacheRef = subStakeCache[`${type}`];
   if (cacheKeyRef.size === 0) {
     await subStakeDao.removeRecordsAsync(type);
   }
