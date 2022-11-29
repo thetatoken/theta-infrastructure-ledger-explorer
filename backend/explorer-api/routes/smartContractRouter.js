@@ -19,7 +19,8 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
     try {
       let sc = await smartContractDao.getSmartContractByAddressAsync(address)
       let byteCode = sc.bytecode;
-      let result = await axios.post(`http://localhost:9090/api/verify/${address}`, {
+      const helperUrl = process.env.HELPER_HOST + ":" + process.env.HELPER_PORT || 'localhost:9090';
+      let result = await axios.post(`http://${helperUrl}/api/verify/${address}`, {
         byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns
       })
       console.log('Received response from verification server.', result.data.result);
