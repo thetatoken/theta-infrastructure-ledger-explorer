@@ -62,12 +62,12 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
               <React.Fragment>
                 <td className="age">{age(txn)}</td>
                 <td className={cx({ 'dim': source === 'to' }, "from")}>
-                  {(isXChain && source === 'to') ? xChainName :
+                  {(isXChain && source === 'to') ? xChainName + (txn.from.length > 42 ? ' ' + txn.from.split('_')[1] : '') :
                     <AddressTNS hash={txn.from} tns={txn.fromTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {tabType !== "token" && <td className={cx(source, "icon")}></td>}
                 <td className={cx({ 'dim': source === 'from' }, "to")}>
-                  {(isXChain && source === 'from') ? xChainName :
+                  {(isXChain && source === 'from') ? xChainName + (txn.to.length > 42 ? ' ' + txn.to.split('_')[1] : '') :
                     <AddressTNS hash={txn.to} tns={txn.toTns} truncate={NUM_TRANSACTIONS} />}
                 </td>
                 {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">

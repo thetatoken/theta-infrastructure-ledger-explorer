@@ -51,7 +51,6 @@ export default class Header extends React.Component {
   handleOnChange(e) {
     const { hasError } = this.state;
     let value = e.target.value;
-    console.log('value:', isNaN(value));
     if (value.endsWith(".theta") || validateHex(value, 40) || validateHex(value, 64) || !isNaN(value)) {
       if (hasError) {
         this.setState({ hasError: false })
