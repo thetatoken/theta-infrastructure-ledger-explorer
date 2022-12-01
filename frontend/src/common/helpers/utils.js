@@ -296,9 +296,6 @@ export async function fetchWTFuelTotalSupply() {
 
   const address = "0x4dc08b15ea0e10b96c41aec22fab934ba15c983e"; //mainnet
 
-  console.log('network:', Theta.chainId || NetworkUrlOfChainId[config.chainInfo.mainchain.host]);
-  console.log('chainId:', Theta.chainId);
-
   try {
     var abiCoder = new ethers.utils.AbiCoder();
     var encodedParameters = abiCoder.encode(inputTypes, inputValues).slice(2);;
