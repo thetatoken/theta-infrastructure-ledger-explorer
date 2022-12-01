@@ -54,7 +54,7 @@
     "react-tabs": "^3.1.1",
     "reactjs-popup": "^1.5.0",
     "reactstrap": "^6.2.0",
-    "sass-loader": "^5.0.1",
+    "sass-loader": "^13.2.0",
     "socket.io": "^2.4.1",
     "style-loader": "^0.13.1",
     "tns-resolver": "^2.0.1",
