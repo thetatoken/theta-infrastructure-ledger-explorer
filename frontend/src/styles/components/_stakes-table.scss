@@ -14,6 +14,10 @@
     color: $color-font-light;
     width: 125px;
 
+    &.half {
+      width: 95px;
+    }
+
     &:before {
       content: '';
       display: inline-block;
