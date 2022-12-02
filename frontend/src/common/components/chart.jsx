@@ -174,9 +174,9 @@ export default class ThetaChart extends React.PureComponent {
         onClick: (e) => {
           switch (clickType) {
             case 'account':
-              var activeElement = this.chart.getElementAtEvent(e);
+              var activeElement = this.chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false);
               if (activeElement.length > 0) {
-                const address = this.chart.config.data.labels[activeElement[0]._index];
+                const address = this.chart.config.data.labels[activeElement[0].index];
                 if (address !== 'Rest Nodes') history.push(`/account/${address}`);
               }
               break;
