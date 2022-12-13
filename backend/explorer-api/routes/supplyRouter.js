@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
-
+var { getMaxTotalSupply } = require('../helper/smart-contract');
 
 var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
@@ -50,6 +50,30 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
       }).catch(err => {
         res.status(400).send(err.message);
       })
+  });
+
+  router.get("/supply/tdrop", async (req, res) => {
+    console.log('Querying the total amount of TDrop.');
+    const totalSupplyAbi = [{
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    }];
+    const tdropAddress = '0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03';
+
+    try {
+      const totalSupply = await getMaxTotalSupply(tdropAddress, totalSupplyAbi);
+      const data = ({
+        "total_supply": totalSupply,
+        "circulation_supply": totalSupply
+      });
+      res.status(200).send(data);
+    } catch (e) {
+      res.status(400).send(err.message);
+    }
+
   });
 
   router.get("/supply/tfuel/burnt", async (req, res) => {
