@@ -22,7 +22,8 @@
     "coinmarketcap":{
         "key": "COINMARKETCAP_API_KEY",
         "thetaId": 2416,
-        "tfuelId": 3822
+        "tfuelId": 3822,
+        "tdropId": 17806
     },
     "cert":{
         "enabled": false,

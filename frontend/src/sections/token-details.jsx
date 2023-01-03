@@ -59,7 +59,6 @@ const TokenDetails = ({ match, location }) => {
 
   useEffect(() => {
     const tabName = location.hash.replace("#", "").split('-')[0];
-    console.log('tabName:', tabName);
     setTabIndex(tabNames.indexOf(tabName) > -1 ? tabNames.indexOf(tabName) : 0);
   }, [])
 

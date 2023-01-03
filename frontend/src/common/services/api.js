@@ -5,6 +5,24 @@ import config from '../../config';
 const API_URI = `${config.restApi.host}:${config.restApi.port}/api`;
 
 export const apiService = {
+  getFullUri(uri, config = {}) {
+    return new Promise((resolve, reject) => {
+      return httpClient
+        .get(uri, config)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          if (err.response.status === 404) {
+            resolve(err.response);
+          } else {
+            console.log(`ERROR: ${uri}.${err}`);
+            Raven.captureException(err);
+            reject(err);
+          }
+        });
+    });
+  },
   get(uri, config = {}) {
     return new Promise((resolve, reject) => {
       return httpClient

@@ -13,6 +13,7 @@ var accountDaoLib = require('../mongo-db/account-dao.js');
 var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
 var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
+var subStakeDaoLib = require('../mongo-db/sub-stake-dao.js');
 var priceDaoLib = require('../mongo-db/price-dao.js');
 var txHistoryDaoLib = require('../mongo-db/tx-history-dao.js');
 var accountingDaoLib = require('../mongo-db/accounting-dao.js');
@@ -59,6 +60,7 @@ var accountDao = null;
 var accountTxDao = null;
 var accountTxSendDao = null;
 var stakeDao = null;
+var subStakeDao = null;
 var priceDao = null;
 var txHistoryDao = null;
 var accountingDao = null;
@@ -130,6 +132,8 @@ function main() {
       bluebird.promisifyAll(accountTxSendDao);
       stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(stakeDao);
+      subStakeDao = new subStakeDaoLib(__dirname, mongoClient, redis);
+      bluebird.promisifyAll(subStakeDao);
       priceDao = new priceDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(priceDao);
       txHistoryDao = new txHistoryDaoLib(__dirname, mongoClient);
@@ -214,7 +218,7 @@ function main() {
       // account transaction mapping router
       accountTxRouter(app, accountDao, accountTxDao, transactionDao);
       // stake router
-      stakeRouter(app, stakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config);
+      stakeRouter(app, stakeDao, subStakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config);
       // supply router
       supplyRouter(app, progressDao, dailyTfuelBurntDao, rpc, config);
       // price router

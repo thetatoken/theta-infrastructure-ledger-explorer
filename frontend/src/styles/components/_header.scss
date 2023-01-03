@@ -1,5 +1,403 @@
-
+.theta-header-wrap {
+  background-color: $color-dark-black;
+  width: 100%;
+}
 .theta-header {
+  @include row($justify: space-between, $align: flex-start);
+  max-width: 1100px;
+  width: 100%;
+  height: 50px;
+  margin: 0 auto 0;
+  padding: 9px 0;
+  color: $color-font-light;
+
+  a {
+    text-decoration: none;
+  }
+
+  .nav {
+    display: flex;
+    flex: 1 0 auto;
+
+    .theta-logo {
+      flex: 0 0 7.25rem;
+      height: 2rem;
+      margin: 0 12px 0 0;
+
+      background: url("/images/logo_theta-matachain@2x.png");
+      @include backgroundImage($url: "/images/logo_theta-matachain@2x.png");
+    }
+
+    a.nav-item {
+      font-family: $font-title;
+      font-weight: $weight-bold;
+      padding: 0.65rem;
+      margin-right: 0;
+
+      color: $color-font-light;
+      font-size: 11px;
+      line-height: 11px;
+      letter-spacing: 2.75px;
+
+      background: $color-font-light;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &::selection {
+        -webkit-text-fill-color: $color-white;
+      }
+
+      &:hover {
+        @include linearHorizontalGradient($color-blue, $color-green);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      @include breakpoint("phablet", max) {
+        font-size: 10px;
+        letter-spacing: 0;
+        padding: 9px 2px;
+      }
+    }
+  }
+
+  .nav-icons {
+    display: flex;
+    align-items: center;
+    margin-left: 50px;
+
+    &__link {
+      margin-right: 20px;
+
+      &--icon {
+        height: 14px;
+        width: 14px;
+        opacity: 0.65;
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        &.twitter {
+          background-image: url("/images/icons/icon_twitter.png");
+        }
+        &.reddit {
+          background-image: url("/images/icons/icon_reddit.png");
+        }
+        &.github {
+          background-image: url("/images/icons/icon_github.png");
+        }
+        &.discord {
+          background-image: url("/images/icons/icon_discord.png");
+        }
+      }
+    }
+    @include breakpoint("phablet", max) {
+      display: none;
+    }
+  }
+
+  .nav-select {
+    height: 100%;
+
+    &__button {
+      width: 250px;
+      height: 34px;
+      color: $color-blue;
+      border: 1px solid rgba($color-blue, 0.75);
+      border-radius: 6px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      margin-top: -1px;
+      cursor: pointer;
+      &:hover {
+        border-color: $color-blue;
+      }
+    }
+    .select-arrow-down {
+      height: 7px;
+      width: 12px;
+      background-image: url("/images/icons/select-arrow-down.png");
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+    }
+  }
+
+  .version-switch {
+    display: flex;
+    height: 30px;
+    align-items: center;
+    background-color: rgba(124, 129, 163, 0.35);
+    border-radius: 10px;
+    padding: 0 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: $color-white;
+    margin-left: 10px;
+
+    &__logo {
+      height: 11px;
+      width: 12px;
+      background-image: url("/images/icons/switch-icon.png");
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      margin-right: 5px;
+    }
+  }
+
+  @include breakpoint("tablet-wide", max) {
+    .nav-select {
+      display: none;
+    }
+    .nav-search .search-input {
+      width: 10rem;
+    }
+    .nav-search .search-select {
+      width: 5rem;
+    }
+    .nav .theta-logo {
+      margin-right: 3%;
+    }
+    .nav a.nav-item {
+      margin-right: 1%;
+      letter-spacing: 0;
+    }
+  }
+  @include breakpoint("tablet", max) {
+    display: block;
+    .flex-spacer {
+      display: none;
+    }
+
+    .nav-search {
+      width: 80%;
+      margin: 3rem auto 0;
+      @include row($justify: center);
+      .search-input {
+        width: 80%;
+      }
+      .search-select {
+        width: 7rem;
+      }
+    }
+    .version-switch {
+      display: none;
+    }
+  }
+  @include breakpoint("phablet", max) {
+    width: 95%;
+    .nav .theta-logo {
+      margin-right: 3%;
+      flex: 0 0 6rem;
+    }
+    .nav-search {
+      margin: 0.5rem auto 0;
+    }
+    .nav a.nav-item {
+      letter-spacing: 0;
+      margin-right: 1%;
+    }
+  }
+  @include breakpoint("phone-small", max) {
+    .nav a.nav-item {
+      font-size: 0.8rem;
+      line-height: 0.8rem;
+    }
+  }
+}
+
+.chain-header-wrap {
+  background-color: rgba($color-blue, 0.25);
+  width: 100%;
+  &.theta {
+    background: linear-gradient(
+      90deg,
+      rgba($color-blue, 0.25),
+      rgba($color-green, 0.25)
+    );
+  }
+}
+.chain-header {
+  @include row($justify: space-between, $align: flex-start);
+  max-width: 1100px;
+  width: 100%;
+  height: 50px;
+  margin: 0 auto 0;
+  padding: 9px 0;
+  color: $color-font-light;
+
+  &__name {
+    color: $color-theta-blue-light !important;
+    letter-spacing: 2.25px;
+    font-size: 15px;
+    font-weight: $weight-bold;
+    line-height: 32px;
+    padding-left: 7px;
+    text-transform: uppercase;
+  }
+  &__navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    a.nav-item {
+      font-family: $font-title;
+      font-weight: $weight-bold;
+      padding: 0.65rem;
+      margin-right: 7px;
+
+      color: $color-white;
+      font-size: 11px;
+      line-height: 11px;
+      letter-spacing: 2.75px;
+
+      background: $color-white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+
+      &::selection {
+        -webkit-text-fill-color: $color-white;
+      }
+
+      &:hover {
+        @include linearHorizontalGradient($color-blue, $color-green);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    .nav-search {
+      display: flex;
+      align-items: center;
+      color: $color-font-body;
+      margin-left: 20px;
+      &:focus-within {
+        .search-input {
+          border: 2px solid $color-blue;
+          border-right: 0;
+        }
+        .search-button {
+          border: 2px solid $color-blue;
+          border-left: 0;
+        }
+        .svg-icon path,
+        .svg-icon polygon,
+        .svg-icon rect,
+        .svg-icon circle {
+          fill: $color-blue;
+        }
+
+        &.error {
+          .search-input {
+            border: 2px solid $color-red;
+            border-right: 0;
+          }
+          .search-button {
+            border: 2px solid $color-red;
+            border-left: 0;
+          }
+          .svg-icon path,
+          .svg-icon polygon,
+          .svg-icon rect,
+          .svg-icon circle {
+            fill: $color-red;
+          }
+        }
+      }
+
+      .search-input {
+        width: 330px;
+        color: $color-light;
+        background-color: $color-white;
+        border-radius: 6px 0 0 6px;
+        padding: 6px;
+        padding-left: 13px;
+        border: 2px solid transparent;
+        border-right: 0;
+
+        &::placeholder {
+          color: $color-light;
+        }
+      }
+
+      .search-select {
+        width: 7rem;
+        margin: 0 10px;
+
+        &::after {
+          content: "";
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 6px solid $color-input-text;
+          position: absolute;
+          right: 5px;
+          top: 12px;
+          pointer-events: none;
+        }
+
+        select {
+          height: 32px;
+          width: 100%;
+          display: inline-block;
+        }
+      }
+
+      .search-button {
+        height: 32px;
+        border-radius: 0 6px 6px 0;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background-color: $color-white;
+        padding: 0 12px;
+        border: 2px solid transparent;
+        border-left: 0;
+      }
+
+      .svg-icon {
+        width: 16px;
+        height: 24px;
+        display: block;
+        margin: auto;
+      }
+
+      .svg-icon path,
+      .svg-icon polygon,
+      .svg-icon rect {
+        fill: $color-light;
+      }
+
+      .svg-icon circle {
+        stroke: $color-light;
+        stroke-width: 1;
+      }
+    }
+  }
+
+  @include breakpoint("phablet", max) {
+    height: 100px;
+    flex-direction: column;
+    .nav-search {
+      display: none;
+    }
+  }
+}
+
+.theta-header-v3 {
   @include row($justify: space-between, $align: flex-start);
   max-width: 1100px;
   width: 90%;
@@ -26,13 +424,13 @@
     a.nav-item {
       font-family: $font-title;
       font-weight: $weight-bold;
-      padding: .65rem;
-      margin-right: 2%;
-      
+      padding: 0.65rem;
+      margin-right: 1%;
+
       color: $color-font-main;
-      font-size: 1rem;
-      line-height: 1rem;
-      letter-spacing: 3px;
+      font-size: 14px;
+      line-height: 14px;
+      letter-spacing: 2.25px;
 
       background: white;
       -webkit-background-clip: text;
@@ -41,7 +439,7 @@
       white-space: nowrap;
       overflow: hidden;
 
-      &:hover{
+      &:hover {
         @include linearHorizontalGradient($color-blue, $color-green);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -55,13 +453,13 @@
     color: $color-font-body;
 
     .search-input {
-      width: 16rem;
+      width: 12rem;
     }
 
     .search-select {
       width: 7rem;
-      margin: 0 10px;
-      
+      margin: 0 5px;
+
       &::after {
         content: "";
         width: 0;
@@ -83,20 +481,15 @@
     }
 
     .search-button {
-      height: 30px;
-      width: 20px;
-      border-radius: 0.25rem .25rem .25rem 0.25rem;
+      height: 32px;
+      width: 24px;
+      padding-right: 4px;
       display: flex;
       align-items: center;
       cursor: pointer;
-      // @include linearVerticalGradient($th-blue, $th-green);
-
-      &:hover{
-        @include linearVerticalGradient($color-blue, $color-green);
-      }
+      background-color: rgba(124, 129, 163, 0.35);
     }
 
-    
     .svg-icon {
       width: 80%;
       height: 80%;
@@ -116,47 +509,84 @@
     }
   }
 
-  
-  @include breakpoint('tablet-wide', max) {
-    .nav-search .search-input { width: 10rem; }
-    .nav-search .search-select { width: 5rem; }
-    .nav .theta-logo { 
+  .version-switch {
+    display: flex;
+    height: 30px;
+    align-items: center;
+    background-color: rgba(124, 129, 163, 0.35);
+    border-radius: 10px;
+    padding: 0 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: $color-white;
+    margin-left: 3px;
+
+    &__logo {
+      height: 11px;
+      width: 12px;
+      background-image: url("/images/icons/switch-icon.png");
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      margin-right: 5px;
+    }
+  }
+
+  @include breakpoint("tablet-wide", max) {
+    .nav-search .search-input {
+      width: 10rem;
+    }
+    .nav-search .search-select {
+      width: 5rem;
+    }
+    .nav .theta-logo {
       margin-right: 3%;
     }
-    .nav a.nav-item{
+    .nav a.nav-item {
       margin-right: 1%;
       letter-spacing: 0;
     }
   }
-  @include breakpoint('tablet', max) {
+  @include breakpoint("tablet", max) {
     display: block;
-    .flex-spacer { display: none; }
+    .flex-spacer {
+      display: none;
+    }
 
     .nav-search {
       width: 80%;
       margin: 3rem auto 0;
       @include row($justify: center);
-      .search-input { width: 80%; }
-      .search-select { width: 7rem; }
+      .search-input {
+        width: 80%;
+      }
+      .search-select {
+        width: 7rem;
+      }
     }
   }
-  @include breakpoint('phablet', max) {
+  @include breakpoint("phablet", max) {
     width: 95%;
-    .nav .theta-logo { 
+    .nav .theta-logo {
       margin-right: 3%;
-      flex: 0 0 6rem; 
+      flex: 0 0 6rem;
     }
-    .nav-search { margin: 0.5rem auto 0; }
-    .nav a.nav-item{
+    .nav-search {
+      margin: 0.5rem auto 0;
+    }
+    .nav a.nav-item {
       letter-spacing: 0;
       margin-right: 1%;
     }
+    .version-switch {
+      display: none;
+    }
   }
-  @include breakpoint('phone-small', max) {
-    .nav a.nav-item{
+  @include breakpoint("phone-small", max) {
+    .nav a.nav-item {
       font-size: 0.8rem;
       line-height: 0.8rem;
     }
   }
 }
-

@@ -10,7 +10,13 @@ import ThetaChart from 'common/components/chart';
 import Detail from 'common/components/dashboard-detail';
 import BigNumber from 'bignumber.js';
 import { WEI } from 'common/constants';
+import config from "../../config";
+import { ChainType } from "../constants";
 
+const host = window.location.host;
+const isMetaChain = host.match(/metachain-explorer/gi) !== null;
+const { mainchain } = config.chainInfo;
+const uri = isMetaChain ? mainchain.host + ':' + mainchain.restApiPort + '/api/' : null;
 export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -34,8 +40,29 @@ export default class TokenDashboard extends React.PureComponent {
       this.getTransactionHistory();
     }
   }
-  getTransactionHistory() {
-    transactionsService.getTransactionHistory()
+  async getTransactionHistory() {
+    if (isMetaChain) {
+      let txTs = [];
+      let txNumber = []
+      let res = await transactionsService.getTransactionHistory(uri);
+      let txHistory = get(res, 'data.body.data');
+      txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach(info => {
+        txTs.push(new Date(info.timestamp * 1000));
+        txNumber.push(info.number);
+      })
+      const subChains = config.chainInfo.subchains
+      for (let i = 0; i < subChains.length; i++) {
+        let uri = subChains[i].host + ':' + subChains[i].restApiPort + '/api/'
+        res = await transactionsService.getTransactionHistory(uri);
+        txHistory = get(res, 'data.body.data');
+        txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach((info, i) => {
+          txNumber[i] += info.number;
+        })
+      }
+      this.setState({ txTs, txNumber })
+      return;
+    }
+    transactionsService.getTransactionHistory(uri)
       .then(res => {
         const txHistory = get(res, 'data.body.data');
         let txTs = [];
@@ -51,7 +78,7 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   getAllStakes() {
-    stakeService.getAllStake(['eenp', 'vcp', 'gcp'])
+    stakeService.getAllStake(['eenp', 'vcp', 'gcp'], uri)
       .then(res => {
         const stakeList = get(res, 'data.body')
         let sum = stakeList.reduce((sum, info) => {
@@ -103,7 +130,7 @@ export default class TokenDashboard extends React.PureComponent {
   }
   getTotalStaked() {
     const { type } = this.props;
-    stakeService.getTotalStake(type)
+    stakeService.getTotalStake(type, uri)
       .then(async res => {
         const stake = get(res, 'data.body');
         let tokenTotalSupply = 0
@@ -134,6 +161,9 @@ export default class TokenDashboard extends React.PureComponent {
     const icon = type + 'wei';
     const token = type.toUpperCase();
     const isTheta = type === 'theta';
+    const isSubChain = config.chainType === ChainType.SUBCHAIN;
+    const txHistoryTitle = isMetaChain ? 'THETA METACHAIN TRANSACTION HISTORY (14 DAYS)' : isSubChain ?
+      "SUBCHAIN TRANSACTION HISTORY (14 DAYS)" : "THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)";
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("dashboard-row", type)}>
@@ -155,13 +185,17 @@ export default class TokenDashboard extends React.PureComponent {
               className="tooltip"
               tooltipText={<TokenTooltip totalSupply={tokenInfo.circulating_supply} staked={tokenStaked} locked={tokenLocked} type={type} />} />
           </div>
-          <div className="column pie-charts">
+          <div className={`column pie-charts ${isSubChain && !isMetaChain ? 'subchain' : ''}`}>
             {type === 'tfuel' ?
               <div className="chart-container">
-                <div className="title">THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)</div>
+                <div className="title">{txHistoryTitle}</div>
                 <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
               </div> :
-              <>
+              isSubChain && !isMetaChain ? <div className="chart-container half">
+                <div className="title">SUBCHAIN VALIDATOR NODES</div>
+                <ThetaChart chartType={'doughnut'} labels={['0x2e833968e5bb786ae419c4d13189fb081cc43bab']}
+                  data={[100]} clickType={'stake'} />
+              </div> : <>
                 <div className="chart-container half">
                   <div className="title">THETA NODES</div>
                   <ThetaChart chartType={'doughnut'} labels={holders.theta} data={percentage.theta} clickType={'stake'} />

@@ -13,7 +13,10 @@ export const blocksService = {
   getBlocksByPage(pageNumber, limit = 10) {
     return apiService.get('blocks/top_blocks', { params: { pageNumber, limit } });
   },
-  getTotalBlockNumber(hour){
+  getTotalBlockNumber(hour, uri) {
+    if (uri) {
+      return apiService.getFullUri(`${uri}blocks/number/${hour}`);
+    }
     return apiService.get(`blocks/number/${hour}`);
   },
 };

@@ -38,7 +38,7 @@ exports.Execute = function () {
 
 exports.Check = function () {
   const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
-    new Date().setUTCHours(7, 0, 0, 0) / 1000 - 60 * 60 * 24 : new Date().setUTCHours(7, 0, 0, 0);
+    new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
   txHistoryDao.getAllTxHistoryAsync()
     .then(async res => {
       console.log('res length:', res.length);
@@ -48,7 +48,7 @@ exports.Check = function () {
       let tmp = 0;
       for (let i = 0; i < 14; i++) {
         const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
-        txHistoryDao.insertAsync({ timestamp: (iniTime - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
+        txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
         tmp = num;
       }
     }).catch(async err => {
@@ -58,7 +58,7 @@ exports.Check = function () {
           let tmp = 0;
           for (let i = 0; i < 14; i++) {
             const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
-            txHistoryDao.insertAsync({ timestamp: (iniTime - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
+            txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
             tmp = num;
           }
         }

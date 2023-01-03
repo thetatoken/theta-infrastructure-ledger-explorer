@@ -1,11 +1,7 @@
 .content.stakes{
   .chart{
-    width: 30%;
-    margin: 0 35%;
-    @include breakpoint('tablet-wide', max) {
-      width: 50%;
-      margin: 0 25%;
-    }
+    min-height: 165px;
+    height: 20vh;
   }
   .legend{
     position: relative;
@@ -18,6 +14,10 @@
   .table-container{
     display: flex;
     justify-content: space-between;
+
+    &.subchain {
+      justify-content: center;
+    }
     .stakes.half{
       margin-top: 30px;
     }

@@ -1,0 +1,155 @@
+.dapp-card {
+  height: 280px;
+  width: 200px;
+  border: 1px solid transparent;
+  background-color: rgba($color-font-light, 0.15);
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-theta-blue-dark;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 50px;
+  }
+
+  &__logo {
+    background-position: center center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+
+    &.tdrop {
+      height: 25px;
+      width: 85px;
+      background-image: url("/images/logos/logo-tdrop.png");
+    }
+
+    &.replay {
+      height: 25px;
+      width: 85px;
+      background-image: url("/images/logos/logo-replay.png");
+    }
+
+    &.voltswap {
+      height: 21px;
+      width: 130px;
+      background-image: url("/images/logos/logo-voltswap.png");
+    }
+
+    &.pentheta {
+      height: 21px;
+      width: 130px;
+      background-image: url("/images/logos/logo-pentheta.png");
+    }
+
+    &.tns {
+      letter-spacing: 5.46px;
+      font-size: 22px;
+      text-transform: uppercase;
+      font-weight: $weight-bold;
+    }
+
+    &.metapass {
+      height: 35px;
+      width: 130px;
+      margin-bottom: -10px;
+      background-image: url("/images/logos/logo-metapass.svg");
+    }
+  }
+
+  &__content {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+    height: 190px;
+  }
+
+  &__price {
+    margin-top: 29px;
+    color: $color-theta-blue-light;
+    font-size: 28px;
+  }
+
+  &__info {
+    margin-top: 23px;
+    width: 100%;
+
+    &.mid {
+      margin-top: 50px;
+    }
+    &--title {
+      color: $color-font-light;
+      font-size: 10px;
+      font-weight: $weight-bold;
+      text-align: center;
+    }
+    &--value {
+      color: $color-white;
+      font-size: 14px;
+      font-weight: $weight-semi;
+      text-align: center;
+
+      &.large {
+        color: $color-theta-blue-light;
+        font-size: 28px;
+        font-weight: $weight-regular;
+        margin-top: 15px;
+      }
+    }
+  }
+
+  &__team {
+    margin-top: 10px;
+
+    &--text {
+      text-align: center;
+      color: $color-font-light;
+      font-weight: $weight-bold;
+      font-size: 10px;
+    }
+
+    &--logo {
+      margin-top: 8px;
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+
+      &.thetaboard {
+        height: 22px;
+        width: 182px;
+        background-image: url("/images/logos/logo-thetaboard.png");
+      }
+    }
+  }
+
+  &__description {
+    color: $color-font-light;
+    font-size: 13px;
+    padding: 0 18px;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    font-size: 10px;
+    color: $color-font-light;
+    &:hover {
+      color: $color-theta-blue;
+    }
+  }
+
+  @include breakpoint("phablet", max) {
+    width: 150px;
+    margin: 10px;
+  }
+}

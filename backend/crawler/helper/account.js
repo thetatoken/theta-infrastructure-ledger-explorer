@@ -112,6 +112,14 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
         await _updateAccountByAddress(tx.data.beneficiary.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.beneficiary.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
         break;
+      case 201:
+        await _updateAccountByAddress(tx.data.Proposer.address, accountDao, tx.type);
+        await _updateAccountMaps(tx.data.Proposer.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+        for (let validator of tx.data.Validators) {
+          await _updateAccountByAddress(validator.Address, accountDao, tx.type);
+          await _updateAccountMaps(validator.Address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+        }
+        break;
       default:
         break;
     }
@@ -190,6 +198,9 @@ async function _updateAccountByAddress(address, accountDao, type) {
       }, 100);
     })
 }
+
+exports.updateAccountMaps = _updateAccountMaps;
+
 
 async function _updateAccountMaps(address, hash, type, timestamp, accountTxDao, dailyAccountDao) {
   accountTxDao.insertAsync({

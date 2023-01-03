@@ -8,105 +8,33 @@ $weight-semi: 600;
 $weight-bold: 700;
  
 // Base Font
-$font-title: 'Rift', 'Helvetica', sans-serif;
-$font-subtitle: 'Rift', 'Helvetica', sans-serif;
-$font-body: 'Alwyn', 'Helvetica', sans-serif;
+$font-title: 'Gilroy', 'Helvetica', sans-serif;
+$font-subtitle: 'Gilroy', 'Helvetica', sans-serif;
+$font-body: 'Gilroy', 'Helvetica', sans-serif;
 $line-height: 1.4;
 
 
 @font-face {
-    font-family: 'Rift';
-    src: url('../fonts/Rift-Bold.otf') format('otf'),
-         url('../fonts/Rift-Bold.woff') format('woff');
+    font-family: 'Gilroy';
+    src: url('../fonts/Gilroy-Bold.otf') format('otf'),
+         url('../fonts/Gilroy-Bold.woff') format('woff');
     font-weight: $weight-bold;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'Rift';
-    src: url('../fonts/Rift-Demi.otf') format('otf'),
-         url('../fonts/Rift-Demi.woff') format('woff');
+    font-family: 'Gilroy';
+    src: url('../fonts/Gilroy-Semibold.otf') format('otf'),
+         url('../fonts/Gilroy-Semibold.woff') format('woff');
     font-weight: $weight-semi;
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'Rift';
-    src: url('../fonts/Rift-Medium.otf') format('otf'),
-         url('../fonts/Rift-Medium.woff') format('woff');
-    font-weight: $weight-medium;
-    font-style: normal;
-}
 
 @font-face {
-    font-family: 'Rift';
-    src: url('../fonts/Rift-Regular.otf') format('otf'),
-         url('../fonts/Rift-Regular.woff') format('woff');
+    font-family: 'Gilroy';
+    src: url('../fonts/Gilroy-Regular.otf') format('otf'),
+         url('../fonts/Gilroy-Regular.woff') format('woff');
     font-weight: $weight-regular;
     font-style: normal;
 }
-
-@font-face {
-    font-family: 'Rift';
-    src: url('../fonts/Rift-Light.otf') format('otf'),
-         url('../fonts/Rift-Light.woff') format('woff');
-    font-weight: $weight-light;
-    font-style: normal;
-}
-
-
-
-
-
-@font-face {
-    font-family: 'Alwyn';
-    src: url('../fonts/Alwyn-New-Bold.otf') format('otf'),
-         url('../fonts/Alwyn-New-Bold.woff') format('woff');
-    font-weight: $weight-bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Alwyn';
-    src: url('../fonts/Alwyn-New-Medium.otf') format('otf'),
-         url('../fonts/Alwyn-New-Medium.woff') format('woff');
-    font-weight: $weight-semi;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Alwyn';
-    src: url('../fonts/Alwyn-New-Medium.otf') format('otf'),
-         url('../fonts/Alwyn-New-Medium.woff') format('woff');
-    font-weight: $weight-medium;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Alwyn';
-    src: url('../fonts/Alwyn-New-Regular.otf') format('otf'),
-         url('../fonts/Alwyn-New-Regular.woff') format('woff');
-    font-weight: $weight-regular;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Alwyn';
-    src: url('../fonts/Alwyn-New-Light.otf') format('otf'),
-         url('../fonts/Alwyn-New-Light.woff') format('woff');
-    font-weight: $weight-light;
-    font-style: normal;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -12,7 +12,12 @@
   }
   .node-type{
     color: $color-font-light;
-    width: 95px;
+    width: 125px;
+
+    &.half {
+      width: 95px;
+    }
+
     &:before {
       content: '';
       display: inline-block;

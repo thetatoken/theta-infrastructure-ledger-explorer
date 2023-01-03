@@ -1,4 +1,4 @@
-import { NetworkUrlOfChainId, EthRPCEndpoints } from 'common/constants';
+import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType } from 'common/constants';
 const host = 'https://localhost';
 const config = {
     restApi: {
@@ -10,6 +10,34 @@ const config = {
         port: 2096
     },
     defaultThetaChainID: NetworkUrlOfChainId[host],
-    ethRPCEndpoint: EthRPCEndpoints[host]
+    ethRPCEndpoint: EthRPCEndpoints[host],
+    chainInfo: {
+        metachain: {
+            host: 'https://localhost',
+        },
+        mainchain: {
+            name: 'Theta Testnet Main Chain',
+            discription: 'One sentence description of Theta Testnet Main Chain',
+            host: 'https://localhost',
+            logoName: "theta",
+            restApiPort: 8843,
+            socketApiPort: 2096
+        },
+        subchains: [{
+            name: 'Theta Testnet SubChain #1',
+            discription: 'One sentence description of subchain #1',
+            host: 'https://localhost',
+            logoName: "theta",
+            restApiPort: 8843,
+            socketApiPort: 2096
+        }]
+    },
+    contractAddresses: {
+        TNT20TokenBank: '0x7d7e270b7e279c94b265a535cdbc00eb62e6e68f',
+        TNT721TokenBank: '0xd5125d7bb9c4fb222c522c4b1922cabc631e52d7'
+    },
+    chainName: 'Theta Testnet Main Chain',
+    chainType: ChainType.MAINCHAIN
+
 };
 export default config;

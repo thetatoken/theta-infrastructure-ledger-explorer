@@ -1,0 +1,53 @@
+.subchain-chart {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid rgba($color-font-light, 0.2);
+  cursor: default;
+
+  & > :first-child {
+    width: 10%;
+  }
+
+  & > :last-child {
+    width: 10%;
+    border-left: 1px solid rgba($color-font-light, 0.2);
+    margin: 15px 0;
+  }
+
+  &__column {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+  }
+  & .chart-container {
+    height: 145px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 15px 0;
+    border-left: 1px solid rgba($color-font-light, 0.2);
+    color: $color-font-light;
+    font-size: 14px;
+    padding: 0 10%;
+
+    & .chart {
+      height: 105px;
+    }
+  }
+
+  @include breakpoint("phablet", max) {
+    margin-left: 10%;
+    flex-wrap: wrap;
+
+    &__column {
+      width: 80%;
+    }
+
+    & >:first-child, >:last-child {
+      display: none;
+    }
+  }
+}

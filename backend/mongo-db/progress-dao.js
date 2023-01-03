@@ -125,7 +125,7 @@ module.exports = class ProgressDAO {
           console.log(error);
           callback(error);
         } else if (!record) {
-          callback(Error('No stake progress record'));
+          callback(Error('NOT_FOUND. No stake progress record'));
         } else {
           var stakesInfo = {};
           stakesInfo.total_amount = record.total_amount;

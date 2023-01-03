@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
-
+var { getMaxTotalSupply } = require('../helper/smart-contract');
 
 var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
@@ -46,12 +46,12 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
           const feeInfo = await progressDao.getFeeAsync()
           const burntAmount = helper.sumCoin(addressZeroBalance, feeInfo.total_fee).toFixed();
           const supply = 5000000000 + ~~((10968061 - 4164982) / 100) * 4800 + ~~((height - 10968061) / 100) * 8600 - helper.formatCoin(burntAmount).toFixed(0);
-          const data = ({
+          let data = ({
             "total_supply": supply,
             "circulation_supply": supply
           })
           if (q === 'totalSupply') {
-            data = supply;
+            data = supply.toString();
           }
           res.status(200).send(data);
         } catch (err) {
@@ -78,16 +78,16 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
     try {
       const totalSupplyWei = await getMaxTotalSupply(tdropAddress, totalSupplyAbi);
       const totalSupply = helper.formatCoin(totalSupplyWei).toFixed(0);
-      const data = ({
+      let data = ({
         "total_supply": totalSupply,
         "circulation_supply": totalSupply
       });
       if (q === 'totalSupply') {
-        data = totalSupply;
+        data = totalSupply.toString();
       }
       res.status(200).send(data);
-    } catch (e) {
-      res.status(400).send(e.message);
+    } catch (err) {
+      res.status(400).send(err.message);
     }
 
   });

@@ -1,25 +1,27 @@
 // brand colors
-$color-theta-green: #21EDBA;
-$color-theta-blue: #29B3EB;
-$color-theta-blue-light: #25C4E4;
+$color-theta-green: #20e3b2;
+$color-theta-blue: #27a7db;
+$color-theta-blue-light: #25c4e4;
+$color-theta-blue-dark: #188194;
 
 // basic colors
 $color-white: #fff;
-$color-black: #1B1F2A;
+$color-dark-black: #15151a;
+$color-black: #1b1f2a;
 $color-blue: $color-theta-blue;
 $color-green: $color-theta-green;
-$color-light: #7C81A3;
-$color-grey-dark: #4A5776;
-$color-red: #FF4F0F;
-$color-orange: #FFB515;
+$color-light: #7c81a3;
+$color-grey-dark: #4a5776;
+$color-red: #ff4f0f;
+$color-orange: #ffb515;
 
 // panels
 $color-page: #1b1f2a;
-$color-panel: rgba(#D6D8FF, .05);
+$color-panel: rgba(#d6d8ff, 0.05);
 
 // Fonts
 $color-font-main: #ffffff;
-$color-font-light: #8A8FB5;
+$color-font-light: #8a8fb5;
 $color-font-highlight: $color-theta-blue;
 
 $color-font-title: $color-font-main;
@@ -39,44 +41,55 @@ $color-select-back: $color-font-highlight;
 $color-select-type: $color-font-main;
 
 // Forms
-$color-input-background: rgba($color-light, .35);
+$color-input-background: rgba($color-light, 0.35);
 $color-input-text: $color-font-main;
-$color-input-placeholder: rgba($color-font-main, .5);
+$color-input-placeholder: rgba($color-font-main, 0.5);
 $color-input-border: $color-line-main;
 
 // Tables
-$color-table-row: rgba(#D6D8FF, .05);
-$color-table-row-alt: rgba(#D6D8FF, .02);
-$color-table-row-line: rgba(#D6D8FF, .12);
+$color-table-row: rgba(#d6d8ff, 0.05);
+$color-table-row-alt: rgba(#d6d8ff, 0.02);
+$color-table-row-line: rgba(#d6d8ff, 0.12);
 
 // Buttons
-$color-button-light: rgba($color-light, .45);
-
-
+$color-button-light: rgba($color-light, 0.45);
 
 //Gradient helpers
-@mixin linearVerticalGradient($top, $bottom){
+@mixin linearVerticalGradient($top, $bottom) {
   background: $top; /* Old browsers */
-  background: -moz-linear-gradient(top,  $top 0%, $bottom 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,$top), color-stop(100%,$bottom)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  $top 0%,$bottom 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  $top 0%,$bottom 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  $top 0%,$bottom 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  $top 0%,$bottom 100%); /* W3C */
+  background: -moz-linear-gradient(top, $top 0%, $bottom 100%); /* FF3.6+ */
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0%, $top),
+    color-stop(100%, $bottom)
+  ); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(
+    top,
+    $top 0%,
+    $bottom 100%
+  ); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, $top 0%, $bottom 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, $top 0%, $bottom 100%); /* IE10+ */
+  background: linear-gradient(to bottom, $top 0%, $bottom 100%); /* W3C */
 }
 
-@mixin linearHorizontalGradient($left, $right){
+@mixin linearHorizontalGradient($left, $right) {
   background: $left; /* Old browsers */
   background: -moz-linear-gradient(left, $left 0%, $right 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(left, $left 0%,$right 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to right, $left 0%,$right 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: -webkit-linear-gradient(
+    left,
+    $left 0%,
+    $right 100%
+  ); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(
+    to right,
+    $left 0%,
+    $right 100%
+  ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
-@mixin buttonGradient() { @include linearHorizontalGradient($color-theta-blue, $color-theta-green); }
-
-
-
-
-
-
-
+@mixin buttonGradient() {
+  @include linearHorizontalGradient($color-theta-blue, $color-theta-green);
+}

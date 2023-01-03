@@ -37,6 +37,8 @@ export function from(txn, trunc = null, address = null, set = null) {
       path = 'data.from.address'
     } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
       path = 'data.holder.address'
+    } else if (txn.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE) {
+      path = 'data.Proposer.address'
     } else {
       let inputs = get(txn, 'data.inputs');
       isSelf = inputs.some(input => {
@@ -74,6 +76,12 @@ export function to(txn, trunc = null, address = null) {
     path = 'data.to.address'
   } else if (txn.type === TxnTypes.STAKE_REWARD_DISTRIBUTION) {
     path = 'data.beneficiary.address'
+  } else if (txn.type === TxnTypes.SUBCHAIN_VALIDATOR_SET_UPDATE) {
+    const validators = get(txn, 'data.Validators');
+    isSelf = validators.some(validator => {
+      return validator.Address === address;
+    })
+    path = 'data.outputs[0].address';
   } else {
     const outputs = get(txn, 'data.outputs');
     isSelf = outputs.some(output => {

@@ -23,6 +23,7 @@ var transactionDao = null;
 var accountDao = null;
 var accountTxDao = null;
 var stakeDao = null;
+var subStakeDao = null;
 var checkpointDao = null;
 var smartContractDao = null;
 var dailyAccountDao = null;
@@ -37,9 +38,11 @@ var latestBlockHeight = 0;
 var upsertTransactionAsyncList = [];
 var validTransactionList = [];
 var cacheEnabled = false;
+var chainType = 'mainchain';
 
 var stakeBlockHeight = 0;
 var stakeTimestamp = 0;
+var contractMap = {};
 // dec
 var startTime;
 //------------------------------------------------------------------------------
@@ -48,13 +51,14 @@ var startTime;
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
   rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, tokenSummaryDaoInstance,
-  tokenHolderDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig) {
+  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig, contractMapConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
   accountDao = accountDaoInstance;
   accountTxDao = accountTxDaoInstance;
   stakeDao = stakeDaoInstance;
+  subStakeDao = subStakeDaoInstance;
   checkpointDao = checkpointDaoInstance;
   smartContractDao = smartContractDaoInstance;
   dailyAccountDao = dailyAccountDaoInstance;
@@ -66,6 +70,8 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   cacheEnabled = cacheEnabledConfig;
   maxBlockPerCrawl = Number(maxBlockPerCrawlConfig);
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
+  chainType = chainTypeConfig || 'mainchain';
+  contractMap = contractMapConfig;
 }
 
 exports.Execute = async function (networkId) {
@@ -125,11 +131,16 @@ exports.Execute = async function (networkId) {
             stakeTimestamp = +new Date()
           }
           getBlockAsyncList.push(rpc.getBlockByHeightAsync([{ 'height': i.toString(), 'include_eth_tx_hashes': true }]));
-          getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': i.toString() }]));
-          getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': i.toString() }]));
-          getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': i.toString() }]));
           getRewardAsyncList.push(rpc.getStakeRewardDistributionAsync([{ 'height': i.toString() }]));
         }
+        if (chainType === 'mainchain') {
+          getStakeAsyncList.push(rpc.getVcpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+          getStakeAsyncList.push(rpc.getGcpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+          getStakeAsyncList.push(rpc.getEenpByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+        } else {
+          getStakeAsyncList.push(rpc.GetValidatorSetByHeightAsync([{ 'height': targetCrawlHeight.toString() }]));
+        }
+
         return Promise.all(getBlockAsyncList.concat(getStakeAsyncList).concat(getRewardAsyncList))
       } else {
         Logger.error('Block crawling is up to date.');
@@ -146,6 +157,8 @@ exports.Execute = async function (networkId) {
         var upsertGcpAsyncList = [];
         var updateEenpAsyncList = [];
         var upsertEenpAsyncList = [];
+        var updateVsAsyncList = [];
+        var upsertVsAsyncList = [];
         var updateRewardAsyncList = [];
         var upsertRewardAsyncList = [];
         var insertStakeHistoryList = [];
@@ -155,6 +168,7 @@ exports.Execute = async function (networkId) {
         var updateTokenList = [];
         var tokenTxs = [];
         var stakes = { vcp: [], gcp: [], eenp: [] };
+        var subStakes = { vs: [] };
         for (var i = 0; i < blockDataList.length; i++) {
           // Store the block data
           var result = JSON.parse(blockDataList[i]);
@@ -212,6 +226,14 @@ exports.Execute = async function (networkId) {
                 })
               })
               upsertRewardAsyncList.push(rewardHelper.updateRewardDistributions(updateRewardAsyncList, rewardDistributionDao, cacheEnabled))
+            } else if (result.result.BlockHashValidatorSetPairs) {
+              subStakes.vs = result.result.BlockHashValidatorSetPairs;
+              result.result.BlockHashValidatorSetPairs.forEach(pair => {
+                pair.ValidatorSet.Validators.forEach(s => {
+                  updateVsAsyncList.push(s);
+                })
+              })
+              upsertVsAsyncList.push(stakeHelper.updateSubStakes(updateVsAsyncList, 'vs', subStakeDao, cacheEnabled));
             } else {  //handle block response
               var txs = result.result.transactions;
               const blockInfo = {
@@ -269,11 +291,15 @@ exports.Execute = async function (networkId) {
           }
         }
         if (tokenTxs.length !== 0) {
-          updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao, tokenHolderDao));
+          updateTokenList.push(scHelper.updateTokenByTxs(tokenTxs, smartContractDao, tokenDao, tokenSummaryDao,
+            tokenHolderDao, contractMap, chainType));
         }
         if (stakes.vcp.length !== 0) {
           // Update total stake info
           upsertGcpAsyncList.push(stakeHelper.updateTotalStake(stakes, progressDao))
+        }
+        if (subStakes.vs.length !== 0) {
+          upsertVsAsyncList.push(stakeHelper.updateTotalSubStake(subStakes, progressDao));
         }
         if (checkpoint_hash)
           for (var i = 0; i < blockDataList.length; i++) {
@@ -299,7 +325,7 @@ exports.Execute = async function (networkId) {
         Logger.log(`Number of upsert TOKEN txs: ${updateTokenList.length}`);
         return Promise.all(upsertBlockAsyncList, upsertVcpAsyncList, upsertGcpAsyncList,
           upsertTransactionAsyncList, upsertCheckpointAsyncList, upsertEenpAsyncList, upsertRewardAsyncList,
-          txHelper.updateFees(validTransactionList, progressDao), updateTokenList)
+          txHelper.updateFees(validTransactionList, progressDao), updateTokenList, upsertVsAsyncList)
       }
     })
     .then(() => {

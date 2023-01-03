@@ -12,6 +12,7 @@ var smartContractDaoLib = require('../mongo-db/smart-contract-dao.js')
 var tokenDaoLib = require('../mongo-db/token-dao.js')
 var tokenSummaryDaoLib = require('../mongo-db/token-summary-dao.js')
 var tokenHolderDaoLib = require('../mongo-db/token-holder-dao.js')
+var dailyAccountDaoLib = require('../mongo-db/daily-account-dao')
 
 var Redis = require("ioredis");
 var redis = null;
@@ -118,8 +119,11 @@ function setupGetBlockCronJob(mongoClient, networkId, retrieveStartHeight) {
   tokenHolderDao = new tokenHolderDaoLib(__dirname, mongoClient);
   bluebird.promisifyAll(tokenHolderDao);
 
+  dailyAccountDao = new dailyAccountDaoLib(__dirname, mongoClient);
+  bluebird.promisifyAll(dailyAccountDao);
+
   readPreTokenCronJob.Initialize(progressDao, blockDao, transactionDao, accountDao, accountTxDao,
-    smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao);
+    smartContractDao, tokenDao, tokenHolderDao, tokenSummaryDao, dailyAccountDao, config.contractAddressMap);
 
   setTimeout(async function run() {
     Logger.log('Start of Execute.');

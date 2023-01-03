@@ -5,13 +5,18 @@ import { formatCoin } from 'common/helpers/utils';
 import map from 'lodash/map';
 import _truncate from 'lodash/truncate'
 import tns from 'libs/tns';
+import config from "../../config";
+import { ChainType } from "../constants";
+
+const isSubChain = config.chainType === ChainType.SUBCHAIN;
 
 const TRUNC = 20;
 const TitleMap = {
   'theta_wallet': 'TOP THETA STAKING WALLETS',
   'theta_node': 'TOP VALIDATOR / GUARDIAN NODES',
   'tfuel_wallet': 'TOP TFUEL STAKING WALLETS',
-  'tfuel_node': 'TOP ELITE EDGE NODES'
+  'tfuel_node': 'TOP ELITE EDGE NODES',
+  "validatorSet_": "TOP VALIDATOR SET WALLETS"
 }
 const NodeMap = {
   'vcp': 'Validator',
@@ -71,8 +76,8 @@ export default class StakesTable extends React.Component {
     const { className, type, truncate, totalStaked, stakes, stakeCoinType } = this.props;
     const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
     let colSpan = type === 'node' ? 5 : 3;
-    const titleKey = `${stakeCoinType}_${type}`;
-    const currencyUnit = stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
+    const titleKey = `${stakeCoinType}_${type || ""}`;
+    const currencyUnit = isSubChain ? '' : stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
       <div className="stakes half">
         <div className="title">{TitleMap[`${titleKey}`]}</div>
@@ -80,7 +85,7 @@ export default class StakesTable extends React.Component {
           <thead>
             <tr onClick={this.toggleList.bind(this)}>
               <th className="address">ADDRESS</th>
-              {type === 'node' && <th className="node-type">TYPE</th>}
+              {type === 'node' && <th className="node-type half">TYPE</th>}
               {type === 'node' && <th className="reward-prct">SPLIT</th>}
               <th className="staked">TOKENS STAKED</th>
               <th className="staked-prct">%STAKED</th>
@@ -88,16 +93,16 @@ export default class StakesTable extends React.Component {
           </thead>
           <tbody className="stake-tb">
             {map(stakes.slice(0, curStakeLength), record => {
-              const address = type === 'node' ? record.holder : record.source;
+              const address = (type === 'node' ? record.holder : record.source) || record.address;
               return (
                 <tr key={address}>
                   <td className="address">
                     <AddressTNS address={address} tns={record.tns} truncate={truncate} />
                   </td>
-                  {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
+                  {type === 'node' && <td className={cx("node-type half", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
-                  <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount, 0)}</div></td>
-                  <td className="staked-prct">{(record.amount / totalStaked * 100).toFixed(2)}%</td>
+                  <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount || record.stake, 0)}</div></td>
+                  <td className="staked-prct">{((record.amount || record.stake) / totalStaked * 100).toFixed(2)}%</td>
                 </tr>);
             })}
             {stakes.length > TRUNC &&

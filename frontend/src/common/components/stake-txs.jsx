@@ -85,7 +85,6 @@ export default class StakeTxsTable extends React.PureComponent {
                 </td>
               </tr>
             }
-            <tr><td className="empty"></td></tr>
             <tr>
               <td></td>
               <td className={cx("token", { 'left': type === 'source' })} colSpan='3'>
