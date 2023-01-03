@@ -15,7 +15,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
       "total_supply": 1000000000,
       "circulation_supply": 1000000000
     });
-    if (q === 'totalSupply') {
+    if (q === 'totalSupply' || q === 'circulationSupply') {
       data = '1000000000';
     }
     res.status(200).send(data);
@@ -30,7 +30,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
         "total_supply": 5000000000,
         "circulation_supply": 5000000000
       });
-      if (q === 'totalSupply') {
+      if (q === 'totalSupply' || q === 'circulationSupply') {
         data = '5000000000';
       }
       res.status(200).send(data);
@@ -50,7 +50,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
             "total_supply": supply,
             "circulation_supply": supply
           })
-          if (q === 'totalSupply') {
+          if (q === 'totalSupply' || q === 'circulationSupply') {
             data = supply.toString();
           }
           res.status(200).send(data);
