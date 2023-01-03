@@ -78,12 +78,15 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
     try {
       const totalSupplyWei = await getMaxTotalSupply(tdropAddress, totalSupplyAbi);
       const totalSupply = helper.formatCoin(totalSupplyWei).toFixed(0);
+      const tSupply = 20000000000;
       let data = ({
         "total_supply": totalSupply,
-        "circulation_supply": totalSupply
+        "circulation_supply": tSupply
       });
-      if (q === 'totalSupply' || q === 'circulationSupply') {
+      if (q === 'circulationSupply') {
         data = totalSupply.toString();
+      } else if (q === 'totalSupply') {
+        data = tSupply.toString();
       }
       res.status(200).send(data);
     } catch (err) {
