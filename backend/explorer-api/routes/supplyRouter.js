@@ -82,7 +82,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
         "total_supply": totalSupply,
         "circulation_supply": totalSupply
       });
-      if (q === 'totalSupply') {
+      if (q === 'totalSupply' || q === 'circulationSupply') {
         data = totalSupply.toString();
       }
       res.status(200).send(data);
