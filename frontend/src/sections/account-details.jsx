@@ -386,12 +386,12 @@ export default class AccountDetails extends React.Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.match.params;
-    const startDate = (new Date(this.startDateRef.value).getTime() / 1000).toString();
-    const endDate = (new Date(this.endDateRef.value).getTime() / 1000).toString();
+    const startDate = (new Date(this.startDateRef.current.value).getTime() / 1000).toString();
+    const endDate = (new Date(this.endDateRef.current.value).getTime() / 1000).toString();
     let hasStartDateErr = false, hasEndDateErr = false;
-    if (this.startDateRef.value === '' || this.endDateRef.value === '') {
-      if (this.startDateRef.value === '') hasStartDateErr = true;
-      if (this.endDateRef.value === '') hasEndDateErr = true;
+    if (this.startDateRef.current.value === '' || this.endDateRef.current.value === '') {
+      if (this.startDateRef.current.value === '') hasStartDateErr = true;
+      if (this.endDateRef.current.value === '') hasEndDateErr = true;
       this.setState({ hasStartDateErr, hasEndDateErr })
       return
     }
