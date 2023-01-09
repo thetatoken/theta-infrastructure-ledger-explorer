@@ -79,8 +79,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
           txHashes.push(acctTx.hash);
         }
 
-        txs = await transactionDao.getTransactionsByPkAsync(txHashes);
-        txs = orderTxs(txs, txHashes);
+        txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
+        // txs = orderTxs(txs, txHashes);
         let records = txs.map(tx => {
           const data = tx.data;
           let obj = {
@@ -107,7 +107,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
                 obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
                 obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
                 obj.from = address;
-                let to = data.outputs.reduce((sum, output) => sum + output.address + ', ', '')
+                let to = data.outputs.reduce((sum, output) => sum + output.address + ' | ', '')
                 obj.to = to.substring(0, to.length - 2)
               } else {
                 data.outputs.forEach(output => {
