@@ -401,8 +401,11 @@
       margin-left: 10px;
       margin-top: 5px;
       .search-button {
-        height: 30px;
         margin-left: -1px;
+        border: 0;
+      }
+      .search-input {
+        height: 32px;
       }
     }
     // .nav-search {
