@@ -78,15 +78,22 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         for (let acctTx of txList) {
           txHashes.push(acctTx.hash);
         }
+        let maxLength = 5000;
+        for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
+          let end = Math.min(txHashes.length, (i + 1) * maxLength);
+          let hashes = txHashes.slice(i * maxLength, end);
+          let tnxs = await transactionDao.getTxsByPkWithSortAsync(hashes);
+          txs = txs.concat(tnxs)
+        }
 
-        txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
+        // txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
         // txs = orderTxs(txs, txHashes);
-        var data = ({
-          type: 'account_tx_list',
-          body: txs
-        });
-        res.status(200).send(data);
-        return;
+        // var data = ({
+        //   type: 'account_tx_list',
+        //   body: txs
+        // });
+        // res.status(200).send(data);
+        // return;
         let records = txs.map(tx => {
           const data = tx.data;
           let obj = {
