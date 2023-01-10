@@ -81,6 +81,12 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
 
         txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
         // txs = orderTxs(txs, txHashes);
+        var data = ({
+          type: 'account_tx_list',
+          body: txs
+        });
+        res.status(200).send(data);
+        return;
         let records = txs.map(tx => {
           const data = tx.data;
           let obj = {
