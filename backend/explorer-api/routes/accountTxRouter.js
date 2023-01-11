@@ -71,20 +71,27 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
     }
+    let startTime = +new Date();
     accountTxDao.getListByTimeAsync(address, startDate, endDate, types)
       .then(async txList => {
+        console.log(`getListByTime takes ${(+new Date() - startTime) / 1000} seconds`);
         let txHashes = [];
         let txs = [];
         for (let acctTx of txList) {
           txHashes.push(acctTx.hash);
         }
         let maxLength = 5000;
+        startTime = +new Date();
         for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
           let end = Math.min(txHashes.length, (i + 1) * maxLength);
           let hashes = txHashes.slice(i * maxLength, end);
+          console.log('hashed length:', hashes.length);
           let tnxs = await transactionDao.getTxsByPkWithSortAsync(hashes);
+          console.log(`loop ${i + 1} takes ${(+new Date() - startTime) / 1000} seconds.`);
+          startTime = +new Date();
           txs = txs.concat(tnxs)
         }
+        console.log('txs length:', txs.length);
 
         // txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
         // txs = orderTxs(txs, txHashes);
@@ -154,6 +161,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
           }
           return obj;
         })
+        console.log(`handle records takes ${(+new Date() - startTime) / 1000} seconds`);
         var data = ({
           type: 'account_tx_list',
           body: records
