@@ -85,8 +85,8 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
           let end = Math.min(txHashes.length, (i + 1) * maxLength);
           let hashes = txHashes.slice(i * maxLength, end);
-          console.log('hashed length:', hashes.length);
-          let tnxs = await transactionDao.getTxsByPkWithSortAsync(hashes);
+          console.log('hashes length:', hashes.length);
+          let tnxs = await transactionDao.getTransactionsByPkAsync(hashes);
           console.log(`loop ${i + 1} takes ${(+new Date() - startTime) / 1000} seconds.`);
           startTime = +new Date();
           txs = txs.concat(tnxs)
