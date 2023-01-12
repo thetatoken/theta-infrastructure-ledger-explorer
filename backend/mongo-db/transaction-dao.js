@@ -188,9 +188,9 @@ module.exports = class TransactionDAO {
       })
     }
   }
-  getTxsByPkWithSort(pks, callback) {
-    const queryObject = { _id: { $in: pks } };
-    this.client.getRecords(this.transactionInfoCollection, queryObject, { timestamp: 1 }, 0, 0, function (error, transactions) {
+  getTxsByPkAndTime(pks, startDate, endDate, callback) {
+    const queryObject = { _id: { $in: pks }, timestamp: { $gte: startDate, $lt: endDate } };
+    this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, function (error, transactions) {
       if (error) {
         console.log('Transation dao getTxsByPkWithSort ERR - ', error, pks);
         callback(error);
