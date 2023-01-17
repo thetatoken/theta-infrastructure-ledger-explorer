@@ -80,7 +80,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         for (let acctTx of txList) {
           txHashes.push(acctTx.hash);
         }
-        let maxLength = 5000;
+        let maxLength = 1000;
         startTime = +new Date();
         console.log('txHashes length:', txHashes.length);
         for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
