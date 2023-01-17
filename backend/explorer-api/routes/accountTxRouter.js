@@ -82,10 +82,11 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         }
         let maxLength = 5000;
         startTime = +new Date();
+        console.log('txHashes length:', txHashes.length);
         for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
           let end = Math.min(txHashes.length, (i + 1) * maxLength);
           let hashes = txHashes.slice(i * maxLength, end);
-          console.log('hashes length:', hashes.length);
+          console.log('hashes length:', hashes.length, i * maxLength, end);
           let tnxs = await transactionDao.getTxsByPkAndTimeAsync(hashes, startDate, endDate);
           console.log(`loop ${i + 1} takes ${(+new Date() - startTime) / 1000} seconds.`);
           startTime = +new Date();
@@ -94,7 +95,9 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         console.log('txs length:', txs.length);
 
         // txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
-        // txs = orderTxs(txs, txHashes);
+        txs = orderTxs(txs, txHashes);
+        console.log(`order records takes ${(+new Date() - startTime) / 1000} seconds`);
+        startTime = +new Date();
         // var data = ({
         //   type: 'account_tx_list',
         //   body: txs
