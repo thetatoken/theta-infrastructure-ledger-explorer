@@ -59,7 +59,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
   //     })
   // })
 
-  router.get("/accountTx/history/:address", async (req, res) => {
+  router.get("/accountTx/history_v1/:address", async (req, res) => {
     const address = helper.normalize(req.params.address.toLowerCase());
     if (!helper.validateHex(address, 40)) {
       res.status(400).send({ type: 'invalid_address' })
@@ -178,6 +178,133 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
         });
         res.status(404).send(err);
       });
+  });
+
+  router.get("/accountTx/history/:address", async (req, res) => {
+    const address = helper.normalize(req.params.address.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    const sTime = +new Date();
+    let { startDate, endDate } = req.query;
+    const types = [0, 2, 5];
+    const gap = 60 * 60 * 24 * 93;
+    if (endDate - startDate > gap) {
+      startDate = (endDate - gap).toString();
+    }
+    const queryGap = 60 * 60 * 24 * 7;
+    let records = [];
+    try {
+      for (let j = 0; j < Math.ceil((endDate - startDate) / queryGap); j++) {
+        const sDate = Number(startDate) + j * queryGap;
+        const eDate = Math.min(Number(startDate) + (j + 1) * queryGap, endDate);
+        let startTime = +new Date();
+        let st = startTime;
+        let txList = await accountTxDao.getListByTimeAsync(address, sDate.toString(), eDate.toString(), types);
+        console.log(`getListByTime takes ${(+new Date() - startTime) / 1000} seconds`);
+        let txHashes = [];
+        let txs = [];
+        for (let acctTx of txList) {
+          txHashes.push(acctTx.hash);
+        }
+        let maxLength = 1000;
+        startTime = +new Date();
+        console.log('txHashes length:', txHashes.length);
+        for (let i = 0; i < Math.ceil(txHashes.length / maxLength); i++) {
+          let end = Math.min(txHashes.length, (i + 1) * maxLength);
+          let hashes = txHashes.slice(i * maxLength, end);
+          console.log('hashes length:', hashes.length, i * maxLength, end);
+          let tnxs = await transactionDao.getTxsByPkAndTimeAsync(hashes, sDate.toString(), eDate.toString());
+          console.log(`loop ${i + 1} takes ${(+new Date() - startTime) / 1000} seconds.`);
+          startTime = +new Date();
+          txs = txs.concat(tnxs)
+        }
+        console.log('txs length:', txs.length);
+
+        // txs = await transactionDao.getTxsByPkWithSortAsync(txHashes);
+        txs = orderTxs(txs, txHashes);
+        console.log(`order records takes ${(+new Date() - startTime) / 1000} seconds`);
+        startTime = +new Date();
+        let list = txs.map(tx => {
+          const data = tx.data;
+          let obj = {
+            'tx_hash': tx.hash,
+            'timestamp': `"${new Date(tx.timestamp * 1000).toUTCString()}"`
+          }
+          switch (tx.type) {
+            case 0:
+              if (data.proposer.address !== address) {
+                data.outputs.forEach(output => {
+                  if (output.address === address) {
+                    obj.tx_type = 'Receive';
+                    obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                    obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                    obj.from = '0x00000';
+                    obj.to = address;
+                  }
+                })
+              }
+              break;
+            case 2:
+              if (data.inputs[0].address === address) {
+                obj.tx_type = 'Send';
+                obj.theta_amount = helper.formatCoin(data.inputs[0].coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.inputs[0].coins.tfuelwei);
+                obj.from = address;
+                let to = data.outputs.reduce((sum, output) => sum + output.address + ' | ', '')
+                obj.to = to.substring(0, to.length - 2)
+              } else {
+                data.outputs.forEach(output => {
+                  if (output.address === address) {
+                    obj.tx_type = 'Receive';
+                    obj.theta_amount = helper.formatCoin(output.coins.thetawei);
+                    obj.tfuel_amount = helper.formatCoin(output.coins.tfuelwei);
+                    obj.from = data.inputs[0].address;
+                    obj.to = address;
+                  }
+                })
+              }
+              break;
+            case 5:
+              if (data.source.address === address) {
+                obj.tx_type = 'Send';
+                obj.theta_amount = helper.formatCoin(data.source.coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.source.coins.tfuelwei);
+                obj.from = address;
+                obj.to = data.target.address;
+              } else if (data.target.address === address) {
+                obj.tx_type = 'Receive';
+                obj.theta_amount = helper.formatCoin(data.source.coins.thetawei);
+                obj.tfuel_amount = helper.formatCoin(data.source.coins.tfuelwei);
+                obj.from = data.source.address;
+                obj.to = address;
+              }
+              break;
+            default:
+              break;
+          }
+          return obj;
+        })
+        console.log(`handle records takes ${(+new Date() - startTime) / 1000} seconds`);
+        records = records.concat(list);
+        console.log(`outer loop ${j} takes ${(+new Date() - st) / 1000} seconds`);
+
+      }
+      console.log(`Full process takes ${(+new Date() - sTime) / 1000} seconds`);
+
+      var data = ({
+        type: 'account_tx_list',
+        body: records
+      });
+      res.status(200).send(data);
+    } catch (err) {
+      const e = ({
+        type: 'error_not_found',
+        error: err.message
+      });
+      res.status(404).send(e);
+    }
   });
 
   router.get("/accountTx/:address", async (req, res) => {
