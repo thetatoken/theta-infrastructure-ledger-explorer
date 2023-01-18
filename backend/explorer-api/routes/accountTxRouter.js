@@ -193,7 +193,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
     }
-    const queryGap = 60 * 60 * 24 * 7;
+    const queryGap = 60 * 60 * 24 * 3;
     let records = [];
     try {
       for (let j = 0; j < Math.ceil((endDate - startDate) / queryGap); j++) {
