@@ -67,7 +67,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
     }
     let { startDate, endDate } = req.query;
     const types = [0, 2, 5];
-    const gap = 60 * 60 * 24 * 93;
+    const gap = 60 * 60 * 24 * 31;
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
     }
@@ -189,7 +189,7 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
     const sTime = +new Date();
     let { startDate, endDate } = req.query;
     const types = [0, 2, 5];
-    const gap = 60 * 60 * 24 * 93;
+    const gap = 60 * 60 * 24 * 31;
     if (endDate - startDate > gap) {
       startDate = (endDate - gap).toString();
     }

@@ -13,7 +13,7 @@ export const apiService = {
           resolve(res);
         })
         .catch((err) => {
-          if (err.response.status === 404) {
+          if (err.response && err.response.status === 404) {
             resolve(err.response);
           } else {
             console.log(`ERROR: ${uri}.${err}`);
@@ -31,7 +31,7 @@ export const apiService = {
           resolve(res);
         })
         .catch((err) => {
-          if (err.response.status === 404) {
+          if (err.response && err.response.status === 404) {
             resolve(err.response);
           } else {
             console.log(`ERROR: ${`${API_URI}/${uri}`}.${err}`);

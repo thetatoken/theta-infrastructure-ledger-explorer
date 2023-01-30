@@ -431,19 +431,22 @@ export default class AccountDetails extends React.Component {
           this.download.current.href = url;
           this.download.current.click();
           this.setState({ isDownloading: false })
+        } else {
+          this.setState({ isDownloading: true })
         }
       });
   }
   handleInput(type) {
+    const gap = 31;
     if (type === 'start') {
       let date = new Date(this.startDateRef.current.value)
-      date.setDate(date.getDate() + 7);
+      date.setDate(date.getDate() + gap);
       this.endDateRef.current.min = this.startDateRef.current.value;
       let newDate = this.getDate(date);
       this.endDateRef.current.max = newDate < today ? newDate : today;
     } else if (type === 'end') {
       let date = new Date(this.endDateRef.current.value)
-      date.setDate(date.getDate() - 7);
+      date.setDate(date.getDate() - gap);
       this.startDateRef.current.max = this.endDateRef.current.value;
       this.startDateRef.current.min = this.getDate(date);
     }
@@ -465,6 +468,8 @@ export default class AccountDetails extends React.Component {
     this.endDateRef.current.value = '';
     this.endDateRef.current.max = today;
     this.endDateRef.current.min = '';
+    if (this.state.hasStartDateErr) this.setState({ hasStartDateErr: false })
+    if (this.state.hasEndDateErr) this.setState({ hasEndDateErr: false })
   }
   handleSelect = (selectedList, selectedItem) => {
     this.setState({
@@ -786,7 +791,7 @@ const TxsTab = React.memo(props => {
     let tabIndex = names.indexOf(tabName) === -1 ? 0 : names.indexOf(tabName);
     setTabNames(names);
     setTabIndex(tabIndex);
-  }, [type, hasTxs, hasTNT20, hasTNT721])
+  }, [type, hasTxs, hasTNT20, hasTNT721, hasTransaction])
   const handleSelect = index => {
     let tabName = tabNames[index];
     setTabIndex(index);
