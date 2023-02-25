@@ -232,7 +232,7 @@ function main() {
       // reward distribution router
       rewardDistributionRouter(app, rewardDistributionDao);
       // token router
-      tokenRouter(app, tokenDao, tokenSummaryDao, tokenHolderDao);
+      tokenRouter(app, tokenDao, tokenSummaryDao, tokenHolderDao, config);
       // keep push block data
       // pushTopBlocks();
     }
