@@ -5,7 +5,7 @@ var helper = require('../helper/utils');
 var BigNumber = require('bignumber.js');
 
 
-var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
+var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
   // The api to get token summary
   router.get("/tokenSummary/:address", (req, res) => {
@@ -95,6 +95,49 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
       })
   });
 
+
+  router.get("/token/topholders", (req, res) => {
+    if (req.headers['x-api-token'] !== config.xApiToken) {
+      res.status(400).send({ type: 'invalid_token' });
+      return;
+    }
+    let { limit = 100, tokenId } = req.query;
+    if (limit > 100) limit = 100;
+    // const tdropAddress = "0x08a0c0e8efd07a98db11d79165063b6bc2469adf"; // testnet
+    const tdropAddress = "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03"; // mainnet
+    tokenHolderDao.getTopHoldersAsync(tdropAddress, null, limit)
+      .then(result => {
+        if (result === null) {
+          res.status(400).send({ type: 'invalid_token' })
+          return;
+        }
+        let holders = [];
+        if (tokenId == null) {
+          const map = {};
+          result.forEach(info => {
+            const address = info.holder;
+            if (map[address] === undefined) map[address] = 0;
+            map[address] = BigNumber.sum(new BigNumber(map[address]), new BigNumber(info.amount)).toFixed();
+          })
+          holders = Object.keys(map).map(address => ({
+            address: address,
+            amount: map[address]
+          }))
+        } else {
+          holders = result.map(info => {
+            return { address: info.holder, amount: info.amount }
+          });
+        }
+        const data = ({
+          "type": "token_holders",
+          body: {
+            "holders": holders
+          }
+        })
+        res.status(200).send(data);
+      })
+  })
+
   // The api to get token info
   router.get("/token/:address", (req, res) => {
     console.log('Querying the token info.');
@@ -172,46 +215,6 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao) => {
         res.status(200).send(data);
       })
   })
-
-  // router.get("/token/topholders", (req, res) => {
-  //   let { limit = 10 } = req.query;
-  //   if (limit > 100) limit = 100;
-  //   const tdropAddress = "0x08a0c0e8efd07a98db11d79165063b6bc2469adf"; // testnet
-  //   // const tdropAddress = "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03"; // mainnet
-  //   tokenHolderDao.getTopHoldersAsync(tdropAddress, null, limit)
-  //     .then(result => {
-  //       if (result === null) {
-  //         res.status(404).send({
-  //           type: 'error_not_found',
-  //         });
-  //         return;
-  //       }
-  //       let holders = [];
-  //       if (tokenId == null) {
-  //         const map = {};
-  //         result.forEach(info => {
-  //           const address = info.holder;
-  //           if (map[address] === undefined) map[address] = 0;
-  //           map[address] = BigNumber.sum(new BigNumber(map[address]), new BigNumber(info.amount)).toFixed();
-  //         })
-  //         holders = Object.keys(map).map(address => ({
-  //           address: address,
-  //           amount: map[address]
-  //         }))
-  //       } else {
-  //         holders = result.map(info => {
-  //           return { address: info.holder, amount: info.amount }
-  //         });
-  //       }
-  //       const data = ({
-  //         "type": "token_holders",
-  //         body: {
-  //           "holders": holders
-  //         }
-  //       })
-  //       res.status(200).send(data);
-  //     })
-  // })
 
   //the / route of router will get mapped to /api
   app.use('/api', router);
