@@ -8,7 +8,7 @@ import tns from 'libs/tns';
 
 import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
 import { from, to, date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity, fetchAbi } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -268,8 +268,9 @@ const Address = ({ hash, truncate = null }) => {
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
-const StakeAmount = ({ stake, price, isSubchain }) => {
-  return (isSubchain ? <div className="currency">{formatCoin(stake)} Subchain Governance Token</div> :
+const StakeAmount = ({ stake, price, isSubchain, symbol }) => {
+  const govTokenSymbol = symbol || 'Subchain Governance Token'
+  return (isSubchain ? <div className="currency">{formatCoin(stake)} {govTokenSymbol}</div> :
     <div className="currency theta">
       {formatCoin(stake)} Theta
       <div className='price'>{`[\$${priceCoin(stake, price['Theta'])} USD]`}</div>
@@ -429,23 +430,35 @@ const Coinbase = ({ transaction, price }) => {
 
 const SubchainValidatorSetUpdate = ({ transaction, price }) => {
   let { data } = transaction;
+  const [symbol, setSymbol] = useState('');
+  useEffect(() => {
+    let flag = true;
+    fetchData();
+
+    async function fetchData() {
+      let symbol = await fetchAbi([CommonFunctionABIs.symbol]);
+      console.log('symbol:', symbol)
+      setSymbol(symbol);
+    }
+    return () => flag = false;
+  }, [transaction])
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Proposer" data={<Address hash={get(data, 'Proposer.address')} />}></DetailsRow>
-        <DetailsRow label="Stake" data={map(data.Validators, (validator, i) => <ValidatorSet key={i} validator={validator} price={price} isSubchain={true} />)} />
+        <DetailsRow label="Stake" data={map(data.Validators, (validator, i) => <ValidatorSet key={i} validator={validator} price={price} isSubchain={true} symbol={symbol} />)} />
       </tbody>
     </table>);
 }
 
-const ValidatorSet = ({ validator, price, isSingle, isSubchain }) => {
+const ValidatorSet = ({ validator, price, isSingle, isSubchain, symbol }) => {
   const isPhone = window.screen.width <= 560;
   const isSmallPhone = window.screen.width <= 320;
   const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
   return (
     <div className={cx("coinbase-output", { "single": isSingle })}>
       <div>
-        <StakeAmount stake={validator.Stake} price={price} isSubchain={isSubchain} />
+        <StakeAmount stake={validator.Stake} price={price} isSubchain={isSubchain} symbol={symbol} />
       </div>
       <AddressTNS hash={validator.Address} truncate={truncate} />
     </div>);
