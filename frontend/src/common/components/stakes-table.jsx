@@ -85,7 +85,7 @@ export default class StakesTable extends React.Component {
           <thead>
             <tr onClick={this.toggleList.bind(this)}>
               <th className="address">ADDRESS</th>
-              {type === 'node' && <th className="node-type">TYPE</th>}
+              {type === 'node' && <th className="node-type half">TYPE</th>}
               {type === 'node' && <th className="reward-prct">SPLIT</th>}
               <th className="staked">TOKENS STAKED</th>
               <th className="staked-prct">%STAKED</th>
@@ -99,7 +99,7 @@ export default class StakesTable extends React.Component {
                   <td className="address">
                     <AddressTNS address={address} tns={record.tns} truncate={truncate} />
                   </td>
-                  {type === 'node' && <td className={cx("node-type", record.type)}>{NodeMap[`${record.type}`]}</td>}
+                  {type === 'node' && <td className={cx("node-type half", record.type)}>{NodeMap[`${record.type}`]}</td>}
                   {type === 'node' && <td className="reward-prct">{record.splitBasisPoint / 100 + '%'}</td>}
                   <td className="staked"><div className={cx("currency", currencyUnit)}>{formatCoin(record.amount || record.stake, 0)}</div></td>
                   <td className="staked-prct">{((record.amount || record.stake) / totalStaked * 100).toFixed(2)}%</td>

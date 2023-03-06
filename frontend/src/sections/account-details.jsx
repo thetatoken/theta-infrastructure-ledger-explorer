@@ -386,12 +386,12 @@ export default class AccountDetails extends React.Component {
 
   downloadTrasanctionHistory() {
     const { accountAddress } = this.props.match.params;
-    const startDate = (new Date(this.startDateRef.value).getTime() / 1000).toString();
-    const endDate = (new Date(this.endDateRef.value).getTime() / 1000).toString();
+    const startDate = (new Date(this.startDateRef.current.value).getTime() / 1000).toString();
+    const endDate = (new Date(this.endDateRef.current.value).getTime() / 1000).toString();
     let hasStartDateErr = false, hasEndDateErr = false;
-    if (this.startDateRef.value === '' || this.endDateRef.value === '') {
-      if (this.startDateRef.value === '') hasStartDateErr = true;
-      if (this.endDateRef.value === '') hasEndDateErr = true;
+    if (this.startDateRef.current.value === '' || this.endDateRef.current.value === '') {
+      if (this.startDateRef.current.value === '') hasStartDateErr = true;
+      if (this.endDateRef.current.value === '') hasEndDateErr = true;
       this.setState({ hasStartDateErr, hasEndDateErr })
       return
     }
@@ -489,8 +489,8 @@ export default class AccountDetails extends React.Component {
   }
   fetchTokenBalance = async (accountAddress) => {
     const tokenMap = {
-      TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-      // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      // TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+      TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
       WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
       TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
     }
@@ -627,8 +627,8 @@ const Balance = ({ balance, price }) => {
 
 const Token = ({ tokenBalance }) => {
   const tokenMap = {
-    TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-    // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+    // TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+    TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
     WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
     TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
   }

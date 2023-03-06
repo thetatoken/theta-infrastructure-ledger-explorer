@@ -311,7 +311,7 @@ export async function fetchWTFuelTotalSupply() {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId || NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
 
@@ -351,8 +351,8 @@ export async function fetchWThetaTotalSupply() {
     return type;
   });
 
-  // const address = "0x90e6ca1087a2340da858069cb8d78d595e4ac798"; //testnet
-  const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+  const address = "0x90e6ca1087a2340da858069cb8d78d595e4ac798"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
@@ -369,7 +369,7 @@ export async function fetchWThetaTotalSupply() {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId || NetworkUrlOfChainId[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
 

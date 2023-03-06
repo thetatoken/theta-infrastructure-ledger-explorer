@@ -389,11 +389,27 @@
   }
 
   @include breakpoint("phablet", max) {
-    height: 100px;
+    height: 130px;
     flex-direction: column;
-    .nav-search {
-      display: none;
+    justify-content: left;
+    &__navbar {
+      flex-wrap: wrap;
+      justify-content: left;
+      margin-top: 10px;
     }
+    .nav-search {
+      margin-left: 10px;
+      margin-top: 5px;
+      .search-button {
+        margin-left: -1px;
+      }
+      .search-input {
+        font-size: 14px;
+      }
+    }
+    // .nav-search {
+    //   display: none;
+    // }
   }
 }
 

@@ -296,7 +296,7 @@ async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, 
     type: tokenType
   };
   try {
-    tokenInfo.max_total_supply = await getMaxTotalSupply(address, abi);
+    tokenInfo.max_total_supply = await _getMaxTotalSupply(address, abi);
     if (tokenType === 'TNT-20') {
       tokenInfo.decimals = await getDecimals(address, abi);
       tokenInfo.symbol = await getSymbol(address, abi);
@@ -379,7 +379,7 @@ async function updateTokenSummary(tokenArr, address, tokenName, tokenType, abi, 
 }
 
 
-async function getMaxTotalSupply(address, abi) {
+async function _getMaxTotalSupply(address, abi) {
   const arr = abi.filter(obj => obj.name == "totalSupply" && obj.type === 'function');
   if (arr.length === 0) return 0;
   const functionData = arr[0];
@@ -513,3 +513,5 @@ async function getSymbol(address, abi) {
     return "";
   }
 }
+
+exports.getMaxTotalSupply = _getMaxTotalSupply;

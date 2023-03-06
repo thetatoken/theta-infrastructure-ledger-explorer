@@ -37,7 +37,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
     obj.data = getHex(obj.data);
     return obj;
   })
-  Logger.log('logs in updateTokenNew:', logs)
+  // Logger.log('logs in updateTokenNew:', logs)
   const tokenArr = [];
   logs = _decodeLogs(logs, infoMap);
   const insertList = [];
@@ -127,7 +127,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
         break;
     }
   }
-  Logger.log('tokenArr:', JSON.stringify(tokenArr));
+  // Logger.log('tokenArr:', JSON.stringify(tokenArr));
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }
@@ -139,7 +139,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
   const xChainName = isMainChain ? 'subchain' : 'mainchain';
   const contractList = Object.keys(contractMap).map(name => contractMap[name]);
   let addressList = _getContractAddressSetByTxs(txs);
-  Logger.log('addressList.length:', addressList.length, JSON.stringify(addressList));
+  // Logger.log('addressList.length:', addressList.length, JSON.stringify(addressList));
   if (addressList.length === 0) {
     return;
   }
@@ -170,7 +170,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
       return obj;
     })
     logs = _decodeLogs(logs, infoMap);
-    Logger.log('logs in updateTokenNew:', JSON.stringify(logs))
+    // Logger.log('logs in updateTokenNew:', JSON.stringify(logs))
     for (let [i, log] of logs.entries()) {
       const contractAddress = get(log, 'address');
       console.log('chainType:', chainType, '.contractMap.TFuelTokenBank:', contractMap.TFuelTokenBank);
@@ -528,7 +528,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
       }
     }
   }
-  Logger.log('tokenArr.length:', tokenArr.length, 'tokenArr:', JSON.stringify(tokenArr));
+  // Logger.log('tokenArr.length:', tokenArr.length, 'tokenArr:', JSON.stringify(tokenArr));
   await updateTokenSummary(tokenArr, infoMap, tokenSummaryDao, tokenHolderDao);
   return Promise.all(insertList);
 }

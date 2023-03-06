@@ -1,9 +1,9 @@
-.content.stakes{
-  .chart{
+.content.stakes {
+  .chart {
     min-height: 165px;
     height: 20vh;
   }
-  .legend{
+  .legend {
     position: relative;
     margin-top: 15px;
     padding-bottom: 20px;
@@ -11,17 +11,17 @@
     color: $color-font-light;
     border-bottom: 1px solid rgba($color-font-light, 0.2);
   }
-  .table-container{
+  .table-container {
     display: flex;
     justify-content: space-between;
 
     &.subchain {
       justify-content: center;
     }
-    .stakes.half{
+    .stakes.half {
       margin-top: 30px;
     }
-    @include breakpoint('phablet', max) {
+    @include breakpoint("phablet", max) {
       flex-wrap: wrap;
     }
   }
@@ -41,13 +41,13 @@
     width: 60px;
     height: 34px;
   }
-  
-  .stake-switch input { 
+
+  .stake-switch input {
     opacity: 0;
     width: 0;
     height: 0;
   }
-  
+
   .slider {
     position: absolute;
     cursor: pointer;
@@ -58,11 +58,11 @@
     right: 0;
     bottom: 0;
     background-color: rgba($color-blue, 0.5);
-    -webkit-transition: .4s;
-    transition: .4s;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
     border-radius: 34px;
   }
-  
+
   .slider:before {
     position: absolute;
     content: "";
@@ -73,9 +73,9 @@
     background-position: center center;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('/images/icons/theta-icon@2x.png');
-    -webkit-transition: .4s;
-    transition: .4s;
+    background-image: url("/images/icons/theta-icon@2x.png");
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
     border-radius: 50%;
   }
 
@@ -84,16 +84,30 @@
   }
 
   input:checked + .slider::before {
-    background-image: url('/images/icons/tfuel-icon@2x.png');;
+    background-image: url("/images/icons/tfuel-icon@2x.png");
   }
-  
+
   input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #2196f3;
   }
-  
+
   input:checked + .slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
+  }
+
+  @include breakpoint("phablet", max) {
+    .legend {
+      display: flex;
+      flex-direction: column;
+    }
+    .stake-switch-container {
+      position: inherit;
+      bottom: auto;
+      right: auto;
+      font-size: 14px;
+      margin-top: 15px;
+    }
   }
 }

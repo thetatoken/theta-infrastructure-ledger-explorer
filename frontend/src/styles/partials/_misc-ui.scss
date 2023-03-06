@@ -37,6 +37,16 @@
   &.aura {
     &:before { background-image: url('/images/icons/aura_token.png'); }
   }
+  &.wtheta {
+    &:before {
+      background-image: url('/images/icons/icon_wtheta.png'); 
+    }
+  }
+  &.wtfuel {
+    &:before {
+      background-image: url('/images/icons/icon_wtfuel.png'); 
+    }
+  }
 }
 
 .currency-link {
