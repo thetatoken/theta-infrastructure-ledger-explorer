@@ -167,6 +167,32 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
       })
   });
 
+  router.get("/hasEenpStake/:id", (req, res) => {
+    console.log('Check if has EENP stake by address.');
+    const address = helper.normalize(req.params.id.toLowerCase());
+    if (!helper.validateHex(address, 40)) {
+      res.status(400).send({ type: 'invalid_address' })
+      return;
+    }
+    
+    stakeDao.getEenpStakeByAddressAsync(address)
+      .then(info => {
+        let hasEenp = false;
+        if (info) {
+          hasEenp = true;
+        }
+        const data = {
+          type: "hasEenpStake",
+          body: {
+            hasEenpStake: hasEenp
+          }
+        }
+        res.status(200).send(data);
+      }).catch(error => {
+        res.status(400).send(error.message);
+      })
+  });
+
   router.get("/stake/:id", (req, res) => {
     console.log('Querying stake by address.');
     let { hasBalance = false, types = ['vcp', 'gcp'] } = req.query;

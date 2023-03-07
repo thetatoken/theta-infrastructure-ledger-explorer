@@ -200,4 +200,14 @@ module.exports = class stakeDAO {
       callback(err, res)
     })
   }
+  getEenpStakeByAddress(address, callback) {
+    const queryObj = { 'holder': address, 'type': 'eenp' };
+    this.client.findOne(this.stakeInfoCollection, queryObj, function (err, res) {
+      if (err) {
+        console.log('Stake dao getEenpStakeByAddress ERR - ', err, address);
+        callback(err);
+      }
+      callback(err, res);
+    })
+  }
 }
