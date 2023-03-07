@@ -175,7 +175,7 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
       return;
     }
     
-    stakeDao.getEenpStakeByAddress(address)
+    stakeDao.getEenpStakeByAddressAsync(address)
       .then(info => {
         let hasEenp = false;
         if (info) {
