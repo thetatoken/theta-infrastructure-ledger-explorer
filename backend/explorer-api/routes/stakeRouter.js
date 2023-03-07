@@ -167,7 +167,7 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
       })
   });
 
-  router.get("/hasEenpStake/:id", (req, res) => {
+  router.get("/stake/hasEenpStake/:id", (req, res) => {
     console.log('Check if has EENP stake by address.');
     const address = helper.normalize(req.params.id.toLowerCase());
     if (!helper.validateHex(address, 40)) {
