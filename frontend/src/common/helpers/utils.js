@@ -351,8 +351,8 @@ export async function fetchWThetaTotalSupply() {
     return type;
   });
 
-  // const address = "0x90e6ca1087a2340da858069cb8d78d595e4ac798"; //testnet
-  const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
+  const address = "0x90e6ca1087a2340da858069cb8d78d595e4ac798"; //testnet
+  // const address = "0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0"; //mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
@@ -401,8 +401,8 @@ export async function fetchAbi(abi) {
     return type;
   });
 
-  // const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; //testnet
-  const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; //mainnet
+  const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; // testnet
+  // const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; // mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
