@@ -55,6 +55,6 @@ module.exports = class TokenHolderDAO {
     const queryObject = { contract_address: address };
     if (tokenId != null) queryObject.token_id = tokenId;
     const sortObject = { amount: -1 };
-    this.client.getRecords(this.collection, queryObject, sortObject, 0, limit, callback);
+    this.client.getTopRecords(this.collection, queryObject, sortObject, limit, callback);
   }
 }
