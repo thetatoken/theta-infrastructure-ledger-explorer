@@ -6,7 +6,7 @@ import map from 'lodash/map';
 import cx from 'classnames';
 import truncate from 'lodash/truncate';
 
-import { formatCoin, priceCoin } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getCurrencyLabel } from 'common/helpers/utils';
 import { from, to, hash, age, date, type, coins } from 'common/helpers/transactions';
 import { TxnClasses } from 'common/constants';
 
@@ -134,12 +134,12 @@ const Value = ({ coins, price }) => {
     <React.Fragment>
       <div className="currency theta">
         {formatCoin(coins.thetawei)}
-        {!isMobile && "Theta"}
+        {!isMobile && " Theta"}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.thetawei, price['Theta'])} USD]`}</div>}
       </div>
       <div className="currency tfuel">
         {formatCoin(coins.tfuelwei)}
-        {!isMobile && "TFuel"}
+        {!isMobile && ' ' + getCurrencyLabel('tfuelwei')}
         {!isMobile && <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>}
       </div>
     </React.Fragment>)

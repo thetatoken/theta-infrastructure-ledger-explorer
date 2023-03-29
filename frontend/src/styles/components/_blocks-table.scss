@@ -3,6 +3,11 @@ table.data.block-table {
   thead tr .height:before{
     height: 1px;
   }
+  thead tr th {
+    &.fee {
+      text-transform: none;
+    }
+  }
   tr .height { 
     width: 100px; 
     white-space: nowrap;
