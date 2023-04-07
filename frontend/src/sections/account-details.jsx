@@ -10,7 +10,7 @@ import { arrayUnique } from 'common/helpers/tns';
 import { from, to } from 'common/helpers/transactions';
 import history from 'common/history'
 
-import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress, formatQuantity } from 'common/helpers/utils';
+import { formatCoin, priceCoin, validateHex, fetchBalanceByAddress, formatQuantity, getCurrencyLabel } from 'common/helpers/utils';
 import { CurrencyLabels, TypeOptions, TxnTypeText } from 'common/constants';
 import { accountService } from 'common/services/account';
 import { transactionsService } from 'common/services/transaction';
@@ -624,7 +624,7 @@ const Balance = ({ balance, price }) => {
   return (
     <div className="act balance">
       {map(balance, (v, k) => <div key={k} className={cx("currency", k)}>
-        {`${formatCoin(v)} ${CurrencyLabels[k] || k}`}
+        {`${formatCoin(v)} ${getCurrencyLabel(k)}`}
         <div className='price'>{`[\$${priceCoin(v, price[CurrencyLabels[k]])} USD]`}</div>
       </div>)}
     </div>)

@@ -6,9 +6,12 @@ import map from 'lodash/map';
 import _truncate from 'lodash/truncate';
 import tns from 'libs/tns';
 
-import { TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress, ZeroAddress, CommonFunctionABIs } from 'common/constants';
+import {
+  TxnTypes, TxnClasses, TxnPurpose, TxnSplitPurpose, zeroTxAddress,
+  ZeroAddress, CommonFunctionABIs, ChainType
+} from 'common/constants';
 import { from, to, date, age, fee, status, type, gasPrice, getTfuelBurnt } from 'common/helpers/transactions';
-import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity } from 'common/helpers/utils';
+import { formatCoin, priceCoin, sumCoin, getHex, validateHex, decodeLogs, formatQuantity, fetchAbi } from 'common/helpers/utils';
 import { priceService } from 'common/services/price';
 import { transactionsService } from 'common/services/transaction';
 import { smartContractService } from 'common/services/smartContract';
@@ -27,7 +30,10 @@ import smartContractApi from 'common/services/smart-contract-api';
 import Theta from '../libs/Theta';
 import ThetaJS from '../libs/thetajs.esm'
 import { tokenService } from "../common/services/token";
+import config from '../config.js'
 
+const isSubchain = config.chainType === ChainType.SUBCHAIN;
+console.log('isSubchain:', isSubchain)
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;
 
@@ -258,7 +264,7 @@ const Amount = ({ coins, price }) => {
         <div></div>
       </div>
       <div className="currency tfuel">
-        {formatCoin(coins.tfuelwei)} TFuel
+        {formatCoin(coins.tfuelwei)} {isSubchain ? 'vTFuel' : 'TFuel'}
         <div className='price'>{`[\$${priceCoin(coins.tfuelwei, price['TFuel'])} USD]`}</div>
       </div>
     </React.Fragment>)
@@ -268,13 +274,14 @@ const Address = ({ hash, truncate = null }) => {
   return (<Link to={`/account/${hash}`}>{truncate ? _truncate(hash, { length: truncate }) : hash}</Link>)
 }
 
-const StakeAmount = ({ stake, price }) => {
-  return (
-  <div className="currency theta">
-    {formatCoin(stake)} Theta
-    <div className='price'>{`[\$${priceCoin(stake, price['Theta'])} USD]`}</div>
-    <div></div>
-  </div>);
+const StakeAmount = ({ stake, price, isSubchain, symbol }) => {
+  const govTokenSymbol = symbol || 'Subchain Governance Token'
+  return (isSubchain ? <div className="currency">{formatCoin(stake)} {govTokenSymbol}</div> :
+    <div className="currency theta">
+      {formatCoin(stake)} Theta
+      <div className='price'>{`[\$${priceCoin(stake, price['Theta'])} USD]`}</div>
+      <div></div>
+    </div>);
 }
 
 const AddressTNS = ({ hash, tns, truncate = null }) => {
@@ -292,7 +299,7 @@ const AddressTNS = ({ hash, tns, truncate = null }) => {
 }
 
 const Fee = ({ transaction }) => {
-  return (<span className="currency tfuel">{fee(transaction) + " TFuel"}</span>);
+  return (<span className="currency tfuel">{fee(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>);
 }
 
 const CoinbaseOutput = ({ output, price, isSingle, tns }) => {
@@ -322,7 +329,7 @@ const ServicePayment = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="From Address" data={<AddressTNS hash={data.source.address} tns={transaction.fromTns} />} />
         <DetailsRow label="To Address" data={<AddressTNS hash={data.target.address} tns={transaction.toTns} />} />
         <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
@@ -339,7 +346,7 @@ const ReserveFund = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="Collateral" data={<Amount coins={data.collateral} price={price} />} />
         <DetailsRow label="Duration" data={data.duration} />
         <DetailsRow label="Amount" data={<Amount coins={data.source.coins} price={price} />} />
@@ -365,7 +372,7 @@ const SplitContract = ({ transaction }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="Duration" data={data.duration} />
         <DetailsRow label="Initiator Address" data={<AddressTNS hash={data.initiator.address} tns={transaction.fromTns} />} />
         <DetailsRow label="Resource Id" data={data.resource_id} />
@@ -395,7 +402,7 @@ const Send = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         {hasTotalCoins ? <DetailsRow label="Total Amount" data={<TotalAmount coins={totalCoins} price={price} />} /> : <></>}
         <DetailsRow label="From Address" data={map(data.inputs, (input, i, inputs) => <CoinbaseOutput key={i} output={input} price={price} isSingle={inputs.length === 1} tns={transaction.fromTns} />)} />
         <DetailsRow label="To Address" data={map(data.outputs, (output, i) => <CoinbaseOutput key={i} output={output} price={price} tns={transaction.toTns} />)} />
@@ -427,25 +434,37 @@ const Coinbase = ({ transaction, price }) => {
     </table>);
 }
 
-const SubchainValidatorSetUpdate = ({transaction, price}) => {
+const SubchainValidatorSetUpdate = ({ transaction, price }) => {
   let { data } = transaction;
+  const [symbol, setSymbol] = useState('');
+  useEffect(() => {
+    let flag = true;
+    fetchData();
+
+    async function fetchData() {
+      let symbol = await fetchAbi([CommonFunctionABIs.symbol]);
+      console.log('symbol:', symbol)
+      setSymbol(symbol);
+    }
+    return () => flag = false;
+  }, [transaction])
   return (
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Proposer" data={<Address hash={get(data, 'Proposer.address')} />}></DetailsRow>
-        <DetailsRow label="Stake" data={map(data.Validators, (validator, i) => <ValidatorSet key={i} validator={validator} price={price} />)} />
+        <DetailsRow label="Stake" data={map(data.Validators, (validator, i) => <ValidatorSet key={i} validator={validator} price={price} isSubchain={true} symbol={symbol} />)} />
       </tbody>
     </table>);
 }
 
-const ValidatorSet = ({validator, price, isSingle}) => {
+const ValidatorSet = ({ validator, price, isSingle, isSubchain, symbol }) => {
   const isPhone = window.screen.width <= 560;
   const isSmallPhone = window.screen.width <= 320;
   const truncate = isPhone ? isSmallPhone ? 10 : 15 : null;
   return (
     <div className={cx("coinbase-output", { "single": isSingle })}>
       <div>
-        <StakeAmount stake={validator.Stake} price={price} />
+        <StakeAmount stake={validator.Stake} price={price} isSubchain={isSubchain} symbol={symbol} />
       </div>
       <AddressTNS hash={validator.Address} truncate={truncate} />
     </div>);
@@ -467,7 +486,7 @@ const WithdrawStake = ({ transaction, price }) => {
       <tbody>
         {returnTime > 0 && <DetailsRow label="Estimated Return" data={<ReturnTime returnTime={returnTime} />} />}
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="Stake Addr." data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.fromTns} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
@@ -482,7 +501,7 @@ const DepositStake = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="Stake Addr." data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.toTns} />} />
         <DetailsRow label="Stake" data={<Amount coins={get(data, 'source.coins')} price={price} />} />
         <DetailsRow label="Purpose" data={TxnPurpose[get(data, 'purpose')]} />
@@ -496,7 +515,7 @@ const StakeRewardDistribution = ({ transaction, price }) => {
     <table className="details txn-details">
       <tbody>
         <DetailsRow label="Fee" data={<Fee transaction={transaction} />} />
-        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+        <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
         <DetailsRow label="Holder" data={<AddressTNS hash={get(data, 'holder.address')} tns={transaction.fromTns} />} />
         <DetailsRow label="Beneficiary" data={<AddressTNS hash={get(data, 'beneficiary.address')} tns={transaction.toTns} />} />
         <DetailsRow label="Purpose" data={TxnSplitPurpose[get(data, 'purpose')]} />
@@ -742,8 +761,8 @@ const SmartContract = (props) => {
               })} />}
               <DetailsRow label="Gas Limit" data={data.gas_limit} />
               {receipt ? <DetailsRow label="Gas Used" data={receipt.GasUsed} /> : null}
-              <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + " TFuel"}</span>} />
-              <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + " TFuel"}</span>} />
+              <DetailsRow label="Gas Price" data={<span className="currency tfuel">{gasPrice(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
+              <DetailsRow label="TFuel Burnt" data={<span className="currency tfuel">{getTfuelBurnt(transaction) + ` ${isSubchain ? 'v' : ''}TFuel`}</span>} />
               {err ? <DetailsRow label="Error Message" data={<span className="text-danger">
                 {Buffer.from(get(transaction, 'receipt.EvmRet'), 'base64').toString() || err}
               </span>} /> : null}
@@ -856,7 +875,7 @@ const Log = ({ log }) => {
 const SmartContractValue = ({ value, price, feeSplit, tfuelSplit }) => {
   return <div className="sc-value">
     <div className="currency tfuel">
-      {formatCoin(value)} TFuel
+      {formatCoin(value)} {(isSubchain ? 'vTFuel' : 'TFuel')}
       <div className='price'>{`[\$${priceCoin(value, price['TFuel'])} USD]`}</div>
     </div>
     {feeSplit && <>

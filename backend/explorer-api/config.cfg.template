@@ -39,5 +39,6 @@
         "family": 4,
         "db": 0
     },
-    "defaultThetaChainID": "testnet"
+    "defaultThetaChainID": "testnet",
+    "xApiToken": ""
 }

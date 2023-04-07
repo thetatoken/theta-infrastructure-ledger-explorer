@@ -34,7 +34,7 @@ export const TxnTypeText = {
   '9': 'Withdraw Stake',
   '10': 'Deposit Stake',
   '11': 'Stake Reward Distribution',
-  '201': 'Validator Set Update'
+  '201': 'Subchain Validator Update'
 }
 
 export const ChainType = {

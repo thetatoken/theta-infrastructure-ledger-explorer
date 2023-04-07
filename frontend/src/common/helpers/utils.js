@@ -3,12 +3,13 @@ import { ethers } from "ethers";
 import get from 'lodash/get';
 import map from 'lodash/map';
 
-import { WEI, CommonEventABIs, EthRPCEndpoints, NetworkUrlOfChainId } from 'common/constants';
+import { WEI, CommonEventABIs, EthRPCEndpoints, NetworkUrlOfChainId, ChainType } from 'common/constants';
 
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from 'libs/Theta';
 import ThetaJS from 'libs/thetajs.esm'
 import config from '../../config.js'
+import { CurrencyLabels } from '../constants.js';
 
 export function truncateMiddle(str, maxLength = 20, separator = '...') {
   if (str && str.length <= 20)
@@ -401,8 +402,8 @@ export async function fetchAbi(abi) {
     return type;
   });
 
-  // const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; //testnet
-  const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; //mainnet
+  // const address = "0x1db1770c4de47f087d2bf397eec7ba777d65115f"; // testnet
+  const address = "0x947735580040c07394b9c80f8e55019b47eeee1a"; // mainnet
 
   try {
     var abiCoder = new ethers.utils.AbiCoder();
@@ -434,4 +435,11 @@ export async function fetchAbi(abi) {
     console.log('error occurs in fetchTokenSymbol:', e.message);
     return 0;
   }
+}
+
+export function getCurrencyLabel(key) {
+  if (key === 'tfuelwei' && config.chainType === ChainType.SUBCHAIN) {
+    return 'vTFuel';
+  }
+  return CurrencyLabels[key] || key;
 }

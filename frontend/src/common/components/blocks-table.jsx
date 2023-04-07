@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import socketClient from 'socket.io-client';
 import history from 'common/history'
 import cx from 'classnames';
+import config from '../../config.js'
 
 import { totalTfuelBurnt, hash, age, date } from 'common/helpers/blocks';
+import { ChainType } from 'common/constants';
 
 export default class BlockOverviewTable extends React.Component {
 
@@ -84,7 +86,7 @@ export default class BlockOverviewTable extends React.Component {
             {includeDetails &&
               <React.Fragment>
                 <th className="age">Age</th>
-                <th className="fee">TFuel Burnt</th>
+                <th className="fee">{config.chainType === ChainType.SUBCHAIN ? 'vTFUEL BURNT' : 'TFUEL BURNT'}</th>
               </React.Fragment>}
             <th className="txns ">Txns</th>
           </tr>
