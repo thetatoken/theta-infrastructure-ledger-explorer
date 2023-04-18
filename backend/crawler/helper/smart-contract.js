@@ -72,15 +72,10 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
         const contractAddress = get(log, 'address');
         if (contractList.indexOf(contractAddress) > -1) {
           let type = '';
-          switch (contractAddress) {
-            case contractMap.TNT20TokenBank:
-              type = 'XCHAIN_TNT20'
-              break;
-            case contractMap.TNT721TokenBank:
-              type = 'XCHAIN_TNT721'
-              break;
-            default:
-              break;
+          if (contractMap.TNT20TokenBank.indexOf(contractAddress) !== -1) {
+            type = 'XCHAIN_TNT20'
+          } else if (contractMap.TNT721TokenBank.indexOf(contractAddress) !== -1) {
+            type = 'XCHAIN_TNT721'
           }
           log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
           const tokenId = get(log, 'decode.result.tokenId');
@@ -224,7 +219,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           insertList.push(_checkAndInsertToken(newToken, tokenDao))
           break;
         case EventHashMap.TFUEL_VOUCHER_MINTED:
-          if (get(log, 'address') !== contractMap.TFuelTokenBank) break;
+          if (contractMap.TFuelTokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_MINTED);
             Logger.log('Decoded TFUEL_VOUCHER_MINTED Log:', JSON.stringify(log));
@@ -243,7 +238,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TFUEL_VOUCHER_BURNED:
-          if (get(log, 'address') !== contractMap.TFuelTokenBank) break;
+          if (contractMap.TFuelTokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_VOUCHER_BURNED);
             Logger.log('Decoded TFUEL_VOUCHER_BURNED Log:', JSON.stringify(log));
@@ -262,7 +257,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TFUEL_TOKEN_LOCKED:
-          if (get(log, 'address') !== contractMap.TFuelTokenBank) break;
+          if (contractMap.TFuelTokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_TOKEN_LOCKED);
             Logger.log('Decoded TFUEL_TOKEN_LOCKED Log:', JSON.stringify(log));
@@ -280,7 +275,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TFUEL_TOKEN_UNLOCKED:
-          if (get(log, 'address') !== contractMap.TFuelTokenBank) break;
+          if (contractMap.TFuelTokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TFUEL_TOKEN_UNLOCKED);
             Logger.log('Decoded TFUEL_TOKEN_UNLOCKED Log:', JSON.stringify(log));
@@ -298,7 +293,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT20_VOUCHER_MINTED:
-          if (get(log, 'address') !== contractMap.TNT20TokenBank) break;
+          if (contractMap.TNT20TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT20_VOUCHER_MINTED);
             Logger.log('Decoded TNT20_VOUCHER_MINTED Log:', JSON.stringify(log));
@@ -317,7 +312,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT20_VOUCHER_BURNED:
-          if (get(log, 'address') !== contractMap.TNT20TokenBank) break;
+          if (contractMap.TNT20TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT20_VOUCHER_BURNED);
             Logger.log('Decoded TNT20_VOUCHER_BURNED Log:', JSON.stringify(log));
@@ -336,7 +331,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT20_TOKEN_LOCKED:
-          if (get(log, 'address') !== contractMap.TNT20TokenBank) break;
+          if (contractMap.TNT20TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT20_TOKEN_LOCKED);
             Logger.log('Decoded TNT20_TOKEN_LOCKED Log:', JSON.stringify(log));
@@ -354,7 +349,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT20_TOKEN_UNLOCKED:
-          if (get(log, 'address') !== contractMap.TNT20TokenBank) break;
+          if (contractMap.TNT20TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT20_TOKEN_UNLOCKED);
             Logger.log('Decoded TNT20_TOKEN_UNLOCKED Log:', JSON.stringify(log));
@@ -372,7 +367,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT721_VOUCHER_MINTED:
-          if (get(log, 'address') !== contractMap.TNT721TokenBank) break;
+          if (contractMap.TNT721TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT721_VOUCHER_MINTED);
             Logger.log('Decoded TNT721_VOUCHER_MINTED Log:', JSON.stringify(log));
@@ -391,7 +386,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT721_VOUCHER_BURNED:
-          if (get(log, 'address') !== contractMap.TNT721TokenBank) break;
+          if (contractMap.TNT721TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT721_VOUCHER_BURNED);
             Logger.log('Decoded TNT721_VOUCHER_BURNED Log:', JSON.stringify(log));
@@ -410,7 +405,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT721_TOKEN_LOCKED:
-          if (get(log, 'address') !== contractMap.TNT721TokenBank) break;
+          if (contractMap.TNT721TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT721_TOKEN_LOCKED);
             Logger.log('Decoded TNT721_TOKEN_LOCKED Log:', JSON.stringify(log));
@@ -428,7 +423,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT721_TOKEN_UNLOCKED:
-          if (get(log, 'address') !== contractMap.TNT721TokenBank) break;
+          if (contractMap.TNT721TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT721_TOKEN_UNLOCKED);
             Logger.log('Decoded TNT721_TOKEN_UNLOCKED Log:', JSON.stringify(log));
@@ -446,7 +441,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT1155_VOUCHER_MINTED:
-          if (get(log, 'address') !== contractMap.TNT1155TokenBank) break;
+          if (contractMap.TNT1155TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT1155_VOUCHER_MINTED);
             Logger.log('Decoded TNT1155_VOUCHER_MINTED Log:', JSON.stringify(log));
@@ -466,7 +461,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT1155_VOUCHER_BURNED:
-          if (get(log, 'address') !== contractMap.TNT1155TokenBank) break;
+          if (contractMap.TNT1155TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT1155_VOUCHER_BURNED);
             Logger.log('Decoded TNT1155_VOUCHER_BURNED Log:', JSON.stringify(log));
@@ -486,7 +481,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT1155_TOKEN_LOCKED:
-          if (get(log, 'address') !== contractMap.TNT1155TokenBank) break;
+          if (contractMap.TNT1155TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT1155_TOKEN_LOCKED);
             Logger.log('Decoded TNT1155_TOKEN_LOCKED Log:', JSON.stringify(log));
@@ -505,7 +500,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           }
           break;
         case EventHashMap.TNT1155_TOKEN_UNLOCKED:
-          if (get(log, 'address') !== contractMap.TNT1155TokenBank) break;
+          if (contractMap.TNT1155TokenBank.indexOf(get(log, 'address')) === -1) break;
           if (typeof get(log, 'decode') !== "object") {
             log = decodeLogByAbiHash(log, EventHashMap.TNT1155_TOKEN_UNLOCKED);
             Logger.log('Decoded TNT1155_TOKEN_UNLOCKED Log:', JSON.stringify(log));
