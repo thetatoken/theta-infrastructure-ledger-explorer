@@ -1,25 +1,54 @@
-.code-loading-text{
+.code-loading-text {
   position: absolute;
   top: 10%;
   width: 100%;
   text-align: center;
 }
-.selects-container{
+.selects-container {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
-.select{
-  &__container{
+.select {
+  &__container {
     display: flex;
     margin: 15px 0;
-    & label{
+    & label {
       line-height: 32px;
     }
+    .switch {
+      display: flex;
+      height: 30px;
+      align-items: center;
+      border: 1px solid rgba(124, 129, 163, 0.35);
+      border-radius: 10px;
+      padding: 0 8px;
+      font-size: 14px;
+      cursor: pointer;
+      color: $color-white;
+      margin-left: 10px;
+      min-width: 170px;
+
+      &:hover {
+        border: 1px solid rgba(124, 129, 163, 0.7);
+      }
+
+      &__logo {
+        height: 11px;
+        width: 12px;
+        background-image: url("/images/icons/switch-icon.png");
+        background-position: center center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        margin-right: 5px;
+      }
+    }
   }
-  &__selector{
+  &__selector {
     width: 12rem;
     margin: 0 5px;
-    &.optimizer{
+    &.optimizer {
       width: 10rem;
     }
     &::after {
@@ -34,20 +63,20 @@
       top: 12px;
       pointer-events: none;
     }
-    & select{
+    & select {
       width: 100%;
       height: 32px;
-      &.isEmpty{
+      &.isEmpty {
         border-color: $color-red;
       }
     }
   }
 
-  &__tooltip{
+  &__tooltip {
     $self: &;
     margin: 0 5px;
     z-index: 100;
-    &.question-mark{
+    &.question-mark {
       display: inline-block;
       color: $color-font-light;
       border: 1px solid $color-font-light;
@@ -58,7 +87,7 @@
       line-height: 0.875rem;
       font-size: 0.875rem;
     }
-    &--text{
+    &--text {
       width: 250px;
       visibility: hidden;
       position: absolute;
@@ -74,8 +103,8 @@
       bottom: calc(100% + 10px);
       left: 50%;
       margin-left: -125px;
-      &:after{
-        content: '';
+      &:after {
+        content: "";
         position: absolute;
         border-style: solid;
         top: 100%;
@@ -85,40 +114,42 @@
         border-width: 5px;
       }
     }
-    &:hover #{ $self }--text{
-        visibility: visible;
+    &:hover #{ $self }--text {
+      visibility: visible;
     }
   }
 }
-.code-buttons{
+.code-buttons {
   display: flex;
   justify-content: space-evenly;
   padding: 0 20%;
-  & div{
+  & div {
     padding: 20px;
     color: $color-input-text;
     background: $color-blue;
     border: none;
-    border-radius: .25rem;
+    border-radius: 0.25rem;
     font-weight: $weight-medium;
     cursor: pointer;
-    &:hover{
-      box-shadow: 0 4px 8px 0 rgba($color-blue, 0.2), 0 6px 20px 0 rgba($color-blue, 0.19);
+    &:hover {
+      box-shadow: 0 4px 8px 0 rgba($color-blue, 0.2),
+        0 6px 20px 0 rgba($color-blue, 0.19);
     }
-    &.reset{
+    &.reset {
       background: $color-light;
-      &:hover{
+      &:hover {
         background-color: $color-input-background;
-        box-shadow: 0 4px 8px 0 rgba($color-input-background, 0.2), 0 6px 20px 0 rgba($color-input-background, 0.19);
+        box-shadow: 0 4px 8px 0 rgba($color-input-background, 0.2),
+          0 6px 20px 0 rgba($color-input-background, 0.19);
       }
     }
   }
 }
-.code-error-text{
+.code-error-text {
   margin-bottom: 30px;
-  &:before{
+  &:before {
     display: inline-block;
-    content: '!';
+    content: "!";
     border: 1px solid $color-red;
     width: 1em;
     height: 1em;
@@ -128,61 +159,61 @@
     margin-right: 5px;
   }
 }
-.contract-info{
+.contract-info {
   width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
   color: $color-font-main;
   background-color: $color-panel;
-  &__title{
+  &__title {
     display: flex;
     height: 40px;
     line-height: 40px;
     margin: 20px 0;
     font-weight: $weight-bold;
-    &--sub{
+    &--sub {
       color: $color-font-light;
       font-size: 0.875rem;
       font-weight: $weight-regular;
     }
-    &.verified{
+    &.verified {
       margin-top: 0;
       color: $color-green;
     }
   }
-  &__general{
+  &__general {
     display: flex;
     flex-direction: row;
-    @include breakpoint('phablet', max) {
+    @include breakpoint("phablet", max) {
       flex-direction: column;
     }
   }
-  &__raws{
+  &__raws {
     width: 50%;
     padding: 0 1rem 0 1rem;
-    &:first-child{
+    &:first-child {
       padding-right: 3rem;
     }
-    @include breakpoint('phablet', max) {
+    @include breakpoint("phablet", max) {
       width: 100%;
     }
   }
-  &__cell{
+  &__cell {
     display: flex;
     line-height: 40px;
-    &:first-child{
+    &:first-child {
       border-bottom: 1px solid $color-light;
     }
-    & > div{
+    & > div {
       width: 40%;
-      &:nth-child(2){
+      &:nth-child(2) {
         flex: 1;
         color: $color-font-light;
       }
     }
   }
-  &__block{
+  &__block {
     margin: 10px 0;
     width: 100%;
   }
@@ -190,16 +221,17 @@
 .setting-section {
   width: 33.3%;
   & label {
-    & input, select {
+    & input,
+    select {
       width: 100%;
       margin-top: 5px;
     }
   }
-  &__tooltip{
+  &__tooltip {
     $self: &;
     margin: 0 5px;
     z-index: 100;
-    &.question-mark{
+    &.question-mark {
       display: inline-block;
       border: 1px solid $color-font-light;
       color: $color-font-light;
@@ -210,7 +242,7 @@
       line-height: 0.875rem;
       font-size: 0.875rem;
     }
-    &--text{
+    &--text {
       width: 250px;
       visibility: hidden;
       position: absolute;
@@ -227,8 +259,8 @@
       bottom: calc(100% + 10px);
       left: 50%;
       margin-left: -125px;
-      &:after{
-        content: '';
+      &:after {
+        content: "";
         position: absolute;
         border-style: solid;
         top: 100%;
@@ -238,8 +270,58 @@
         border-width: 10px;
       }
     }
-    &:hover #{ $self }--text{
-        visibility: visible;
+    &:hover #{ $self }--text {
+      visibility: visible;
     }
+  }
+}
+.file-uploader {
+  cursor: pointer;
+  margin-bottom: 20px;
+  &__label {
+    color: $color-white;
+    font-weight: bold;
+    text-align: center;
+  }
+  &__tooltip {
+    margin: 0;
+    font-size: 14px;
+  }
+  &__preview {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 30px;
+    font-weight: bold;
+    &--empty {
+      margin-top: 35px;
+    }
+  }
+  &__file-wrap {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    border-top: 1px solid $color-font-light;
+    padding-top: 6px;
+    margin: 23px 10px 0;
+  }
+  &__file {
+    margin-top: 15px;
+  }
+}
+.rejected-file {
+  display: flex;
+  align-items: center;
+  color: $color-red;
+  margin: -10px 10px 20px;
+  font-weight: 600;
+  &__name {
+    margin-left: 20px;
+    font-weight: 400;
+    font-size: 14px;
   }
 }

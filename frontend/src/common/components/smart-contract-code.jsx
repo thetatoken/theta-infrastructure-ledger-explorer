@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import get from 'lodash/get';
 
 import LoadingPanel from 'common/components/loading-panel';
@@ -6,6 +6,7 @@ import AceEditor from 'common/components/ace-editor';
 import { Accordion, AccordionHeader } from 'common/components/accordion';
 import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
+import { useDropzone } from 'react-dropzone';
 
 export default class SmartContractCode extends React.PureComponent {
   setStates = (keys, vals) => {
@@ -40,6 +41,7 @@ const Options = () => {
 }
 const CodeUploader = props => {
   const { isReleasesReady, address, fetchSmartContract } = props;
+  const [isSingleFile, setIsSingleFile] = useState(true);
   const [isCodeEmpty, setIsCodeEmpty] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errMsg, setErrMsg] = useState('');
@@ -47,6 +49,7 @@ const CodeUploader = props => {
   const [uploaderAbi, setUploaderAbi] = useState('');
   const [uploaderVersion, setUploaderVersion] = useState('');
   const [uploaderOptimizer, setUploaderOptimizer] = useState(0);
+  const [files, setFiles] = useState([]);
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
@@ -59,7 +62,8 @@ const CodeUploader = props => {
       optimizerRef.current.value = uploaderOptimizer;
     }
     if (versionRef.current) versionRef.current.value = uploaderVersion;
-  })
+  }, [sourceCodeRef.current, versionRef.current]);
+
   const reset = () => {
     sourceCodeRef.current.value = '';
     abiRef.current.value = '';
@@ -89,6 +93,18 @@ const CodeUploader = props => {
       versionRef.current.focus();
       return;
     }
+
+    const formData = new FormData();
+    console.log('files:', files)
+    files.forEach((file) => {
+      formData.append('files[]', file);
+    });
+    console.log('formData:', formData);
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${JSON.stringify(value)}`);
+    }
+    return;
     setIsVerifying(true);
 
     // return;
@@ -114,6 +130,9 @@ const CodeUploader = props => {
     } else {
       e.target.classList.remove('isEmpty')
     }
+  }
+  const handleSwitch = () => {
+    setIsSingleFile(!isSingleFile);
   }
   return (isVerifying ?
     <>
@@ -147,13 +166,24 @@ const CodeUploader = props => {
             </select>
           </div>
         </div>
+        <div className="select__container switch">
+          <div className="switch" onClick={handleSwitch}>
+            <div className="switch__logo" ></div>
+            {isSingleFile ? "Upload Multiple Files" : "Upload Single File"}
+          </div>
+        </div>
       </div>
-      <label htmlFor="txtSourceCode">
-        <b>Enter the Solidity Contract Code below &nbsp;</b>
-        <span className="text-danger">*</span>
-        <span className="text-danger">{isCodeEmpty ? 'source code is reqired. ' : ''}Only Single File Supported</span>
-      </label>
-      <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
+      {isSingleFile ? <>
+        <label htmlFor="txtSourceCode">
+          <b>Enter the Solidity Contract Code below &nbsp;</b>
+          {/* <span className="text-danger">*</span> */}
+          {/* <span className="text-danger">{isCodeEmpty ? 'source code is reqired. ' : ''}Only Single File Supported</span> */}
+          <span className="text-danger">{isCodeEmpty ? '*source code is reqired. ' : ''}</span>
+        </label>
+        <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
+      </> : <>
+        <FileInput setfiles={setFiles} files={files} />
+      </>}
       <Accordion
         header={<AccordionHeader
           title="Constructor Arguments ABI-encoded"
@@ -297,3 +327,94 @@ const CodeViewer = props => {
       </div>
     </>)
 }
+
+const FileInput = props => {
+  const { name, label = name, setfiles, files } = props;
+  const [rejectedFiles, setRectjectFiles] = useState([]);
+  const onDropAccepted = useCallback(
+    (acceptedFiles) => {
+      // filter out any files that do not have the ".sol" extension
+      const solFiles = acceptedFiles.filter(file => file.name.endsWith('.sol'));
+      const rejFiles = acceptedFiles.filter(file => !file.name.endsWith('.sol'));
+      setfiles(solFiles);
+      setRectjectFiles(rejFiles);
+    },
+    []
+  );
+  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject, acceptedFiles } = useDropzone({
+    onDropAccepted,
+    accept: ".sol",
+    multiple: true
+    // onDrop: (acceptedFiles) => {
+    //   console.log('acceptedFiles:', acceptedFiles);
+    //   setfiles(acceptedFiles);
+    // },
+
+  });
+  const style = useMemo(() => ({
+    ...baseStyle,
+    ...(isDragActive ? activeStyle : {}),
+    ...(isDragAccept ? acceptStyle : {}),
+    ...(isDragReject ? rejectStyle : {})
+  }), [
+    isDragActive,
+    isDragReject,
+    isDragAccept
+  ]);
+
+  return (
+    <>
+      <div className="file-uploader">
+        <div {...getRootProps({ style })}>
+          <input {...getInputProps()} />
+          <p className="file-uploader__label">Drag and drop some .sol files here, or click to select .sol files</p>
+          <p className="file-uploader__tooltip">(CTRL click to select multiple files)</p>
+          <div className="file-uploader__preview">
+            {files.length === 0 ? <div className="file-uploader__preview--empty">
+              No file selected
+            </div> : <div className="file-uploader__file-wrap">
+              {files.map(file => {
+                return <div className="file-uploader__file" key={file.path}>{file.name}</div>
+              })}
+            </div>}
+          </div>
+        </div>
+      </div>
+      {rejectedFiles.length > 0 && <div className="rejected-file">
+        WRONG TYPE OF FILES: {rejectedFiles.map(file => {
+          return <div key={file.name} className="rejected-file__name">
+            {file.name}
+          </div>
+        })}
+      </div>}
+    </>
+  )
+}
+
+const baseStyle = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: '40px',
+  borderWidth: 2,
+  borderRadius: 8,
+  borderColor: '#2C2F40',
+  borderStyle: 'dashed',
+  backgroundColor: '#191D29',
+  color: '#8A8FB5',
+  outline: 'none',
+  transition: 'border .24s ease-in-out'
+};
+
+const activeStyle = {
+  borderColor: '#18C99D'
+};
+
+const acceptStyle = {
+  borderColor: '#18C99D'
+};
+
+const rejectStyle = {
+  borderColor: '#ff1744'
+};
