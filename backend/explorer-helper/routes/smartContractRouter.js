@@ -13,11 +13,17 @@ var smartContractRouter = (app) => {
   // The api to verify the source and bytecode
   router.post("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, byteCode, abi, version, versionFullName, optimizer, optimizerRuns = 200 } = req.body;
+    let { sourceCode, byteCode, abi, version, versionFullName, optimizer, optimizerRuns = 200, isSingleFile } = req.body;
     optimizerRuns = +optimizerRuns;
     if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     try {
       console.log('Verifing the source code and bytecode for address:', address);
+      const sourcecodes = isSingleFile ? {
+        'test.sol': {
+          content: sourceCode
+        }
+      } : JSON.parse(sourceCode);
+      console.log('sourcecodes:', sourcecodes);
       let start = +new Date();
       var input = {
         language: 'Solidity',
@@ -32,11 +38,7 @@ var smartContractRouter = (app) => {
             }
           }
         },
-        sources: {
-          'test.sol': {
-            content: sourceCode
-          }
-        }
+        sources: sourcecodes
       };
       var output = '';
       console.log(`Loading specific version starts.`)
@@ -75,35 +77,42 @@ var smartContractRouter = (app) => {
       if (check.error) {
         data = { result: { verified: false }, err_msg: check.error }
       } else {
+        console.log('output.contracts.MyContract.sol:', output);
         if (output.contracts) {
           let hexBytecode = helper.getHex(byteCode).substring(2);
-          for (var contractName in output.contracts['test.sol']) {
-            const byteCode = output.contracts['test.sol'][contractName].evm.bytecode.object;
-            const deployedBytecode = output.contracts['test.sol'][contractName].evm.deployedBytecode.object;
-            const processed_compiled_bytecode = helper.getBytecodeWithoutMetadata(deployedBytecode);
-            // const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
-            const constructor_arguments = hexBytecode.slice(byteCode.length);
-            // console.log(`contract name:`, contractName)
-            // console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
-            // console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
-            // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
-            if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
-              verified = true;
-              let abi = output.contracts['test.sol'][contractName].abi;
-              const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
-              sc = {
-                'address': address,
-                'abi': abi,
-                'source_code': helper.stampDate(sourceCode),
-                'verification_date': +new Date(),
-                'compiler_version': breifVersion,
-                'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
-                'optimizerRuns': optimizerRuns,
-                'name': contractName,
-                'function_hash': output.contracts['test.sol'][contractName].evm.methodIdentifiers,
-                'constructor_arguments': constructor_arguments
+          console.log('hexBytecode:', hexBytecode);
+          for (var cFileName in output.contracts) {
+            console.log('cFileName:', cFileName)
+            for (var contractName in output.contracts[cFileName]) {
+              const byteCode = output.contracts[cFileName][contractName].evm.bytecode.object;
+              const deployedBytecode = output.contracts[cFileName][contractName].evm.deployedBytecode.object;
+              const processed_compiled_bytecode = helper.getBytecodeWithoutMetadata(deployedBytecode);
+              // const processed_blockchain_bytecode = helper.getBytecodeWithoutMetadata(hexBytecode.slice(0, curCode.length));
+              const constructor_arguments = hexBytecode.slice(byteCode.length);
+              console.log(`contract name:`, contractName)
+              // console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
+              console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
+              console.log(`processed_compiled_bytecode: ${processed_compiled_bytecode}`);
+              console.log(`hexBytecode: length:${hexBytecode.length}`);
+              // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
+              if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
+                verified = true;
+                let abi = output.contracts[cFileName][contractName].abi;
+                const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
+                sc = {
+                  'address': address,
+                  'abi': abi,
+                  'source_code': helper.stampDate(helper.flatSourceCode(sourceCode, isSingleFile)),
+                  'verification_date': +new Date(),
+                  'compiler_version': breifVersion,
+                  'optimizer': optimizer === '1' ? 'enabled' : 'disabled',
+                  'optimizerRuns': optimizerRuns,
+                  'name': contractName,
+                  'function_hash': output.contracts[cFileName][contractName].evm.methodIdentifiers,
+                  'constructor_arguments': constructor_arguments
+                }
+                break;
               }
-              break;
             }
           }
         }

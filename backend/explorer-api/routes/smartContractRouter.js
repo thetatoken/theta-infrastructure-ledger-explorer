@@ -12,7 +12,9 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   // The api to verify the source and bytecode
   router.post("/smartContract/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200 } = req.body;
+    let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200, isSingleFile = true } = req.body;
+    console.log('sourceCode:', sourceCode)
+    console.log('isSingleFile:', isSingleFile, typeof isSingleFile)
     optimizerRuns = +optimizerRuns;
     if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     console.log('Verifying source code for address', address);
@@ -21,7 +23,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       let byteCode = sc.bytecode;
       const helperUrl = (process.env.HELPER_HOST || 'localhost') + ":" + (process.env.HELPER_PORT || '9090');
       let result = await axios.post(`http://${helperUrl}/api/verify/${address}`, {
-        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns
+        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns, isSingleFile
       })
       console.log('Received response from verification server.', result.data.result);
       if (result.data.result.verified === true) {
@@ -40,7 +42,8 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
         console.log('Error in catch:', e.response.status)
         res.status(400).send(e.response.status)
       } else {
-        res.status(400).send(e)
+        console.log('error msg:', e.message)
+        res.status(400).send(e.message)
       }
     }
   });

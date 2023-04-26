@@ -68,8 +68,16 @@ const CodeUploader = props => {
     sourceCodeRef.current.value = '';
     abiRef.current.value = '';
   }
-  const submit = () => {
-    const sourceCode = sourceCodeRef.current.value;
+  const submit = async () => {
+    const fileObj = {};
+    if (!isSingleFile) {
+      for (let i = 0; i < files.length; i++) {
+        const fileContents = await readFileAsync(files[i]);
+        fileObj[files[i].name] = {content: fileContents};
+      }
+    }
+    console.log('fileObj:', fileObj)
+    const sourceCode = isSingleFile ? sourceCodeRef.current.value : JSON.stringify(fileObj);
     const version = versionRef.current.value;
     const versionFullname = window.soljsonReleases[version]
     const abi = abiRef.current.value;
@@ -94,21 +102,11 @@ const CodeUploader = props => {
       return;
     }
 
-    const formData = new FormData();
-    console.log('files:', files)
-    files.forEach((file) => {
-      formData.append('files[]', file);
-    });
-    console.log('formData:', formData);
-
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${JSON.stringify(value)}`);
-    }
-    return;
+    // return;
     setIsVerifying(true);
 
     // return;
-    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns)
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
@@ -133,6 +131,8 @@ const CodeUploader = props => {
   }
   const handleSwitch = () => {
     setIsSingleFile(!isSingleFile);
+    if (files.length > 0) setFiles([]);
+    if (isCodeEmpty) setIsCodeEmpty(false);
   }
   return (isVerifying ?
     <>
@@ -182,7 +182,7 @@ const CodeUploader = props => {
         </label>
         <textarea className='code-area' placeholder="Enter your code here." name="txtSourceCode" ref={sourceCodeRef} required />
       </> : <>
-        <FileInput setfiles={setFiles} files={files} />
+        <FileInput setfiles={setFiles} files={files} isCodeEmpty={isCodeEmpty} />
       </>}
       <Accordion
         header={<AccordionHeader
@@ -329,7 +329,7 @@ const CodeViewer = props => {
 }
 
 const FileInput = props => {
-  const { name, label = name, setfiles, files } = props;
+  const { name, label = name, setfiles, files, isCodeEmpty } = props;
   const [rejectedFiles, setRectjectFiles] = useState([]);
   const onDropAccepted = useCallback(
     (acceptedFiles) => {
@@ -371,7 +371,8 @@ const FileInput = props => {
           <p className="file-uploader__tooltip">(CTRL click to select multiple files)</p>
           <div className="file-uploader__preview">
             {files.length === 0 ? <div className="file-uploader__preview--empty">
-              No file selected
+              <span>No file selected</span>
+              {isCodeEmpty && <span className="text-danger">*source code is reqired.</span>}
             </div> : <div className="file-uploader__file-wrap">
               {files.map(file => {
                 return <div className="file-uploader__file" key={file.path}>{file.name}</div>
@@ -418,3 +419,17 @@ const acceptStyle = {
 const rejectStyle = {
   borderColor: '#ff1744'
 };
+
+function readFileAsync(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function () {
+      const fileContents = reader.result;
+      resolve(fileContents);
+    };
+    reader.onerror = function () {
+      reject(reader.error);
+    };
+  });
+}

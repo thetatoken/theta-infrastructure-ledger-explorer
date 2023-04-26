@@ -22,3 +22,11 @@ exports.stampDate = function (sourceCode) {
     date = new Date(date.getTime() - (offset * 60 * 1000))
     return `/**\n *Submitted for verification at thetatoken.org on ${date.toISOString().split('T')[0]}\n */\n` + sourceCode;
 }
+exports.flatSourceCode = function (sourceCode, isSingleFile) {
+    if (isSingleFile) return sourceCode;
+    let newCode = '';
+    for (let filename in sourceCode) {
+        newCode += sourceCode[filename].content;
+    }
+    console.log('newCode:', newCode);
+}

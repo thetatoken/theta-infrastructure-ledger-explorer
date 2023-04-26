@@ -297,6 +297,8 @@
     font-weight: bold;
     &--empty {
       margin-top: 35px;
+      // display: flex;
+      // flex-direction: column;
     }
   }
   &__file-wrap {
