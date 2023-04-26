@@ -1,4 +1,4 @@
-import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType } from 'common/constants';
+import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType, SubGovTokenAddress } from 'common/constants';
 const host = 'https://localhost';
 const config = {
     restApi: {
@@ -32,12 +32,8 @@ const config = {
             socketApiPort: 2096
         }]
     },
-    contractAddresses: {
-        TNT20TokenBank: '0x7d7e270b7e279c94b265a535cdbc00eb62e6e68f',
-        TNT721TokenBank: '0xd5125d7bb9c4fb222c522c4b1922cabc631e52d7'
-    },
     chainName: 'Theta Testnet Main Chain',
-    chainType: ChainType.MAINCHAIN
-
+    chainType: ChainType.MAINCHAIN,
+    subGovTokenAddress: SubGovTokenAddress[host]
 };
 export default config;

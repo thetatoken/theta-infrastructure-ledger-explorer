@@ -167,6 +167,13 @@ export const TDropStakingAddress = {
   'mainnet': '0xa89c744db76266eca60e2b0f62afcd1f8581b7ed'
 };
 
+export const SubGovTokenAddress = {
+  'https://testnet-tsub360777-explorer.thetatoken.org': '0x1db1770c4de47f087d2bf397eec7ba777d65115f',
+  'https://tsub360888-explorer.thetatoken.org': '0x947735580040c07394b9c80f8e55019b47eeee1a',
+  'https://tsub360889-explorer.thetatoken.org': '0x14a0f075582d388c1c809f4d6ce98aeb0e0ea97e',
+  'https://tsub360890-explorer.thetatoken.org': '0x46fbf4487fa1b9c70d35bd761c51c360df9459ed'
+}
+
 export const CommonEventABIs = {
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{
     anonymous: false,
