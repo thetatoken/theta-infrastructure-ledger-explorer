@@ -868,7 +868,7 @@ async function getMaxTotalSupply(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {

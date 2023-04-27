@@ -57,7 +57,7 @@ const TDropStakeTable = React.memo(({ address }) => {
           gasLimit: gasLimit
         }, senderSequence);
         const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
         const callResponseJSON = await callResponse.json();
         const result = get(callResponseJSON, 'result');
         let outputValues = get(result, 'vm_return');

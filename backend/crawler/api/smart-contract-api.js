@@ -1,21 +1,20 @@
 var axios = require("axios").default;
 
-const BASE_URL = "https://api-wallet.thetatoken.org";
+const BASE_URL = "https://theta-bridge-rpc.thetatoken.org/rpc";
 
 const DEFAULT_HEADERS = {
   'Accept': 'application/json',
   'Content-Type': 'application/json',
 };
 
+//------------------------------------------------------------------------------
+//  Global variables
+//------------------------------------------------------------------------------
+var config = null;
+
 //
 //Helpers
 //
-
-exports.isResponseSuccessful = function (response) {
-  let { status } = response;
-
-  return (status === 200 || status === 201 || status === 202 || status === 204);
-}
 
 function objectToQueryString(object) {
   if (!object) {
@@ -81,10 +80,27 @@ function POST(path, headers, queryParams, body) {
 }
 
 class Api {
-  static callSmartContract(body, queryParams) {
-    let path = "/smart-contract/call";
+  static setConfig(cfg) {
+    config = cfg;
+  }
 
-    return POST(path, null, queryParams, body);
+  static callSmartContract(body, params) {
+    let path = params.url || config.ethRPCEndpoint || '';
+    console.log('callSmartContract path:', path);
+    let rawTransaction = body.data;
+
+    let data = {
+      jsonrpc: '2.0',
+      method: 'theta.CallSmartContract',
+      params: [
+        {
+          "sctx_bytes": rawTransaction
+        }
+      ],
+      id: 1
+    };
+
+    return POST(path, null, {}, data);
   }
 }
 

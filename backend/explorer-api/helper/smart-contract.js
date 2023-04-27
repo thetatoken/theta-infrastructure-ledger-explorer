@@ -210,7 +210,7 @@ async function _getTNT20Name(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
@@ -255,7 +255,7 @@ async function _getTNT721Name(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
@@ -409,7 +409,7 @@ async function _getMaxTotalSupply(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
@@ -454,7 +454,7 @@ async function getDecimals(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {
@@ -499,7 +499,7 @@ async function getSymbol(address, abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
     const result = get(callResponse, 'data.result');
     let outputValues = get(result, 'vm_return');
     const outputTypes = map(functionOutputs, ({ name, type }) => {

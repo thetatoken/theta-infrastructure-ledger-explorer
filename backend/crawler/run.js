@@ -2,6 +2,7 @@ var schedule = require('node-schedule-tz');
 var bluebird = require("bluebird");
 var fs = require('fs');
 var rpc = require('./api/rpc.js');
+var scApi = require('./api/smart-contract-api.js');
 var Logger = require('./helper/logger');
 var mongoClient = require('../mongo-db/mongo-client.js')
 var progressDaoLib = require('../mongo-db/progress-dao.js');
@@ -71,6 +72,7 @@ function main() {
     process.exit(1);
   }
   const networkId = config.blockchain.networkId;
+  scApi.setConfig(config);
   rpc.setConfig(config);
 
   bluebird.promisifyAll(rpc);
