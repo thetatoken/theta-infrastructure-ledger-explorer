@@ -81,7 +81,7 @@ function POST(path, headers, queryParams, body) {
 
 export default class Api {
   static callSmartContract(body, params) {
-    let path = params.url || '';
+    let path = params ? (params.url || '') : "";
     let rawTransaction = body.data;
 
     let data = {
