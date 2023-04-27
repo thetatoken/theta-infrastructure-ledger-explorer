@@ -45,5 +45,5 @@
     "retrieveTokenStartHeight": 0,
     "defaultThetaChainID": "testnet",
     "chainType": "mainchain",
-    "ethRPCEndpoint": ""
+    "thetaRPCEndpoint": ""
 }

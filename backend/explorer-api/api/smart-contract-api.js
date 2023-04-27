@@ -85,7 +85,7 @@ class Api {
   }
 
   static callSmartContract(body) {
-    let path = config.ethRPCEndpoint || '';
+    let path = config.thetaRPCEndpoint || '';
     console.log('callSmartContract path:', path);
     let rawTransaction = body.data;
 

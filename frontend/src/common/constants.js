@@ -154,7 +154,7 @@ export const NetworkUrlOfChainId = {
   'https://localhost': Networks.THETA_PRIVATENET,
 };
 
-export const EthRPCEndpoints = {
+export const ThetaRPCEndpoints = {
   'https://explorer.thetatoken.org': "https://theta-bridge-rpc.thetatoken.org/rpc",
   'https://stg-explorer.thetatoken.org': "https://theta-bridge-rpc.thetatoken.org/rpc",
   'https://beta-explorer.thetatoken.org': "https://theta-bridge-rpc-testnet.thetatoken.org/rpc",
@@ -164,6 +164,14 @@ export const EthRPCEndpoints = {
   'https://tsub360888-explorer.thetatoken.org': 'https://tsub360888-rpc.thetatoken.org/rpc',
   'https://tsub360889-explorer.thetatoken.org': 'https://tsub360889-rpc.thetatoken.org/rpc',
   'https://tsub360890-explorer.thetatoken.org': 'https://tsub360890-rpc.thetatoken.org/rpc'
+}
+
+export const EthRPCEndpoints = {
+  'https://explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
+  'https://stg-explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
+  'https://beta-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
+  'https://testnet-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
+  'https://localhost': "http://localhost:18888/rpc",
 }
 
 export const TDropStakingAddress = {

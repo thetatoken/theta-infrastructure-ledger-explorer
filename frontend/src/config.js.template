@@ -1,4 +1,4 @@
-import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType, SubGovTokenAddress } from 'common/constants';
+import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType, SubGovTokenAddress, ThetaRPCEndpoints } from 'common/constants';
 const host = 'https://localhost';
 const config = {
     restApi: {
@@ -11,6 +11,7 @@ const config = {
     },
     defaultThetaChainID: NetworkUrlOfChainId[host],
     ethRPCEndpoint: EthRPCEndpoints[host],
+    thetaRPCEndPoint: ThetaRPCEndpoints[host],
     chainInfo: {
         metachain: {
             host: 'https://localhost',
