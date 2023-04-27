@@ -1,6 +1,5 @@
 import config from '../../config';
 const BASE_URL = config.thetaRPCEndPoint;
-console.log('BASE_URL:', BASE_URL);
 
 const DEFAULT_HEADERS = {
   'Accept': 'application/json',
