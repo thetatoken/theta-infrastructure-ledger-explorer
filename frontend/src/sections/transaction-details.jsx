@@ -33,7 +33,6 @@ import { tokenService } from "../common/services/token";
 import config from '../config.js'
 
 const isSubchain = config.chainType === ChainType.SUBCHAIN;
-console.log('isSubchain:', isSubchain)
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;
 

@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import get from 'lodash/get';
 import map from 'lodash/map';
 
-import { WEI, CommonEventABIs, EthRPCEndpoints, NetworkUrlOfChainId, ChainType } from 'common/constants';
+import { WEI, CommonEventABIs, EthRPCEndpoints, NetworkUrlOfChainId, ChainType, ThetaRPCEndpoints } from 'common/constants';
 
 import smartContractApi from 'common/services/smart-contract-api';
 import Theta from 'libs/Theta';
@@ -312,7 +312,7 @@ export async function fetchWTFuelTotalSupply() {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: EthRPCEndpoints[config.chainInfo.mainchain.host] });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { url: ThetaRPCEndpoints[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
 
@@ -370,7 +370,7 @@ export async function fetchWThetaTotalSupply() {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { url: EthRPCEndpoints[config.chainInfo.mainchain.host] });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { url: ThetaRPCEndpoints[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
 
@@ -420,7 +420,7 @@ export async function fetchAbi(abi) {
       gasLimit: gasLimit
     }, senderSequence);
     const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { url: EthRPCEndpoints[config.chainInfo.mainchain.host] });
+    const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { url: ThetaRPCEndpoints[config.chainInfo.mainchain.host] });
     const callResponseJSON = await callResponse.json();
     const result = get(callResponseJSON, 'result');
     let outputValues = get(result, 'vm_return');
