@@ -16,7 +16,7 @@ import { ChainType } from "../constants";
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
 const { mainchain } = config.chainInfo;
-const uri = isMetaChain ? mainchain.host + ':' + mainchain.restApiPort + '/api/' : null;
+const uri = isMetaChain ? mainchain.hostApi + ':' + mainchain.restApiPort + '/api/' : null;
 export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -52,7 +52,7 @@ export default class TokenDashboard extends React.PureComponent {
       })
       const subChains = config.chainInfo.subchains
       for (let i = 0; i < subChains.length; i++) {
-        let uri = subChains[i].host + ':' + subChains[i].restApiPort + '/api/'
+        let uri = subChains[i].hostApi + ':' + subChains[i].restApiPort + '/api/'
         res = await transactionsService.getTransactionHistory(uri);
         txHistory = get(res, 'data.body.data');
         txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach((info, i) => {

@@ -10,14 +10,13 @@ import DashboardRow from "common/components/dashboard-row";
 import SubchainChart from "common/components/subchain-chart";
 import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
-import { ChainList } from 'common/constants';
 import config from '../config';
 import { ChainType } from "../common/constants";
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
 const { mainchain } = config.chainInfo;
-const uri = isMetaChain ? mainchain.host + ':' + mainchain.restApiPort + '/api/' : null;
+const uri = isMetaChain ? mainchain.hostApi + ':' + mainchain.restApiPort + '/api/' : null;
 export default class Dashboard extends React.PureComponent {
   constructor(props) {
     super(props);

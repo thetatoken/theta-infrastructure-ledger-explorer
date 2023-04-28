@@ -57,7 +57,7 @@ const DashboardRow = ({ isSubChain }) => {
 
     async function fetchData() {
       try {
-        let uri = config.chainInfo.mainchain.host + ":" + config.chainInfo.mainchain.restApiPort + '/api/';
+        let uri = config.chainInfo.mainchain.hostApi + ":" + config.chainInfo.mainchain.restApiPort + '/api/';
         let res = await accountService.getTotalWallets(uri);
         let aNum = get(res, 'data.total_number_account');
         res = await accountService.getDailyActiveWallets(uri);
@@ -67,7 +67,7 @@ const DashboardRow = ({ isSubChain }) => {
         res = await transactionsService.getTotalTransactionNumber(24, uri);
         let tNum = get(res, 'data.body.total_num_tx');
         for (let i = 0; i < config.chainInfo.subchains.length; i++) {
-          let uri = config.chainInfo.subchains[i].host + ":" + config.chainInfo.subchains[i].restApiPort + '/api/';
+          let uri = config.chainInfo.subchains[i].hostApi + ":" + config.chainInfo.subchains[i].restApiPort + '/api/';
           res = await accountService.getTotalWallets(uri)
           aNum += get(res, 'data.total_number_account');
           res = await accountService.getDailyActiveWallets(uri);
