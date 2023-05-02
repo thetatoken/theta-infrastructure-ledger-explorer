@@ -108,32 +108,6 @@ export const nodeTypes = {
   eenp: 'Elite Edge'
 }
 
-export const ChainList = {
-  mainChain: [{
-    name: "Theta Beta Main Chain",
-    logoName: "theta",
-    host: "https://beta-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of the Theta Main Chain"
-  }],
-  subChain: [{
-    name: "Theta Smart Contract Test Chain",
-    logoName: "replay",
-    host: "https://smart-contracts-sandbox-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of subchain #1"
-  }, {
-    name: "Theta Smart Contract Test Chain 2",
-    logoName: "replay",
-    host: "https://smart-contracts-sandbox-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of subchain #2"
-  }]
-}
-
 export const Networks = {
   __deprecated__ETHEREUM: 'ethereum',
   THETA_TESTNET: 'testnet',
@@ -154,18 +128,41 @@ export const NetworkUrlOfChainId = {
   'https://localhost': Networks.THETA_PRIVATENET,
 };
 
+export const ThetaRPCEndpoints = {
+  'https://explorer.thetatoken.org': "https://theta-bridge-rpc.thetatoken.org/rpc",
+  'https://stg-explorer.thetatoken.org': "https://theta-bridge-rpc.thetatoken.org/rpc",
+  'https://beta-explorer.thetatoken.org': "https://theta-bridge-rpc-testnet.thetatoken.org/rpc",
+  'https://testnet-explorer.thetatoken.org': "https://theta-bridge-rpc-testnet.thetatoken.org/rpc",
+  'https://localhost': "http://localhost:18888/rpc",
+  'https://testnet-tsub360777-explorer.thetatoken.org': 'https://testnet-tsub360777-rpc.thetatoken.org/rpc',
+  'https://tsub360888-explorer.thetatoken.org': 'https://tsub360888-rpc.thetatoken.org/rpc',
+  'https://tsub360889-explorer.thetatoken.org': 'https://tsub360889-rpc.thetatoken.org/rpc',
+  'https://tsub360890-explorer.thetatoken.org': 'https://tsub360890-rpc.thetatoken.org/rpc'
+}
+
 export const EthRPCEndpoints = {
   'https://explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
   'https://stg-explorer.thetatoken.org': "https://eth-rpc-api.thetatoken.org/rpc",
   'https://beta-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
   'https://testnet-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
   'https://localhost': "http://localhost:18888/rpc",
+  'https://testnet-tsub360777-explorer.thetatoken.org': 'https://testnet-tsub360777-eth-rpc.thetatoken.org/rpc',
+  'https://tsub360888-explorer.thetatoken.org': 'https://tsub360888-eth-rpc.thetatoken.org/rpc',
+  'https://tsub360889-explorer.thetatoken.org': 'https://tsub360889-eth-rpc.thetatoken.org/rpc',
+  'https://tsub360890-explorer.thetatoken.org': 'https://tsub360890-eth-rpc.thetatoken.org/rpc'
 }
 
 export const TDropStakingAddress = {
   'testnet': '0xa8bfa60203e55f86dc7013cbf3d8ff85bb1d3cc7',
   'mainnet': '0xa89c744db76266eca60e2b0f62afcd1f8581b7ed'
 };
+
+export const SubGovTokenAddress = {
+  'https://testnet-tsub360777-explorer.thetatoken.org': '0x1db1770c4de47f087d2bf397eec7ba777d65115f',
+  'https://tsub360888-explorer.thetatoken.org': '0x947735580040c07394b9c80f8e55019b47eeee1a',
+  'https://tsub360889-explorer.thetatoken.org': '0x14a0f075582d388c1c809f4d6ce98aeb0e0ea97e',
+  'https://tsub360890-explorer.thetatoken.org': '0x46fbf4487fa1b9c70d35bd761c51c360df9459ed'
+}
 
 export const CommonEventABIs = {
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": [{

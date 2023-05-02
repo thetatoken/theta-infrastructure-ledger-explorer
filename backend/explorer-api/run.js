@@ -5,6 +5,7 @@ var compression = require('compression')
 
 var bluebird = require("bluebird");
 var rpc = require('./api/rpc');
+var scApi = require('./api/smart-contract-api');
 var mongoClient = require('../mongo-db/mongo-client.js')
 var blockDaoLib = require('../mongo-db/block-dao.js');
 var progressDaoLib = require('../mongo-db/progress-dao.js');
@@ -88,6 +89,7 @@ function main() {
   }
 
   rpc.setConfig(config);
+  scApi.setConfig(config);
   bluebird.promisifyAll(rpc);
 
   Theta.chainId = config.defaultThetaChainID;
@@ -163,6 +165,17 @@ function main() {
       app.use(compression());
       app.use(cors());
       app.use(setApiToken);
+
+
+      app.get('/', function (req, res) {
+        console.log('Receive healthcheck / from ELB - ' + req.connection.remoteAddress);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': 2
+        });
+        res.write('OK');
+        res.end();
+      });
 
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);

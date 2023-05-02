@@ -1,16 +1,19 @@
-import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType } from 'common/constants';
+import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType, SubGovTokenAddress, ThetaRPCEndpoints } from 'common/constants';
 const host = 'https://localhost';
+const hostApi = 'https://localhost';
+const hostWs = 'https://localhost';
 const config = {
     restApi: {
-        host: host,
+        host: hostApi,
         port: 8443
     },
     socketApi: {
-        host: host,
+        host: hostWs,
         port: 2096
     },
     defaultThetaChainID: NetworkUrlOfChainId[host],
     ethRPCEndpoint: EthRPCEndpoints[host],
+    thetaRPCEndPoint: ThetaRPCEndpoints[host],
     chainInfo: {
         metachain: {
             host: 'https://localhost',
@@ -19,6 +22,8 @@ const config = {
             name: 'Theta Testnet Main Chain',
             discription: 'One sentence description of Theta Testnet Main Chain',
             host: 'https://localhost',
+            hostApi: 'https://localhost',
+            hostWs: 'https://localhost',
             logoName: "theta",
             restApiPort: 8843,
             socketApiPort: 2096
@@ -27,17 +32,15 @@ const config = {
             name: 'Theta Testnet SubChain #1',
             discription: 'One sentence description of subchain #1',
             host: 'https://localhost',
+            hostApi: 'https://localhost',
+            hostWs: 'https://localhost',
             logoName: "theta",
             restApiPort: 8843,
             socketApiPort: 2096
         }]
     },
-    contractAddresses: {
-        TNT20TokenBank: '0x7d7e270b7e279c94b265a535cdbc00eb62e6e68f',
-        TNT721TokenBank: '0xd5125d7bb9c4fb222c522c4b1922cabc631e52d7'
-    },
     chainName: 'Theta Testnet Main Chain',
-    chainType: ChainType.MAINCHAIN
-
+    chainType: ChainType.MAINCHAIN,
+    subGovTokenAddress: SubGovTokenAddress[host]
 };
 export default config;

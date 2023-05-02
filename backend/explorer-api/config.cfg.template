@@ -40,5 +40,6 @@
         "db": 0
     },
     "defaultThetaChainID": "testnet",
-    "xApiToken": ""
+    "xApiToken": "",
+    "thetaRPCEndpoint": ""
 }

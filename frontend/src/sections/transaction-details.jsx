@@ -33,7 +33,6 @@ import { tokenService } from "../common/services/token";
 import config from '../config.js'
 
 const isSubchain = config.chainType === ChainType.SUBCHAIN;
-console.log('isSubchain:', isSubchain)
 export default class TransactionExplorer extends React.Component {
   _isMounted = true;
 
@@ -674,7 +673,7 @@ const SmartContract = (props) => {
           gasLimit: gasLimit
         }, senderSequence);
         const rawTxBytes = ThetaJS.TxSigner.serializeTx(tx);
-        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) }, { network: Theta.chainId });
+        const callResponse = await smartContractApi.callSmartContract({ data: rawTxBytes.toString('hex').slice(2) });
         const callResponseJSON = await callResponse.json();
         const result = get(callResponseJSON, 'result');
         let outputValues = get(result, 'vm_return');

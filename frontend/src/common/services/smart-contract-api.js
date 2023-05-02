@@ -1,4 +1,5 @@
-const BASE_URL = "https://api-wallet.thetatoken.org";
+import config from '../../config';
+const BASE_URL = config.thetaRPCEndPoint;
 
 const DEFAULT_HEADERS = {
   'Accept': 'application/json',
@@ -78,9 +79,21 @@ function POST(path, headers, queryParams, body) {
 }
 
 export default class Api {
-  static callSmartContract(body, queryParams, newPath) {
-    let path = newPath || "/smart-contract/call";
+  static callSmartContract(body, params) {
+    let path = params ? (params.url || '') : "";
+    let rawTransaction = body.data;
 
-    return POST(path, null, queryParams, body);
+    let data = {
+      jsonrpc: '2.0',
+      method: 'theta.CallSmartContract',
+      params: [
+        {
+          "sctx_bytes": rawTransaction
+        }
+      ],
+      id: 1
+    };
+
+    return POST(path, null, {}, data);
   }
 }
