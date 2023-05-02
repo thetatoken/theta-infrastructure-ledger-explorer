@@ -166,6 +166,40 @@
     width: 100px;
     margin-top: -10px;
   }
+  &.toonstar {
+    background-image: url("/images/icons/icon-toonstar.jpeg");
+    height: 24px;
+    width: 24px;
+    border-radius: 12px;
+    background-position: 0 50%;
+    margin-top: -2px;
+    &::after{
+      content: "TOONSTAR";
+      margin-left: 30px;
+      display: flex;
+      align-items: center;
+      font-weight: 550;
+      color: $color-white;
+      letter-spacing: 1px;
+      transform: translateY(2px);
+    }
+  }
+  &.lavita {
+    background-image: url("/images/icons/icon-lavita.png");
+    height: 24px;
+    width: 24px;
+    margin-top: -2px;
+    &::after{
+      content: "LAVITA";
+      margin-left: 30px;
+      display: flex;
+      align-items: center;
+      font-weight: 550;
+      color: $color-white;
+      letter-spacing: 1px;
+      transform: translateY(2px);
+    }
+  }
 }
 
 .content.check {

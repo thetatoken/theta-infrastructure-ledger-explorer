@@ -35,24 +35,35 @@ app.get('*', function (req, res) {
   res.sendFile(path.resolve(__dirname, 'index.html'));
 });
 
+if (process.env.DISABLE_SSL !== 'true') {
+  var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');
+  var certificate = fs.readFileSync('./cert/star_thetatoken_org.crt');
+  var options = {
+    key: privateKey,
+    cert: certificate
+  };
+  var h2 = require('spdy').createServer(options, app);
 
 
-var privateKey = fs.readFileSync('./cert/star_thetatoken_org.key');
-var certificate = fs.readFileSync('./cert/star_thetatoken_org.crt');
-var options = {
-  key: privateKey,
-  cert: certificate
-};
-var h2 = require('spdy').createServer(options, app);
+  h2.listen(port, function (err) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Listening at port: ${port} with SSL`);
+  });
+} else {
+  var http = require('http').createServer(app);
 
+  http.listen(port, function (err) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    console.log(`Listening at port: ${port} without SSL`);
+  });
+}
 
-h2.listen(port, function (err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log(`Listening at port: ${port}`);
-});
 
 /**
 var http = require('http').createServer(app);

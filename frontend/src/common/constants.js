@@ -108,32 +108,6 @@ export const nodeTypes = {
   eenp: 'Elite Edge'
 }
 
-export const ChainList = {
-  mainChain: [{
-    name: "Theta Beta Main Chain",
-    logoName: "theta",
-    host: "https://beta-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of the Theta Main Chain"
-  }],
-  subChain: [{
-    name: "Theta Smart Contract Test Chain",
-    logoName: "replay",
-    host: "https://smart-contracts-sandbox-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of subchain #1"
-  }, {
-    name: "Theta Smart Contract Test Chain 2",
-    logoName: "replay",
-    host: "https://smart-contracts-sandbox-explorer.thetatoken.org",
-    restApiPort: 8843,
-    socketApiPort: 2096,
-    description: "One sentence description of subchain #2"
-  }]
-}
-
 export const Networks = {
   __deprecated__ETHEREUM: 'ethereum',
   THETA_TESTNET: 'testnet',

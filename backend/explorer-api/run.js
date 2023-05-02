@@ -166,6 +166,17 @@ function main() {
       app.use(cors());
       app.use(setApiToken);
 
+
+      app.get('/', function (req, res) {
+        console.log('Receive healthcheck / from ELB - ' + req.connection.remoteAddress);
+        res.writeHead(200, {
+          'Content-Type': 'text/plain',
+          'Content-Length': 2
+        });
+        res.write('OK');
+        res.end();
+      });
+
       app.get('/ping', function (req, res) {
         console.log('Receive healthcheck /ping from ELB - ' + req.connection.remoteAddress);
         res.writeHead(200, {

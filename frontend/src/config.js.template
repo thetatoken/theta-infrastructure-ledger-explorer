@@ -1,12 +1,14 @@
 import { NetworkUrlOfChainId, EthRPCEndpoints, ChainType, SubGovTokenAddress, ThetaRPCEndpoints } from 'common/constants';
 const host = 'https://localhost';
+const hostApi = 'https://localhost';
+const hostWs = 'https://localhost';
 const config = {
     restApi: {
-        host: host,
+        host: hostApi,
         port: 8443
     },
     socketApi: {
-        host: host,
+        host: hostWs,
         port: 2096
     },
     defaultThetaChainID: NetworkUrlOfChainId[host],
@@ -20,6 +22,8 @@ const config = {
             name: 'Theta Testnet Main Chain',
             discription: 'One sentence description of Theta Testnet Main Chain',
             host: 'https://localhost',
+            hostApi: 'https://localhost',
+            hostWs: 'https://localhost',
             logoName: "theta",
             restApiPort: 8843,
             socketApiPort: 2096
@@ -28,6 +32,8 @@ const config = {
             name: 'Theta Testnet SubChain #1',
             discription: 'One sentence description of subchain #1',
             host: 'https://localhost',
+            hostApi: 'https://localhost',
+            hostWs: 'https://localhost',
             logoName: "theta",
             restApiPort: 8843,
             socketApiPort: 2096

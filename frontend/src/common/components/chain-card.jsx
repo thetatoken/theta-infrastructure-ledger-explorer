@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { ChainList } from "common/constants";
 import cx from 'classnames';
 import config from "../../config";
 
