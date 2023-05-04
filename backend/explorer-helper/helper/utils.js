@@ -1,3 +1,5 @@
+var { linkBytecode } = require('solc/linker');
+
 exports.normalize = function (hash) {
     const regex = /^0x/i;
     return regex.test(hash) ? hash : '0x' + hash;
@@ -23,10 +25,17 @@ exports.stampDate = function (sourceCode) {
     return `/**\n *Submitted for verification at thetatoken.org on ${date.toISOString().split('T')[0]}\n */\n` + sourceCode;
 }
 exports.flatSourceCode = function (sourceCode, isSingleFile) {
+    console.log('isSingleFile in flat:', isSingleFile)
     if (isSingleFile) return sourceCode;
-    let newCode = '';
-    for (let filename in sourceCode) {
-        newCode += sourceCode[filename].content;
-    }
-    console.log('newCode:', newCode);
+    let source = JSON.parse(sourceCode);
+    const flattenedBytecode = Object.values(source).map(contract => contract.content).join('\n');
+    let flattenedSource = linkBytecode(flattenedBytecode, {});
+    flattenedSource = flattenedSource.replace(/import.*;\n/g, "");
+
+    const solidityPragmaRegex = /pragma solidity.*\n/g;
+
+    flattenedSource = flattenedSource.replace(solidityPragmaRegex, (match, offset) => {
+        return offset === flattenedSource.search(solidityPragmaRegex) ? match : "";
+    });
+    return flattenedSource;
 }

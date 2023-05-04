@@ -14,7 +14,7 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "socketio": "^1.0.0",
-    "solc": "^0.7.1",
+    "solc": "^0.8.19",
     "spdy": "^4.0.2"
   },
   "devDependencies": {},
