@@ -110,7 +110,7 @@
     }
 
     &__chain {
-      height: 60px;
+      min-height: 60px;
       line-height: 20px;
       border: 1px solid rgba($color-font-light, 0.2);
       color: $color-font-light;
@@ -118,6 +118,7 @@
       padding: 20px;
       margin-bottom: 8px;
       display: flex;
+      align-items: center;
 
       &:hover {
         border-color: $color-font-light;
@@ -130,8 +131,12 @@
 
       &--logo {
         height: 100%;
-        width: 90px;
+        width: 80px;
         margin-right: 110px;
+      }
+
+      &--description {
+        flex: 1;
       }
 
       @include breakpoint("phablet", max) {
@@ -156,15 +161,26 @@
   background-color: transparent;
   &.theta {
     background-image: url("/images/logos/logo-theta-chain.png");
+    height: 20px;
   }
   &.replay {
     background-image: url("/images/logos/logo-replay.png");
   }
   &.playground {
-    background-image: url("/images/logos/logo-playground.png");
-    height: 40px;
-    width: 100px;
-    margin-top: -10px;
+    background-image: url("/images/icons/icon-playground.png");
+    height: 24px;
+    width: 24px;
+    background-position: 0 50%;
+    &::after{
+      content: "PLAYGROUND";
+      margin-left: 30px;
+      display: flex;
+      align-items: center;
+      font-weight: 550;
+      color: $color-white;
+      letter-spacing: 1px;
+      transform: translateY(2px);
+    }
   }
   &.toonstar {
     background-image: url("/images/icons/icon-toonstar.jpeg");
@@ -172,7 +188,6 @@
     width: 24px;
     border-radius: 12px;
     background-position: 0 50%;
-    margin-top: -2px;
     &::after{
       content: "TOONSTAR";
       margin-left: 30px;
@@ -188,7 +203,6 @@
     background-image: url("/images/icons/icon-lavita.png");
     height: 24px;
     width: 24px;
-    margin-top: -2px;
     &::after{
       content: "LAVITA";
       margin-left: 30px;
