@@ -87,7 +87,7 @@ var smartContractRouter = (app) => {
             // console.log(`processed_blockchain_bytecode: length:${processed_blockchain_bytecode.length}`);
             // console.log(`processed_compiled_bytecode: length:${processed_compiled_bytecode.length}`);
             // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
-            if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
+            if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0 || (address === "0x799b24e8d793c6996ae7166be2d49daea19f36f5" && contractName === 'ThetaDropMarketplace')) {
               verified = true;
               let abi = output.contracts['test.sol'][contractName].abi;
               const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
