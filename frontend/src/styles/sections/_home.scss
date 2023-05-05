@@ -189,7 +189,7 @@
     border-radius: 12px;
     background-position: 0 50%;
     &::after{
-      content: "TOONSTAR";
+      content: "SPACE JUNK";
       margin-left: 30px;
       display: flex;
       align-items: center;
@@ -197,6 +197,7 @@
       color: $color-white;
       letter-spacing: 1px;
       transform: translateY(2px);
+      white-space: nowrap;
     }
   }
   &.lavita {
