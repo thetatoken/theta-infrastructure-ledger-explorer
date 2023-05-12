@@ -143,9 +143,20 @@
         min-height: 60px;
         height: auto;
         align-items: center;
+        flex-direction: column;
         &--logo {
           margin-right: 10px;
           height: 20px;
+          margin-bottom: 10px;
+          .playground {
+            margin-left: -25px;
+          }
+          .toonstar {
+            margin-left: -17px;
+          }
+        }
+        &--description {
+          text-align: center;
         }
       }
     }
@@ -161,6 +172,7 @@
   background-color: transparent;
   &.theta {
     background-image: url("/images/logos/logo-theta-chain.png");
+    height: 20px;
   }
   &.replay {
     background-image: url("/images/logos/logo-replay.png");
@@ -188,7 +200,7 @@
     border-radius: 12px;
     background-position: 0 50%;
     &::after{
-      content: "TOONSTAR";
+      content: "SPACE JUNK";
       margin-left: 30px;
       display: flex;
       align-items: center;
@@ -196,6 +208,7 @@
       color: $color-white;
       letter-spacing: 1px;
       transform: translateY(2px);
+      white-space: nowrap;
     }
   }
   &.lavita {
