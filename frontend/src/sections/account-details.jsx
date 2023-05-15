@@ -786,7 +786,7 @@ const TxsTab = React.memo(props => {
     let tabIndex = names.indexOf(tabName) === -1 ? 0 : names.indexOf(tabName);
     setTabNames(names);
     setTabIndex(tabIndex);
-  }, [type, hasTxs, hasTNT20, hasTNT721])
+  }, [type, hasTxs, hasTNT20, hasTNT721, transactions])
   const handleSelect = index => {
     let tabName = tabNames[index];
     setTabIndex(index);

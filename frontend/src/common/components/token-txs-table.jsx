@@ -73,7 +73,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
                 {(type === 'TNT-721' || type === 'XCHAIN_TNT721' || type === 'XCHAIN_TNT1155') && <td className="tokenId">
                   <Link to={`/token/${txn.contract_address}?a=${txn.token_id}`}>{txn.token_id}</Link>
                 </td>}
-                {type === 'TFUEL' || type === 'XCHAIN_TFUEL' && <td className="quantity">
+                {(type === 'TFUEL' || type === 'XCHAIN_TFUEL') && <td className="quantity">
                   <div className="currency tfuel">
                     {formatCoin(txn.value, 2)}
                   </div>
