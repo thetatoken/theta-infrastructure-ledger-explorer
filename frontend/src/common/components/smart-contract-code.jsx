@@ -55,6 +55,13 @@ const CodeUploader = props => {
   const optimizerRef = useRef(null);
   const optimizerRunsRef = useRef(null);
   const abiRef = useRef(null);
+  const libRefs = useRef([]);
+  // const libArr = new Array(10);
+  Array.from({ length: 10 }).forEach((_, index) => {
+    libRefs.current[index] = [useRef(), useRef()];
+  });
+  // console.log('libArr:', libArr)
+  console.log('libRefs:', libRefs)
   useEffect(() => {
     if (sourceCodeRef.current) {
       sourceCodeRef.current.value = uploaderSourceCode;
@@ -73,7 +80,7 @@ const CodeUploader = props => {
     if (!isSingleFile) {
       for (let i = 0; i < files.length; i++) {
         const fileContents = await readFileAsync(files[i]);
-        fileObj[files[i].name] = {content: fileContents};
+        fileObj[files[i].name] = { content: fileContents };
       }
     }
     console.log('fileObj:', fileObj)
@@ -190,6 +197,32 @@ const CodeUploader = props => {
           subTitle="(for contracts that were created with constructor parameters)"
         />}
         body={<textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />} />
+      <Accordion
+        header={<AccordionHeader
+          title="Contract Library Address "
+          subTitle="(for contracts that use libraries, supports up to 10 libraries)"
+        />}
+        body={<div className="sc-library">
+          <div className="sc-library__note">Note: Library names are case sensitive and affects the keccak library hash</div>
+          <div className="sc-libraries">
+            {Array.from({ length: 10 }).map((_, index) => {
+              return <div className="sc-library__row" key={index}>
+                <div className="sc-library__section">
+                  <div className="sc-library__section--title">Library #{index + 1} Name:</div>
+                  <input className="sc-library__section--input" type="text" ref={ref => (libRefs.current[index][0].current = ref)} />
+                </div>
+                <div className="sc-library__arrow">
+                  <div></div>
+                  <div className="sc-library__arrow right"></div>
+                </div>
+                <div className="sc-library__section">
+                  <div className="sc-library__section--title">Library #{index + 1} Contract Address:</div>
+                  <input className="sc-library__section--input" type="text" ref={ref => (libRefs.current[index][1].current = ref)} />
+                </div>
+              </div>
+            })}
+          </div>
+        </div>} />
       <Accordion
         header={<AccordionHeader
           title="Misc Settings"

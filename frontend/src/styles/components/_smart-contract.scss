@@ -327,3 +327,28 @@
     font-size: 14px;
   }
 }
+.sc-library {
+  &__row {
+    display: flex;
+  }
+  &__section {
+    width: 220px;
+    margin-top: 20px;
+    &--input {
+      width: 100%;
+    }
+  }
+  &__arrow {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    &.right {
+      &::after {
+        content: "\21E8";
+        font-size: 1rem;
+        transform: translateY(-5px);
+      }
+    }
+  }
+}
