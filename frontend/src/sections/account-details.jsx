@@ -42,7 +42,17 @@ export default class AccountDetails extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = this.getInitialState();
+    this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
+    this.download = React.createRef();
+    this.startDateRef = React.createRef();
+    this.endDateRef = React.createRef();
+    this.select = React.createRef();
+    this.handleInput = this.handleInput.bind(this);
+    this.resetInput = this.resetInput.bind(this);
+  }
+  getInitialState = () => {
+    return {
       account: this.getEmptyAccount(this.props.match.params.accountAddress),
       accountTNS: null,
       transactions: null,
@@ -78,13 +88,6 @@ export default class AccountDetails extends React.Component {
       tokenBalance: INITIAL_TOKEN_BALANCE,
       tabNames: []
     };
-    this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
-    this.download = React.createRef();
-    this.startDateRef = React.createRef();
-    this.endDateRef = React.createRef();
-    this.select = React.createRef();
-    this.handleInput = this.handleInput.bind(this);
-    this.resetInput = this.resetInput.bind(this);
   }
   setSingleTNS = async (address, stateKey) => {
     const name = await tns.getDomainName(address);
@@ -137,21 +140,7 @@ export default class AccountDetails extends React.Component {
   }
   componentDidUpdate(preProps, preState) {
     if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
-      this.setState({
-        hasOtherTxs: true,
-        includeService: false,
-        rewardSplit: 0,
-        beneficiary: "",
-        tabIndex: 0,
-        hasToken: false,
-        hasTNT20: false,
-        hasTNT721: false,
-        hasXChainTxs: false,
-        hasXChainTNT721: false,
-        hasXChainTNT20: false,
-        hasXChainTNT1155: false,
-        tokenBalance: INITIAL_TOKEN_BALANCE
-      })
+      this.setState(this.getInitialState());
       this.fetchData(this.props.match.params.accountAddress);
     }
     if (preState.account !== this.state.account
