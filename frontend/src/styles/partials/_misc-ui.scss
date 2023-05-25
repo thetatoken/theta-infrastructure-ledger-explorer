@@ -47,6 +47,11 @@
       background-image: url('/images/icons/icon_wtfuel.png'); 
     }
   }
+  &.lavita {
+    &:before {
+      background-image: url('/images/icons/icon-lavita.png'); 
+    }
+  }
 }
 
 .currency-link {
