@@ -51,13 +51,17 @@ export default class TokenDashboard extends React.PureComponent {
         txNumber.push(info.number);
       })
       const subChains = config.chainInfo.subchains
-      for (let i = 0; i < subChains.length; i++) {
+      for (let i = 0; i < subChains.length - 1; i++) {
         let uri = subChains[i].hostApi + ':' + subChains[i].restApiPort + '/api/'
-        res = await transactionsService.getTransactionHistory(uri);
-        txHistory = get(res, 'data.body.data');
-        txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach((info, i) => {
-          txNumber[i] += info.number;
-        })
+        try {
+          res = await transactionsService.getTransactionHistory(uri);
+          txHistory = get(res, 'data.body.data');
+          txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach((info, i) => {
+            txNumber[i] += info.number;
+          })
+        } catch (e) {
+          console.log('error in fetch subchain transation history:', e)
+        }
       }
       this.setState({ txTs, txNumber })
       return;
