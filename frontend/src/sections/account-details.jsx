@@ -33,7 +33,7 @@ import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0' };
+const INITIAL_TOKEN_BALANCE = { WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0' };
 let scrollTimes = 0;
 let maxScrollTimes = 1;
 
@@ -480,11 +480,13 @@ export default class AccountDetails extends React.Component {
     const tokenMap = {
       TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
       // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
       WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
       TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
       Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
     }
     const decimalsMap = {
+      'WTheta': 18,
       'TBill': 9,
       'WTFuel': 18,
       'TDrop': 18,
@@ -496,10 +498,6 @@ export default class AccountDetails extends React.Component {
     for (let key of keys) {
       let balanceBN = await fetchBalanceByAddress(tokenMap[key], accountAddress);
       let balance = balanceBN.toString();
-      console.log('key:', key);
-      console.log('balance:', balance);
-      console.log('new BigNumber(balance).gt(MIN_DISPLAY_VALUE:', new BigNumber(balance).gt(MIN_DISPLAY_VALUE));
-      console.log('MIN_DISPLAY_VALUE:', MIN_DISPLAY_VALUE);
       tokenBalance[key] = balance;
       const MIN_DISPLAY_VALUE = new BigNumber(10).exponentiatedBy(decimalsMap[key] - 2);
 
@@ -621,15 +619,16 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
-  console.log('tokenBalance:', tokenBalance)
   const tokenMap = {
     TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
     // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+    WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
     WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
     TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
     Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
   }
   const decimalsMap = {
+    'WTheta': 18,
     'TBill': 9,
     'WTFuel': 18,
     'TDrop': 18,
