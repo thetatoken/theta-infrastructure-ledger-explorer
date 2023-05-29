@@ -66,7 +66,7 @@ const DashboardRow = ({ isSubChain }) => {
         let bNum = get(res, 'data.body.total_num_block');
         res = await transactionsService.getTotalTransactionNumber(24, uri);
         let tNum = get(res, 'data.body.total_num_tx');
-        for (let i = 0; i < config.chainInfo.subchains.length - 1; i++) {
+        for (let i = 0; i < config.chainInfo.subchains.length; i++) {
           let uri = config.chainInfo.subchains[i].hostApi + ":" + config.chainInfo.subchains[i].restApiPort + '/api/';
           try {
             res = await accountService.getTotalWallets(uri)

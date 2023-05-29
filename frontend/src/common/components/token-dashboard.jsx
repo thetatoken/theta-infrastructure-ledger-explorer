@@ -51,7 +51,7 @@ export default class TokenDashboard extends React.PureComponent {
         txNumber.push(info.number);
       })
       const subChains = config.chainInfo.subchains
-      for (let i = 0; i < subChains.length - 1; i++) {
+      for (let i = 0; i < subChains.length; i++) {
         let uri = subChains[i].hostApi + ':' + subChains[i].restApiPort + '/api/'
         try {
           res = await transactionsService.getTransactionHistory(uri);
