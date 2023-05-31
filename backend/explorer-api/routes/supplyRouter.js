@@ -88,7 +88,7 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
     try {
       const totalSupplyWei = await getMaxTotalSupply(tokenAddress, totalSupplyAbi);
       const totalSupply = helper.formatCoin(totalSupplyWei).toFixed(0);
-      let tSupply = 20000000000;
+      let maxSupply = 20000000000;
       if (token === 'lavita') {
         const maxSupplyAbi = [{
           "inputs": [],
@@ -97,16 +97,17 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
           "stateMutability": "view",
           "type": "function"
         }];
-        tSupply = await getMaxSupply(tokenAddress, maxSupplyAbi);
+        const maxSupplyWei = await getMaxSupply(tokenAddress, maxSupplyAbi);
+        maxSupply = helper.formatCoin(maxSupplyWei).toFixed(0);
       }
       let data = ({
-        "total_supply": tSupply,
+        "total_supply": maxSupply,
         "circulation_supply": totalSupply
       });
       if (q === 'circulationSupply') {
         data = totalSupply.toString();
       } else if (q === 'totalSupply') {
-        data = tSupply.toString();
+        data = maxSupply.toString();
       }
       res.status(200).send(data);
     } catch (err) {
