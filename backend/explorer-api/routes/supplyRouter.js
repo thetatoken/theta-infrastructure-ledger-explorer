@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
-var { getMaxTotalSupply } = require('../helper/smart-contract');
+var { getMaxTotalSupply, getMaxSupply } = require('../helper/smart-contract');
 
 var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
   router.use(bodyParser.urlencoded({ extended: true }));
@@ -88,10 +88,20 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
     try {
       const totalSupplyWei = await getMaxTotalSupply(tokenAddress, totalSupplyAbi);
       const totalSupply = helper.formatCoin(totalSupplyWei).toFixed(0);
-      const tSupply = 20000000000;
+      let tSupply = 20000000000;
+      if (token === 'lavita') {
+        const maxSupplyAbi = [{
+          "inputs": [],
+          "name": "maxSupply",
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+          "stateMutability": "view",
+          "type": "function"
+        }];
+        tSupply = await getMaxSupply(tokenAddress, maxSupplyAbi);
+      }
       let data = ({
-        "total_supply": totalSupply,
-        "circulation_supply": tSupply
+        "total_supply": tSupply,
+        "circulation_supply": totalSupply
       });
       if (q === 'circulationSupply') {
         data = totalSupply.toString();
