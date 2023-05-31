@@ -63,8 +63,13 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
       })
   });
 
-  router.get("/supply/tdrop", async (req, res) => {
-    console.log('Querying the total amount of TDrop.');
+  router.get("/supply/:token", async (req, res) => {
+    const token = req.params.token.toLowerCase()
+    console.log(`Querying the total amount of ${token}.`);
+    if (token !== 'tdrop' && token !== 'lavita') {
+      res.status(400).send(`Invalid Token: ${token}`);
+      return;
+    }
     const { q } = req.query;
     const totalSupplyAbi = [{
       "inputs": [],
@@ -73,10 +78,15 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
       "stateMutability": "view",
       "type": "function"
     }];
-    const tdropAddress = '0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03';
+
+    const tokenAddress = helper.getTokenAddress(token);
+    if (!tokenAddress) {
+      res.status(400).send(`No token address found for token ${token}`);
+      return;
+    }
 
     try {
-      const totalSupplyWei = await getMaxTotalSupply(tdropAddress, totalSupplyAbi);
+      const totalSupplyWei = await getMaxTotalSupply(tokenAddress, totalSupplyAbi);
       const totalSupply = helper.formatCoin(totalSupplyWei).toFixed(0);
       const tSupply = 20000000000;
       let data = ({

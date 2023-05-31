@@ -24,3 +24,11 @@ exports.getHex = function (str) {
     const bufString = buffer.toString('hex');
     return '0x' + bufString;
 }
+
+exports.getTokenAddress = function (token) {
+    const tokenAddressMap = {
+        'tdrop': '0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03',
+        'lavita': '0x46fbf4487fa1b9c70d35bd761c51c360df9459ed'
+    }
+    return tokenAddressMap[token];
+}
