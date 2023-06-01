@@ -104,8 +104,8 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao, config) => {
     let { limit = 100, tokenId } = req.query;
     limit = Number(limit);
     if (limit > 100) limit = 100;
-    const tdropAddress = "0x08a0c0e8efd07a98db11d79165063b6bc2469adf"; // testnet
-    // const tdropAddress = "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03"; // mainnet
+    // const tdropAddress = "0x08a0c0e8efd07a98db11d79165063b6bc2469adf"; // testnet
+    const tdropAddress = "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03"; // mainnet
     tokenHolderDao.getTopHoldersAsync(tdropAddress, null, limit)
       .then(result => {
         if (result === null) {
