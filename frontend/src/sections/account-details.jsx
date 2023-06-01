@@ -33,7 +33,7 @@ import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-const INITIAL_TOKEN_BALANCE = { TDrop: '0', WTFuel: '0', TBill: '0' };
+const INITIAL_TOKEN_BALANCE = { WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0' };
 let scrollTimes = 0;
 let maxScrollTimes = 1;
 
@@ -42,7 +42,17 @@ export default class AccountDetails extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = this.getInitialState();
+    this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
+    this.download = React.createRef();
+    this.startDateRef = React.createRef();
+    this.endDateRef = React.createRef();
+    this.select = React.createRef();
+    this.handleInput = this.handleInput.bind(this);
+    this.resetInput = this.resetInput.bind(this);
+  }
+  getInitialState = () => {
+    return {
       account: this.getEmptyAccount(this.props.match.params.accountAddress),
       accountTNS: null,
       transactions: null,
@@ -78,13 +88,6 @@ export default class AccountDetails extends React.Component {
       tokenBalance: INITIAL_TOKEN_BALANCE,
       tabNames: []
     };
-    this.downloadTrasanctionHistory = this.downloadTrasanctionHistory.bind(this);
-    this.download = React.createRef();
-    this.startDateRef = React.createRef();
-    this.endDateRef = React.createRef();
-    this.select = React.createRef();
-    this.handleInput = this.handleInput.bind(this);
-    this.resetInput = this.resetInput.bind(this);
   }
   setSingleTNS = async (address, stateKey) => {
     const name = await tns.getDomainName(address);
@@ -137,21 +140,7 @@ export default class AccountDetails extends React.Component {
   }
   componentDidUpdate(preProps, preState) {
     if (preProps.match.params.accountAddress !== this.props.match.params.accountAddress) {
-      this.setState({
-        hasOtherTxs: true,
-        includeService: false,
-        rewardSplit: 0,
-        beneficiary: "",
-        tabIndex: 0,
-        hasToken: false,
-        hasTNT20: false,
-        hasTNT721: false,
-        hasXChainTxs: false,
-        hasXChainTNT721: false,
-        hasXChainTNT20: false,
-        hasXChainTNT1155: false,
-        tokenBalance: INITIAL_TOKEN_BALANCE
-      })
+      this.setState(this.getInitialState());
       this.fetchData(this.props.match.params.accountAddress);
     }
     if (preState.account !== this.state.account
@@ -489,15 +478,19 @@ export default class AccountDetails extends React.Component {
   }
   fetchTokenBalance = async (accountAddress) => {
     const tokenMap = {
-      // TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-      TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+      // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+      WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
       WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
-      TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
+      TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
+      Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
     }
     const decimalsMap = {
+      'WTheta': 18,
       'TBill': 9,
       'WTFuel': 18,
-      'TDrop': 18
+      'TDrop': 18,
+      'Lavita': 18
     }
     let keys = Object.keys(tokenMap);
     let tokenBalance = this.state.tokenBalance;
@@ -627,15 +620,19 @@ const Balance = ({ balance, price }) => {
 
 const Token = ({ tokenBalance }) => {
   const tokenMap = {
-    // TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-    TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+    TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+    // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+    WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
     WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
-    TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39'
+    TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
+    Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
   }
   const decimalsMap = {
+    'WTheta': 18,
     'TBill': 9,
     'WTFuel': 18,
-    'TDrop': 18
+    'TDrop': 18,
+    'Lavita': 18
   }
   return (
     <div className="act balance">
@@ -643,7 +640,7 @@ const Token = ({ tokenBalance }) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
           {`${formatQuantity(v, decimalsMap[k], 2)}`}
-          {k === 'TBill' ? <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
+          {(k === 'TBill' || k === 'Lavita') ? <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
             : <Link className="currency-link" to={`/token/${tokenMap[k]}`}>{CurrencyLabels[k] || k}</Link>}
         </div>
       })}
@@ -786,7 +783,7 @@ const TxsTab = React.memo(props => {
     let tabIndex = names.indexOf(tabName) === -1 ? 0 : names.indexOf(tabName);
     setTabNames(names);
     setTabIndex(tabIndex);
-  }, [type, hasTxs, hasTNT20, hasTNT721])
+  }, [type, hasTxs, hasTNT20, hasTNT721, transactions])
   const handleSelect = index => {
     let tabName = tabNames[index];
     setTabIndex(index);
