@@ -7,11 +7,11 @@ export const smartContractService = {
     }
     return apiService.get(`smartcontract/${address}`, {});
   },
-  verifySourceCode(address, sourceCode, abi, version, versionFullName, optimizer, optimizerRuns, isSingleFile) {
+  verifySourceCode(address, sourceCode, abi, version, versionFullName, optimizer, optimizerRuns, isSingleFile, libs) {
     if (!address) {
       throw Error('Missing argument');
     }
-    return apiService.post(`smartcontract/verify/${address}`, { sourceCode, abi, version, versionFullName, optimizer, optimizerRuns, isSingleFile })
+    return apiService.post(`smartcontract/verify/${address}`, { sourceCode, abi, version, versionFullName, optimizer, optimizerRuns, isSingleFile, libs })
   },
   getAbiByAddress(address) {
     if (!address) {

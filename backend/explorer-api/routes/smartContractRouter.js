@@ -12,8 +12,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   // The api to verify the source and bytecode
   router.post("/smartContract/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
-    let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200, isSingleFile = true } = req.body;
-    console.log('sourceCode:', sourceCode)
+    let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200, isSingleFile = true, libs = {} } = req.body;
     console.log('isSingleFile:', isSingleFile, typeof isSingleFile)
     optimizerRuns = +optimizerRuns;
     if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
@@ -21,9 +20,34 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
     try {
       let sc = await smartContractDao.getSmartContractByAddressAsync(address)
       let byteCode = sc.bytecode;
+      let libsSourceCode = {}
+      for (let lib in libs) {
+        const libAdr = helper.normalize(libs[lib].toLowerCase());
+        console.log('lib:', lib, libAdr)
+
+        if (!helper.validateHex(libAdr, 40)) {
+          res.status(200).send({ err_msg: `Invalid library address: ${libAdr}.` })
+          return;
+        }
+        let libsc;
+        try {
+          libsc = await smartContractDao.getSmartContractByAddressAsync(libAdr);
+        } catch (e) {
+          if (e.message.includes('NOT_FOUND')) {
+            res.status(200).send({ err_msg: `No contract library found on address: ${libAdr}.` })
+            return;
+          }
+        }
+        if (!libsc.source_code) {
+          res.status(200).send({ err_msg: `Library contract ${libAdr}} haven't been verified, please verify the library contract first.` })
+          return;
+        }
+        libsSourceCode[libAdr] = libsc.source_code;
+      }
+      console.log('libsSourceCode:', libsSourceCode)
       const helperUrl = (process.env.HELPER_HOST || 'localhost') + ":" + (process.env.HELPER_PORT || '9090');
       let result = await axios.post(`http://${helperUrl}/api/verify/${address}`, {
-        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns, isSingleFile
+        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns, isSingleFile, libs, libsSourceCode
       })
       console.log('Received response from verification server.', result.data.result);
       if (result.data.result.verified === true) {

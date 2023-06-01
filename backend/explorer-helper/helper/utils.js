@@ -1,6 +1,7 @@
 var { linkBytecode } = require('solc/linker');
 var fs = require('fs');
 var path = require('path');
+const crypto = require('crypto');
 
 exports.normalize = function (hash) {
     const regex = /^0x/i;
@@ -38,6 +39,12 @@ exports.flatSourceCode = function (sourceCode) {
     });
     return flattenedSource;
 }
+
+exports.convertToHashString = function(inputString) {
+    const hash = crypto.createHash('sha256').update(inputString).digest('hex');
+    return hash.substr(0, 32);
+}
+
 
 function _getImportedContracts(importedFiles, input) {
     let nestedImportedContracts = [];

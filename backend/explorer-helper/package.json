@@ -9,11 +9,13 @@
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "cors": "^2.8.4",
+    "crypto": "^1.0.1",
     "express": "^4.16.3",
     "js-sha3": "^0.8.0",
     "memorystream": "^0.3.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
+    "sha.js": "^2.4.11",
     "socketio": "^1.0.0",
     "solc": "^0.8.19",
     "spdy": "^4.0.2"

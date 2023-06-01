@@ -50,23 +50,27 @@ const CodeUploader = props => {
   const [uploaderVersion, setUploaderVersion] = useState('');
   const [uploaderOptimizer, setUploaderOptimizer] = useState(0);
   const [files, setFiles] = useState([]);
+  const [uploaderLibs, setUploaderLibs] = useState({});
   const sourceCodeRef = useRef(null);
   const versionRef = useRef(null);
   const optimizerRef = useRef(null);
   const optimizerRunsRef = useRef(null);
   const abiRef = useRef(null);
-  const libRefs = useRef([]);
-  // const libArr = new Array(10);
-  Array.from({ length: 10 }).forEach((_, index) => {
-    libRefs.current[index] = [useRef(), useRef()];
-  });
+  // const libRefs = useRef([]);
+  // Array.from({ length: 10 }).forEach((_, index) => {
+  //   libRefs.current[index] = [useRef(), useRef()];
+  // });
   // console.log('libArr:', libArr)
-  console.log('libRefs:', libRefs)
+  // console.log('libRefs:', libRefs)
   useEffect(() => {
     if (sourceCodeRef.current) {
       sourceCodeRef.current.value = uploaderSourceCode;
       abiRef.current.value = uploaderAbi;
       optimizerRef.current.value = uploaderOptimizer;
+      // Object.keys(uploaderLibs).forEach((name, index) => {
+      //   libRefs.current[index][0].current.value = name;
+      //   libRefs.current[index][1].current.value = uploaderLibs[name];
+      // })
     }
     if (versionRef.current) versionRef.current.value = uploaderVersion;
   }, [sourceCodeRef.current, versionRef.current]);
@@ -84,6 +88,13 @@ const CodeUploader = props => {
       }
     }
     console.log('fileObj:', fileObj)
+    const libs = {};
+    // libRefs.current.forEach((arr, index) => {
+    //   if (arr[0].current.value && arr[1].current.value) {
+    //     libs[arr[0].current.value] = arr[1].current.value
+    //   }
+    // })
+    // console.log('libs:', libs);
     const sourceCode = isSingleFile ? sourceCodeRef.current.value : JSON.stringify(fileObj);
     const version = versionRef.current.value;
     const versionFullname = window.soljsonReleases[version]
@@ -96,6 +107,7 @@ const CodeUploader = props => {
     setUploaderAbi(abi);
     setUploaderVersion(version);
     setUploaderOptimizer(optimizer);
+    setUploaderLibs(libs);
     if (sourceCode === '') {
       setIsCodeEmpty(true);
       sourceCodeRef.current.focus();
@@ -113,7 +125,7 @@ const CodeUploader = props => {
     setIsVerifying(true);
 
     // return;
-    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile)
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
@@ -127,6 +139,7 @@ const CodeUploader = props => {
         setIsVerifying(false);
         setErrMsg('Something wrong in the verification process.')
         console.log('error:', e)
+        console.log('error:', e.message)
       })
   }
   const resetBorder = e => {
@@ -197,7 +210,7 @@ const CodeUploader = props => {
           subTitle="(for contracts that were created with constructor parameters)"
         />}
         body={<textarea className='abi-area' placeholder="Enter your code here." ref={abiRef} />} />
-      <Accordion
+      {/* <Accordion
         header={<AccordionHeader
           title="Contract Library Address "
           subTitle="(for contracts that use libraries, supports up to 10 libraries)"
@@ -222,7 +235,7 @@ const CodeUploader = props => {
               </div>
             })}
           </div>
-        </div>} />
+        </div>} /> */}
       <Accordion
         header={<AccordionHeader
           title="Misc Settings"
