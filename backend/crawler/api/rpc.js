@@ -1,4 +1,5 @@
 var http = require("http");
+var https = require("https");
 
 //------------------------------------------------------------------------------
 //  Global variables
@@ -145,9 +146,9 @@ var ProcessHttpRequest = (function (maxConcurrency) {
 })(MAX_CONCURRENCY);
 
 var processHttpRequest = function (host, port, method, path, requestBody, callback) {
-
+  var isHttps = host.includes('https');
   var options = {
-    host: host,
+    host: host.replace('https://', ''),
     port: port,
     method: method,
     path: path,
@@ -158,8 +159,10 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
     console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);
   }
 
+  const protocol = isHttps ? https : http;
+
   try {
-    var req = http.request(options, function (res) {
+    var req = protocol.request(options, function (res) {
       var body = '';
       res.setEncoding('utf8');
       res.on('data', function (dataBlock) {

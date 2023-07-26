@@ -236,6 +236,10 @@ exports.Execute = async function (networkId) {
               upsertVsAsyncList.push(stakeHelper.updateSubStakes(updateVsAsyncList, 'vs', subStakeDao, cacheEnabled));
             } else {  //handle block response
               var txs = result.result.transactions;
+              if (txs == undefined) {
+                Logger.log(`txs info is not found in the block info: ${JSON.stringify(result.result)}, stopping the process.`);
+                process.exit(1)
+              }
               const blockInfo = {
                 epoch: result.result.epoch,
                 status: result.result.status,
