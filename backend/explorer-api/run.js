@@ -12,7 +12,6 @@ var progressDaoLib = require('../mongo-db/progress-dao.js');
 var transactionDaoLib = require('../mongo-db/transaction-dao.js');
 var accountDaoLib = require('../mongo-db/account-dao.js');
 var accountTxDaoLib = require('../mongo-db/account-tx-dao.js');
-var accountTxSendDaoLib = require('../mongo-db/account-tx-send-dao.js');
 var stakeDaoLib = require('../mongo-db/stake-dao.js');
 var subStakeDaoLib = require('../mongo-db/sub-stake-dao.js');
 var priceDaoLib = require('../mongo-db/price-dao.js');
@@ -59,7 +58,6 @@ var progressDao = null
 var transactionDao = null;
 var accountDao = null;
 var accountTxDao = null;
-var accountTxSendDao = null;
 var stakeDao = null;
 var subStakeDao = null;
 var priceDao = null;
@@ -130,8 +128,6 @@ function main() {
       bluebird.promisifyAll(accountDao);
       accountTxDao = new accountTxDaoLib(__dirname, mongoClient);
       bluebird.promisifyAll(accountTxDao);
-      accountTxSendDao = new accountTxSendDaoLib(__dirname, mongoClient);
-      bluebird.promisifyAll(accountTxSendDao);
       stakeDao = new stakeDaoLib(__dirname, mongoClient, redis);
       bluebird.promisifyAll(stakeDao);
       subStakeDao = new subStakeDaoLib(__dirname, mongoClient, redis);

@@ -1,6 +1,5 @@
 //------------------------------------------------------------------------------
 //  DAO for token holder
-//  Require index: `db.tokenHolder.createIndex({contract_address:1, token_id:1})`
 //  Require index: `db.tokenHolder.createIndex({contract_address:1, token_id:1, holder:1})`
 //  Require index: `db.tokenHolder.createIndex({contract_address:1, token_id:1, amount: 1})`
 //  Require index: `db.tokenHolder.createIndex({contract_address:1, holder:1})`

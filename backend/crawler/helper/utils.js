@@ -13,10 +13,8 @@ exports.createIndexes = async function () {
     await createIndexAsync('block', { timestamp: -1 })
 
     await createIndexAsync('transaction', { number: 1 })
-    await createIndexAsync('transaction', { status: 1 })
     await createIndexAsync('transaction', { timestamp: -1 })
-    await createIndexAsync('transaction', { number: 1, status: 1 })
-    await createIndexAsync('transaction', { number: -1, status: 1 })
+    await createIndexAsync('transaction', { status: 1, number: 1 })
     await createIndexAsync('transaction', { eth_tx_hash: 1 })
 
     await createIndexAsync('acctTx', { acct: 1, hash: 1 })
@@ -26,7 +24,6 @@ exports.createIndexes = async function () {
     await createIndexAsync('account', { "balance.thetawei": -1 })
     await createIndexAsync('account', { "balance.tfuelwei": -1 })
 
-    await createIndexAsync('stake', { type: 1 })
     await createIndexAsync('stake', { type: 1, holder: 1 })
     await createIndexAsync('stake', { type: 1, source: 1 })
 
@@ -43,10 +40,7 @@ exports.createIndexes = async function () {
     await createIndexAsync('token', { contract_address: 1, type: 1 })
     await createIndexAsync('token', { from: 1, type: 1, timestamp: -1 })
     await createIndexAsync('token', { to: 1, type: 1, timestamp: -1 })
-    await createIndexAsync('token', { from: 1, type: 1 })
-    await createIndexAsync('token', { to: 1, type: 1 })
 
-    await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1 })
     await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1, holder: 1 })
     await createIndexAsync('tokenHolder', { contract_address: 1, token_id: 1, amount: 1 })
     await createIndexAsync('tokenHolder', { contract_address: 1, holder: 1 })
