@@ -148,7 +148,7 @@ export const EthRPCEndpoints = {
   'https://testnet-explorer.thetatoken.org': "https://eth-rpc-api-testnet.thetatoken.org/rpc",
   'https://localhost': "http://localhost:18888/rpc",
   'https://testnet-tsub360777-explorer.thetatoken.org': 'https://testnet-tsub360777-eth-rpc.thetatoken.org/rpc',
-  'https://testnet-tsub99999-explorer.thetatoken.org': 'https://eth-rpc-testnet-tsub99999.staging.imaginereplay.com/rpc',
+  'https://testnet-tsub99999-explorer.thetatoken.org': 'https://main-eth-rpc-testnet-tsub99999.staging.imaginereplay.com/rpc',
   'https://tsub360888-explorer.thetatoken.org': 'https://tsub360888-eth-rpc.thetatoken.org/rpc',
   'https://tsub360889-explorer.thetatoken.org': 'https://tsub360889-eth-rpc.thetatoken.org/rpc',
   'https://tsub360890-explorer.thetatoken.org': 'https://tsub360890-eth-rpc.thetatoken.org/rpc'
