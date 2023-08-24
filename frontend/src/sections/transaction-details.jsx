@@ -1070,7 +1070,7 @@ const TransactionAction = ({ token, info, disabled }) => {
   </div>
 }
 
-const TokenTransferred = ({ token, info, disabled }) => {
+const TokenTransferred = ({ token, info, disabled, contractAddress }) => {
   const truncate = 15;
   const name = info ? info.name : "";
   const tokenName = info ? info.tokenName || name : "";
@@ -1079,8 +1079,12 @@ const TokenTransferred = ({ token, info, disabled }) => {
   const isTnt20 = token.type === "TNT-20";
   const isTnt721 = token.type === "TNT-721";
   const address = get(token, 'contractAddress');
+  const isTFuelTransfer = config.tokenMap.TFuelTransfer && config.tokenMap.TFuelTransfer.indexOf(address) !== -1;
+
   const Name = () => {
-    if (disabled) {
+    if (isTFuelTransfer) {
+      return <span className="text-disabled name">TFuel</span>;
+    } else if (disabled) {
       if (isTnt20) return <span className="text-disabled name">{` ${name} ${symbol ? `(${symbol})` : '-'}`}</span>;
       if (isTnt721) return <span className="text-disabled name"> {tokenName}</span>;
     } else {
@@ -1098,16 +1102,14 @@ const TokenTransferred = ({ token, info, disabled }) => {
     <b>To:</b>
     <Address hash={token.to} truncate={truncate} />
     <b>For</b>
-    {isTnt721 && <span className="text-container">
-      {/* Note: Disabled token feature */}
-      TNT-721 TokenID [<TokenId />]<Name />
-      {/* TNT-721 TokenID [<Link className="token-link__token-id" to="#">{token.tokenId}</Link>]
-      <Link className="token-link" to="#">{name}</Link> */}
+    {isTFuelTransfer && <span className="text-container">
+      {formatQuantity(token.value, 18, 2)}<Name />
     </span>}
-    {isTnt20 && <span className="text-container">
-      {/* Note: Disabled token feature */}
+    {!isTFuelTransfer && isTnt721 && <span className="text-container">
+      TNT-721 TokenID [<TokenId />]<Name />
+    </span>}
+    {!isTFuelTransfer && isTnt20 && <span className="text-container">
       {formatQuantity(token.value, decimals, 2)}<Name />
-      {/* {formatCoin(token.value)}<Link to="#">{`${name} (${symbol})`}</Link> */}
     </span>}
   </div>
 }
