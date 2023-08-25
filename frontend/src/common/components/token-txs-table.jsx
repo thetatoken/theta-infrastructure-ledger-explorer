@@ -36,7 +36,7 @@ const TokenTxsTable = ({ transactions, type, className, address, tabType, tokenM
       </thead>
       <tbody>
         {map(transactions, (txn, i) => {
-          const isXChain = type.includes("XCHAIN_");
+          const isXChain = type ? type.includes("XCHAIN_") : false;
           let source = !address ? 'none' : address === txn.from ? 'from' : 'to';
           if (isXChain) {
             switch (type) {
