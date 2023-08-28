@@ -4,7 +4,8 @@ let gulp = require('gulp'),
     prefixer = require('gulp-autoprefixer'),
     webpack = require("webpack-stream"),
     compiler = require('webpack'),
-    gulpClean = require("gulp-clean");
+    gulpClean = require("gulp-clean"),
+    rename = require("gulp-rename");
 let browserSync = require('browser-sync').create()
 let webPackConfig = require('./webpack.config.js');
 
@@ -69,6 +70,7 @@ const buildJS = done => {
   webPackConfig.mode = buildMode;
   return gulp.src(paths.js_start)
     .pipe(webpack(webPackConfig, compiler))
+    .pipe(rename({ suffix: '.[contenthash]' }))
     .pipe(gulp.dest(paths.js_dest))
     .pipe(browserSync.stream());
 }

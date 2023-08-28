@@ -41,6 +41,7 @@ const config = {
     },
     chainName: 'Theta Testnet Main Chain',
     chainType: ChainType.MAINCHAIN,
-    subGovTokenAddress: SubGovTokenAddress[host]
+    subGovTokenAddress: SubGovTokenAddress[host],
+    tokenMap: {}
 };
 export default config;
