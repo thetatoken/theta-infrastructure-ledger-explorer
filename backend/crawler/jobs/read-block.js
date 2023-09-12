@@ -237,8 +237,8 @@ exports.Execute = async function (networkId) {
             } else {  //handle block response
               var txs = result.result.transactions;
               if (txs == undefined) {
-                Logger.log(`txs info is not found in the block info: ${JSON.stringify(result.result)}, stopping the process.`);
-                process.exit(1)
+                Logger.log(`txs info is not found in the block info: ${JSON.stringify(result.result)}, skip the current loop.`);
+                continue;
               }
               const blockInfo = {
                 epoch: result.result.epoch,
