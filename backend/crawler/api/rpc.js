@@ -147,12 +147,15 @@ var ProcessHttpRequest = (function (maxConcurrency) {
 
 var processHttpRequest = function (host, port, method, path, requestBody, callback) {
   var isHttps = host.includes('https');
+  var timeout = config.requestTimeoutMs || 30000
+
   var options = {
     host: host.replace('https://', ''),
     port: port,
     method: method,
     path: path,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
+    timeout: timeout
   };
   if (config.log.level == 'debug') {
     console.log('[Debug] ____');
@@ -178,7 +181,6 @@ var processHttpRequest = function (host, port, method, path, requestBody, callba
       });
     });
 
-    const timeout = config.requestTimeoutMs || 10000
     req.setTimeout(timeout, function () {
       req.abort();
       callback('Request Timeout: ' + path, null);
