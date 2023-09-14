@@ -41,6 +41,7 @@
     "gulp-minify": "^3.1.0",
     "gulp-sass": "^4.0.2",
     "history": "^4.10.1",
+    "html-webpack-plugin": "^4.5.2",
     "moment": "^2.29.4",
     "multiselect-react-dropdown": "^1.6.3",
     "node-sass": "^4.14.1",
@@ -66,9 +67,7 @@
     "webpack-hot-middleware": "^2.25.2",
     "webpack-stream": "^5.2.1"
   },
-  "devDependencies": {
-    "html-webpack-plugin": "^4.5.2"
-  },
+  "devDependencies": {},
   "browserslist": {
     "production": [
       ">0.2%",

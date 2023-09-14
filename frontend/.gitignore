@@ -5,4 +5,5 @@ config.js
 .sass-cache
 public/js/
 public/css/
+public/index.html
 *.map
