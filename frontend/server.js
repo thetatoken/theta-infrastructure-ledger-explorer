@@ -14,7 +14,7 @@ var compiler = webpack(config);
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static('public', {
+app.use(express.static(path.join(__dirname, 'public',), {
   maxAge: "3600000"
 }));
 
@@ -32,7 +32,7 @@ app.get('/ping', function (req, res) {
 
 
 app.get('*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, 'index.html'));
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
 if (process.env.DISABLE_SSL !== 'true') {
@@ -63,16 +63,3 @@ if (process.env.DISABLE_SSL !== 'true') {
     console.log(`Listening at port: ${port} without SSL`);
   });
 }
-
-
-/**
-var http = require('http').createServer(app);
-
-http.listen(port, function (err) {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log(`Listening at port: ${port}`);
-});
- */

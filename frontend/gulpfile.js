@@ -1,11 +1,10 @@
 let gulp = require('gulp'),
-    sass = require('gulp-sass'),
-    cssnano = require('gulp-cssnano'),
-    prefixer = require('gulp-autoprefixer'),
-    webpack = require("webpack-stream"),
-    compiler = require('webpack'),
-    gulpClean = require("gulp-clean"),
-    rename = require("gulp-rename");
+  sass = require('gulp-sass'),
+  cssnano = require('gulp-cssnano'),
+  prefixer = require('gulp-autoprefixer'),
+  webpack = require("webpack-stream"),
+  compiler = require('webpack'),
+  gulpClean = require("gulp-clean");
 let browserSync = require('browser-sync').create()
 let webPackConfig = require('./webpack.config.js');
 
@@ -14,35 +13,35 @@ const DEV = 'development';
 const PROD = 'production';
 
 let paths = {
-      sass_start: './src/styles/styles.scss',
-      sass_dest: './public/css',
-      sass_watch: './src/styles/**/*.scss',
+  sass_start: './src/styles/styles.scss',
+  sass_dest: './public/css',
+  sass_watch: './src/styles/**/*.scss',
 
-      js_start: './src/index.jsx',
-      js_dest: './public/js/',
-      js_watch: ['./src/**/*.jsx', './src/**/*.js'],
+  js_start: './src/index.jsx',
+  js_dest: './public/',
+  js_watch: ['./src/**/*.jsx', './src/**/*.js'],
 
-      clean: ['./public/js/','./public/css/'],
-      sassCache: "/tmp/sass-cache"
-    };
+  clean: ['./public/js/', './public/css/'],
+  sassCache: "/tmp/sass-cache"
+};
 
 let displayError = error => {
 
-    // Initial building up of the error
-    var errorString = '[' + error.plugin + ']';
-    errorString += ' ' + error.message.replace("\n",''); // Removes new line at the end
+  // Initial building up of the error
+  var errorString = '[' + error.plugin + ']';
+  errorString += ' ' + error.message.replace("\n", ''); // Removes new line at the end
 
-    // If the error contains the filename or line number add it to the string
-    if(error.fileName)
-        errorString += ' in ' + error.fileName;
+  // If the error contains the filename or line number add it to the string
+  if (error.fileName)
+    errorString += ' in ' + error.fileName;
 
-    if(error.lineNumber)
-        errorString += ' on line ' + error.lineNumber;
+  if (error.lineNumber)
+    errorString += ' on line ' + error.lineNumber;
 
-    // This will output an error like the following:
-    // [gulp-sass] error message in file_name on line 1
-    console.error(errorString);
-    return errorString;
+  // This will output an error like the following:
+  // [gulp-sass] error message in file_name on line 1
+  console.error(errorString);
+  return errorString;
 };
 
 const setBuildMode = mode => done => {
@@ -70,14 +69,13 @@ const buildJS = done => {
   webPackConfig.mode = buildMode;
   return gulp.src(paths.js_start)
     .pipe(webpack(webPackConfig, compiler))
-    .pipe(rename({ suffix: '.[contenthash]' }))
     .pipe(gulp.dest(paths.js_dest))
     .pipe(browserSync.stream());
 }
 
 const clean = done => {
-  return gulp.src(paths.clean, { read: false,  allowEmpty: true })
-    .pipe(gulpClean({allowEmpty: true}))
+  return gulp.src(paths.clean, { read: false, allowEmpty: true })
+    .pipe(gulpClean({ allowEmpty: true }))
     .on("error", async (err) => {
       displayError(err);
     });
@@ -85,7 +83,7 @@ const clean = done => {
 
 const sync = done => {
   browserSync.init({
-      proxy: "https://localhost:4000"
+    proxy: "https://localhost:4000"
   });
   done();
 }

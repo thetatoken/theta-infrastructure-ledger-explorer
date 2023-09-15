@@ -1,22 +1,24 @@
 var path = require("path");
 let webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 let srcDir = path.join(__dirname, "src/");
-let distDir = path.join(__dirname, "public/js");
+let distDir = path.join(__dirname, "public/");
 
 module.exports = {
   mode: 'production',
   entry: path.join(srcDir, 'index.jsx'),
   output: {
     path: distDir,
-    publicPath: '/public/',
-    filename: "app.js",
+    publicPath: '/',
+    filename: "js/app.[contenthash].js",
     sourceMapFilename: "[file].map"
   },
   module: {
     rules: [
-      { test: /\.js|.jsx?$/,
+      {
+        test: /\.js|.jsx?$/,
         exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
@@ -32,9 +34,15 @@ module.exports = {
             ]
           }
         }]
-    }]
+      }]
   },
-  resolve: { 
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'index.html', 
+      filename: 'index.html'
+    }),
+  ],
+  resolve: {
     modules: [
       'node_modules',
       path.resolve(srcDir),
