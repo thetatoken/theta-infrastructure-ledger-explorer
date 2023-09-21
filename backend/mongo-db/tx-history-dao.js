@@ -27,19 +27,18 @@ module.exports = class TxHistoryDAO {
     });
   }
 
-  // @deprecated
-  // getAllTxHistory(callback) {
-  //   this.client.findAll(this.txHistoryInfoCollection, function (error, recordList) {
-  //     if (error) {
-  //       console.log('TX history dao getAllTxHistory ERR - ', error);
-  //       callback(error);
-  //     } else if (!recordList || !recordList.length) {
-  //       callback(Error('NOT_FOUND - Transaction History.'));
-  //     } else {
-  //       callback(error, recordList)
-  //     }
-  //   })
-  // }
+  getAllTxHistory(callback) {
+    this.client.findAll(this.txHistoryInfoCollection, function (error, recordList) {
+      if (error) {
+        console.log('TX history dao getAllTxHistory ERR - ', error);
+        callback(error);
+      } else if (!recordList || !recordList.length) {
+        callback(Error('NOT_FOUND - Transaction History.'));
+      } else {
+        callback(error, recordList)
+      }
+    })
+  }
 
   removeAll(callback) {
     this.client.remove(this.txHistoryInfoCollection, function (err, res) {
