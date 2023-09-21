@@ -16,7 +16,7 @@ const SubchainChart = ({ }) => {
 
   useEffect(() => {
     function getTransactionHistory() {
-      transactionsService.getTransactionHistory()
+      transactionsService.getTransactionHistory(14)
         .then(res => {
           const txHistory = get(res, 'data.body.data');
           let txTs = [];

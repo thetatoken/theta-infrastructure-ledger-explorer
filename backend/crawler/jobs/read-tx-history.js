@@ -25,7 +25,7 @@ exports.Execute = function () {
         if (err.message.includes('NOT_FOUND')) {
           let records = []
           let tmp = 0;
-          for (let i = 0; i < 14; i++) {
+          for (let i = 0; i < 60; i++) {
             const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
             txHistoryDao.insertAsync({ timestamp: (new Date().getTime() / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
             tmp = num;
@@ -42,11 +42,11 @@ exports.Check = function () {
   txHistoryDao.getAllTxHistoryAsync()
     .then(async res => {
       console.log('res length:', res.length);
-      if (res.length === 14) return;
-      Logger.log('Tx History less than 14 reocrds. Reset Records.');
+      if (res.length === 60) return;
+      Logger.log('Tx History less than 60 reocrds. Reset Records.');
       await txHistoryDao.removeAllAsync();
       let tmp = 0;
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 60; i++) {
         const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
         txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
         tmp = num;
@@ -56,7 +56,7 @@ exports.Check = function () {
       if (err) {
         if (err.message.includes('NOT_FOUND')) {
           let tmp = 0;
-          for (let i = 0; i < 14; i++) {
+          for (let i = 0; i < 60; i++) {
             const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
             txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
             tmp = num;

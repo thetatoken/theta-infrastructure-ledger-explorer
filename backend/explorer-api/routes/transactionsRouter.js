@@ -120,10 +120,12 @@ var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDa
   });
 
   router.get("/transactions/history", (req, res) => {
-    txHistoryDao.getAllTxHistoryAsync()
+    let { limitNumber = 14 } = req.query;
+    limitNumber = Number(limitNumber);
+    txHistoryDao.getTxHistoryAsync(limitNumber)
       .then(infoList => {
         var data = ({
-          type: 'transaction_number_by_hour',
+          type: 'transaction_history',
           body: { data: infoList }
         });
         res.status(200).send(data);

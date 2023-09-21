@@ -40,10 +40,10 @@ export const transactionsService = {
     }
     return apiService.get(`accounttx/${address}`, { params: { type, pageNumber, limitNumber, isEqualType, types } });
   },
-  getTransactionHistory(uri) {
+  getTransactionHistory(limitNumber, uri) {
     if (uri) {
-      return apiService.getFullUri(`${uri}transactions/history`);
+      return apiService.getFullUri(`${uri}transactions/history`, { params: { limitNumber } });
     }
-    return apiService.get(`transactions/history`);
+    return apiService.get(`transactions/history`, { params: { limitNumber } });
   }
 };

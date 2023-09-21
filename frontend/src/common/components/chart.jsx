@@ -4,10 +4,15 @@ import 'chartjs-adapter-moment';
 import history from 'common/history'
 import cx from 'classnames';
 
+const host = window.location.host;
+const isMetaChain = host.match(/metachain-explorer/gi) !== null;
+
 const getLineOptions = (type, data, labels, ctx) => {
   let gradient = ctx.createLinearGradient(0, 0, 0, 110);
   gradient.addColorStop(0, 'rgba(37,196,228,.25)');
   gradient.addColorStop(1, 'rgba(37,196,228,0)');
+  const timeUnit = isMetaChain ? 'month' : 'week';
+  const pointRadius = isMetaChain ? 0 : 2;
   return {
     type: type,
     data: {
@@ -55,7 +60,7 @@ const getLineOptions = (type, data, labels, ctx) => {
           tension: 0.4
         },
         point: {
-          radius: 2,
+          radius: pointRadius,
           borderWidth: 0
         }
       },
@@ -66,7 +71,10 @@ const getLineOptions = (type, data, labels, ctx) => {
         x: {
           type: 'time',
           time: {
-            unit: 'week'
+            unit: timeUnit
+          },
+          ticks: {
+            source: 'auto'
           },
           gridLines: {
             display: false
