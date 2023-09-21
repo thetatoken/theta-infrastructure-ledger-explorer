@@ -13,6 +13,20 @@ module.exports = class TxHistoryDAO {
     this.client.insert(this.txHistoryInfoCollection, txHistoryInfo, callback);
   }
 
+  getTxHistory(limit, callback) {
+    const sortObject = { 'timestamp': -1 };
+    this.client.getRecords(this.txHistoryInfoCollection, {}, sortObject, 0, limit, function (error, recordList) {
+      if (error) {
+        console.log('TX history dao getAllTxHistory ERR - ', error);
+        callback(error);
+      } else if (!recordList || !recordList.length) {
+        callback(Error('NOT_FOUND - Transaction History.'));
+      } else {
+        callback(error, recordList)
+      }
+    });
+  }
+
   getAllTxHistory(callback) {
     this.client.findAll(this.txHistoryInfoCollection, function (error, recordList) {
       if (error) {
