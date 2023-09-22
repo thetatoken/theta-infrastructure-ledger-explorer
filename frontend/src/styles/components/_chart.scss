@@ -9,7 +9,13 @@
         margin: 5px 5%;
     }
     @include breakpoint('phablet', max) {
-        width: 130% !important;
-        margin: 10px 0 0 -15% !important;
+        &.doughnut {
+            width: 130% !important;
+            margin: 10px 0 0 -10% !important;
+        }
+        &.line {
+            width: 90% !important;
+            margin: 0;
+        }
     }
 }
