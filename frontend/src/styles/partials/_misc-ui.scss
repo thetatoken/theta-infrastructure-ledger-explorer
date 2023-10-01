@@ -52,6 +52,11 @@
       background-image: url('/images/icons/icon-lavita.png'); 
     }
   }
+  &.rplay {
+    &:before {
+      background-image: url('/images/icons/icon-replay.png'); 
+    }
+  }
 }
 
 .currency-link {

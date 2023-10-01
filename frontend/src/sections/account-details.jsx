@@ -36,6 +36,23 @@ const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = { WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0' };
 let scrollTimes = 0;
 let maxScrollTimes = 1;
+const tokenMap = {
+  TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
+  // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
+  WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
+  WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
+  TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
+  Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed',
+  RPLAY: '0x3Da3D8CDE7B12CD2CBb688E2655BcaCD8946399D'
+}
+const decimalsMap = {
+  'WTheta': 18,
+  'TBill': 9,
+  'WTFuel': 18,
+  'TDrop': 18,
+  'Lavita': 18,
+  'RPLAY': 18
+}
 
 export default class AccountDetails extends React.Component {
   _isMounted = true;
@@ -477,21 +494,6 @@ export default class AccountDetails extends React.Component {
     this.setState({ hasToken });
   }
   fetchTokenBalance = async (accountAddress) => {
-    const tokenMap = {
-      TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-      // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
-      WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
-      WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
-      TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
-      Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
-    }
-    const decimalsMap = {
-      'WTheta': 18,
-      'TBill': 9,
-      'WTFuel': 18,
-      'TDrop': 18,
-      'Lavita': 18
-    }
     let keys = Object.keys(tokenMap);
     let tokenBalance = this.state.tokenBalance;
     const self = this;
@@ -619,21 +621,6 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
-  const tokenMap = {
-    TDrop: '0x1336739B05C7Ab8a526D40DCC0d04a826b5f8B03', //address for mainnet
-    // TDrop: '0x08a0c0e8EFd07A98db11d79165063B6Bc2469ADF', //address for testnet
-    WTheta: '0xaf537fb7e4c77c97403de94ce141b7edb9f7fcf0',
-    WTFuel: '0x4dc08b15ea0e10b96c41aec22fab934ba15c983e',
-    TBill: '0x22Cb20636c2d853DE2b140c2EadDbFD6C3643a39',
-    Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed'
-  }
-  const decimalsMap = {
-    'WTheta': 18,
-    'TBill': 9,
-    'WTFuel': 18,
-    'TDrop': 18,
-    'Lavita': 18
-  }
   return (
     <div className="act balance">
       {map(tokenBalance, (v, k) => {
