@@ -96,7 +96,6 @@ var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDa
         body: { total_num_tx: txNumber }
       });
     }
-
   });
 
   router.get("/transactions/number/:h", (req, res) => {
@@ -116,6 +115,20 @@ var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDa
       })
       .catch(err => {
         console.log('Error - Push total number of transaction', err);
+      });
+  });
+
+  router.get("/transactions/numberByTimeRange", (req, res) => {
+    let { startTime, endTime } = req.query;
+    transactionDao.getTotalNumberByTimeRangeAsync(startTime, endTime)
+      .then(number => {
+        var data = ({
+          type: 'transaction_number',
+          body: { total_num_tx: number }
+        })
+        res.status(200).send(data);
+      }).catch(err => {
+        console.log('Error - get total number of transactions by time range', err);
       });
   });
 

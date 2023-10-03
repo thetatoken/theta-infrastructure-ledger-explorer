@@ -148,6 +148,10 @@ module.exports = class TransactionDAO {
       }
     });
   }
+  getTotalNumberByTimeRange(startTime, endTime, callback) {
+    const queryObject = { 'timestamp': { $gte: startTime, $lte: endTime }, 'status': 'finalized' };
+    this.client.getTotal(this.transactionInfoCollection, queryObject, callback);
+  }
   getTransactionsByPk(pks, callback) {
     let self = this;
     const redis_key = `tx_ids:${pks.join('_')}`;
