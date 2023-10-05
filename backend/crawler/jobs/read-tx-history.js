@@ -3,7 +3,7 @@ var Logger = require('../helper/logger');
 let transactionDao = null;
 let txHistoryDao = null;
 
-const MAX_RECORD_DAYS = 365;
+const MAX_RECORD_DAYS = 60;
 exports.Initialize = function (transactionDaoInstance, txHistoryDaoInstance) {
   transactionDao = transactionDaoInstance;
   txHistoryDao = txHistoryDaoInstance;
