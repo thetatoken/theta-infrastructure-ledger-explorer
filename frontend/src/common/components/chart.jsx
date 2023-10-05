@@ -11,11 +11,14 @@ const getLineOptions = (type, data, labels, ctx) => {
   let gradient = ctx.createLinearGradient(0, 0, 0, 110);
   gradient.addColorStop(0, 'rgba(37,196,228,.25)');
   gradient.addColorStop(1, 'rgba(37,196,228,0)');
+  // const timeOpt = isMetaChain ? {
+  //   unit: 'quarter',
+  //   displayFormats: {
+  //     quarter: 'MMM YYYY'
+  //   }
+  // } : { unit: 'week' }
   const timeOpt = isMetaChain ? {
-    unit: 'quarter',
-    displayFormats: {
-      quarter: 'MMM YYYY'
-    }
+    unit: 'month',
   } : { unit: 'week' }
   const ticksOpt = isMetaChain ? { maxTicksLimit: 3 } : { source: 'auto' }
   const pointRadius = isMetaChain ? 0 : 2;
