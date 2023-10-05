@@ -109,9 +109,9 @@ var tokenRouter = (app, tokenDao, tokenSumDao, tokenHolderDao, config) => {
       return;
     }
     //testnet
-    // const tokenAddress = token === 'tdrop' ? "0x08a0c0e8efd07a98db11d79165063b6bc2469adf" : "0x46fbf4487fa1b9c70d35bd761c51c360df9459ed"
+    const tokenAddress = token === 'tdrop' ? "0x08a0c0e8efd07a98db11d79165063b6bc2469adf" : "0x46fbf4487fa1b9c70d35bd761c51c360df9459ed"
     //mainnet
-    const tokenAddress = token === 'tdrop' ? "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03" : "0x46fbf4487fa1b9c70d35bd761c51c360df9459ed"
+    // const tokenAddress = token === 'tdrop' ? "0x1336739b05c7ab8a526d40dcc0d04a826b5f8b03" : "0x46fbf4487fa1b9c70d35bd761c51c360df9459ed"
     tokenHolderDao.getTopHoldersAsync(tokenAddress, null, limit)
       .then(result => {
         if (result === null) {
