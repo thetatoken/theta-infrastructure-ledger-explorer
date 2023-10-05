@@ -10,7 +10,14 @@ module.exports = class TxHistoryDAO {
   }
 
   insert(txHistoryInfo, callback) {
+    txHistoryInfo._id = txHistoryInfo.timestamp;
     this.client.insert(this.txHistoryInfoCollection, txHistoryInfo, callback);
+  }
+
+  upsert(txHistoryInfo, callback) {
+    txHistoryInfo._id = txHistoryInfo.timestamp;
+    const queryObject = { '_id': txHistoryInfo._id };
+    this.client.upsert(this.txHistoryInfoCollection, queryObject, txHistoryInfo, callback);
   }
 
   getTxHistory(limit, callback) {
@@ -37,6 +44,17 @@ module.exports = class TxHistoryDAO {
       } else {
         callback(error, recordList)
       }
+    })
+  }
+
+  removeRecordsByTs(tsList, callback) {
+    const queryObject = { timestamp: { $in: tsList } };
+    this.client.remove(this.txHistoryInfoCollection, queryObject, function (err, res) {
+      if (err) {
+        console.log('TX history dao removeRecordsByTs ERR - ', err, tsList);
+        callback(err);
+      }
+      callback(err, res);
     })
   }
 

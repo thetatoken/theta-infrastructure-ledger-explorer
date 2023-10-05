@@ -3,67 +3,108 @@ var Logger = require('../helper/logger');
 let transactionDao = null;
 let txHistoryDao = null;
 
-const MAX_RECORD_DAYS = 60;
+const MAX_RECORD_DAYS = 365;
+
+let keyCache = new Set();
 exports.Initialize = function (transactionDaoInstance, txHistoryDaoInstance) {
   transactionDao = transactionDaoInstance;
   txHistoryDao = txHistoryDaoInstance;
 }
 
-exports.Execute = function () {
-  txHistoryDao.getAllTxHistoryAsync()
-    .then(async res => {
-      await txHistoryDao.removeAllAsync();
-      res.sort((a, b) => { return a.timestamp - b.timestamp }).shift();
-      const num = await transactionDao.getTotalNumberByHourAsync(24);
-      res.push({ timestamp: (new Date().getTime() / 1000).toFixed(), number: num });
-      res.forEach(info => {
-        const data = { timestamp: info.timestamp, number: info.number };
-        txHistoryDao.insertAsync(data);
-      })
-    }).catch(async err => {
-      Logger.log('err:', err)
-      if (err) {
-        if (err.message.includes('NOT_FOUND')) {
-          let records = []
-          let tmp = 0;
-          for (let i = 0; i < MAX_RECORD_DAYS; i++) {
-            const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
-            txHistoryDao.insertAsync({ timestamp: (new Date().getTime() / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
-            tmp = num;
-          }
-          Logger.log(records);
-        }
-      }
-    })
-}
-
-exports.Check = function () {
+exports.Execute = async function () {
   const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
     new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
-  txHistoryDao.getAllTxHistoryAsync()
-    .then(async res => {
-      console.log('res length:', res.length);
-      if (res.length === MAX_RECORD_DAYS) return;
-      Logger.log(`Tx History less than ${MAX_RECORD_DAYS} reocrds. Reset Records.`);
-      await txHistoryDao.removeAllAsync();
-      let tmp = 0;
-      for (let i = 0; i < MAX_RECORD_DAYS; i++) {
-        const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
-        txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
-        tmp = num;
-      }
-      Logger.log(`Tx History Reset Records progress done.`);
-    }).catch(async err => {
-      Logger.log('Tx history check err:', err)
-      if (err) {
-        if (err.message.includes('NOT_FOUND')) {
-          let tmp = 0;
-          for (let i = 0; i < MAX_RECORD_DAYS; i++) {
-            const num = await transactionDao.getTotalNumberByHourAsync(24 * (i + 1))
-            txHistoryDao.insertAsync({ timestamp: (iniTime / 1000 - 60 * 60 * 24 * i).toFixed(), number: num - tmp });
-            tmp = num;
-          }
+  console.log('Execute iniTime:', iniTime)
+  try {
+    if (keyCache.size === 0) {
+      let res = await txHistoryDao.getAllTxHistoryAsync()
+      keyCache = new Set(res.map(obj => obj.timestamp))
+    }
+    let minTs = Math.min(...keyCache).toFixed();
+    keyCache.delete(minTs);
+    await txHistoryDao.removeRecordsByTsAsync([minTs]);
+    const endTime = iniTime / 1000;
+    const startTime = endTime - 60 * 60 * 24;
+    const key = endTime.toFixed();
+    const num = await transactionDao.getTotalNumberByTimeRangeAsync(startTime, endTime)
+    await txHistoryDao.upsertAsync({ timestamp: key, number: num })
+    keyCache.add(key)
+    console.log('Removed key:', minTs, typeof minTs)
+    console.log('Added key:', key)
+  } catch (err) {
+    Logger.log('Tx history check err:', err)
+    if (err) {
+      if (err.message.includes('NOT_FOUND')) {
+        keyCache = new Set();
+        let endTime = iniTime / 1000;
+        for (let i = 0; i < MAX_RECORD_DAYS; i++) {
+          const key = endTime.toFixed();
+          let startTime = endTime - 60 * 60 * 24;
+          const num = await transactionDao.getTotalNumberByTimeRangeAsync(startTime, endTime)
+          await txHistoryDao.upsertAsync({ timestamp: key, number: num })
+          keyCache.add(key)
+          endTime = startTime;
         }
       }
-    })
+    }
+  }
 }
+
+exports.Check = async function () {
+  const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
+    new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
+  console.log('iniTime:', (iniTime / 1000 - 60 * 60 * 24 * 0).toFixed())
+  try {
+    if (keyCache.size === 0) {
+      let res = await txHistoryDao.getAllTxHistoryAsync()
+      keyCache = new Set(res.map(obj => obj.timestamp))
+    }
+    Logger.log(`Tx History records ${keyCache.size}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size === MAX_RECORD_DAYS}`);
+    if (keyCache.size === MAX_RECORD_DAYS) return;
+    Logger.log(`Tx History records number is ${keyCache.size}, doesn't match with ${MAX_RECORD_DAYS} reocrds. Fixing Records.`);
+    const insertList = [];
+    const existKeySet = new Set(keyCache);
+    let endTime = iniTime / 1000;
+    for (let i = 0; i < MAX_RECORD_DAYS; i++) {
+      const key = endTime.toFixed();
+      let startTime = endTime - 60 * 60 * 24;
+      if (existKeySet.has(key)) {
+        existKeySet.delete(key)
+      } else {
+        const num = await transactionDao.getTotalNumberByTimeRangeAsync(startTime, endTime)
+        insertList.push({ timestamp: key, number: num })
+      }
+      endTime = startTime;
+    }
+    const removeList = [...existKeySet];
+    Logger.log('Tx History removeList length:', removeList.length)
+    await txHistoryDao.removeRecordsByTsAsync(removeList);
+    for (let ts of removeList) {
+      keyCache.delete(ts);
+    }
+    Logger.log('Tx History insertList length:', insertList.length)
+    for (let obj of insertList) {
+      await txHistoryDao.upsertAsync(obj);
+      keyCache.add(obj.timestamp);
+    }
+    Logger.log(`Tx History Fixing Records progress done.`);
+  } catch (err) {
+    Logger.log('Tx history check err:', err)
+    if (err) {
+      if (err.message.includes('NOT_FOUND')) {
+        keyCache = new Set();
+        let endTime = iniTime / 1000;
+        for (let i = 0; i < MAX_RECORD_DAYS; i++) {
+          const key = endTime.toFixed();
+          let startTime = endTime - 60 * 60 * 24;
+          const num = await transactionDao.getTotalNumberByTimeRangeAsync(startTime, endTime)
+          await txHistoryDao.upsertAsync({ timestamp: key, number: num })
+          keyCache.add(key)
+          endTime = startTime;
+        }
+      }
+    }
+  }
+}
+
+// function 

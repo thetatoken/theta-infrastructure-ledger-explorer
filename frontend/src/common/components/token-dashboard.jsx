@@ -13,7 +13,7 @@ import { WEI } from 'common/constants';
 import config from "../../config";
 import { ChainType } from "../constants";
 
-const MAX_RECORD_DAYS = 60;
+const MAX_RECORD_DAYS = 365;
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;

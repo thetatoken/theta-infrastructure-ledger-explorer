@@ -149,7 +149,7 @@ module.exports = class TransactionDAO {
     });
   }
   getTotalNumberByTimeRange(startTime, endTime, callback) {
-    const queryObject = { 'timestamp': { $gte: startTime, $lte: endTime }, 'status': 'finalized' };
+    const queryObject = { 'timestamp': { $gte: startTime.toString(), $lte: endTime.toString() } };
     this.client.getTotal(this.transactionInfoCollection, queryObject, callback);
   }
   getTransactionsByPk(pks, callback) {
