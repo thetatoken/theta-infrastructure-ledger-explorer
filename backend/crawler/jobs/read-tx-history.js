@@ -60,8 +60,6 @@ exports.Check = async function () {
     removeList = res.map(obj => obj._id).filter(id => !id.length || id.length >= 24)
     keyCache = new Set(res.map(obj => obj._id).filter(id => id.length && id.length < 24))
     Logger.log(`Tx History records keyCache.size:${keyCache.size} removeList.length:${removeList.length}, sum:${keyCache.size + removeList.length}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size + removeList.length === MAX_RECORD_DAYS}`);
-    if (keyCache.size + removeList.length === MAX_RECORD_DAYS) return;
-    Logger.log(`Tx History records number is ${keyCache.size + removeList.length}, doesn't match with ${MAX_RECORD_DAYS} reocrds. Fixing Records.`);
     const insertList = [];
     const existKeySet = new Set(keyCache);
     let endTime = iniTime / 1000;
