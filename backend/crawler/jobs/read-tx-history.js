@@ -16,10 +16,8 @@ exports.Execute = async function () {
     new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
   console.log('Execute iniTime:', iniTime)
   try {
-    if (keyCache.size === 0) {
-      let res = await txHistoryDao.getAllTxHistoryAsync()
-      keyCache = new Set(res.map(obj => obj.timestamp))
-    }
+    let res = await txHistoryDao.getAllTxHistoryAsync()
+    keyCache = new Set(res.map(obj => obj.timestamp))
     let minTs = Math.min(...keyCache).toFixed();
     keyCache.delete(minTs);
     await txHistoryDao.removeRecordsByIdAsync([minTs]);
@@ -56,12 +54,10 @@ exports.Check = async function () {
   console.log('iniTime:', (iniTime / 1000 - 60 * 60 * 24 * 0).toFixed())
   let removeList = [];
   try {
-    if (keyCache.size === 0) {
-      let res = await txHistoryDao.getAllTxHistoryAsync()
-      removeList = res.map(obj => obj._id).filter(id => !id.length || id.length >= 24)
-      keyCache = new Set(res.map(obj => obj._id).filter(id => id.length && id.length < 24))
-    }
-    Logger.log(`Tx History records ${keyCache.size + removeList.length}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size + removeList.length === MAX_RECORD_DAYS}`);
+    let res = await txHistoryDao.getAllTxHistoryAsync()
+    removeList = res.map(obj => obj._id).filter(id => !id.length || id.length >= 24)
+    keyCache = new Set(res.map(obj => obj._id).filter(id => id.length && id.length < 24))
+    Logger.log(`Tx History records keyCache.size:${keyCache.size} removeList.length:${removeList.length}, sum:${keyCache.size + removeList.length}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size + removeList.length === MAX_RECORD_DAYS}`);
     if (keyCache.size + removeList.length === MAX_RECORD_DAYS) return;
     Logger.log(`Tx History records number is ${keyCache.size + removeList.length}, doesn't match with ${MAX_RECORD_DAYS} reocrds. Fixing Records.`);
     const insertList = [];
