@@ -12,8 +12,9 @@ exports.Initialize = function (transactionDaoInstance, txHistoryDaoInstance) {
 }
 
 exports.Execute = async function () {
-  const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
-    new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
+  const curDate = new Date();
+  curDate.setHours(0, 0, 0, 0)
+  const iniTime = curDate.getTime();
   console.log('Execute iniTime:', iniTime)
   try {
     let res = await txHistoryDao.getAllTxHistoryAsync()
@@ -49,8 +50,9 @@ exports.Execute = async function () {
 }
 
 exports.Check = async function () {
-  const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
-    new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
+  const curDate = new Date();
+  curDate.setHours(0, 0, 0, 0)
+  const iniTime = curDate.getTime();
   console.log('iniTime:', (iniTime / 1000 - 60 * 60 * 24 * 0).toFixed())
   let removeList = [];
   try {
