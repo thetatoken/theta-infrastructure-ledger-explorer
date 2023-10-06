@@ -47,11 +47,11 @@ module.exports = class TxHistoryDAO {
     })
   }
 
-  removeRecordsByTs(tsList, callback) {
-    const queryObject = { timestamp: { $in: tsList } };
+  removeRecordsById(ids, callback) {
+    const queryObject = { _id: { $in: ids } };
     this.client.remove(this.txHistoryInfoCollection, queryObject, function (err, res) {
       if (err) {
-        console.log('TX history dao removeRecordsByTs ERR - ', err, tsList);
+        console.log('TX history dao removeRecordsByTs ERR - ', err, ids);
         callback(err);
       }
       callback(err, res);

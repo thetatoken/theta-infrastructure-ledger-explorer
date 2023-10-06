@@ -22,7 +22,7 @@ exports.Execute = async function () {
     }
     let minTs = Math.min(...keyCache).toFixed();
     keyCache.delete(minTs);
-    await txHistoryDao.removeRecordsByTsAsync([minTs]);
+    await txHistoryDao.removeRecordsByIdAsync([minTs]);
     const endTime = iniTime / 1000;
     const startTime = endTime - 60 * 60 * 24;
     const key = endTime.toFixed();
@@ -54,14 +54,16 @@ exports.Check = async function () {
   const iniTime = new Date().setUTCHours(7, 0, 0, 0) > new Date().getTime() ?
     new Date().setUTCHours(7, 0, 0, 0) : new Date().setUTCHours(7, 0, 0, 0);
   console.log('iniTime:', (iniTime / 1000 - 60 * 60 * 24 * 0).toFixed())
+  let removeList = [];
   try {
     if (keyCache.size === 0) {
       let res = await txHistoryDao.getAllTxHistoryAsync()
-      keyCache = new Set(res.map(obj => obj.timestamp))
+      removeList = res.map(obj => obj._id).filter(id => !id.length || id.length >= 24)
+      keyCache = new Set(res.map(obj => obj._id).filter(id => id.length && id.length < 24))
     }
-    Logger.log(`Tx History records ${keyCache.size}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size === MAX_RECORD_DAYS}`);
-    if (keyCache.size === MAX_RECORD_DAYS) return;
-    Logger.log(`Tx History records number is ${keyCache.size}, doesn't match with ${MAX_RECORD_DAYS} reocrds. Fixing Records.`);
+    Logger.log(`Tx History records ${keyCache.size + removeList.length}, matched with ${MAX_RECORD_DAYS}? ${keyCache.size + removeList.length === MAX_RECORD_DAYS}`);
+    if (keyCache.size + removeList.length === MAX_RECORD_DAYS) return;
+    Logger.log(`Tx History records number is ${keyCache.size + removeList.length}, doesn't match with ${MAX_RECORD_DAYS} reocrds. Fixing Records.`);
     const insertList = [];
     const existKeySet = new Set(keyCache);
     let endTime = iniTime / 1000;
@@ -76,9 +78,9 @@ exports.Check = async function () {
       }
       endTime = startTime;
     }
-    const removeList = [...existKeySet];
+    removeList = removeList.concat([...existKeySet]);
     Logger.log('Tx History removeList length:', removeList.length)
-    await txHistoryDao.removeRecordsByTsAsync(removeList);
+    await txHistoryDao.removeRecordsByIdAsync(removeList);
     for (let ts of removeList) {
       keyCache.delete(ts);
     }
@@ -106,5 +108,3 @@ exports.Check = async function () {
     }
   }
 }
-
-// function 
