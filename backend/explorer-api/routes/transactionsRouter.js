@@ -175,6 +175,28 @@ var transactionRouter = (app, transactionDao, blockDao, progressDao, txHistoryDa
         console.log('Error - Get transactions by block range:', err);
       });
   })
+
+  router.get("/transactions/type", (req, res) => {
+    let totalPageNumber = 0;
+    let { type = 6, pageNumber = 1, limit = 100 } = req.query;
+    type = parseInt(type);
+    transactionDao.getTotalNumberByTypeAsync(type)
+      .then(number => {
+        totalPageNumber = Math.ceil(number / limit);
+        pageNumber = parseInt(pageNumber);
+        limit = parseInt(limit);
+        return transactionDao.getTransactionsByTypeAsync(type, pageNumber, limit)
+      })
+      .then(transactionInfoList => {
+        var data = ({
+          type: 'transaction_list',
+          body: transactionInfoList,
+          totalPageNumber,
+          currentPageNumber: pageNumber
+        });
+        res.status(200).send(data);
+      });
+  })
   //the / route of router will get mapped to /api
   app.use('/api', router);
 }
