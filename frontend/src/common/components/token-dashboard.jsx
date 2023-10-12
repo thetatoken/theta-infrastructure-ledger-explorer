@@ -19,6 +19,7 @@ const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
 const { mainchain } = config.chainInfo;
 const uri = isMetaChain ? mainchain.hostApi + ':' + mainchain.restApiPort + '/api/' : null;
+const isMainChain = config.chainType === ChainType.MAINCHAIN;
 export default class TokenDashboard extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -43,7 +44,7 @@ export default class TokenDashboard extends React.PureComponent {
     }
   }
   async getTransactionHistory() {
-    if (isMetaChain) {
+    if (isMetaChain || isMainChain) {
       let txTs = [];
       let txNumber = []
       let res = await transactionsService.getTransactionHistory(MAX_RECORD_DAYS, uri);
@@ -168,8 +169,8 @@ export default class TokenDashboard extends React.PureComponent {
     const token = type.toUpperCase();
     const isTheta = type === 'theta';
     const isSubChain = config.chainType === ChainType.SUBCHAIN;
-    const txHistoryTitle = isMetaChain ? 'THETA METACHAIN TRANSACTION HISTORY (1 YEAR)' : isSubChain ?
-      "SUBCHAIN TRANSACTION HISTORY (14 DAYS)" : "THETA BLOCKCHAIN TRANSACTION HISTORY (14 DAYS)";
+    const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (1 YEAR)' :
+      "SUBCHAIN TRANSACTION HISTORY (14 DAYS)";
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("dashboard-row", type)}>
