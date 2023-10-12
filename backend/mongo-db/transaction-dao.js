@@ -191,8 +191,13 @@ module.exports = class TransactionDAO {
       })
     }
   }
-  getTransactionsByType(type, callback) {
+  getTransactionsByType(type, pageNumber, limitNumber, callback) {
     const queryObject = { 'type': type };
-    this.client.getRecords(this.transactionInfoCollection, queryObject, {}, 0, 0, callback);
+    const sortObject = { 'number': -1 };
+    this.client.getRecords(this.transactionInfoCollection, queryObject, sortObject, pageNumber, limitNumber, callback);
+  }
+  getTotalNumberByType(type, callback) {
+    const queryObject = { 'type': type };
+    this.client.getTotal(this.transactionInfoCollection, queryObject, callback);
   }
 }
