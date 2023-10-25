@@ -442,7 +442,6 @@ const SubchainValidatorSetUpdate = ({ transaction, price }) => {
 
     async function fetchData() {
       let symbol = await fetchAbi([CommonFunctionABIs.symbol]);
-      console.log('symbol:', symbol)
       setSymbol(symbol);
     }
     return () => flag = false;
@@ -605,7 +604,10 @@ const SmartContract = (props) => {
         contractAddress: get(log, 'address')
       })
       if (addressMap[`${get(log, 'address')}`] === undefined) {
-        addressMap[`${get(log, 'address')}`] = { type, tokenId };
+        addressMap[`${get(log, 'address')}`] = { type, tokenId, tokenIds: new Set() };
+      }
+      if (type === 'TNT-721') {
+        addressMap[`${get(log, 'address')}`].tokenIds.add(tokenId)
       }
     })
     setTokens(tokenArr);
@@ -622,23 +624,25 @@ const SmartContract = (props) => {
             const decimals = await fetchData(CommonFunctionABIs.decimals, [], [CommonFunctionABIs.decimals], address);
             map[address] = { name, symbol, decimals };
           } else if (addressMap[address].type === 'TNT-721') {
-            // fetch image info
-            const inputValues = [addressMap[address].tokenId];
-            let url = await fetchData(CommonFunctionABIs.tokenURI, inputValues, [CommonFunctionABIs.tokenURI], address);
-            if (/^http:\/\/(.*)api.thetadrop.com.*\.json(\?[-a-zA-Z0-9@:%._\\+~#&//=]*){0,1}$/g.test(url) && typeof url === "string") {
-              url = url.replace("http://", "https://")
-            }
-            const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
-            if (isImage) {
-              map[address] = { image: url };
-            } else {
-              const data = await fetch(url).then(res => res.json())
-              map[address] = data;
-            }
+            if (!map[address]) map[address] = {};
             const tokenInfoRes = await tokenService.getTokenInfoByAddressAndTokenId(address);
             const tokenName = get(tokenInfoRes, 'data.body.name');
-            if (!map[address]) map[address] = {};
             map[address].tokenName = tokenName;
+            // fetch image info
+            for (let tokenId of [...addressMap[address].tokenIds]) {
+              const inputValues = [tokenId];
+              let url = await fetchData(CommonFunctionABIs.tokenURI, inputValues, [CommonFunctionABIs.tokenURI], address);
+              if (/^http:\/\/(.*)api.thetadrop.com.*\.json(\?[-a-zA-Z0-9@:%._\\+~#&//=]*){0,1}$/g.test(url) && typeof url === "string") {
+                url = url.replace("http://", "https://")
+              }
+              const isImage = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|svg)/g.test(url);
+              if (isImage) {
+                map[address][tokenId] = { image: url };
+              } else {
+                const data = await fetch(url).then(res => res.json())
+                map[address][tokenId] = data;
+              }
+            }
           }
         } catch (e) {
           console.log('Error in fetchTokenInfoMap:', e.message);
@@ -646,7 +650,6 @@ const SmartContract = (props) => {
       }
       if (!isMountedRef.current) return;
       setTokenInfoMap(map);
-
     }
     async function fetchData(functionData, inputValues, abi, address) {
       const iface = new ethers.utils.Interface(abi || []);
@@ -1002,7 +1005,7 @@ const Items = props => {
         tmpLogs.push(log);
         if (tokenInfoMap) {
           const address = get(log, 'address');
-          const info = tokenInfoMap[address];
+          const info = tokenInfoMap[address] ? tokenInfoMap[address][tokenId] : undefined;
           if (info !== undefined && isHidden) {
             setIsHidden(false);
           }
@@ -1011,6 +1014,7 @@ const Items = props => {
     })
     setFiltedLogs(tmpLogs);
   }, [logs, tokenInfoMap])
+
   return !isHidden && <>
     <div className="details-header item">
       <div className="txn-type smart-contract items">Items</div>
@@ -1024,7 +1028,7 @@ const Items = props => {
             tokenId={tokenId}
             address={address}
             abi={abiMap ? abiMap[address] : []}
-            item={tokenInfoMap ? tokenInfoMap[address] : {}}
+            item={tokenInfoMap && tokenInfoMap[address] ? tokenInfoMap[address][tokenId] : {}}
             key={i}
             handleHashScroll={handleHashScroll}
           />
