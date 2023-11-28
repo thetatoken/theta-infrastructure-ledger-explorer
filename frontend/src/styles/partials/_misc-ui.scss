@@ -57,6 +57,16 @@
       background-image: url('/images/icons/icon-replay.png'); 
     }
   }
+  &.pog {
+    &:before {
+      background-image: url('/images/icons/icon-pog.png'); 
+    }
+  }
+  &.plasm {
+    &:before {
+      background-image: url('/images/icons/icon-plasm.png'); 
+    }
+  }
 }
 
 .currency-link {

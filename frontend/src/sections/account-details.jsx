@@ -33,7 +33,7 @@ import { Multiselect } from 'multiselect-react-dropdown';
 import { useIsMountedRef } from 'common/helpers/hooks';
 const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
-const INITIAL_TOKEN_BALANCE = { WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0', vLavita: '0' };
+const INITIAL_TOKEN_BALANCE = { WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0', vLavita: '0', POG: '0', 'PLASM': '0' };
 let scrollTimes = 0;
 let maxScrollTimes = 1;
 const tokenMap = {
@@ -45,6 +45,8 @@ const tokenMap = {
   Lavita: '0x46fBF4487fA1B9C70d35BD761c51c360dF9459ed',
   RPLAY: '0x3Da3D8CDE7B12CD2CBb688E2655BcaCD8946399D',
   vLavita: '0x7c1aae7bd03c577af08f51b536bfeeba516db877',
+  POG: '0x71dC74256d1acB42A216CC5c3c097B8dA71026b0',
+  PLASM: '0x5c2fB1E2594E85C5f1579b07DD5b8DFEA3F929E0'
 }
 const decimalsMap = {
   'WTheta': 18,
@@ -53,7 +55,9 @@ const decimalsMap = {
   'TDrop': 18,
   'Lavita': 18,
   'RPLAY': 18,
-  'vLavita': 18
+  'vLavita': 18,
+  'POG': 18,
+  'PLASM': 18
 }
 
 export default class AccountDetails extends React.Component {
@@ -628,7 +632,8 @@ const Token = ({ tokenBalance }) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
           {`${formatQuantity(v, decimalsMap[k], 2)}`}
-          {(k === 'TBill' || k === 'Lavita' || k === 'vLavita') ? <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
+          {(k === 'TBill' || k === 'Lavita' || k === 'vLavita' || k === 'PLASM' || k === 'POG') ?
+            <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
             : <Link className="currency-link" to={`/token/${tokenMap[k]}`}>{CurrencyLabels[k] || k}</Link>}
         </div>
       })}
