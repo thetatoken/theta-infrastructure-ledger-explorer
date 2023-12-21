@@ -77,7 +77,7 @@ export default class StakesTable extends React.Component {
     const { stakeList, isSliced, curStakeLength, totalStakeLength } = this.state;
     let colSpan = type === 'node' ? 5 : 3;
     const titleKey = `${stakeCoinType}_${type || ""}`;
-    const currencyUnit = isSubChain ? '' : stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
+    const currencyUnit = isSubChain ? config.tokenName : stakeCoinType === 'tfuel' ? 'tfuelwei' : 'thetawei';
     return (
       <div className="stakes half">
         <div className="title">{TitleMap[`${titleKey}`]}</div>

@@ -72,6 +72,11 @@
       > :last-child {
         width: 10%;
       }
+      & > :first-child {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
       & > :nth-child(4) {
         width: 26%;

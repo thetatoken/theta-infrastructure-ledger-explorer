@@ -4,6 +4,7 @@ import get from 'lodash/get';
 import Detail from 'common/components/dashboard-detail';
 import { formatQuantity, fetchAbi, fetchTokenTotalSupply, fetchTokenDecimals, fetchTokenSymbol } from 'common/helpers/utils';
 import { CommonFunctionABIs } from '../constants';
+import config from "../../config";
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
@@ -31,7 +32,9 @@ const DashboardRow = ({ }) => {
   }, [])
 
   return <div className={`dashboard-row half subchain`}>
-    <div className="column"></div>
+    <div className="column">
+      {config.tokenName && <div class={`currency ${config.tokenName}`}></div>}
+    </div>
     <div className="column last">
       <Detail title={'GOV TOKEN NAME/SYMBOL'} value={`${name} / ${symbol}`} />
     </div>
