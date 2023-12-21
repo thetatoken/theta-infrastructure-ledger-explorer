@@ -33,7 +33,7 @@ const DashboardRow = ({ }) => {
 
   return <div className={`dashboard-row half subchain`}>
     <div className="column">
-      {config.tokenName && <div class={`currency ${config.tokenName}`}></div>}
+      {config.tokenName && <div className={`currency ${config.tokenName}`}></div>}
     </div>
     <div className="column last">
       <Detail title={'GOV TOKEN NAME/SYMBOL'} value={`${name} / ${symbol}`} />

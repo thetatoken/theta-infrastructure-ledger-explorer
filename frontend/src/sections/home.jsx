@@ -73,7 +73,7 @@ export default class Dashboard extends React.PureComponent {
           {isSubChain && <SubchainTokenDashboard />}
           <DashboardRow isSubChain={isSubChain} />
           {isSubChain && <SubchainChart></SubchainChart>}
-          {isSubChain && <SubchainAbout />}
+          {isSubChain && config.hasAbout && <SubchainAbout />}
         </div>
         {type === 'metachain' ? <>
           <div className="chain-overview">
