@@ -1,0 +1,100 @@
+.subchain-about {
+  display: flex;
+  color: $color-font-light;
+  border-top: 1px solid rgba($color-font-light, 0.2);
+  padding: 30px 0;
+  &__info {
+    flex: 6;
+    padding-right: 20px;
+    border-right: 1px solid rgba($color-font-light, 0.2);
+    &--title {
+      font-weight: 600;
+      font-size: 11px;
+    }
+    &--logo {
+      margin: 22px 0;
+      & .chain-logo.lavita {
+        height: 35px;
+        width: 35px;
+        &::after {
+          margin-left: 40px;
+          font-size: 20px;
+        }
+      }
+    }
+    &--description {
+      max-width: 520px;
+    }
+  }
+  &__links {
+    flex: 4;
+    padding-left: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    &--websites {
+      display: flex;
+      flex-wrap: wrap;
+      a {
+        color: $color-font-light;
+        &:hover {
+          color: $color-font-link-hover;
+        }
+      }
+    }
+    &--link {
+      flex: 0 0 50%;
+      display: flex;
+      margin-bottom: 10px;
+    }
+    &--icon {
+      height: 20px;
+      width: 20px;
+      margin-right: 10px;
+      // opacity: 0.65;
+      background-position: center center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-color: transparent;
+      &.website {
+        background-image: url("/images/icons/icon-website.png");
+      }
+      &.whitepaper {
+        background-image: url("/images/icons/icon-whitepaper.png");
+      }
+      &.cmc {
+        background-image: url("/images/icons/icon-cmc.png");
+      }
+      &.ck {
+        background-image: url("/images/icons/icon-ck.png");
+      }
+      &.tg {
+        background-image: url("/images/icons/icon-sm-tg.png");
+      }
+      &.twitter {
+        background-image: url("/images/icons/icon-sm-twitter.png");
+      }
+      &.discord {
+        background-image: url("/images/icons/icon-sm-discord.png");
+      }
+      &.medium {
+        background-image: url("/images/icons/icon-sm-medium.png");
+      }
+    }
+  }
+  &__sm {
+    &--title {
+      letter-spacing: 2.5px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    &--wrap {
+      display: flex;
+    }
+    &--link {
+      // flex: 1;
+      margin-right: 10px;
+    }
+  }
+}

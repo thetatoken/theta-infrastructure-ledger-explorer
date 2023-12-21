@@ -12,6 +12,7 @@ import { priceService } from 'common/services/price';
 import DappCard from "../common/components/dapp-card";
 import config from '../config';
 import { ChainType } from "../common/constants";
+import SubchainAbout from "../common/components/subchain-about";
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
@@ -72,6 +73,7 @@ export default class Dashboard extends React.PureComponent {
           {isSubChain && <SubchainTokenDashboard />}
           <DashboardRow isSubChain={isSubChain} />
           {isSubChain && <SubchainChart></SubchainChart>}
+          {isSubChain && <SubchainAbout />}
         </div>
         {type === 'metachain' ? <>
           <div className="chain-overview">
