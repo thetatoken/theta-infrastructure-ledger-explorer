@@ -20,7 +20,7 @@ const SubchainAbout = ({ }) => {
       <div className="subchain-about__links--websites">
         {config.links.website && <a className="subchain-about__links--link" href={config.links.website} target="_blank" rel="noreferrer">
           <div className="subchain-about__links--icon website"></div>
-          {config.links.website}
+          {removeHttps(config.links.website)}
         </a>}
         {config.links.cmc && <a className="subchain-about__links--link" href={config.links.cmc} target="_blank" rel="noreferrer">
           <div className="subchain-about__links--icon cmc"></div>
@@ -64,6 +64,15 @@ function getSubchainName(name) {
     return name.substring(0, subchainIndex);
   } else {
     return name;
+  }
+}
+
+function removeHttps(url) {
+  const httpsPrefix = 'https://';
+  if (url.startsWith(httpsPrefix)) {
+    return url.substring(httpsPrefix.length);
+  } else {
+    return url;
   }
 }
 export default SubchainAbout;
