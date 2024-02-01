@@ -99,11 +99,11 @@ var supplyRouter = (app, progressDao, dailyTfuelBurntDao, rpc, config) => {
         }];
         const maxSupplyWei = await getMaxSupply(tokenAddress, maxSupplyAbi);
         maxSupply = helper.formatCoin(maxSupplyWei).toFixed(0);
-        if (q === 'TotalSupply') {
+        if (q.toLocaleLowerCase() === 'totalsupply') {
           const data = totalSupply.toString();
           res.status(200).send(data);
           return;
-        } else if (q === 'MaxSupply') {
+        } else if (q.toLocaleLowerCase() === 'maxsupply') {
           const data = maxSupply.toString();
           res.status(200).send(data);
           return;
