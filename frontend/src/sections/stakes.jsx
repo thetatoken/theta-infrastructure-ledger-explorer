@@ -184,8 +184,8 @@ export default class Stakes extends React.Component {
     const { holders, percentage, sortedStakesByHolder, sortedStakesBySource, totalStaked } = this.state;
     let isTablet = window.screen.width <= 768;
     const truncate = isTablet ? 10 : 20;
-    const title = `TOTAL ${isSubChain ? 'SUBCHAIN VALIDATOR' :
-      stakeCoinType === 'tfuel' ? 'TFUEL' : 'THETA'} STAKED`;
+    const title = `TOTAL ${isSubChain ? 'SUBCHAIN VALIDATOR SHARES' :
+      stakeCoinType === 'tfuel' ? 'TFUEL STAKED' : 'THETA STAKED'}`;
     const legend = isSubChain ? 'SUBCHAIN VALIDATOR' :
       stakeCoinType === 'tfuel' ? 'TFUEL NODES' : 'THETA NODES';
 

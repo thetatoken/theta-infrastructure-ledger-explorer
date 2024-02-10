@@ -87,8 +87,8 @@ export default class StakesTable extends React.Component {
               <th className="address">ADDRESS</th>
               {type === 'node' && <th className="node-type half">TYPE</th>}
               {type === 'node' && <th className="reward-prct">SPLIT</th>}
-              <th className="staked">TOKENS STAKED</th>
-              <th className="staked-prct">%STAKED</th>
+              <th className="staked">{isSubChain ? 'VOTING SHARES' : 'TOKENS STAKED'}</th>
+              <th className="staked-prct">{isSubChain ? '% SHARES' : '%STAKED'}</th>
             </tr>
           </thead>
           <tbody className="stake-tb">
