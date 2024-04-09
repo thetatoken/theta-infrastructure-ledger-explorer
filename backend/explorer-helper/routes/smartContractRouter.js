@@ -154,7 +154,7 @@ var smartContractRouter = (app) => {
               // console.log(`hexBytecode: length:${hexBytecode.length}`);
 
               // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
-              if ((hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) || (address === '0xc1cff4648d490480f3b7e1449aae5f7a34a75dfa' && contractName === 'GroveToken')) {
+              if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
                 verified = true;
                 let abi = output.contracts[cFileName][contractName].abi;
                 const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
