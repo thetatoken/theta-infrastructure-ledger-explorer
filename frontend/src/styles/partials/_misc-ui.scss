@@ -67,6 +67,11 @@
       background-image: url('/images/icons/icon-plasm.png'); 
     }
   }
+  &.grove {
+    &:before {
+      background-image: url('/images/icons/icon-grove.png'); 
+    }
+  }
 }
 
 .currency-link {
