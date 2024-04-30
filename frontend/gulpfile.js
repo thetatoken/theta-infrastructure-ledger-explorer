@@ -7,6 +7,8 @@ let gulp = require('gulp'),
   gulpClean = require("gulp-clean");
 let browserSync = require('browser-sync').create()
 let webPackConfig = require('./webpack.config.js');
+const revCollector = require('gulp-rev-collector');
+const hash = require('gulp-hash');
 
 let buildMode = 'development';
 const DEV = 'development';
@@ -56,11 +58,14 @@ const buildSASS = done => {
       displayError(err);
       done();
     })
-    .on("error", async (err) => {
-      displayError(err);
-      done();
-    })
     .pipe(cssnano())
+    .pipe(hash())
+    .pipe(gulp.dest(paths.sass_dest))
+    .pipe(hash.manifest('css.json', {
+      deleteOld: true,
+      sourceDir: paths.sass_dest,
+      destDir: paths.sass_dest
+    }))
     .pipe(gulp.dest(paths.sass_dest))
     .pipe(browserSync.stream());
 }
@@ -99,10 +104,18 @@ const watch = done => {
   done();
 };
 
-gulp.task('default', gulp.series(setBuildMode(DEV), clean, sync, buildSASS, buildJS, watch));
-gulp.task('build-dev', gulp.series(setBuildMode(DEV), clean, buildSASS, buildJS));
-gulp.task('build-prod', gulp.series(setBuildMode(PROD), clean, buildSASS, buildJS));
-gulp.task('nosync', gulp.series(clean, buildSASS, buildJS, watch));
+const replaceCSSHash = done => {
+  return gulp.src(['public/css/css.json', 'public/**/*.html'])
+    .pipe(revCollector({
+      replaceReved: true
+    }))
+    .pipe(gulp.dest('public'));
+}
+
+gulp.task('default', gulp.series(setBuildMode(DEV), clean, sync, buildSASS, buildJS, replaceCSSHash, watch));
+gulp.task('build-dev', gulp.series(setBuildMode(DEV), clean, buildSASS, buildJS, replaceCSSHash));
+gulp.task('build-prod', gulp.series(setBuildMode(PROD), clean, buildSASS, buildJS, replaceCSSHash));
+gulp.task('nosync', gulp.series(clean, buildSASS, buildJS, replaceCSSHash, watch));
 gulp.task('build-js', buildJS);
 gulp.task('build-sass', buildSASS);
 gulp.task('clean', clean);
