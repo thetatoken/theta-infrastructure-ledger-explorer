@@ -7,7 +7,7 @@ import { Accordion, AccordionHeader } from 'common/components/accordion';
 import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
 import { useDropzone } from 'react-dropzone';
-
+import { EvmVerstions } from "../constants";
 export default class SmartContractCode extends React.PureComponent {
   setStates = (keys, vals) => {
     let newState = {}
@@ -49,6 +49,7 @@ const CodeUploader = props => {
   const [uploaderAbi, setUploaderAbi] = useState('');
   const [uploaderVersion, setUploaderVersion] = useState('');
   const [uploaderOptimizer, setUploaderOptimizer] = useState(0);
+  const [uploaderEvm, setUploaderEvm] = useState('default');
   const [files, setFiles] = useState([]);
   const [uploaderLibs, setUploaderLibs] = useState({});
   const sourceCodeRef = useRef(null);
@@ -56,6 +57,7 @@ const CodeUploader = props => {
   const optimizerRef = useRef(null);
   const optimizerRunsRef = useRef(null);
   const abiRef = useRef(null);
+  const evmRef = useRef(null);
   // const libRefs = useRef([]);
   // Array.from({ length: 10 }).forEach((_, index) => {
   //   libRefs.current[index] = [useRef(), useRef()];
@@ -67,6 +69,7 @@ const CodeUploader = props => {
       sourceCodeRef.current.value = uploaderSourceCode;
       abiRef.current.value = uploaderAbi;
       optimizerRef.current.value = uploaderOptimizer;
+      evmRef.current.value = uploaderEvm;
       // Object.keys(uploaderLibs).forEach((name, index) => {
       //   libRefs.current[index][0].current.value = name;
       //   libRefs.current[index][1].current.value = uploaderLibs[name];
@@ -101,6 +104,7 @@ const CodeUploader = props => {
     const abi = abiRef.current.value;
     const optimizer = optimizerRef.current.value;
     const optimizerRuns = optimizerRunsRef.current.value;
+    const evm = evmRef.current.value;
     console.log('optimizerRuns:', optimizerRuns);
     const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
@@ -108,6 +112,7 @@ const CodeUploader = props => {
     setUploaderVersion(version);
     setUploaderOptimizer(optimizer);
     setUploaderLibs(libs);
+    setUploaderEvm(evm);
     if (sourceCode === '') {
       setIsCodeEmpty(true);
       sourceCodeRef.current.focus();
@@ -125,7 +130,7 @@ const CodeUploader = props => {
     setIsVerifying(true);
 
     // return;
-    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs)
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs, evm)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
@@ -271,9 +276,12 @@ const CodeUploader = props => {
                 </div>
               </div>
               EVM Version to target
-              <div className="setting-section__tooltip">
-                <select defaultValue='default' disabled>
-                  <option value='default'>default (complier defaults)</option>
+              <div className="setting-section__tooltip select__selector">
+                <select defaultValue='default' ref={evmRef}>
+                  {/* <option value='default'>default (complier defaults)</option> */}
+                  {EvmVerstions.map(evm => {
+                    return <option value={evm} key={evm}>{evm === 'default' ? 'default (complier defaults)' : evm}</option>
+                  })}
                 </select>
                 <div className="setting-section__tooltip--text">
                   A list of target EVM versions and the compiler-relevant changes introduced at each version.
@@ -347,7 +355,7 @@ const CodeViewer = props => {
               </div>
               <div className="contract-info__cell">
                 <div>Other Settings:</div>
-                <div><b>default</b> evmVersion</div>
+                <div><b>{contract.evm || 'default'}</b> evmVersion</div>
               </div>
             </div>
           </div>

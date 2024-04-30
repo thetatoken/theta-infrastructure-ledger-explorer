@@ -231,6 +231,9 @@
     $self: &;
     margin: 0 5px;
     z-index: 100;
+    &.select__selector {
+      width: auto;
+    }
     &.question-mark {
       display: inline-block;
       border: 1px solid $color-font-light;

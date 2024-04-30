@@ -5,7 +5,7 @@ export const accountService = {
     if (!address) {
       throw Error('Missing argument');
     }
-    return apiService.get(`account/update/${address}`, {});
+    return apiService.get(`account/${address}`, {});
   },
   getTransactionHistory(address, startDate, endDate) {
     if (!address) {
