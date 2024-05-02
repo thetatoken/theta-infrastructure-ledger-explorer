@@ -16,11 +16,12 @@ var smartContractRouter = (app) => {
   router.post("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     let { sourceCode, byteCode, abi, version, versionFullName, optimizer, optimizerRuns = 200,
-      isSingleFile = true, libs = {}, libsSourceCode = {} } = req.body;
+      isSingleFile = true, libs = {}, libsSourceCode = {}, evm = 'default' } = req.body;
     console.log('isSingleFile:', isSingleFile)
     console.log('libs:', libs)
     console.log('libsSourceCode:', libsSourceCode)
     console.log('byteCode:', byteCode)
+    console.log('evm:', evm)
     optimizerRuns = +optimizerRuns;
     if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     try {
@@ -47,6 +48,9 @@ var smartContractRouter = (app) => {
         },
         sources: sourcecodes
       };
+      if (evm && evm !== 'default') {
+        input.settings.evmVersion = evm;
+      }
 
       // console.log('input:', input);
       var output = '';
@@ -168,8 +172,10 @@ var smartContractRouter = (app) => {
                   'optimizerRuns': optimizerRuns,
                   'name': contractName,
                   'function_hash': output.contracts[cFileName][contractName].evm.methodIdentifiers,
-                  'constructor_arguments': constructor_arguments
+                  'constructor_arguments': constructor_arguments,
+                  'evm': evm
                 }
+                console.log('evm:', evm)
                 break;
               }
             }
