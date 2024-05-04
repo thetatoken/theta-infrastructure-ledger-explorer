@@ -93,7 +93,7 @@ module.exports = class TransactionDAO {
           callback(null, JSON.parse(reply));
           return;
         }
-        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        console.log(`Redis does not contain the key ${redis_key}, query DB.`)
         query();
       })
     } else {
@@ -168,7 +168,7 @@ module.exports = class TransactionDAO {
           callback(null, JSON.parse(reply));
           return;
         }
-        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        console.log(`Redis does not contain the key ${redis_key}, query DB.`)
         query();
       })
     } else {

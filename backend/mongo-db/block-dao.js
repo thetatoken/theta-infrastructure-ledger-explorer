@@ -60,7 +60,7 @@ module.exports = class BlockDAO {
           callback(null, JSON.parse(reply));
           return;
         }
-        console.log(`Redis doesnot contain the key ${redis_key} ${height}, query DB.`)
+        console.log(`Redis does not contain the key ${redis_key} ${height}, query DB.`)
         query();
       })
     } else {
@@ -113,7 +113,7 @@ module.exports = class BlockDAO {
           callback(null, JSON.parse(reply));
           return;
         }
-        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        console.log(`Redis does not contain the key ${redis_key}, query DB.`)
         query();
       })
     } else {
@@ -170,7 +170,7 @@ module.exports = class BlockDAO {
           callback(null, JSON.parse(reply));
           return;
         }
-        console.log(`Redis doesnot contain the key ${redis_key}, query DB.`)
+        console.log(`Redis does not contain the key ${redis_key}, query DB.`)
         query();
       })
     } else {

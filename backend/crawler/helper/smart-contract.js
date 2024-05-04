@@ -97,7 +97,7 @@ exports.updateToken = async function (tx, smartContractDao, tokenDao, tokenSumma
           continue;
         }
         // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
-        // this record will be hanlded in the contract verification
+        // this record will be handled in the contract verification
         if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
           continue;
         }
@@ -197,7 +197,7 @@ exports.updateTokenByTxs = async function (txs, smartContractDao, tokenDao, toke
           break;
         case EventHashMap.TRANSFER:
           // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
-          // this record will be hanlded in the contract verification
+          // this record will be handled in the contract verification
           if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
             continue;
           }

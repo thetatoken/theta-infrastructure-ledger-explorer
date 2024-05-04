@@ -55,10 +55,10 @@ var smartContractRouter = (app) => {
       const prefix = './libs';
       const fileName = prefix + '/' + versionFullName;
       if (!fs.existsSync(fileName)) {
-        console.log(`file ${fileName} does not exsit, downloading`)
+        console.log(`file ${fileName} does not exist, downloading`)
         await downloader.downloadByVersion(version, './libs');
       } else {
-        console.log(`file ${fileName} exsits, skip download process`)
+        console.log(`file ${fileName} exist, skip download process`)
       }
       console.log(`Download solc-js file takes: ${(+new Date() - start) / 1000} seconds`)
       start = +new Date();
