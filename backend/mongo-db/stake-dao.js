@@ -18,7 +18,7 @@ module.exports = class stakeDAO {
     const queryObj = { _id: stakeInfo._id };
     this.client.upsert(this.stakeInfoCollection, queryObj, stakeInfo, async function (error, record) {
       if (error) {
-        console.log('error happend in stake upsert')
+        console.log('error happened in stake upsert')
         // console.log('Stake dao ERR - ', error);
       } else {
         const redis_key = `stake_${stakeInfo.type}`;

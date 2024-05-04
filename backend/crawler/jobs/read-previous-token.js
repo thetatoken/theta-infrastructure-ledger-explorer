@@ -141,7 +141,7 @@ async function updateTokens(txs, smartContractDao, tokenDao, tokenSummaryDao) {
           break;
         case EventHashMap.TRANSFER:
           // If log.address === tx.receipt.ContractAddress, and the contract has not been verified
-          // this record will be hanlded in the contract verification
+          // this record will be handled in the contract verification
           if (get(infoMap, `${contractAddress}.type`) === 'unknow' && contractAddress === get(tx, 'receipt.ContractAddress')) {
             continue;
           }
