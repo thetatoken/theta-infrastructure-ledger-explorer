@@ -265,6 +265,22 @@
       transform: translateY(2px);
     }
   }
+
+  &.bullit {
+    background-image: url("/images/icons/icon-bullit.jpeg");
+    height: 24px;
+    width: 24px;
+    &::after{
+      content: "BULLIT";
+      margin-left: 30px;
+      display: flex;
+      align-items: center;
+      font-weight: 550;
+      color: $color-white;
+      letter-spacing: 1px;
+      transform: translateY(2px);
+    }
+  }
 }
 
 .content.check {

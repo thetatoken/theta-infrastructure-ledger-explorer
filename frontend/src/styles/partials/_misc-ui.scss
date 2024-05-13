@@ -72,6 +72,11 @@
       background-image: url('/images/icons/icon-grove.png'); 
     }
   }
+  &.bullit {
+    &:before {
+      background-image: url('/images/icons/icon-bullit.jpeg'); 
+    }
+  }
 }
 
 .currency-link {
