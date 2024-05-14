@@ -7,7 +7,8 @@
     },
     "node": {
         "address": "localhost",
-        "port": 16888
+        "port": 16888,
+        "path": "/rpc"
     },
     "log": {
         "level": "debug"

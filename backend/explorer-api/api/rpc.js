@@ -20,7 +20,7 @@ exports.getAccount = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 
 // exports.getCode = function (params, callback) {
@@ -30,7 +30,7 @@ exports.getAccount = function (params, callback) {
 //     params: params,
 //     id: RandomIdGenerator()
 //   }
-//   ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+//   ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 // }
 
 //------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ var ProcessHttpRequest = (function (maxConcurrency) {
   };
 })(MAX_CONCURRENCY);
 
-var processHttpRequest = function (host, port, method, path, requestBody, callback) {
+var processHttpRequest = function (host, port, method, path = '/rpc', requestBody, callback) {
   var isHttps = host.includes('https');
   var options = {
     host: host.replace('https://', ''),

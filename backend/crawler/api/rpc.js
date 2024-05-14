@@ -20,7 +20,7 @@ exports.getBlock = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 
 exports.getBlockByHeight = function (params, callback) {
@@ -30,7 +30,7 @@ exports.getBlockByHeight = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 
 exports.getStatus = function (params, callback) {
@@ -40,7 +40,7 @@ exports.getStatus = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.getAccount = function (params, callback) {
   body = {
@@ -49,7 +49,7 @@ exports.getAccount = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.getVcpByHeight = function (params, callback) {
   body = {
@@ -58,7 +58,7 @@ exports.getVcpByHeight = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.getGcpByHeight = function (params, callback) {
   body = {
@@ -67,7 +67,7 @@ exports.getGcpByHeight = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.getEenpByHeight = function (params, callback) {
   body = {
@@ -76,7 +76,7 @@ exports.getEenpByHeight = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.GetValidatorSetByHeight = function (params, callback) {
   body = {
@@ -85,7 +85,7 @@ exports.GetValidatorSetByHeight = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 exports.getPendingTxs = function (params, callback) {
   body = {
@@ -94,7 +94,7 @@ exports.getPendingTxs = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 
 exports.getStakeRewardDistribution = function (params, callback) {
@@ -104,7 +104,7 @@ exports.getStakeRewardDistribution = function (params, callback) {
     params: params,
     id: RandomIdGenerator()
   }
-  ProcessHttpRequest(config.node.address, config.node.port, 'POST', '/rpc', JSON.stringify(body), callback);
+  ProcessHttpRequest(config.node.address, config.node.port, 'POST', config.node.path, JSON.stringify(body), callback);
 }
 //------------------------------------------------------------------------------
 //  Utils
@@ -145,7 +145,7 @@ var ProcessHttpRequest = (function (maxConcurrency) {
   };
 })(MAX_CONCURRENCY);
 
-var processHttpRequest = function (host, port, method, path, requestBody, callback) {
+var processHttpRequest = function (host, port, method, path = '/rpc', requestBody, callback) {
   var isHttps = host.includes('https');
   var timeout = config.requestTimeoutMs || 30000
 
