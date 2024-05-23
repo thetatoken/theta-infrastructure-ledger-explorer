@@ -112,6 +112,8 @@ export const EvmVerstions = ['default', 'cancun', 'shanghai', 'paris', 'london',
   'berlin', 'istanbul', 'petersburg', 'constantinople', 'byzantium', 'spuriousDragon',
   'tangerineWhistle', 'homestead']
 
+export const viaIROptions = [true, false]
+
 
 export const Networks = {
   __deprecated__ETHEREUM: 'ethereum',

@@ -60,7 +60,7 @@
       border-top: 6px solid $color-input-text;
       position: absolute;
       right: 5px;
-      top: 12px;
+      top: 13px;
       pointer-events: none;
     }
     & select {
@@ -224,7 +224,7 @@
     & input,
     select {
       width: 100%;
-      margin-top: 5px;
+      // margin-top: 5px;
     }
   }
   &__tooltip {
