@@ -13,8 +13,9 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
   router.post("/smartContract/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     let { sourceCode, abi, version, optimizer, versionFullName, optimizerRuns = 200, isSingleFile = true,
-      libs = {}, evm = 'default' } = req.body;
+      libs = {}, evm = 'default', viaIR = false } = req.body;
     console.log('isSingleFile:', isSingleFile, typeof isSingleFile)
+    console.log('viaIR:', viaIR, typeof viaIR)
     optimizerRuns = +optimizerRuns;
     if (Number.isNaN(optimizerRuns)) optimizerRuns = 200;
     console.log('Verifying source code for address', address);
@@ -48,7 +49,8 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       console.log('libsSourceCode:', libsSourceCode)
       const helperUrl = (process.env.HELPER_HOST || 'localhost') + ":" + (process.env.HELPER_PORT || '9090');
       let result = await axios.post(`http://${helperUrl}/api/verify/${address}`, {
-        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns, isSingleFile, libs, libsSourceCode, evm
+        byteCode, sourceCode, abi, version, optimizer, versionFullName, optimizerRuns,
+        isSingleFile, libs, libsSourceCode, evm, viaIR
       })
       console.log('Received response from verification server.', result.data.result);
       if (result.data.result.verified === true) {

@@ -16,7 +16,7 @@ var smartContractRouter = (app) => {
   router.post("/verify/:address", async (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     let { sourceCode, byteCode, abi, version, versionFullName, optimizer, optimizerRuns = 200,
-      isSingleFile = true, libs = {}, libsSourceCode = {}, evm = 'default' } = req.body;
+      isSingleFile = true, libs = {}, libsSourceCode = {}, evm = 'default', viaIR = false } = req.body;
     console.log('isSingleFile:', isSingleFile)
     console.log('libs:', libs)
     console.log('libsSourceCode:', libsSourceCode)
@@ -44,7 +44,8 @@ var smartContractRouter = (app) => {
             '*': {
               '*': ['*']
             }
-          }
+          },
+          viaIR: viaIR === 'true' ? true : false
         },
         sources: sourcecodes
       };

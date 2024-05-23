@@ -7,7 +7,8 @@ import { Accordion, AccordionHeader } from 'common/components/accordion';
 import { getHex, getArguments } from 'common/helpers/utils';
 import { smartContractService } from 'common/services/smartContract';
 import { useDropzone } from 'react-dropzone';
-import { EvmVerstions } from "../constants";
+import { EvmVerstions, viaIROptions } from "../constants";
+import { capitalize } from "../helpers/utils";
 export default class SmartContractCode extends React.PureComponent {
   setStates = (keys, vals) => {
     let newState = {}
@@ -50,6 +51,7 @@ const CodeUploader = props => {
   const [uploaderVersion, setUploaderVersion] = useState('');
   const [uploaderOptimizer, setUploaderOptimizer] = useState(0);
   const [uploaderEvm, setUploaderEvm] = useState('default');
+  const [uploaderViaIR, setUploaderViaIR] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploaderLibs, setUploaderLibs] = useState({});
   const sourceCodeRef = useRef(null);
@@ -58,6 +60,7 @@ const CodeUploader = props => {
   const optimizerRunsRef = useRef(null);
   const abiRef = useRef(null);
   const evmRef = useRef(null);
+  const viaIRRef = useRef(null);
   // const libRefs = useRef([]);
   // Array.from({ length: 10 }).forEach((_, index) => {
   //   libRefs.current[index] = [useRef(), useRef()];
@@ -70,6 +73,7 @@ const CodeUploader = props => {
       abiRef.current.value = uploaderAbi;
       optimizerRef.current.value = uploaderOptimizer;
       evmRef.current.value = uploaderEvm;
+      viaIRRef.current.value = uploaderViaIR;
       // Object.keys(uploaderLibs).forEach((name, index) => {
       //   libRefs.current[index][0].current.value = name;
       //   libRefs.current[index][1].current.value = uploaderLibs[name];
@@ -105,6 +109,7 @@ const CodeUploader = props => {
     const optimizer = optimizerRef.current.value;
     const optimizerRuns = optimizerRunsRef.current.value;
     const evm = evmRef.current.value;
+    const viaIR = viaIRRef.current.value;
     console.log('optimizerRuns:', optimizerRuns);
     const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
@@ -113,6 +118,7 @@ const CodeUploader = props => {
     setUploaderOptimizer(optimizer);
     setUploaderLibs(libs);
     setUploaderEvm(evm);
+    setUploaderViaIR(viaIR);
     if (sourceCode === '') {
       setIsCodeEmpty(true);
       sourceCodeRef.current.focus();
@@ -130,7 +136,7 @@ const CodeUploader = props => {
     setIsVerifying(true);
 
     // return;
-    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs, evm)
+    smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs, evm, viaIR)
       .then(res => {
         setIsVerifying(false);
         console.log('res from verify source code:', res);
@@ -286,6 +292,27 @@ const CodeUploader = props => {
                 <div className="setting-section__tooltip--text">
                   A list of target EVM versions and the compiler-relevant changes introduced at each version.
                   Backward compatibility is not guaranteed between each version.
+                </div>
+              </div>
+            </label>
+          </div>
+          <div className="setting-section">
+            <label>
+              <div className="setting-section__tooltip question-mark">?
+                <div className="setting-section__tooltip--text">
+                  via-ir, an intermediate representation in the Solidity compiler.
+                </div>
+              </div>
+              viaIR
+              <div className="setting-section__tooltip select__selector">
+                <select defaultValue={false} ref={viaIRRef}>
+                  {/* <option value='default'>default (complier defaults)</option> */}
+                  {viaIROptions.map(v => {
+                    return <option value={v} key={v}>{v ? 'True' : "False (default)"}</option>
+                  })}
+                </select>
+                <div className="setting-section__tooltip--text">
+                  Do not change if you are unsure. Previous versions of truffle defaulted to a value of false.
                 </div>
               </div>
             </label>
