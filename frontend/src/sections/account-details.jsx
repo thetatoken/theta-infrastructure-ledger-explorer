@@ -633,13 +633,14 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
+  const unverifiedContracts = ['TBill', 'vLavita', 'WBULT']
   return (
     <div className="act balance">
       {map(tokenBalance, (v, k) => {
         const isZero = v === '0';
         return !isZero && <div key={k} className={cx("currency", k.toLowerCase())}>
           {`${formatQuantity(v, decimalsMap[k], 2)}`}
-          {(k === 'TBill' || k === 'Lavita' || k === 'vLavita' || k === 'PLASM' || k === 'POG' || k === 'WBULT') ?
+          {unverifiedContracts.includes(k) ?
             <span className="text-disabled currency-link">{CurrencyLabels[k] || k}</span>
             : <Link className="currency-link" to={`/token/${tokenMap[k]}`}>{CurrencyLabels[k] || k}</Link>}
         </div>
