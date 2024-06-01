@@ -635,7 +635,7 @@ const Balance = ({ balance, price }) => {
 }
 
 const Token = ({ tokenBalance }) => {
-  const unverifiedContracts = ['TBill', 'vLavita', 'WBULT', 'BULT']
+  const unverifiedContracts = ['TBill', 'vLavita', 'WBULT']
   return (
     <div className="act balance">
       {map(tokenBalance, (v, k) => {
