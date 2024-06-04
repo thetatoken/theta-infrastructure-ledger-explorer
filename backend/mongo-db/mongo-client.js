@@ -215,3 +215,11 @@ exports.createIndex = function (collectionName, queryObject, callback) {
     callback(err, res);
   })
 }
+
+exports.aggregate = function (collectionName, pipeline, callback) {
+  var collection = _db.collection(collectionName);
+  collection.aggregate(pipeline).toArray(function (err, res) {
+    if (err) callback(err);
+    callback(err, res);
+  });
+}
