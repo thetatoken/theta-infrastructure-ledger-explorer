@@ -210,24 +210,26 @@ module.exports = class stakeDAO {
       callback(err, res);
     })
   }
-  getValidEenpStaker(addresses, type, callback) {
+  getValidEenpStaker(addresses, type, amount, Decimal128, callback) {
     const pipeline = [
       {
         $match: {
-          holder: { $in: addresses },
+          source: { $in: addresses },
           type: type,
-          withdrawn: false
-        },
+          withdrawn: false,
+          $expr: {
+            $gte: [
+              { $toDecimal: "$amount" },
+              Decimal128.fromString(amount)
+            ]
+          }
+        }
       },
       {
         $group: {
-          _id: '$holder',
-          totalAmount: {
-            $sum: {
-              $toDecimal: '$amount',
-            },
-          },
-        },
+          _id: "$source",
+          valid_stakes: { $sum: 1 }
+        }
       }
     ];
     this.client.aggregate(this.stakeInfoCollection, pipeline, callback);

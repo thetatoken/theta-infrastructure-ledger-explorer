@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
 var axios = require("axios").default;
 var BigNumber = require('bignumber.js');
+var { Decimal128 } = require('mongodb');
 
 let startTime = { theta: +new Date(), tfuel: +new Date(), eenp: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
@@ -195,17 +196,13 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
       })
   });
 
-  router.get("/stake/validEenp", (req, res) => {
+  router.get("/stake/validStaker", (req, res) => {
     console.log('Check valid eenp addresses.');
     let { addresses = [], amount = '500000000000000000000000', type = 'eenp' } = req.query;
 
-    stakeDao.getValidEenpStakerAsync(JSON.parse(addresses), type)
+    stakeDao.getValidEenpStakerAsync(JSON.parse(addresses), type, amount, Decimal128)
       .then(result => {
-        const filteredResult = result.filter(item => {
-          const totalAmount = new BigNumber(item.totalAmount);
-          return totalAmount.isGreaterThanOrEqualTo(amount);
-        }).map(o => o._id);
-        res.status(200).send(filteredResult);
+        res.status(200).send(result);
       }).catch(error => {
         res.status(400).send(error.message);
       })
