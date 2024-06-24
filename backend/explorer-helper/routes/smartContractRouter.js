@@ -44,13 +44,16 @@ var smartContractRouter = (app) => {
             '*': {
               '*': ['*']
             }
-          },
-          viaIR: viaIR === 'true' ? true : false
+          }
         },
         sources: sourcecodes
       };
       if (evm && evm !== 'default') {
         input.settings.evmVersion = evm;
+      }
+
+      if (helper.isVersionLater(version, '0.8.8')) {
+        input.settings.viaIR = viaIR === 'true' ? true : false
       }
 
       // console.log('input:', input);
