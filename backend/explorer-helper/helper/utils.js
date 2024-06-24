@@ -40,7 +40,7 @@ exports.flatSourceCode = function (sourceCode) {
     return flattenedSource;
 }
 
-exports.convertToHashString = function(inputString) {
+exports.convertToHashString = function (inputString) {
     const hash = crypto.createHash('sha256').update(inputString).digest('hex');
     return hash.substr(0, 32);
 }
@@ -68,3 +68,18 @@ function _getImportedContracts(importedFiles, input) {
 }
 
 exports.getImportedContracts = _getImportedContracts;
+
+exports.isVersionLater = function (version, target) {
+    const versionParts = version.split('.').map(Number);
+    const targetParts = target.split('.').map(Number);
+
+    for (let i = 0; i < 3; i++) {
+        if (versionParts[i] > targetParts[i]) {
+            return true;
+        } else if (versionParts[i] < targetParts[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
