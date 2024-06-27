@@ -5,7 +5,7 @@ import cx from 'classnames';
 import { formatNumber, formatCurrency, sumCoin, fetchWTFuelTotalSupply, fetchWThetaTotalSupply } from 'common/helpers/utils';
 import { transactionsService } from 'common/services/transaction';
 import { stakeService } from 'common/services/stake';
-import { blocksService } from 'common/services/block';
+import { accountService } from 'common/services/account';
 import ThetaChart from 'common/components/chart';
 import Detail from 'common/components/dashboard-detail';
 import BigNumber from 'bignumber.js';
@@ -31,7 +31,8 @@ export default class TokenDashboard extends React.PureComponent {
       txNumber: [],
       nodeNum: 0,
       tokenStaked: 0,
-      tokenLocked: 0
+      tokenLocked: 0,
+      eblocked: 0
     };
   }
   componentDidMount() {
@@ -140,22 +141,26 @@ export default class TokenDashboard extends React.PureComponent {
     stakeService.getTotalStake(type, uri)
       .then(async res => {
         const stake = get(res, 'data.body');
-        let tokenTotalSupply = 0
+        let tokenTotalSupply = 0;
+        let eblocked = 0;
         try {
           if (type === 'tfuel') {
             tokenTotalSupply = await fetchWTFuelTotalSupply();
+            const accountRes = await accountService.getOneAccountByAddress('0xd551Fd014d98edf6362c0C4e141Dd7331888d9f8');
+            eblocked = get(accountRes, 'data.body.balance.tfuelwei')
           } else if (type === 'theta') {
             tokenTotalSupply = await fetchWThetaTotalSupply();
           }
         } catch (e) {
           console.log('Error in fetch WTFuel total supply. Err:', e.message);
         }
-        const totalStaked = BigNumber.sum(stake.totalAmount, tokenTotalSupply);
+        const totalStaked = BigNumber.sum(stake.totalAmount, tokenTotalSupply, eblocked);
         this.setState({
           totalStaked: totalStaked,
           nodeNum: stake.totalNodes,
           tokenStaked: stake.totalAmount,
-          tokenLocked: tokenTotalSupply
+          tokenLocked: tokenTotalSupply,
+          eblocked: eblocked
         });
       })
       .catch(err => {
@@ -163,7 +168,7 @@ export default class TokenDashboard extends React.PureComponent {
       });
   }
   render() {
-    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum, tokenStaked, tokenLocked } = this.state;
+    const { totalStaked, holders, percentage, txTs, txNumber, nodeNum, tokenStaked, tokenLocked, eblocked } = this.state;
     const { tokenInfo, type } = this.props;
     const icon = type + 'wei';
     const token = type.toUpperCase();
@@ -190,7 +195,8 @@ export default class TokenDashboard extends React.PureComponent {
             <Detail title={isTheta ? 'THETA STAKED+LOCKED (%)' : 'TFUEL STAKED+LOCKED (%)'}
               value={<StakedPercent staked={totalStaked} totalSupply={tokenInfo.circulating_supply} />}
               className="tooltip"
-              tooltipText={<TokenTooltip totalSupply={tokenInfo.circulating_supply} staked={tokenStaked} locked={tokenLocked} type={type} />} />
+              tooltipText={<TokenTooltip totalSupply={tokenInfo.circulating_supply} staked={tokenStaked}
+                locked={tokenLocked} type={type} eblocked={eblocked} />} />
           </div>
           <div className={`column pie-charts ${isSubChain && !isMetaChain ? 'subchain' : ''}`}>
             {type === 'tfuel' ?
@@ -238,7 +244,7 @@ const StakedPercent = ({ staked, totalSupply }) => {
   );
 }
 
-const TokenTooltip = ({ staked, locked, totalSupply, type }) => {
+const TokenTooltip = ({ staked, locked, totalSupply, type, eblocked }) => {
   return <div className="tooltip--text">
     <div>
       {type} STAKED:
@@ -252,5 +258,11 @@ const TokenTooltip = ({ staked, locked, totalSupply, type }) => {
         {`${new BigNumber(locked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
       </span>
     </div>
+    {type === 'tfuel' && <div>
+      Elite Booster Locked:
+      <span>
+        {`${new BigNumber(eblocked).dividedBy(WEI).dividedBy(totalSupply / 100).toFixed(2)}%`}
+      </span>
+    </div>}
   </div>
 }
