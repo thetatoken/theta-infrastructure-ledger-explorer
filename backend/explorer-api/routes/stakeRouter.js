@@ -35,43 +35,6 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
         }
       });
   });
-  //TODO: remove after merge 3.0 branch
-  router.get("/stake/totalAmount/tfuel", async (req, res) => {
-    console.log(`Querying total staked tfuel tokens.`);
-    let type = 'tfuel';
-    let cur = +new Date();
-    if (cur - startTime[type] < cachePeriod && cacheData && cacheData[type]) {
-      const data = cacheData[type];
-      if (data.type === 'stakeTotalAmout') {
-        res.status(200).send(data);
-      } else if (data.type === 'error_not_found') {
-        res.status(404).send(data);
-      }
-      return;
-    }
-    startTime[type] = cur;
-    progressDao.getStakeProgressAsync(type)
-      .then(info => {
-        const data = ({
-          type: 'stakeTotalAmout',
-          body: { totalAmount: info.total_amount, totalNodes: info.holder_num, type: info.type },
-        });
-        cacheData[type] = data;
-        res.status(200).send(data);
-      })
-      .catch(error => {
-        if (error.message.includes('NOT_FOUND')) {
-          const err = ({
-            type: 'error_not_found',
-            error
-          });
-          cacheData[type] = err;
-          res.status(404).send(err);
-        } else {
-          console.log('ERR - ', error)
-        }
-      });
-  })
   router.get("/stake/totalAmount", (req, res) => {
     let { type = 'theta' } = req.query;
     console.log(`Querying total staked ${type} tokens.`);
@@ -196,9 +159,9 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
       })
   });
 
-  router.get("/stake/validStaker", (req, res) => {
+  router.post("/stake/validStaker", (req, res) => {
     console.log('Check valid eenp addresses.');
-    let { addresses = [], amount = '500000000000000000000000', type = 'eenp' } = req.query;
+    let { addresses = [], amount = '500000000000000000000000', type = 'eenp' } = req.body;
 
     stakeDao.getValidEenpStakerAsync(JSON.parse(addresses), type, amount, Decimal128)
       .then(result => {
