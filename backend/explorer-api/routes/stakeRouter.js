@@ -2,14 +2,13 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var helper = require('../helper/utils');
-var axios = require("axios").default;
-var BigNumber = require('bignumber.js');
 var { Decimal128 } = require('mongodb');
 
 let startTime = { theta: +new Date(), tfuel: +new Date(), eenp: +new Date() };
 const cachePeriod = 6 * 1000 // 6 seconds
 let cacheData = { theta: undefined, tfuel: undefined, eenp: undefined, vs: undefined };
 var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao, stakeHistoryDao, config) => {
+  router.use(bodyParser.json({ limit: '1mb' }));
   router.use(bodyParser.urlencoded({ extended: true }));
 
   router.get("/stake/all", (req, res) => {
@@ -163,7 +162,7 @@ var stakeRouter = (app, stakeDao, subStakeDao, blockDao, accountDao, progressDao
     console.log('Check valid eenp addresses.');
     let { addresses = [], amount = '500000000000000000000000', type = 'eenp' } = req.body;
 
-    stakeDao.getValidEenpStakerAsync(JSON.parse(addresses), type, amount, Decimal128)
+    stakeDao.getValidEenpStakerAsync(addresses, type, amount, Decimal128)
       .then(result => {
         res.status(200).send(result);
       }).catch(error => {
