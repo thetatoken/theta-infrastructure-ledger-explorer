@@ -146,7 +146,7 @@ export default class TokenDashboard extends React.PureComponent {
         try {
           if (type === 'tfuel') {
             tokenTotalSupply = await fetchWTFuelTotalSupply();
-            const accountRes = await accountService.getOneAccountByAddress('0xd551Fd014d98edf6362c0C4e141Dd7331888d9f8');
+            const accountRes = await accountService.getOneAccountByAddress('0xd551Fd014d98edf6362c0C4e141Dd7331888d9f8', uri);
             eblocked = get(accountRes, 'data.body.balance.tfuelwei')
           } else if (type === 'theta') {
             tokenTotalSupply = await fetchWThetaTotalSupply();

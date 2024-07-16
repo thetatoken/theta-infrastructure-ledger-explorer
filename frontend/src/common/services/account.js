@@ -1,9 +1,12 @@
 import { apiService } from './api';
 
 export const accountService = {
-  getOneAccountByAddress(address) {
+  getOneAccountByAddress(address, uri) {
     if (!address) {
       throw Error('Missing argument');
+    }
+    if (uri) {
+      return apiService.getFullUri(`${uri}account/update/${address}`, {})
     }
     return apiService.get(`account/update/${address}`, {});
   },
