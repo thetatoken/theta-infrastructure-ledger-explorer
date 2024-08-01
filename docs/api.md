@@ -26,6 +26,9 @@ The **Theta Explorer APIs** is provided by the Theta Explorer Microservice Node.
    - [Token APIs](#token-apis)
 		- [GetTokenSummary](#gettokensummary)
       - [GetTokenTransactions](#gettokentransactions)
+   - [Smart Contract APIs](#smart-contract-apis)
+		- [GetSmartContract](#getsmartcontract)
+      - [VerifySmartContract](#verifysmartcontract)
 
 ## Theta Explorer APIs
 
@@ -880,5 +883,131 @@ curl https://explorer-api.thetatoken.org/api/token/0x5d0004fe2e0ec6d002678c7fa01
       type: "TNT-721"
       value: 1
    }, ...]
+}
+```
+
+## Smart Contract APIs
+### GetSmartContract
+
+This API returns the details of the smart contract being queried with address.
+
+**REST Uri**: /smartContract/:address
+
+**Query Parameters**
+
+- address: the smart contract address
+
+**Returns**
+
+- abi: the Application Binary Interface(ABI) of the smart contract
+- address: the unique blockchain address where the smart contract is deployed
+- bytecode: the compiled bytecode of the smart contract
+- compiler_version: the version of the compiler used to compile the smart contract's source code into bytecode
+- constructor_arguments: the arguments passed to the smart contract’s constructor during deployment
+- function_hash: the hash of a specific function within the smart contract
+- name: the name of the smart contract as specified in the source code
+- optimizer: indicates whether optimization was used during the compilation process
+- optimizerRuns: the number of optimization runs configured for the compiler
+- source_code: the original source code of the smart contract written in Solidity
+- verification_date: the date when the smart contract’s source code was verified on the blockchain explorer
+- evm: the Ethereum Virtual Machine(EVM) version that the smart contract is compatible with
+- viaIR: indicates whether the smart contract was compiled using an intermediate representation(IR)
+
+**Example**
+```
+// Request 
+curl https://explorer-api.thetatoken.org/api/smartcontract/0xb464bcdc89570eb7fac1f546703396f49a6ba24d
+
+// Result
+{
+   "type": "token_info",
+   "body": {
+        "abi": [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "val",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "SetValue",
+                "type": "event"
+            },
+            {
+                "inputs": [],
+                "name": "CalculateSquare",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },...],
+        "address": "0xb464bcdc89570eb7fac1f546703396f49a6ba24d",
+        "bytecode": "YIBgQFI0gBVhABBXYACA/VtQYQFWgGEAIGAAOWAA8/5ggGBAUjSAFWEAEFdgAID9W1BgBDYQYQBBV2AANWDgHIBjP6TyRRRhAEZXgGNVJBB3FGEAZFeAY7WgJBoUYQCSV1tgAID9W2EATmEAsFZbYEBRgIKBUmAgAZFQUGBAUYCRA5DzW2EAkGAEgDYDYCCBEBVhAHpXYACA/VuBAZCAgDWQYCABkJKRkFBQUGEAtlZbAFthAJphAPdWW2BAUYCCgVJgIAGRUFBgQFGAkQOQ81tgAFSBVluAYACBkFVQf+2LBwZe8HN8DPsb8eI8zIgdeX7JgE90Iwo2C4SYKTirgWBAUYCCgVJgIAGRUFBgQFGAkQOQoVBWW2AAgGAAVGAAVAKQUGAAVGAAVIKBYQERV/5bBBRhARlX/luAkVBQkFb+omRpcGZzWCISIJ+8GVNMCLRKEZ1Wb0J8Ad5UjUomo7wv9aDzGTh69fRvZHNvbGNDAAcEADM=",
+        "compiler_version": "v0.7.4+commit.3f05b770",
+        "constructor_arguments": "",
+        "function_hash": {
+            "CalculateSquare()": "b5a0241a",
+            "setValue(uint256)": "55241077",
+            "value()": "3fa4f245"
+        },
+        "name": "SquareCalculator",
+        "optimizer": "disabled",
+        "source_code": "/**\n *Submitted for verification at thetatoken.org on 2020-12-16\n */\npragma solidity ^0.7.4;\n\ncontract SquareCalculator {\n    event SetValue(uint val);\n    \n    uint public value;\n    \n    function setValue(uint val) public {\n        value = val;\n        emit SetValue(val);\n    }\n    \n    function CalculateSquare() view public returns (uint) {\n        uint sqr = value * value;\n        assert(sqr / value == value); // overflow protection\n        return sqr;\n    }\n}",
+        "verification_date": 1608159599911
+   }
+}
+```
+
+### VerifySmartContract
+
+This API verifies and validates a smart contract deployed on a blockchain.
+
+**REST Uri**: /smartContract/verify/:address
+
+**Query Parameters**
+
+- address: the smart contract address
+
+**Request Body**
+
+- sourceCode: the original source code of the smart contract written in Solidity
+- abi(optional): the Application Binary Interface(ABI) of the smart contract
+- version: the version of the compiler used to compile the smart contract's source code into bytecode, like "0.7.4"
+- optimizer: indicates whether optimization was used during the compilation process. "0" indicates disabled, "1" indicates enabled 
+- versionFullName: the version full name of the compiler used to compile the smart contract's source code into bytecode, like "soljson-v0.7.4+commit.3f05b770.js"
+- optimizerRuns(optional): the number of optimization runs configured for the compiler
+- evm(optional): the Ethereum Virtual Machine(EVM) version that the smart contract is compatible with
+- viaIR(optional): indicates whether the smart contract was compiled using an intermediate representation(IR)
+
+**Example**
+```
+// Request 
+curl -X POST https://explorer-api.thetatoken.org/api/smartcontract/verify/0xb464bcdc89570eb7fac1f546703396f49a6ba24d \
+-H "Content-Type: application/json" \
+-d '{
+  "abi": "",
+  "evm": "default",
+  "optimizer": "0",
+  "optimizerRuns": "200",
+  "sourceCode": "pragma solidity ^0.7.4;\n\ncontract SquareCalculator {\n    event SetValue(uint val);\n    \n    uint public value;\n    \n    function setValue(uint val) public {\n        value = val;\n        emit SetValue(val);\n    }\n    \n    function CalculateSquare() view public returns (uint) {\n        uint sqr = value * value;\n        assert(sqr / value == value); // overflow protection\n        return sqr;\n    }\n}"
+  "version": "0.7.4",
+  "versionFullName": "soljson-v0.7.4+commit.3f05b770.js",
+  "viaIR": "false"
+}'
+
+// Result
+{
+    "result": {
+        "verified": true
+    },
+    "warning_msg": [...]
 }
 ```

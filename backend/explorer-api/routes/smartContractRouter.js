@@ -74,7 +74,7 @@ var smartContractRouter = (app, smartContractDao, transactionDao, accountTxDao, 
       }
     }
   });
-  // The api to only get smart contract api by address
+  // The api to only get smart contract ABI by address
   router.get("/smartContract/abi/:address", (req, res) => {
     let address = helper.normalize(req.params.address.toLowerCase());
     console.log('Querying smart contract abi for address:', address);

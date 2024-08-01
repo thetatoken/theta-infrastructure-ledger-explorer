@@ -22,7 +22,8 @@ module.exports = class smartContractDAO {
       'name': smartContractInfo.name,
       'function_hash': smartContractInfo.function_hash,
       'constructor_arguments': smartContractInfo.constructor_arguments,
-      'evm': smartContractInfo.evm
+      'evm': smartContractInfo.evm,
+      'viaIR': smartContractInfo.viaIR
     }
     const queryObject = { '_id': smartContractInfo.address };
     this.client.upsert(this.collection, queryObject, newObject, callback);

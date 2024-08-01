@@ -177,9 +177,9 @@ var smartContractRouter = (app) => {
                   'name': contractName,
                   'function_hash': output.contracts[cFileName][contractName].evm.methodIdentifiers,
                   'constructor_arguments': constructor_arguments,
-                  'evm': evm
+                  'evm': evm,
+                  'viaIR': viaIR
                 }
-                console.log('evm:', evm)
                 break;
               }
             }
