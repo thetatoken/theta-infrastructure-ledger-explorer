@@ -133,7 +133,8 @@ export default class AccountDetails extends React.Component {
       transactions.map((x) => from(x, null, address))
         .concat(transactions.map((x) => to(x, null, address)))
     );
-    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    let domainNames = await tns.getDomainNames(uniqueAddresses);
+    if (!domainNames) domainNames = {};
     transactions.map((transaction) => {
       transaction.fromTns = from(transaction, null, address) ? domainNames[from(transaction, null, address)] : null;
       transaction.toTns = to(transaction, null, address) ? domainNames[to(transaction, null, address)] : null;
@@ -147,7 +148,8 @@ export default class AccountDetails extends React.Component {
         .concat(thetaHolderTxs.map((x) => x.source))
         .concat(tfuelHolderTxs.map((x) => x.source))
     );
-    const domainNames = await tns.getDomainNames(uniqueAddresses);
+    let domainNames = await tns.getDomainNames(uniqueAddresses);
+    if (!domainNames) domainNames = {};
     thetaSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
     tfuelSourceTxs.map((x) => { x.toTns = x.holder ? domainNames[x.holder] : null });
     thetaHolderTxs.map((x) => { x.toTns = x.source ? domainNames[x.source] : null });
@@ -688,7 +690,8 @@ const TokenTab = React.memo(props => {
         .concat(transactions.map((x) => x.to))
     );
     try {
-      const domainNames = await tns.getDomainNames(uniqueAddresses);
+      let domainNames = await tns.getDomainNames(uniqueAddresses);
+      if (!domainNames) domainNames = {};
       transactions.map((transaction) => {
         transaction.fromTns = transaction.from ? domainNames[transaction.from] : null;
         transaction.toTns = transaction.to ? domainNames[transaction.to] : null;

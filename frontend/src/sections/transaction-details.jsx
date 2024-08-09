@@ -1000,11 +1000,12 @@ const Items = props => {
     logs.forEach(log => {
       const tokenId = get(log, 'decode.result.tokenId');
       if (tokenId === undefined) return;
-      if (!ids.has(tokenId)) {
-        ids.add(tokenId);
+      const address = get(log, 'address');
+      const id = address + '_' + tokenId;
+      if (!ids.has(id)) {
+        ids.add(id);
         tmpLogs.push(log);
         if (tokenInfoMap) {
-          const address = get(log, 'address');
           const info = tokenInfoMap[address] ? tokenInfoMap[address][tokenId] : undefined;
           if (info !== undefined && isHidden) {
             setIsHidden(false);

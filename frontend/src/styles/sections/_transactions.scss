@@ -1,15 +1,10 @@
-
 .content.transactions {
-
-  
 }
 
 .content.transaction-details {
-  
-
   .details-header {
     @include row($justify: space-between, $align: flex-end);
-    padding: 3rem 1rem .75rem 0;
+    padding: 3rem 1rem 0.75rem 0;
     &.item {
       padding-top: 0;
     }
@@ -22,19 +17,24 @@
       text-transform: uppercase;
       &:before {
         top: 3px;
-        margin-right: .75rem;
+        margin-right: 0.75rem;
       }
     }
     .btn.raw {
-      margin-bottom: .125rem;
+      margin-bottom: 0.125rem;
       color: $color-font-light;
       font-weight: $weight-regular;
     }
   }
+  .details.txn-details.item {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
   .coinbase-output {
     @include row($align: flex-start);
     border-bottom: 1px solid $color-line;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
     &.single {
       padding: 0;
     }
@@ -56,12 +56,12 @@
       overflow-x: hidden;
       text-overflow: ellipsis;
     }
-    .currency{
-      @include breakpoint('phablet', max) { 
+    .currency {
+      @include breakpoint("phablet", max) {
         flex-wrap: wrap;
       }
-      @include breakpoint('phone-small', max) { 
-        &:before{
+      @include breakpoint("phone-small", max) {
+        &:before {
           display: none;
         }
       }
@@ -87,7 +87,7 @@
           margin-left: -140px;
           left: 50%;
           &:after {
-            content: '';
+            content: "";
             position: absolute;
             border-style: solid;
             top: 100%;
@@ -106,42 +106,65 @@
       }
     }
   }
-
-  
 }
-
 
 // In the global space since the icons are everywhere
 .txn-type {
   &:before {
-    content: '';
+    content: "";
     display: inline-block;
     top: 4px;
     position: relative;
     width: 18px;
     height: 18px;
-    margin-right: .5rem;
+    margin-right: 0.5rem;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
-  }  
+  }
 }
-  
-.txn-type.coinbase:before { background-image: url('/images/icons/icon_coinbase@2x.png'); }
-.txn-type.transfer:before { background-image: url('/images/icons/icon_send@2x.png'); }
-.txn-type.service-payment:before { background-image: url('/images/icons/icon_servicepayment@2x.png'); }
-.txn-type.split-contract:before { background-image: url('/images/icons/icon_splitrule@2x.png'); }
-.txn-type.smart-contract:before { background-image: url('/images/icons/icon_smartcontract@2x.png'); }
-.txn-type.reserve:before { background-image: url('/images/icons/icon_reservefund@2x.png'); }
-.txn-type.release:before { background-image: url('/images/icons/icon_releasefund@2x.png'); }
-.txn-type.slash:before { background-image: url('/images/icons/icon_slash@2x.png'); }
-.txn-type.deposit-stake:before { background-image: url('/images/icons/icon_deposit-stake-transaction@2x.png'); }
-.txn-type.withdraw-stake:before { background-image: url('/images/icons/icon_withdraw-stake-transaction@2x.png'); }
-.txn-type.stake-reward-distribution:before { background-image: url('/images/icons/icon_distribute-stake@2x.png'); }
 
-.txn-type.items:before { background-image: url('/images/icons/icon_items@2x.png'); }
+.txn-type.coinbase:before {
+  background-image: url("/images/icons/icon_coinbase@2x.png");
+}
+.txn-type.transfer:before {
+  background-image: url("/images/icons/icon_send@2x.png");
+}
+.txn-type.service-payment:before {
+  background-image: url("/images/icons/icon_servicepayment@2x.png");
+}
+.txn-type.split-contract:before {
+  background-image: url("/images/icons/icon_splitrule@2x.png");
+}
+.txn-type.smart-contract:before {
+  background-image: url("/images/icons/icon_smartcontract@2x.png");
+}
+.txn-type.reserve:before {
+  background-image: url("/images/icons/icon_reservefund@2x.png");
+}
+.txn-type.release:before {
+  background-image: url("/images/icons/icon_releasefund@2x.png");
+}
+.txn-type.slash:before {
+  background-image: url("/images/icons/icon_slash@2x.png");
+}
+.txn-type.deposit-stake:before {
+  background-image: url("/images/icons/icon_deposit-stake-transaction@2x.png");
+}
+.txn-type.withdraw-stake:before {
+  background-image: url("/images/icons/icon_withdraw-stake-transaction@2x.png");
+}
+.txn-type.stake-reward-distribution:before {
+  background-image: url("/images/icons/icon_distribute-stake@2x.png");
+}
 
-.txn-type.update-validators:before { background-image: url('/images/icons/icon_updatevalidators@2x.png'); }
+.txn-type.items:before {
+  background-image: url("/images/icons/icon_items@2x.png");
+}
+
+.txn-type.update-validators:before {
+  background-image: url("/images/icons/icon_updatevalidators@2x.png");
+}
 
 .sc-log {
   &__data {
@@ -206,7 +229,7 @@
   }
   &__image {
     max-width: 140px;
-    @include breakpoint('tablet', max) {
+    @include breakpoint("tablet", max) {
       width: 100%;
     }
   }
@@ -216,7 +239,7 @@
     flex-wrap: wrap;
     &.name {
       margin-bottom: 8px;
-      color: $color-white
+      color: $color-white;
     }
   }
 }
@@ -248,7 +271,7 @@
   & a {
     margin: 0 5px;
     width: 365px;
-    @media only screen and (max-width : 560px) {
+    @media only screen and (max-width: 560px) {
       width: auto;
     }
   }
@@ -258,7 +281,7 @@
   display: flex;
   margin-bottom: 10px;
   align-items: center;
-  &:last-child{
+  &:last-child {
     margin-bottom: 0;
   }
 
@@ -282,7 +305,7 @@
     width: 20px;
     margin-left: 5px;
     &::before {
-      content: '\2794';
+      content: "\2794";
     }
   }
 }
@@ -312,12 +335,12 @@
   color: $color-font-light;
   display: flex;
   flex-wrap: wrap;
-  & a{
+  & a {
     margin: 0 10px;
   }
   & .currency {
     margin-left: 10px;
-    color: white
+    color: white;
   }
   & .text-container {
     margin-left: 10px;
@@ -341,7 +364,7 @@
   &__token {
     margin: 5px 0 0 10px;
     &::before {
-      content: '\25CF';
+      content: "\25CF";
       padding-right: 10px;
     }
     & .token-link {
