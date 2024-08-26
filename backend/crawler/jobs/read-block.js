@@ -43,6 +43,7 @@ var chainType = 'mainchain';
 var stakeBlockHeight = 0;
 var stakeTimestamp = 0;
 var contractMap = {};
+var tokenMap = {};
 // dec
 var startTime;
 //------------------------------------------------------------------------------
@@ -51,7 +52,8 @@ var startTime;
 exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactionDaoInstance, accountDaoInstance,
   accountTxDaoInstance, stakeDaoInstance, checkpointDaoInstance, smartContractDaoInstance, dailyAccountDaoInstance,
   rewardDistributionDaoInstance, stakeHistoryDaoInstance, tokenDaoInstance, tokenSummaryDaoInstance,
-  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig, contractMapConfig) {
+  tokenHolderDaoInstance, subStakeDaoInstance, cacheEnabledConfig, maxBlockPerCrawlConfig, chainTypeConfig, contractMapConfig,
+  tokenMapConfig) {
   blockDao = blockDaoInstance;
   progressDao = progressDaoInstance;
   transactionDao = transactionDaoInstance;
@@ -72,6 +74,7 @@ exports.Initialize = function (progressDaoInstance, blockDaoInstance, transactio
   maxBlockPerCrawl = Number.isNaN(maxBlockPerCrawl) ? 2 : maxBlockPerCrawl;
   chainType = chainTypeConfig || 'mainchain';
   contractMap = contractMapConfig;
+  tokenMap = tokenMapConfig;
 }
 
 exports.Execute = async function (networkId) {
@@ -334,7 +337,7 @@ exports.Execute = async function (networkId) {
     })
     .then(() => {
       Logger.log('update account after handle all stakes')
-      accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, dailyAccountDao, validTransactionList);
+      accountHelper.updateAccount(accountDao, accountTxDao, smartContractDao, dailyAccountDao, validTransactionList, tokenMap);
     })
     .then(async function () {
       validTransactionList = [];

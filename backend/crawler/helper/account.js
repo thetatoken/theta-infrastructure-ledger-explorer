@@ -1,7 +1,10 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
+var get = require('lodash/get');
+var { getHex } = require('./utils');
+var { EventHashMap, CommonEventABIs } = require('./constants');
 
-exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList, tokenMap) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -89,6 +92,33 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
             await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
             await _updateAccountMaps(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
             await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
+          }
+          if (tokenMap.TFuelTransfer && tokenMap.TFuelTransfer.indexOf(tx.receipt.ContractAddress) !== -1) {
+            let logs = get(tx, 'receipt.Logs');
+            logs = JSON.parse(JSON.stringify(logs));
+            logs = logs.map(obj => {
+              obj.data = getHex(obj.data);
+              return obj;
+            })
+            for (let log of logs.entries()) {
+              switch (get(log, 'topics[0]')) {
+                case EventHashMap.TRANSFER:
+                  log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+                  let from = (get(log, 'decode.result[0]') || '').toLowerCase();
+                  if (from !== tx.data.from.address && from !== tx.data.to.address) {
+                    await _updateAccountByAddress(from, accountDao, tx.type);
+                    await _updateAccountMaps(from, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+                  }
+                  let to = (get(log, 'decode.result[1]') || '').toLowerCase();
+                  if (to !== tx.data.from.address && to !== tx.data.to.address) {
+                    await _updateAccountByAddress(to, accountDao, tx.type);
+                    await _updateAccountMaps(to, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }
           }
         }
         break;
@@ -229,4 +259,27 @@ async function _createSmartContract(address, bytecode, smartContractDao) {
       'name': ''
     });
   }
+}
+
+function decodeLogByAbiHash(log, abiHash) {
+  const events = CommonEventABIs[abiHash];
+  for (let event of events) {
+    try {
+      const ifaceTmp = new ethers.utils.Interface([event] || []);
+      let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+      let data = {};
+      Object.keys(bigNumberData).forEach(k => {
+        data[k] = bigNumberData[k].toString();
+      })
+      log.decode = {
+        result: data,
+        eventName: event.name,
+        event: event
+      }
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
+  return log;
 }
