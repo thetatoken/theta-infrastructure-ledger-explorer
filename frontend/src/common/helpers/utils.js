@@ -165,6 +165,31 @@ export function decodeLogs(logs, abiMap) {
   })
 }
 
+export function decodeLogByAbiHash(log, abiHash) {
+  const events = CommonEventABIs[abiHash];
+  console.log('events:', events)
+  for (let event of events) {
+    try {
+      const ifaceTmp = new ethers.utils.Interface([event] || []);
+      let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+      let data = {};
+      Object.keys(bigNumberData).forEach(k => {
+        data[k] = bigNumberData[k].toString();
+      })
+      log.decode = {
+        result: data,
+        eventName: event.name,
+        event: event
+      }
+      break;
+    } catch (e) {
+      console.log('e:', e)
+      continue;
+    }
+  }
+  return log;
+}
+
 export function checkTnt721(abi) {
   const obj = {
     'balanceOf': { contains: false, type: 'function' },

@@ -100,7 +100,7 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
               obj.data = getHex(obj.data);
               return obj;
             })
-            for (let log of logs.entries()) {
+            for (let log of logs) {
               switch (get(log, 'topics[0]')) {
                 case EventHashMap.TRANSFER:
                   log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
