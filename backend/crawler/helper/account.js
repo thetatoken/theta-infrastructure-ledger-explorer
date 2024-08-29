@@ -3,6 +3,7 @@ var Logger = require('./logger');
 var get = require('lodash/get');
 var { getHex } = require('./utils');
 var { EventHashMap, CommonEventABIs } = require('./constants');
+var { ethers } = require("ethers");
 
 exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList, tokenMap) {
   var counter = 0;
@@ -78,17 +79,21 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
         }
         break;
       case 7:
+        let accSet = new Set();
         // Update from account
+        accSet.add(tx.data.from.address);
         await _updateAccountByAddress(tx.data.from.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.from.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update to account
+        accSet.add(tx.data.to.address);
         await _updateAccountByAddress(tx.data.to.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update smart contract account
         if (tx.receipt) {
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
+            accSet.add(tx.receipt.ContractAddress);
             await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
             await _updateAccountMaps(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
             await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
@@ -105,12 +110,14 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
                 case EventHashMap.TRANSFER:
                   log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
                   let from = (get(log, 'decode.result[0]') || '').toLowerCase();
-                  if (from !== tx.data.from.address && from !== tx.data.to.address) {
+                  if (!accSet.has(from)) {
+                    accSet.add(from);
                     await _updateAccountByAddress(from, accountDao, tx.type);
                     await _updateAccountMaps(from, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
                   }
                   let to = (get(log, 'decode.result[1]') || '').toLowerCase();
-                  if (to !== tx.data.from.address && to !== tx.data.to.address) {
+                  if (!accSet.has(to)) {
+                    accSet.add(to);
                     await _updateAccountByAddress(to, accountDao, tx.type);
                     await _updateAccountMaps(to, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
                   }
