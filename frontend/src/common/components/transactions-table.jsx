@@ -3,15 +3,15 @@ import history from 'common/history'
 import { Link } from 'react-router-dom';
 import socketClient from 'socket.io-client';
 import map from 'lodash/map';
+import get from 'lodash/get';
 import cx from 'classnames';
 import truncate from 'lodash/truncate';
 
-import { formatCoin, priceCoin, getCurrencyLabel } from 'common/helpers/utils';
+import { formatCoin, priceCoin, getCurrencyLabel, decodeLogByAbiHash, getHex } from 'common/helpers/utils';
 import { from, to, hash, age, date, type, coins } from 'common/helpers/transactions';
-import { TxnClasses } from 'common/constants';
-
-
-
+import { TxnClasses, EventHashMap } from 'common/constants';
+import config from "../../config";
+import BigNumber from "bignumber.js";
 export default class TransactionTable extends React.Component {
   constructor(props) {
     super(props);
@@ -77,11 +77,13 @@ export default class TransactionTable extends React.Component {
     }
   };
 
+
   render() {
     const { className, includeDetails, truncate, account, price } = this.props;
     const { transactions } = this.state;
     const address = account ? account.address : null;
     const txSet = new Set();
+
     return (
       <table className={cx("data txn-table", className)}>
         <thead>
@@ -101,8 +103,48 @@ export default class TransactionTable extends React.Component {
         </thead>
         <tbody>
           {map(transactions, (txn, i) => {
-            let source = null;
-            source = !account ? 'none' : account.address === from(txn, null, address) ? 'from' : 'to';
+            let cs = coins(txn, account);
+            let source = 'none';
+            let fromAddress, toAddress;
+            if (account) {
+              source = account.address === from(txn, null, address) ? 'from' : 'to';
+              if (config.tokenMap && config.tokenMap.TFuelTransfer) {
+                if (txn.type === 7 && config.tokenMap.TFuelTransfer.indexOf(txn.receipt.ContractAddress) !== -1) {
+                  let logs = get(txn, 'receipt.Logs');
+                  logs = JSON.parse(JSON.stringify(logs));
+                  logs = logs.map(obj => {
+                    obj.data = getHex(obj.data);
+                    return obj;
+                  })
+                  let sum = new BigNumber(0);
+                  for (let log of logs) {
+                    switch (get(log, 'topics[0]')) {
+                      case EventHashMap.TRANSFER:
+                        log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+                        let from = (get(log, 'decode.result[0]') || '').toLowerCase();
+                        let to = (get(log, 'decode.result[1]') || '').toLowerCase();
+                        let value = get(log, 'decode.result[2]');
+                        if (account.address === from) {
+                          sum = sum.plus(value);
+                          source = 'from';
+                          fromAddress = from;
+                          toAddress = to;
+                        }
+                        if (account.address === to) {
+                          sum = new BigNumber(value);
+                          source = 'to';
+                          fromAddress = from;
+                          toAddress = to;
+                        }
+                        break;
+                      default:
+                        break;
+                    }
+                  }
+                  cs = { 'thetawei': 0, 'tfuelwei': sum.toFixed() };
+                }
+              }
+            }
             if (txSet.has(txn.hash)) source = 'to';
             return (
               <tr key={i} className={TxnClasses[txn.type]}>
@@ -113,13 +155,13 @@ export default class TransactionTable extends React.Component {
                     <td className="block">{txn.block_height}</td>
                     <td className="age" title={date(txn)}>{age(txn)}</td>
                     <td className={cx({ 'dim': source === 'to' }, "from")}>
-                      <AddressTNS txn={txn} address={address} type="from" trunc={truncate} txSet={txSet} />
+                      <AddressTNS txn={txn} address={address} type="from" trunc={truncate} txSet={txSet} fromAddress={fromAddress} />
                     </td>
                     <td className={cx(source, "icon")}></td>
                     <td className={cx({ 'dim': source === 'from' }, "to")}>
-                      <AddressTNS txn={txn} address={address} type="to" trunc={truncate} />
+                      <AddressTNS txn={txn} address={address} type="to" trunc={truncate} toAddress={toAddress} />
                     </td>
-                    <td className="value"><Value coins={coins(txn, account)} price={price} /></td>
+                    <td className="value"><Value coins={cs} price={price} /></td>
                   </React.Fragment>}
               </tr>);
           })}
@@ -145,7 +187,7 @@ const Value = ({ coins, price }) => {
     </React.Fragment>)
 }
 
-const AddressTNS = ({ txn, address, type, trunc = 20, txSet }) => {
+const AddressTNS = ({ txn, address, type, trunc = 20, txSet, fromAddress, toAddress }) => {
   if (type === 'from') {
     if (txn && txn.fromTns) {
       return (
@@ -154,10 +196,10 @@ const AddressTNS = ({ txn, address, type, trunc = 20, txSet }) => {
             <p>{txn.fromTns}</p>
             <p>({from(txn, null, address, txSet)})</p>
           </div>
-          <Link to={`/account/${from(txn, null, address)}`}>{truncate(txn.fromTns, { length: trunc })}</Link>
+          <Link to={`/account/${fromAddress || from(txn, null, address)}`}>{truncate(fromAddress || txn.fromTns, { length: trunc })}</Link>
         </div>);
     } else {
-      return (<Link to={`/account/${from(txn, null, address)}`}>{from(txn, trunc, address, txSet)}</Link>)
+      return (<Link to={`/account/${fromAddress || from(txn, null, address)}`}>{truncate(fromAddress, { length: trunc }) || from(txn, trunc, address, txSet)}</Link>)
     }
   } else if (type === 'to') {
     if (txn && txn.toTns) {
@@ -167,10 +209,10 @@ const AddressTNS = ({ txn, address, type, trunc = 20, txSet }) => {
             <p>{txn.toTns}</p>
             <p>({to(txn, null, address)})</p>
           </div>
-          <Link to={`/account/${to(txn, null, address)}`}>{truncate(txn.toTns, { length: trunc })}</Link>
+          <Link to={`/account/${toAddress || to(txn, null, address)}`}>{truncate(toAddress || txn.toTns, { length: trunc })}</Link>
         </div>);
     } else {
-      return (<Link to={`/account/${to(txn, null, address)}`}>{to(txn, trunc, address, txSet)}</Link>)
+      return (<Link to={`/account/${toAddress || to(txn, null, address)}`}>{truncate(toAddress, { length: trunc }) || to(txn, trunc, address, txSet)}</Link>)
     }
   }
   return (<span></span>)

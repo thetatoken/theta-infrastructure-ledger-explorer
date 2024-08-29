@@ -1,7 +1,11 @@
 var rpc = require('../api/rpc.js');
 var Logger = require('./logger');
+var get = require('lodash/get');
+var { getHex } = require('./utils');
+var { EventHashMap, CommonEventABIs } = require('./constants');
+var { ethers } = require("ethers");
 
-exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList) {
+exports.updateAccount = async function (accountDao, accountTxDao, smartContractDao, dailyAccountDao, transactionList, tokenMap) {
   var counter = 0;
   transactionList.forEach(tx => {
     switch (tx.type) { // TODO: Add other type cases
@@ -75,20 +79,53 @@ exports.updateAccount = async function (accountDao, accountTxDao, smartContractD
         }
         break;
       case 7:
+        let accSet = new Set();
         // Update from account
+        accSet.add(tx.data.from.address);
         await _updateAccountByAddress(tx.data.from.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.from.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update to account
+        accSet.add(tx.data.to.address);
         await _updateAccountByAddress(tx.data.to.address, accountDao, tx.type);
         await _updateAccountMaps(tx.data.to.address, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
 
         // Update smart contract account
         if (tx.receipt) {
           if (tx.receipt.ContractAddress !== tx.data.to.address) {
+            accSet.add(tx.receipt.ContractAddress);
             await _updateAccountByAddress(tx.receipt.ContractAddress, accountDao, tx.type);
             await _updateAccountMaps(tx.receipt.ContractAddress, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
             await _createSmartContract(tx.receipt.ContractAddress, tx.data.data, smartContractDao);
+          }
+          if (tokenMap.TFuelTransfer && tokenMap.TFuelTransfer.indexOf(tx.receipt.ContractAddress) !== -1) {
+            let logs = get(tx, 'receipt.Logs');
+            logs = JSON.parse(JSON.stringify(logs));
+            logs = logs.map(obj => {
+              obj.data = getHex(obj.data);
+              return obj;
+            })
+            for (let log of logs) {
+              switch (get(log, 'topics[0]')) {
+                case EventHashMap.TRANSFER:
+                  log = decodeLogByAbiHash(log, EventHashMap.TRANSFER);
+                  let from = (get(log, 'decode.result[0]') || '').toLowerCase();
+                  if (!accSet.has(from)) {
+                    accSet.add(from);
+                    await _updateAccountByAddress(from, accountDao, tx.type);
+                    await _updateAccountMaps(from, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+                  }
+                  let to = (get(log, 'decode.result[1]') || '').toLowerCase();
+                  if (!accSet.has(to)) {
+                    accSet.add(to);
+                    await _updateAccountByAddress(to, accountDao, tx.type);
+                    await _updateAccountMaps(to, tx.hash, tx.type, tx.timestamp, accountTxDao, dailyAccountDao);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }
           }
         }
         break;
@@ -229,4 +266,27 @@ async function _createSmartContract(address, bytecode, smartContractDao) {
       'name': ''
     });
   }
+}
+
+function decodeLogByAbiHash(log, abiHash) {
+  const events = CommonEventABIs[abiHash];
+  for (let event of events) {
+    try {
+      const ifaceTmp = new ethers.utils.Interface([event] || []);
+      let bigNumberData = ifaceTmp.decodeEventLog(event.name, log.data, log.topics);
+      let data = {};
+      Object.keys(bigNumberData).forEach(k => {
+        data[k] = bigNumberData[k].toString();
+      })
+      log.decode = {
+        result: data,
+        eventName: event.name,
+        event: event
+      }
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
+  return log;
 }
