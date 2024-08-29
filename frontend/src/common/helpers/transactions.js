@@ -171,6 +171,7 @@ export function date(txn) {
 export function coins(txn, account = null) {
   let coins = { 'thetawei': 0, 'tfuelwei': 0 };
   let outputs = null, inputs = null, index = 0;
+  if (!txn.data) return coins;
   switch (txn.type) {
     case TxnTypes.COINBASE:
       outputs = get(txn, 'data.outputs');
