@@ -48,6 +48,24 @@ var RandomIdGenerator = function () {
 
 const MAX_CONCURRENCY = 100;
 
+var createAgent = (isHttps) => {
+  return isHttps
+    ? new https.Agent({
+      keepAlive: true,
+      maxSockets: 50,
+      maxFreeSockets: 10,
+      timeout: 30000,
+      freeSocketTimeout: 30000,
+    })
+    : new http.Agent({
+      keepAlive: true,
+      maxSockets: 50,
+      maxFreeSockets: 10,
+      timeout: 30000,
+      freeSocketTimeout: 30000,
+    });
+};
+
 var ProcessHttpRequest = (function (maxConcurrency) {
   var requestQueue = [];
   var outstandingRequests = 0;
@@ -79,7 +97,8 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
     port: port,
     method: method,
     path: path,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
+    agent: createAgent(isHttps),
   };
   if (config.log.level == 'debug') {
     console.log('[Debug] ____');
