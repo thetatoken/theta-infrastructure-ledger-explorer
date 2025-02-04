@@ -114,12 +114,31 @@ var RandomIdGenerator = function () {
   var id = '';
   var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var length = 8;
-  for (var i = 0; i < length; i++)
+  for (var i = 0; i < length; i++) {
     id += charSet.charAt(Math.floor(Math.random() * charSet.length));
+  }
   return id;
-}
+};
 
-const MAX_CONCURRENCY = 100;
+var MAX_CONCURRENCY = 100;
+
+var createAgent = (isHttps) => {
+  return isHttps
+    ? new https.Agent({
+      keepAlive: true,
+      maxSockets: 50,
+      maxFreeSockets: 10,
+      timeout: config.requestTimeoutMs || 30000,
+      freeSocketTimeout: config.requestTimeoutMs || 30000,
+    })
+    : new http.Agent({
+      keepAlive: true,
+      maxSockets: 50,
+      maxFreeSockets: 10,
+      timeout: config.requestTimeoutMs || 30000,
+      freeSocketTimeout: config.requestTimeoutMs || 30000,
+    });
+};
 
 var ProcessHttpRequest = (function (maxConcurrency) {
   var requestQueue = [];
@@ -155,11 +174,12 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
     method: method,
     path: path,
     headers: { 'Content-Type': 'application/json' },
-    timeout: timeout
+    timeout: timeout,
+    agent: createAgent(isHttps),
   };
-  if (config.log.level == 'debug') {
+  if (config && config.log && config.log.level === 'debug') {
     console.log('[Debug] ____');
-    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);
+    console.log('[Debug] HTTP Request:', JSON.stringify(options), requestBody);
   }
 
   const protocol = isHttps ? https : http;
@@ -172,8 +192,8 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
         body += dataBlock;
       });
       res.on('end', function () {
-        if (config.log.level == 'debug') {
-          console.log('[Debug]' + body);
+        if (config && config.log && config.log.level === 'debug') {
+          console.log('[Debug] Response:', body);
           console.log('[Debug] ____');
         }
 
@@ -183,19 +203,22 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
 
     req.setTimeout(timeout, function () {
       req.abort();
-      callback('Request Timeout: ' + path, null);
-      callback = null;
+      if (callback) {
+        callback(new Error(`Request Timeout: ${path}`), null);
+      }
     });
 
     req.on('error', function (error) {
-      console.log('req error: ' + error)
+      console.log('[Error] Request Error:', error);
       if (callback) { callback(error, null); }
     });
 
     req.write(requestBody);
     req.end();
+  } catch (error) {
+    console.error('[Error] Exception:', error);
+    if (callback) {
+      callback(error.stack, null);
+    }
   }
-  catch (error) {
-    callback(error.stack, null);
-  }
-}
+};
