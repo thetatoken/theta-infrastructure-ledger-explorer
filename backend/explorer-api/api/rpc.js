@@ -46,25 +46,25 @@ var RandomIdGenerator = function () {
   return id;
 }
 
-const MAX_CONCURRENCY = 100;
+const MAX_CONCURRENCY = 50;
 
-var createAgent = (isHttps) => {
-  return isHttps
-    ? new https.Agent({
-      keepAlive: true,
-      maxSockets: 50,
-      maxFreeSockets: 10,
-      timeout: config.requestTimeoutMs || 60000,
-      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
-    })
-    : new http.Agent({
-      keepAlive: true,
-      maxSockets: 50,
-      maxFreeSockets: 10,
-      timeout: config.requestTimeoutMs || 60000,
-      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
-    });
-};
+var agentHttp = new http.Agent({
+  keepAlive: true,
+  maxSockets: 200,
+  maxFreeSockets: 50,
+  timeout: config.requestTimeoutMs + 5000 || 65000,
+  freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
+});
+
+var agentHttps = new https.Agent({
+  keepAlive: true,
+  maxSockets: 200,
+  maxFreeSockets: 50,
+  timeout: config.requestTimeoutMs + 5000 || 65000,
+  freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
+});
+
+var createAgent = (isHttps) => (isHttps ? agentHttps : agentHttp);
 
 var ProcessHttpRequest = (function (maxConcurrency) {
   var requestQueue = [];
