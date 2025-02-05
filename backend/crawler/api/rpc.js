@@ -128,15 +128,15 @@ var createAgent = (isHttps) => {
       keepAlive: true,
       maxSockets: 50,
       maxFreeSockets: 10,
-      timeout: config.requestTimeoutMs || 30000,
-      freeSocketTimeout: config.requestTimeoutMs || 30000,
+      timeout: config.requestTimeoutMs || 60000,
+      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
     })
     : new http.Agent({
       keepAlive: true,
       maxSockets: 50,
       maxFreeSockets: 10,
-      timeout: config.requestTimeoutMs || 30000,
-      freeSocketTimeout: config.requestTimeoutMs || 30000,
+      timeout: config.requestTimeoutMs || 60000,
+      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
     });
 };
 
