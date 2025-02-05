@@ -5,6 +5,8 @@ var https = require("https");
 //  Global variables
 //------------------------------------------------------------------------------
 var config = null;
+var agentHttp = null;
+var agentHttps = null;
 
 //------------------------------------------------------------------------------
 //  APIs
@@ -122,23 +124,33 @@ var RandomIdGenerator = function () {
 
 var MAX_CONCURRENCY = 50;
 
-var agentHttp = new http.Agent({
-  keepAlive: true,
-  maxSockets: 200,
-  maxFreeSockets: 50,
-  timeout: config.requestTimeoutMs + 5000 || 65000,
-  freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
-});
+var createAgentHttp = () => {
+  if (!config) throw new Error("Config not set. Call setConfig() before using RPC.");
+  if (!agentHttp) {
+    agentHttp = new http.Agent({
+      keepAlive: true,
+      maxSockets: 200,
+      maxFreeSockets: 50,
+      timeout: (config.requestTimeoutMs || 60000) + 5000,
+      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
+    });
+  }
+  return agentHttp;
+};
 
-var agentHttps = new https.Agent({
-  keepAlive: true,
-  maxSockets: 200,
-  maxFreeSockets: 50,
-  timeout: config.requestTimeoutMs + 5000 || 65000,
-  freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
-});
-
-var createAgent = (isHttps) => (isHttps ? agentHttps : agentHttp);
+var createAgentHttps = () => {
+  if (!config) throw new Error("Config not set. Call setConfig() before using RPC.");
+  if (!agentHttps) {
+    agentHttps = new https.Agent({
+      keepAlive: true,
+      maxSockets: 200,
+      maxFreeSockets: 50,
+      timeout: (config.requestTimeoutMs || 60000) + 5000,
+      freeSocketTimeout: config.freeSocketTimeoutMs || 10000,
+    });
+  }
+  return agentHttps;
+};
 
 var ProcessHttpRequest = (function (maxConcurrency) {
   var requestQueue = [];
@@ -175,7 +187,7 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
     path: path,
     headers: { 'Content-Type': 'application/json' },
     timeout: timeout,
-    agent: createAgent(isHttps),
+    agent: isHttps ? createAgentHttps() : createAgentHttp(),
   };
   if (config && config.log && config.log.level === 'debug') {
     console.log('[Debug] ____');
