@@ -194,9 +194,9 @@ function main() {
           key: privateKey,
           cert: certificate
         };
-        var spdy = require('spdy');
-        restServer = spdy.createServer(options, app);
-        socketIOServer = spdy.createServer(options, app);
+        var https = require('https');
+        restServer = https.createServer(options, app);
+        socketIOServer = https.createServer(options, app);
       } else {
         var http = require('http');
         restServer = http.createServer(app);

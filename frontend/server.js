@@ -42,7 +42,7 @@ if (process.env.DISABLE_SSL !== 'true') {
     key: privateKey,
     cert: certificate
   };
-  var h2 = require('spdy').createServer(options, app);
+  var h2 = require('https').createServer(options, app);
 
 
   h2.listen(port, function (err) {
