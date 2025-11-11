@@ -104,7 +104,7 @@ var processHttpRequest = function (host, port, method, path = '/rpc', requestBod
   };
   if (config.log.level == 'debug') {
     console.log('[Debug] ____');
-    console.log('[Debug] Http request: ' + JSON.stringify(options) + ' ' + requestBody);
+    console.log('[Debug] HTTP requestBody:', requestBody)
   }
 
   const protocol = isHttps ? https : http;
