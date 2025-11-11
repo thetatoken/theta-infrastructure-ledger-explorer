@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:12.19.0
+FROM node:24.11.0
 ENV NODE_ENV=production
 ENV MONGO_HOST "host.docker.internal"
 

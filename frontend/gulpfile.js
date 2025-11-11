@@ -1,5 +1,5 @@
 let gulp = require('gulp'),
-  sass = require('gulp-sass'),
+  sass = require('gulp-sass')(require('sass')),
   cssnano = require('gulp-cssnano'),
   prefixer = require('gulp-autoprefixer'),
   webpack = require("webpack-stream"),

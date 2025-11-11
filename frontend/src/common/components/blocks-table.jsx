@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import socketClient from 'socket.io-client';
+import { io } from "socket.io-client";
 import history from 'common/history'
 import cx from 'classnames';
 import config from '../../config.js'
@@ -62,7 +62,9 @@ export default class BlockOverviewTable extends React.Component {
     if (this.socket) return;
 
     const { backendAddress } = this.state;
-    this.socket = socketClient(backendAddress);
+    this.socket = io(backendAddress, {
+      transports: ['websocket']
+    });
     this.socket.on('PUSH_TOP_BLOCKS', this.onSocketEvent)
   };
 
