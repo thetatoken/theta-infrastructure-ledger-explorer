@@ -204,7 +204,12 @@ function main() {
       }
 
       // start server program
-      io = require('socket.io')(socketIOServer);
+      io = require('socket.io')(socketIOServer, {
+        cors: {
+          origin: "*",
+          methods: ["GET", "POST"]
+        }
+      });
       io.on('connection', onClientConnect);
 
       socketIOServer.listen(config.server.socketIOPort || '2096', () => {
@@ -250,7 +255,7 @@ function main() {
 }
 
 function onClientConnect(client) {
-  console.log('client connected.');
+  console.log('client connected:', client.id);
   isPushingData = true;
   pushTopBlocks();
   pushTopTransactions();

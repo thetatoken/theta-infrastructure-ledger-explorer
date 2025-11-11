@@ -59,7 +59,7 @@
     "reactstrap": "^6.2.0",
     "sass": "^1.79.4",
     "sass-loader": "^10.5.2",
-    "socket.io": "^4.8.0",
+    "socket.io": "^4.4.1",
     "style-loader": "^1.3.0",
     "tns-resolver": "^2.0.4",
     "webpack": "^4.29.5",

@@ -1,7 +1,7 @@
 import React from "react";
 import history from 'common/history'
 import { Link } from 'react-router-dom';
-import socketClient from 'socket.io-client';
+import { io } from "socket.io-client";
 import map from 'lodash/map';
 import get from 'lodash/get';
 import cx from 'classnames';
@@ -65,7 +65,9 @@ export default class TransactionTable extends React.Component {
     if (this.socket) return;
 
     const { backendAddress } = this.state;
-    this.socket = socketClient(backendAddress);
+    this.socket = io(backendAddress, {
+      transports: ['websocket']
+    });
     this.socket.on('PUSH_TOP_TXS', this.onSocketEvent)
   };
 
