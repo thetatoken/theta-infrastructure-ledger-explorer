@@ -88,6 +88,11 @@
       background-image: url("/images/icons/icon-bullit.jpeg");
     }
   }
+  &.tpulse {
+    &:before {
+      background-image: url("/images/icons/icon-tpulse-token.png");
+    }
+  }
 }
 
 .currency-link {

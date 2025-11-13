@@ -6,7 +6,9 @@
   &__info {
     flex: 6;
     padding-right: 20px;
-    border-right: 1px solid rgba($color-font-light, 0.2);
+    &.no-links {
+      padding: 0 10%;
+    }
     &--title {
       font-weight: 600;
       font-size: 11px;
@@ -45,6 +47,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border-left: 1px solid rgba($color-font-light, 0.2);
     &--websites {
       display: flex;
       flex-wrap: wrap;

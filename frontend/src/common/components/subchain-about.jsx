@@ -3,9 +3,13 @@ import get from 'lodash/get';
 import config from "../../config";
 
 const SubchainAbout = ({ }) => {
-
-  return <div className="subchain-about">
-    <div className="subchain-about__info">
+  const hasWebsites = config.links.website && config.links.cmc
+    && config.links.whitePaper && config.links.ck;
+  const hasSocialMedia = config.links.tg && config.links.twitter
+    && config.links.discord && config.links.medium;
+  const hasLinks = hasWebsites && hasSocialMedia;
+  return <div className={`subchain-about`}>
+    <div className={`subchain-about__info ${hasLinks ? '' : 'no-links'}`}>
       <div className="subchain-about__info--title">
         About {getSubchainName(config.chainName)}
       </div>
@@ -16,8 +20,8 @@ const SubchainAbout = ({ }) => {
         {config.chainDescription}
       </div>
     </div>
-    <div className="subchain-about__links">
-      <div className="subchain-about__links--websites">
+    {hasLinks && <div className="subchain-about__links">
+      {hasWebsites && <div className="subchain-about__links--websites">
         {config.links.website && <a className="subchain-about__links--link" href={config.links.website} target="_blank" rel="noreferrer">
           <div className="subchain-about__links--icon website"></div>
           {removeHttps(config.links.website)}
@@ -34,8 +38,8 @@ const SubchainAbout = ({ }) => {
           <div className="subchain-about__links--icon ck"></div>
           Coingecko.com
         </a>}
-      </div>
-      <div className="subchain-about__sm">
+      </div>}
+      {hasSocialMedia && <div className="subchain-about__sm">
         <div className="subchain-about__sm--title">
           SOCIAL MEDIA
         </div>
@@ -53,8 +57,8 @@ const SubchainAbout = ({ }) => {
             <div className="subchain-about__links--icon medium"></div>
           </a>}
         </div>
-      </div>
-    </div>
+      </div>}
+    </div>}
   </div>
 }
 
