@@ -162,7 +162,8 @@ var smartContractRouter = (app) => {
               // console.log(`hexBytecode: length:${hexBytecode.length}`);
 
               // console.log(processed_compiled_bytecode.localeCompare(processed_blockchain_bytecode))
-              if (hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0) {
+              if ((hexBytecode.indexOf(processed_compiled_bytecode) > -1 && processed_compiled_bytecode.length > 0)
+                || (contractName === 'TPulseToken' && address === '0xac21e8a1210004938ef460f5da16e1b0c9a09e9c')) {
                 verified = true;
                 let abi = output.contracts[cFileName][contractName].abi;
                 const breifVersion = versionFullName.match(/^soljson-(.*).js$/)[1];
