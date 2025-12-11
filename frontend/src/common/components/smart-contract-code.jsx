@@ -62,7 +62,6 @@ const Options = () => {
     "0.7.0": "soljson-v0.7.0+commit.9e61f92b.js"
   }
   let releases = window.soljsonReleases;
-  console.log('releases:', releases)
   return (<>
     <option value='' key='empty'>[Please select]</option>
     {Object.keys(releases).map(key => {
@@ -126,7 +125,7 @@ const CodeUploader = props => {
         fileObj[files[i].name] = { content: fileContents };
       }
     }
-    console.log('fileObj:', fileObj)
+    // console.log('fileObj:', fileObj)
     const libs = {};
     // libRefs.current.forEach((arr, index) => {
     //   if (arr[0].current.value && arr[1].current.value) {
@@ -142,7 +141,7 @@ const CodeUploader = props => {
     const optimizerRuns = optimizerRunsRef.current.value;
     const evm = evmRef.current.value;
     const viaIR = viaIRRef.current.value;
-    console.log('optimizerRuns:', optimizerRuns);
+    // console.log('optimizerRuns:', optimizerRuns);
     const byteCode = get(props, 'smartContract.bytecode');
     setUploaderSourceCode(sourceCode);
     setUploaderAbi(abi);
@@ -171,17 +170,17 @@ const CodeUploader = props => {
     smartContractService.verifySourceCode(address, sourceCode, abi, version, versionFullname, optimizer, optimizerRuns, isSingleFile, libs, evm, viaIR)
       .then(res => {
         setIsVerifying(false);
-        console.log('res from verify source code:', res);
+        // console.log('res from verify source code:', res);
         let isVerified = get(res, 'data.result.verified')
         let error = get(res, 'data.err_msg')
-        console.log('result: ', isVerified)
+        // console.log('result: ', isVerified)
         if (isVerified === true) { fetchSmartContract(address) }
         else if (error) { setErrMsg(error) }
         else setErrMsg('Code does not match.')
       }).catch(e => {
         setIsVerifying(false);
         setErrMsg('Something wrong in the verification process.')
-        console.log('error:', e)
+        // console.log('error:', e)
         console.log('error:', e.message)
       })
   }
