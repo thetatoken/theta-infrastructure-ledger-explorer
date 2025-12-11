@@ -85,6 +85,7 @@ export default class SmartContract extends React.PureComponent {
       script.onload = () => {
         if (callback) callback();
       };
+      
     }
     if (existingScript && callback) callback();
   }

@@ -29,15 +29,47 @@ export default class SmartContractCode extends React.PureComponent {
 }
 
 const Options = () => {
+  if (!window.soljsonReleases) window.soljsonReleases = {
+    "0.8.26": "soljson-v0.8.26+commit.45c2d7f2.js",
+    "0.8.25": "soljson-v0.8.25+commit.59dbf8f1.js",
+    "0.8.24": "soljson-v0.8.24+commit.7e36bb15.js",
+    "0.8.23": "soljson-v0.8.23+commit.8df45f5f.js",
+    "0.8.22": "soljson-v0.8.22+commit.8b3a9e20.js",
+    "0.8.21": "soljson-v0.8.21+commit.d4a1f52f.js",
+    "0.8.20": "soljson-v0.8.20+commit.a1b79de0.js",
+    "0.8.19": "soljson-v0.8.19+commit.7dd6d404.js",
+    "0.8.18": "soljson-v0.8.18+commit.87f61d96.js",
+    "0.8.17": "soljson-v0.8.17+commit.8df45f5f.js",
+    "0.8.16": "soljson-v0.8.16+commit.07a7930e.js",
+    "0.8.15": "soljson-v0.8.15+commit.e14f2714.js",
+    "0.8.14": "soljson-v0.8.14+commit.80d49f37.js",
+    "0.8.13": "soljson-v0.8.13+commit.abaa5c0e.js",
+    "0.8.12": "soljson-v0.8.12+commit.f00d7308.js",
+    "0.8.11": "soljson-v0.8.11+commit.869f8a7e.js",
+    "0.8.10": "soljson-v0.8.10+commit.fc410830.js",
+    "0.8.9": "soljson-v0.8.9+commit.e5eed63a.js",
+    "0.8.8": "soljson-v0.8.8+commit.dddeac2f.js",
+    "0.8.7": "soljson-v0.8.7+commit.e28d00a7.js",
+    "0.8.6": "soljson-v0.8.6+commit.11564f7e.js",
+    "0.8.5": "soljson-v0.8.5+commit.a4f2e591.js",
+    "0.8.4": "soljson-v0.8.4+commit.c7e474f2.js",
+    "0.7.6": "soljson-v0.7.6+commit.7338295f.js",
+    "0.7.5": "soljson-v0.7.5+commit.eb77ed08.js",
+    "0.7.4": "soljson-v0.7.4+commit.3f05b770.js",
+    "0.7.3": "soljson-v0.7.3+commit.9bfce1f6.js",
+    "0.7.2": "soljson-v0.7.2+commit.51b20bc0.js",
+    "0.7.1": "soljson-v0.7.1+commit.f4a555be.js",
+    "0.7.0": "soljson-v0.7.0+commit.9e61f92b.js"
+  }
   let releases = window.soljsonReleases;
-  return (
-    <>
-      <option value='' key='empty'>[Please select]</option>
-      {Object.keys(releases).map(key => {
-        let text = releases[key].match(/^soljson-(.*).js$/)[1];
-        return (<option value={key} key={key}>{text}</option>)
-      })}
-    </>
+  console.log('releases:', releases)
+  return (<>
+    <option value='' key='empty'>[Please select]</option>
+    {Object.keys(releases).map(key => {
+      let text = releases[key].match(/^soljson-(.*).js$/)[1];
+      return (<option value={key} key={key}>{text}</option>)
+    })}
+  </>
   )
 }
 const CodeUploader = props => {
