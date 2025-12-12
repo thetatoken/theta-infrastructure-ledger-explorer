@@ -59,6 +59,7 @@ const buildSASS = done => {
       done();
     })
     .pipe(cssnano())
+    //
     .pipe(hash())
     .pipe(gulp.dest(paths.sass_dest))
     .pipe(hash.manifest('css.json', {
@@ -66,6 +67,7 @@ const buildSASS = done => {
       sourceDir: paths.sass_dest,
       destDir: paths.sass_dest
     }))
+    //
     .pipe(gulp.dest(paths.sass_dest))
     .pipe(browserSync.stream());
 }
