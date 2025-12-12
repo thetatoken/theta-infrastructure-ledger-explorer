@@ -3,24 +3,29 @@ var MemoryStream = require('memorystream');
 var keccak256 = require('js-sha3').keccak256;
 var fs = require('fs')
 
-
 function getVersionList() {
   return new Promise((resolve, reject) => {
     console.log('Retrieving available version list...');
 
-    var mem = new MemoryStream(null, { readable: false });
-    https.get('https://solc-bin.ethereum.org/bin/list.json', function (response) {
+    const mem = new MemoryStream(null, { readable: false });
+    https.get('https://binaries.soliditylang.org/bin/list.json', (response) => {
       if (response.statusCode !== 200) {
-        reject('Error downloading list: ' + response.statusCode)
+        reject('Error downloading list: ' + response.statusCode);
         return;
       }
       response.pipe(mem);
-      response.on('end', function () {
-        resolve(JSON.parse(mem.toString()))
+      mem.on('finish', () => {
+        try {
+          const json = JSON.parse(mem.toString());
+          resolve(json);
+        } catch (e) {
+          reject('Invalid JSON in list.json: ' + e);
+        }
       });
-    });
-  })
+    }).on('error', reject);
+  });
 }
+
 function downloadBinary(outputName, version, expectedHash) {
   return new Promise((resolve, reject) => {
     const prefix = outputName.slice(0, outputName.lastIndexOf('/'))
@@ -42,7 +47,7 @@ function downloadBinary(outputName, version, expectedHash) {
     process.on('SIGINT', handleInt);
 
     var file = fs.createWriteStream(outputName, { encoding: 'binary' });
-    https.get('https://solc-bin.ethereum.org/bin/' + version, function (response) {
+    https.get('https://binaries.soliditylang.org/bin/' + version, function (response) {
       if (response.statusCode !== 200) {
         reject('Error downloading file: ' + response.statusCode);
         return;
