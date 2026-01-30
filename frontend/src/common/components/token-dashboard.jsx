@@ -50,19 +50,26 @@ export default class TokenDashboard extends React.PureComponent {
       let txNumber = []
       let res = await transactionsService.getTransactionHistory(MAX_RECORD_DAYS, uri);
       let txHistory = get(res, 'data.body.data');
-      txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach(info => {
-        txTs.push(new Date(info.timestamp * 1000));
-        txNumber.push(info.number);
-      })
+      const curDate = Math.floor(new Date().getTime() / 1000) - 60 * 60 * 24 * 180;
+      txHistory
+        .filter(o => Number(o.timestamp) > curDate)
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .forEach(info => {
+          txTs.push(new Date(info.timestamp * 1000));
+          txNumber.push(info.number);
+        })
       const subChains = config.chainInfo.subchains
       for (let i = 0; i < subChains.length; i++) {
         let uri = subChains[i].hostApi + ':' + subChains[i].restApiPort + '/api/'
         try {
           res = await transactionsService.getTransactionHistory(MAX_RECORD_DAYS, uri);
           txHistory = get(res, 'data.body.data');
-          txHistory.sort((a, b) => a.timestamp - b.timestamp).forEach((info, i) => {
-            txNumber[i] += info.number;
-          })
+          txHistory
+            .filter(o => Number(o.timestamp) > curDate)
+            .sort((a, b) => a.timestamp - b.timestamp)
+            .forEach((info, i) => {
+              txNumber[i] += info.number;
+            })
         } catch (e) {
           console.log('error in fetch subchain transation history:', e)
         }
@@ -174,7 +181,7 @@ export default class TokenDashboard extends React.PureComponent {
     const token = type.toUpperCase();
     const isTheta = type === 'theta';
     const isSubChain = config.chainType === ChainType.SUBCHAIN;
-    const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (1 YEAR)' :
+    const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (6 MONTHS)' :
       "SUBCHAIN TRANSACTION HISTORY (14 DAYS)";
     return (
       <React.Fragment>
