@@ -16,7 +16,7 @@ const SubchainChart = ({ }) => {
 
   useEffect(() => {
     function getTransactionHistory() {
-      transactionsService.getTransactionHistory(14)
+      transactionsService.getTransactionHistory(180)
         .then(res => {
           const txHistory = get(res, 'data.body.data');
           let txTs = [];
@@ -82,7 +82,7 @@ const SubchainChart = ({ }) => {
     <div></div>
     <div className="subchain-chart__column">
       {txNumber.length > 0 && <div className="chart-container">
-        <div className="title">SUBCHAIN TRANSACTION HISTORY (14 DAYS)</div>
+        <div className="title">SUBCHAIN TRANSACTION HISTORY (6 MONTHS)</div>
         <ThetaChart chartType={'line'} labels={txTs} data={txNumber} clickType={''} />
       </div>}
     </div>
