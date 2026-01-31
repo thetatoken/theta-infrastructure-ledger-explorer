@@ -14,14 +14,22 @@ const getLineOptions = (type, data, labels, ctx) => {
   let gradient = ctx.createLinearGradient(0, 0, 0, 110);
   gradient.addColorStop(0, 'rgba(37,196,228,.25)');
   gradient.addColorStop(1, 'rgba(37,196,228,0)');
-  const timeOpt = (isMetaChain || isMainChain) ? {
+  // const timeOpt = (isMetaChain || isMainChain) ? {
+  //   unit: 'quarter',
+  //   displayFormats: {
+  //     quarter: 'MMM YYYY'
+  //   }
+  // } : { unit: 'week' }
+  // const ticksOpt = (isMetaChain || isMainChain) ? { maxTicksLimit: 3 } : { source: 'auto' }
+  // const pointRadius = (isMetaChain || isMainChain) ? 0 : 2;
+  const timeOpt = {
     unit: 'quarter',
     displayFormats: {
       quarter: 'MMM YYYY'
     }
-  } : { unit: 'week' }
-  const ticksOpt = (isMetaChain || isMainChain) ? { maxTicksLimit: 3 } : { source: 'auto' }
-  const pointRadius = (isMetaChain || isMainChain) ? 0 : 2;
+  }
+  const ticksOpt = { maxTicksLimit: 3 };
+  const pointRadius = 0;
   return {
     type: type,
     data: {

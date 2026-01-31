@@ -77,7 +77,7 @@ export default class TokenDashboard extends React.PureComponent {
       this.setState({ txTs, txNumber })
       return;
     }
-    transactionsService.getTransactionHistory(14, uri)
+    transactionsService.getTransactionHistory(180, uri)
       .then(res => {
         const txHistory = get(res, 'data.body.data');
         let txTs = [];
@@ -182,7 +182,7 @@ export default class TokenDashboard extends React.PureComponent {
     const isTheta = type === 'theta';
     const isSubChain = config.chainType === ChainType.SUBCHAIN;
     const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (6 MONTHS)' :
-      "SUBCHAIN TRANSACTION HISTORY (14 DAYS)";
+      "SUBCHAIN TRANSACTION HISTORY (6 MONTHS)";
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("dashboard-row", type)}>
