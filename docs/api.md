@@ -467,7 +467,7 @@ This API returns a list of block of given the page number and limit number.
 **Query Parameters**
 
 - blockStart: the lowest block height wants to query
-- blockEnd: the heighest block height wants to query
+- blockEnd: the highest block height wants to query
 
 **Returns**
 
@@ -587,7 +587,7 @@ This API returns the list of top token holders.
 
 **Returns**
 
-- For each acount it is similar to the returns of the GetAccount API. Please [see above](#getaccount).
+- For each account it is similar to the returns of the GetAccount API. Please [see above](#getaccount).
 
 **Example**
 ```

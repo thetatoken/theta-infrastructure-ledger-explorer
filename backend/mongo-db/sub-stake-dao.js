@@ -16,7 +16,7 @@ module.exports = class subStakeDAO {
     const queryObj = { _id: stakeInfo._id };
     this.client.upsert(this.stakeInfoCollection, queryObj, stakeInfo, async function (error, record) {
       if (error) {
-        console.log('error happend in stake upsert')
+        console.log('error happened in stake upsert')
       } else {
         callback(error, record);
       }
