@@ -21,6 +21,7 @@ import map from 'lodash/map';
 import cx from 'classnames';
 import { useIsMountedRef } from 'common/helpers/hooks';
 import { arrayUnique } from 'common/helpers/tns';
+import { TokenIcons } from 'common/constants';
 import history from 'common/history'
 import tns from 'libs/tns';
 
@@ -307,7 +308,7 @@ const TokenDetails = ({ match, location }) => {
 }
 
 const TokenName = ({ info }) => {
-  return <div className={cx({ 'currency tdrop': info.name === 'TDrop Token' })}>
+  return <div className={cx(TokenIcons[info.name], { 'currency': TokenIcons[info.name] })}>
     {info.name}{info.type === 'TNT-20' && info.symbol && `  (${info.symbol})`}
   </div>
 }

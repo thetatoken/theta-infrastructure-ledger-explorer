@@ -35,7 +35,7 @@ const NUM_TRANSACTIONS = 20;
 const today = new Date().toISOString().split("T")[0];
 const INITIAL_TOKEN_BALANCE = {
   WTheta: '0', TDrop: '0', WTFuel: '0', TBill: '0', Lavita: '0',
-  vLavita: '0', POG: '0', 'PLASM': '0', Grove: '0', WBULT: '0', BULT: '0'
+  vLavita: '0', POG: '0', 'PLASM': '0', Grove: '0', WBULT: '0', BULT: '0', FUN: '0'
 };
 let scrollTimes = 0;
 let maxScrollTimes = 1;
@@ -52,7 +52,8 @@ const tokenMap = {
   PLASM: '0x5c2fB1E2594E85C5f1579b07DD5b8DFEA3F929E0',
   Grove: '0xC1cFF4648D490480F3B7E1449aaE5f7a34A75DFA',
   WBULT: '0x27f4ab4d5d21a9ce8d152a6b22c6bf77574632d5',
-  BULT: '0xb97c24d014cabdb8744f198a16918497effc36e5'
+  BULT: '0xb97c24d014cabdb8744f198a16918497effc36e5',
+  FUN: '0xecc049f662939324a307bbe13d34e55e0466a2d4'
 }
 const decimalsMap = {
   'WTheta': 18,
@@ -66,7 +67,8 @@ const decimalsMap = {
   'PLASM': 18,
   'Grove': 18,
   'WBULT': 16,
-  'BULT': 16
+  'BULT': 16,
+  'FUN': 18
 }
 
 export default class AccountDetails extends React.Component {
