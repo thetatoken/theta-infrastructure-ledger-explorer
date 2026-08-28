@@ -165,7 +165,22 @@ var accountTxRouter = (app, accountDao, accountTxDao, transactionDao) => {
     let { type = 2, isEqualType = 'true', pageNumber = 1, limitNumber = 10, types = null } = req.query;
     type = parseInt(type);
     if (types !== -1 && types !== null) {
-      type = JSON.parse(types).map(c => parseInt(c))
+      let parsedTypes;
+      try {
+        parsedTypes = JSON.parse(types);
+      } catch (e) {
+        res.status(400).send({ type: 'invalid_types' });
+        return;
+      }
+      if (!Array.isArray(parsedTypes)) {
+        res.status(400).send({ type: 'invalid_types' });
+        return;
+      }
+      type = parsedTypes.map(c => parseInt(c));
+      if (type.some(isNaN)) {
+        res.status(400).send({ type: 'invalid_types' });
+        return;
+      }
     }
     pageNumber = parseInt(pageNumber);
     limitNumber = parseInt(limitNumber);

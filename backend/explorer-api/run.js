@@ -70,6 +70,14 @@ var isPushingData = false;
 //  Start from here
 //------------------------------------------------------------------------------
 
+// Node >= 15 terminates the process on an unhandled rejection by default. An
+// async route handler that throws produces one, since express 4 ignores the
+// promise it returns, so a single bad request would take down the whole server.
+// Log and keep serving instead; the offending request is left to time out.
+process.on('unhandledRejection', function (reason) {
+  console.log('Unhandled rejection:', reason);
+});
+
 main();
 
 //------------------------------------------------------------------------------
