@@ -14,6 +14,7 @@ import config from "../../config";
 import { ChainType } from "../constants";
 
 const MAX_RECORD_DAYS = 365;
+const TRANSACTION_HISTORY_DAYS = 30;
 
 const host = window.location.host;
 const isMetaChain = host.match(/metachain-explorer/gi) !== null;
@@ -50,7 +51,7 @@ export default class TokenDashboard extends React.PureComponent {
       let txNumber = []
       let res = await transactionsService.getTransactionHistory(MAX_RECORD_DAYS, uri);
       let txHistory = get(res, 'data.body.data');
-      const curDate = Math.floor(new Date().getTime() / 1000) - 60 * 60 * 24 * 180;
+      const curDate = Math.floor(new Date().getTime() / 1000) - 60 * 60 * 24 * TRANSACTION_HISTORY_DAYS;
       txHistory
         .filter(o => Number(o.timestamp) > curDate)
         .sort((a, b) => a.timestamp - b.timestamp)
@@ -77,7 +78,7 @@ export default class TokenDashboard extends React.PureComponent {
       this.setState({ txTs, txNumber })
       return;
     }
-    transactionsService.getTransactionHistory(180, uri)
+    transactionsService.getTransactionHistory(TRANSACTION_HISTORY_DAYS, uri)
       .then(res => {
         const txHistory = get(res, 'data.body.data');
         let txTs = [];
@@ -181,8 +182,8 @@ export default class TokenDashboard extends React.PureComponent {
     const token = type.toUpperCase();
     const isTheta = type === 'theta';
     const isSubChain = config.chainType === ChainType.SUBCHAIN;
-    const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (6 MONTHS)' :
-      "SUBCHAIN TRANSACTION HISTORY (6 MONTHS)";
+    const txHistoryTitle = (isMetaChain || !isSubChain) ? 'THETA METACHAIN TRANSACTION HISTORY (1 MONTH)' :
+      "SUBCHAIN TRANSACTION HISTORY (1 MONTH)";
     return (
       <React.Fragment>
         {tokenInfo && <div className={cx("dashboard-row", type)}>
